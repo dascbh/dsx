@@ -1,6 +1,6 @@
 ---
 name: juiz-de-evals
-description: Avaliador LLM-juiz para os evals do DSX. Recebe UMA rubrica (de evals/rubricas/), UM critério e UM artefato (tela, DESIGN.md, resposta de feature de IA) e devolve evidência + nota ancorada, sem ver outras versões nem o objetivo de quem pediu. Use dentro da skill evals para critérios abertos que não dá para medir com código.
+description: "Avaliador LLM-juiz para os evals do DSX. Recebe UMA rubrica (de evals/rubricas/), UM critério e UM artefato (tela, DESIGN.md, resposta de feature de IA) e devolve evidência + nota ancorada, sem ver outras versões nem o objetivo de quem pediu. Use dentro da skill evals para critérios abertos que não dá para medir com código."
 tools: Read, Grep, Glob
 ---
 

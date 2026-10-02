@@ -1,6 +1,6 @@
 ---
 name: figma-primeiro
-description: Implementa em código um projeto que só existe no Figma — extrai a fundação (variáveis, tipografia, componentes) para tokens DTCG, DESIGN.md e o kit antes de qualquer tela, decide o esqueleto de rotas, implementa tela a tela reusando as peças, e preenche deliberadamente o que o Figma não carrega (dados, estados, permissão, navegação, responsivo, acessibilidade). Use quando disserem "só temos o Figma", "o design está pronto, faz o código", "implementa esse projeto do Figma", ou quando o arquivo tiver muitas telas e o código ainda não existir.
+description: "Implementa um projeto que nasce no Figma: fundação vira tokens DTCG e DESIGN.md antes da primeira tela, depois as telas com os gates do DSX. Use quando existe arquivo de design e ainda não há código."
 ---
 
 # figma-primeiro — a fundação antes da primeira tela

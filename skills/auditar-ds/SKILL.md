@@ -1,6 +1,6 @@
 ---
 name: auditar-ds
-description: Audita a saúde de um design system existente em código — inventário de tokens e componentes, drift (valores crus e componentes fora do kit, por 1000 linhas), duplicação ("quase iguais"), cobertura de estados e acessibilidade por componente, paridade claro/escuro, documentação e governança — e atribui nível de maturidade com plano de correção priorizado. Use quando a UI estiver inconsistente entre telas, antes de um redesign, ao herdar um projeto, ou periodicamente para medir a evolução do sistema.
+description: "Audita a saúde de um design system em código: tokens, drift de valores crus, componentes duplicados, estados, acessibilidade e maturidade, com plano priorizado. Use quando a UI está inconsistente, antes de redesign ou ao herdar um projeto."
 ---
 
 # Auditoria de design system

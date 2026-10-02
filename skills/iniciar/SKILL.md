@@ -1,6 +1,6 @@
 ---
 name: iniciar
-description: Instala o DSX num projeto — detecta a stack de UI e onde estão tokens e componentes, cria ou importa o DESIGN.md, configura os tokens, conecta o contexto de design a todos os agentes usados no repositório (CLAUDE.md, AGENTS.md, regras do Cursor, instruções do Copilot) sem duplicar conteúdo, e adiciona os gates de verificação. Use na primeira vez que o DSX for usado num repositório, quando as outras skills reclamarem de DESIGN.md ausente, ou para religar o contexto de design depois de uma mudança de stack.
+description: "Instala o DSX num projeto: detecta stack, tokens e componentes, cria ou avalia o DESIGN.md, conecta o contexto aos agentes (CLAUDE.md, AGENTS.md, Cursor, Copilot) e sugere gates. Use na primeira vez que o DSX roda num repositório."
 ---
 
 # Iniciar o DSX num projeto

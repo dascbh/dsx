@@ -1,6 +1,6 @@
 ---
 name: figma-trazer
-description: Traz de volta para o código as mudanças feitas no Figma — parte do relatório de diff, prova no código que cada divergência existe lá, classifica cada alteração (token, primitivo, composição de tela, texto ou padrão novo), passa cada uma pelos gates do DSX (contraste, padrões do catálogo, acessibilidade, ux-writing), aplica no lugar certo da árvore na ordem token → primitivo → composição → texto, verifica reespelhando a tela e devolve as recusas com motivo. Use quando disserem "aplica o que mudei no Figma", "traz o design de volta pro código", "implementa esse frame", ao receber um link do Figma com ajustes, ou como a volta do ciclo (skill `figma-ciclo`).
+description: "Traz mudanças do Figma para o código na camada certa (token, componente, tela, texto), com os gates do DSX e recusas registradas. Use quando pedirem para aplicar no código o que mudou no Figma."
 argument-hint: "[frames ou relatório de diff]"
 ---
 

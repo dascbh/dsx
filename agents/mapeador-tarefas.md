@@ -1,6 +1,6 @@
 ---
 name: mapeador-tarefas
-description: Mapeia os passos dentro de uma única tarefa — formulários em várias etapas, sequências de envio, fluxos de confirmação e efeitos colaterais — e quais tarefas dependem de outras feitas antes. Grava um mapa de referência (`.dsx/mapas/tarefas.{md,json}`) que o `figma-trazer` e o `figma-espelhar` leem em vez de redescobrir. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa.
+description: "Mapeia os passos dentro de uma única tarefa — formulários em várias etapas, sequências de envio, fluxos de confirmação e efeitos colaterais — e quais tarefas dependem de outras feitas antes. Grava um mapa de referência (`.dsx/mapas/tarefas.{md,json}`) que o `figma-trazer` e o `figma-espelhar` leem em vez de redescobrir. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 

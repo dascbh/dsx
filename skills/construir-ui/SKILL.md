@@ -1,6 +1,6 @@
 ---
 name: construir-ui
-description: Constrói ou altera interface (página, componente, formulário, tabela, modal, dashboard) DENTRO do design system do projeto — lê o DESIGN.md e os tokens, reutiliza componentes existentes, aplica os padrões de interação do catálogo, implementa todos os estados (vazio, carregando, erro, sucesso, foco, desabilitado) e verifica contraste, valores crus e acessibilidade antes de entregar. Use sempre que for escrever ou modificar código de UI, quando a tela "não parece profissional", destoa do resto do app ou foi feita sem sistema.
+description: "Constrói ou altera UI dentro do design system: lê DESIGN.md e tokens, reusa componentes, segue o catálogo de padrões, implementa todos os estados e verifica contraste e valores crus. Use sempre que escrever ou modificar código de interface."
 ---
 
 # Construir UI dentro do sistema

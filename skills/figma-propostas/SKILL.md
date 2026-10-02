@@ -1,6 +1,6 @@
 ---
 name: figma-propostas
-description: Usa o Figma como mesa de exploração do DSX — gera 2 a 3 alternativas de uma tela ou fluxo na página `09 · Propostas` a partir do design system e do catálogo de padrões (cada uma com a hipótese que testa), e faz a crítica prévia das propostas que o design desenhou lá (heurísticas, padrões, acessibilidade, texto, tokens) antes de qualquer uma voltar para o código. Use quando quiser visualizar opções antes de codar, comparar alternativas lado a lado, "ver como ficaria", pedir uma segunda opinião sobre o que foi desenhado no Figma, ou antes de rodar `figma-trazer`.
+description: "Explora alternativas na página 09 · Propostas a partir do DSX e critica o que o design desenhou lá antes de virar código. Use para visualizar opções no Figma ou pedir segunda opinião sobre uma proposta."
 ---
 
 # Propostas no Figma: explorar e criticar antes de trazer

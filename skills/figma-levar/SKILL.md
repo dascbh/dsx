@@ -1,6 +1,6 @@
 ---
 name: figma-levar
-description: Orquestra a escrita no Figma — design system, telas, fluxos, estados e wireframes — a partir dos artefatos de descoberta (`.dsx/mapas/*`: mapa-ui, fluxos, tarefas, jornada, domínio, design-system.json), dos tokens DTCG do projeto e do `DESIGN.md`, em vez de redescobrir pelo código. Acrescenta um ledger de estado retomável, descoberta reusar-antes-de-criar contra o arquivo de destino, exposição dos hazards do design-system.json e Sections organizadas por jornada sobre o esquema de páginas da skill `figma-espelhar`. Passa pela guarda da vez exatamente como `figma-espelhar`. Use quando a fase de descoberta e validação terminou e é hora de construir no Figma de fato ("leva o app pro Figma", "monta o design system e as telas no Figma"), ou quando uma execução precisa ser retomada depois de interrompida no meio.
+description: "Leva o projeto inteiro ao Figma a partir dos mapas e do DESIGN.md: fundação, telas, estados e seções por jornada, com ledger retomável. Use quando o mapeamento está pronto e é hora de construir no Figma."
 ---
 
 # figma-levar — construir a partir do que já se sabe, não de um olhar novo

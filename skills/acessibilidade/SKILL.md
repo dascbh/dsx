@@ -1,6 +1,6 @@
 ---
 name: acessibilidade
-description: Audita e corrige acessibilidade de telas e componentes contra WCAG 2.2 nível AA — semântica e nomes acessíveis, teclado e foco (visível, não obscurecido, ordem), contraste de texto e de UI não textual, alvo de toque, formulários e erros, conteúdo dinâmico (live regions), zoom/reflow 320px, movimento reduzido e padrões ARIA de componentes (modal, abas, menu, combobox, toast). Use ao construir ou revisar qualquer UI, quando pedirem auditoria WCAG/a11y, antes de lançamento, ou quando um componente customizado substituir um elemento nativo.
+description: "Audita e corrige acessibilidade WCAG 2.2 AA de telas e componentes: teclado e foco, contraste, nomes acessíveis, formulários, ARIA, zoom e movimento. Use ao construir ou revisar UI ou quando pedirem auditoria de a11y."
 ---
 
 # Acessibilidade (WCAG 2.2 AA)

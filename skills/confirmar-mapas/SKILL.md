@@ -1,6 +1,6 @@
 ---
 name: confirmar-mapas
-description: Conduz o usuário por um assistente de validação que transforma os achados brutos do `mapear` numa fundação confirmada — roda o `mapear` de novo, confronta os mapas com as specs e docs do próprio projeto, pede ao usuário para confirmar ou corrigir exatamente os pontos que os agentes mapeadores marcaram como inferidos em vez de observados, e grava a linha de base AS-IS/TO-BE única (`design/as-is-to-be.md`) sobre a qual todo o resto se apoia, mais o ledger `.dsx/mapas/confirmacoes.json`. É a única etapa de descoberta interativa — `mapear` é silencioso, esta fala com o usuário de propósito. Use ao começar o DSX ou o ciclo Figma num projeto novo quando a precisão importa mais que a velocidade, quando uma execução anterior deixou perguntas em aberto, ou quando o usuário pedir para "validar", "confirmar" ou "reduzir a ambiguidade" do que foi descoberto. Não é para rodadas do ciclo — com o ciclo em andamento, o registro de sincronia da skill `figma-ciclo` assume.
+description: "Confirma com o usuário o que os mapas do projeto inferiram, cruzando com specs e docs, e grava o AS-IS/TO-BE em design/as-is-to-be.md. Use depois de /dsx:mapear, quando a precisão importa antes de construir ou levar ao Figma."
 argument-hint: "[caminho para limitar a varredura, opcional — o padrão é o projeto inteiro]"
 ---
 

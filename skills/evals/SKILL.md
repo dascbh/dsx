@@ -1,6 +1,6 @@
 ---
 name: evals
-description: Cria avaliações repetíveis para UI gerada por agentes e para funcionalidades com IA — define tarefa e critérios antes da métrica, monta conjunto de casos (típicos, borda, adversariais, falhas reais), escolhe avaliador por critério (código, LLM-juiz calibrado, humano), separa gates de limiares e metas, roda múltiplas tentativas e transforma falhas em testes de regressão. Use para medir se um agente respeita o design system, comparar versões de prompt/skill/DESIGN.md, avaliar qualidade de respostas de IA (RAG, agentes) ou montar critérios de aceite de uma feature de IA.
+description: "Cria avaliações repetíveis para UI gerada por agentes e features de IA: casos, gates, limiares, avaliador por critério (código, LLM-juiz, humano) e regressões. Use para medir aderência ao design system ou comparar versões."
 ---
 
 # Evals de UI e de IA

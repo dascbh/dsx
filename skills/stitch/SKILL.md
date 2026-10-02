@@ -1,6 +1,6 @@
 ---
 name: stitch
-description: Usa o Google Stitch como mesa de exploração do DSX, sem edição manual — sincroniza o design system do projeto (DESIGN.md) com o Stitch e confere o que ele preservou, gera telas e variantes a partir do problema, da persona e dos padrões do catálogo, critica cada tela com os gates e as lentes do DSX (papéis de cor, contraste, acessibilidade, heurísticas, texto), itera por instrução com edit_screens e traz a tela escolhida para o código com os tokens e componentes reais do projeto. Use quando quiser ver uma tela antes de codar, explorar alternativas, gerar variantes, revisar ou melhorar uma tela com agentes, ou quando alguém mencionar Stitch.
+description: "Usa o Google Stitch sem edição manual: sincroniza o DESIGN.md, gera telas e variantes, critica com os gates do DSX, itera por instrução e traz para o código. Use para ver uma tela antes de codar, explorar opções ou quando mencionarem Stitch."
 ---
 
 # Stitch no DSX: gerar, criticar, iterar, trazer

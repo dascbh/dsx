@@ -1,6 +1,6 @@
 ---
 name: tokens
-description: Cria, expande ou corrige design tokens no formato W3C DTCG em três camadas (primitivos → semânticos → componente) — gera rampas de cor em OKLCH, escala tipográfica modular ou fluida, escala de espaçamento em grade de 4/8px, temas claro/escuro, e verifica contraste WCAG de todos os pares declarados antes de compilar para CSS. Use ao montar a fundação visual de um projeto, adicionar tema escuro, trocar a cor da marca, quando aparecerem valores crus no código ou quando um par de cores falhar em contraste.
+description: "Cria e corrige design tokens DTCG em 3 camadas: paleta OKLCH, escalas tipográfica e de espaçamento, temas claro/escuro e contraste verificado no build. Use ao montar a fundação, trocar a marca, adicionar dark mode ou achar valores crus."
 ---
 
 # Design tokens

@@ -1,6 +1,6 @@
 ---
 name: mapeador-projeto
-description: Varre a estrutura física do projeto — diretórios, arquivos, specs, docs, assets, sinais de stack — e grava um mapa de referência (`.dsx/mapas/mapa-projeto.{md,json}`) que as outras skills e agentes do DSX leem em vez de redescobrir o projeto do zero a cada vez. Sobrescreve a própria saída a cada execução, então o mapa nunca deriva do que está de fato em disco. Use como primeiro ato num projeto (via `/dsx:mapear`, passo 1, ou modo `projeto`), ou sempre que o projeto mudou o bastante para as etapas de descoberta das outras skills parecerem desatualizadas. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa.
+description: "Varre a estrutura física do projeto — diretórios, arquivos, specs, docs, assets, sinais de stack — e grava um mapa de referência (`.dsx/mapas/mapa-projeto.{md,json}`) que as outras skills e agentes do DSX leem em vez de redescobrir o projeto do zero a cada vez. Sobrescreve a própria saída a cada execução, então o mapa nunca deriva do que está de fato em disco. Use como primeiro ato num projeto (via `/dsx:mapear`, passo 1, ou modo `projeto`), ou sempre que o projeto mudou o bastante para as etapas de descoberta das outras skills parecerem desatualizadas. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 

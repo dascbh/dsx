@@ -1,6 +1,6 @@
 ---
 name: pesquisa
-description: Planeja, roteiriza e sintetiza pesquisa com usuários — escolhe o método pela pergunta (entrevista, teste de usabilidade moderado/não moderado, card sorting, tree testing, survey/SUS, analytics, A/B), escreve tarefas como cenário, define amostra e critério de sucesso antes de coletar, conduz síntese rastreável (observação → achado → recomendação) e comunica resultados. Aplica a doutrina de que saída de LLM e usuários sintéticos são hipóteses, nunca evidência. Use ao planejar ou analisar qualquer estudo com pessoas, ao validar se uma tela funciona, ou quando alguém propuser "testar com IA" no lugar de gente.
+description: "Planeja, roteiriza e sintetiza pesquisa com usuários (entrevista, usabilidade, card sorting, SUS, A/B) com síntese rastreável; usuário sintético é hipótese, nunca evidência. Use ao planejar ou analisar estudos com pessoas."
 ---
 
 # Pesquisa com usuários

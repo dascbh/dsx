@@ -76,3 +76,17 @@ test('lint de valores crus: acusa hex/px e respeita dsx-ignore', () => {
   const hits = lintText('.a { color: #ff0000; margin: 13px; }\n.b { color: #000; } /* dsx-ignore */');
   assert.deepEqual(hits.map((h) => h.rule).sort(), ['cor-hex', 'px-solto']);
 });
+
+test('frontmatter de skills e agentes: name e description entre aspas (YAML estrito)', async () => {
+  const { readdirSync, existsSync } = await import('node:fs');
+  const arquivos = [
+    ...readdirSync('skills').map((d) => `skills/${d}/SKILL.md`).filter((f) => existsSync(f)),
+    ...readdirSync('agents').filter((f) => f.endsWith('.md')).map((f) => `agents/${f}`),
+  ];
+  for (const f of arquivos) {
+    const fm = readFileSync(f, 'utf8').split('---')[1];
+    assert.match(fm, /^name: [a-z0-9-]+$/m, `${f}: name`);
+    // Sem aspas, ": " no meio do texto quebra o YAML e a skill aparece sem descrição.
+    assert.match(fm, /^description: "(?:[^"\\]|\\.)+"$/m, `${f}: description deve ser uma string entre aspas`);
+  }
+});

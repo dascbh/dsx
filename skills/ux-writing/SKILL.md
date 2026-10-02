@@ -1,6 +1,6 @@
 ---
 name: ux-writing
-description: Escreve e revisa todo texto visível da interface em pt-BR — rótulos, botões, links, mensagens de erro, estados vazios, toasts, confirmações, onboarding, tooltips e textos de IA — com tom de voz definido em 4 dimensões, vocabulário consistente entre telas (glossário) e ortografia/concordância corretas. Use ao criar ou alterar qualquer string visível, quando rótulos "não batem" entre telas, quando mensagens de erro forem genéricas ("Algo deu errado"), ou para revisar a microcópia de um fluxo inteiro.
+description: "Escreve e revisa todo texto da interface em pt-BR: botões, erros, vazios, toasts, confirmações e conteúdo de IA, com tom definido e glossário consistente. Use ao criar ou mudar qualquer string visível."
 ---
 
 # UX writing

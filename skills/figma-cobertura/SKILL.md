@@ -1,6 +1,6 @@
 ---
 name: figma-cobertura
-description: Audita a cobertura entre código e Figma — enumera as superfícies de UI do projeto a partir do código (rotas, abas, diálogos, painéis, overlays, estados), confere contra o arquivo do Figma e produz a lista do que falta e uma matriz que liga cada arquivo de UI aos frames que o representam; no projeto que nasceu no Figma, lê a matriz invertida (frame → rota, com status). Use quando perguntarem "ficou faltando alguma tela no Figma?", "o Figma está completo?", "quanto do design já virou produto?", "audita o espelho contra o código", ao fechar um espelho (skill `figma-espelhar`), ou quando alguém precisar provar cobertura em vez de afirmá-la.
+description: "Audita a cobertura entre código e Figma (rotas, diálogos, estados × frames) e atualiza a matriz nos dois sentidos. Use quando perguntarem se falta alguma tela no Figma ou para provar cobertura em vez de afirmá-la."
 argument-hint: "[codigo→figma | figma→codigo]"
 ---
 

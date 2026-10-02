@@ -1,6 +1,6 @@
 ---
 name: mapeador-fluxos
-description: Mapeia como o usuário se move entre telas para atingir um objetivo — o grafo de navegação, seus desvios, pontos de decisão e rotas de entrada e saída — derivado das chamadas de navegação reais do código, nunca suposto. Grava um mapa de referência (`.dsx/mapas/fluxos.{md,json}`) que a fase de Fluxos do `figma-espelhar`, o `figma-trazer` e o `construir-ui` leem em vez de redescobrir a navegação. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa.
+description: "Mapeia como o usuário se move entre telas para atingir um objetivo — o grafo de navegação, seus desvios, pontos de decisão e rotas de entrada e saída — derivado das chamadas de navegação reais do código, nunca suposto. Grava um mapa de referência (`.dsx/mapas/fluxos.{md,json}`) que a fase de Fluxos do `figma-espelhar`, o `figma-trazer` e o `construir-ui` leem em vez de redescobrir a navegação. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 

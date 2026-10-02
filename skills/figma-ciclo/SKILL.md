@@ -1,6 +1,6 @@
 ---
 name: figma-ciclo
-description: Governa o ida-e-volta contínuo entre código e Figma — quem tem a autoridade em cada momento (a vez), como uma rodada começa e fecha, onde ficam as propostas de mudança, os gates que travam uma proposta antes de virar código, e o registro de sincronia (figma-sync.md + changelog + achados) que impede a próxima rodada de espelho de apagar o refinamento feito no Figma. Use ao montar esse fluxo pela primeira vez, antes de reespelhar um arquivo que já foi refinado, quando não estiver claro qual lado é a fonte de verdade agora, ou quando código e Figma tiverem divergido.
+description: "Governa o ciclo código ↔ Figma: de quem é a vez, como a rodada abre e fecha, registro de sincronia, changelog, gates e baseline. Use ao montar o ciclo, antes de reespelhar um arquivo refinado ou quando código e Figma divergiram."
 ---
 
 # figma-ciclo — a única regra que faz o ida-e-volta funcionar

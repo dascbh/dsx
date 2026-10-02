@@ -1,6 +1,6 @@
 ---
 name: figma-diff
-description: Tira o retrato atual do arquivo do Figma (snapshot canônico em duas fases, hashes e detalhe) e compara com o baseline versionado em design/figma-baseline/, produzindo o relatório de mudanças já classificado em token, primitivo e composição — sem aplicar nada. Use quando perguntarem "o que mudou no Figma?", ao fim de uma rodada de refino do designer, antes de aplicar propostas no código (skill figma-trazer), ou para conferir se o baseline está velho.
+description: "Tira o retrato atual do arquivo do Figma e compara com o baseline versionado, gerando o relatório já classificado em token, primitivo e composição. Use para ver o que mudou no Figma antes de trazer para o código."
 argument-hint: "[páginas ou frames a limitar, opcional]"
 ---
 

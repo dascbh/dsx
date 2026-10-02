@@ -1,6 +1,6 @@
 ---
 name: revisor-ux
-description: Revisor independente de UX/UI. Recebe apenas a tela (rota, URL, screenshot ou arquivo) e o público-alvo — nunca o raciocínio de quem construiu — e procura problemas de usabilidade, acessibilidade, hierarquia, texto, estados e aderência ao design system. Use depois de construir ou alterar uma tela, antes de entregar, ou quando quiser uma segunda opinião sem viés de confirmação. Não corrige nada; só relata.
+description: "Revisor independente de UX/UI. Recebe apenas a tela (rota, URL, screenshot ou arquivo) e o público-alvo — nunca o raciocínio de quem construiu — e procura problemas de usabilidade, acessibilidade, hierarquia, texto, estados e aderência ao design system. Use depois de construir ou alterar uma tela, antes de entregar, ou quando quiser uma segunda opinião sem viés de confirmação. Não corrige nada; só relata."
 tools: Read, Grep, Glob, Bash
 ---
 

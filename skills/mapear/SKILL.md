@@ -1,6 +1,6 @@
 ---
 name: mapear
-description: Mapeia o projeto inteiro e grava os mapas de referência que o resto do DSX lê em vez de redescobrir — estrutura física (diretórios, specs, docs, assets, stack), a UI (páginas, modais, tokens, tipografia, ícones, kit de componentes, estados), fluxos de usuário, fluxos de tarefa, mapa de jornada, modelo de domínio e o design system completo, com adaptadores por framework (MUI, Tailwind v3/v4, CSS variables) e detecção mecânica de hazards de drift. Conteúdo canvas/WebGL entra só como referência, nunca como token. Silencioso (não despeja os mapas na conversa), nunca chama `use_figma` e roda em qualquer vez do ciclo. Use como primeiro ato num projeto, antes de `construir-ui`, `design-md` Modo A, `auditar-ds`, `revisar-ux` ou de qualquer skill `figma-*`, ou sempre que o projeto mudou o bastante para essas etapas redescobrirem tudo do zero. Modos — `projeto`, `completo` (padrão), `design-system`.
+description: "Mapeia o projeto em .dsx/mapas/: estrutura, UI, fluxos, tarefas, jornada, domínio e design system real com hazards, sem tocar no código nem no Figma. Use ao herdar ou iniciar um projeto e antes de construir, auditar ou levar ao Figma."
 argument-hint: "[projeto | completo | design-system] [caminho para limitar a varredura, opcional — o padrão é o projeto inteiro]"
 ---
 

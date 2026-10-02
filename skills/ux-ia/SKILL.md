@@ -1,6 +1,6 @@
 ---
 name: ux-ia
-description: Desenha e revisa a experiência de funcionalidades com IA e de agentes autônomos — autonomia proporcional ao risco, confirmação específica, progresso visível, incerteza acionável, fontes e verificação (RAG), rotulagem de conteúdo gerado, revisão/edição do resultado, recuperação de erro, permissões, handoff para humano, UI generativa com catálogo e invariantes, e interações multimodais. Use ao projetar chat, copiloto, agente que executa ações, resposta gerada, busca com IA, ou ao revisar uma feature de IA que parece "mágica demais", insegura ou difícil de confiar.
+description: "Desenha e revisa features de IA e agentes: autonomia por risco, confirmação específica, progresso, incerteza, fontes, rotulagem, revisão e recuperação de erro. Use em chat, copiloto, agente que executa ações ou resposta gerada."
 ---
 
 # UX de IA e agentes

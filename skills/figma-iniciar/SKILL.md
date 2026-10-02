@@ -1,6 +1,6 @@
 ---
 name: figma-iniciar
-description: Monta o ciclo Figma↔código num projeto — descobre de que lado o projeto nasceu (código sem Figma → levar para o Figma; Figma sem código → implementação inicial; os dois → medir a divergência primeiro), e fecha com Code Connect, convenções no arquivo, primeiro baseline e o registro de sincronia (figma-sync.md + changelog + figma-reference.json) nascendo juntos. Use quando pedirem para "ligar o projeto ao Figma", "montar o ciclo", "começar o ida-e-volta com o design", ou quando o projeto ainda não tiver design/figma-sync.md.
+description: "Monta o ciclo código ↔ Figma num projeto: registro de sincronia, Code Connect, primeiro baseline, changelog e reference. Use na primeira vez que o projeto vai trabalhar com Figma."
 argument-hint: "[link ou fileKey do Figma]"
 ---
 

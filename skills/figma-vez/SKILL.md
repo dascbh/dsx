@@ -1,6 +1,6 @@
 ---
 name: figma-vez
-description: Lê ou troca de quem é a vez no ciclo Figma↔código (codigo, design ou aplicando) no registro design/figma-sync.md, validando o pré-requisito que cada troca exige — baseline comitado e pendências vazias para passar ao design, diff revisado para aplicar, rodada fechada para voltar ao código. Use quando perguntarem "de quem é a vez?", "posso mexer no Figma/código agora?", ao entregar o arquivo para o designer refinar, ao começar a aplicar propostas, ou ao fechar uma rodada.
+description: "Lê ou troca de quem é a vez no ciclo com o Figma (código, design, aplicando), validando o que a troca exige. Use ao passar o arquivo para o design ou ao fechar uma rodada de refino."
 argument-hint: "[codigo|design|aplicando]"
 ---
 

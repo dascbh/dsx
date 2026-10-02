@@ -1,6 +1,6 @@
 ---
 name: revisar-ux
-description: Faz revisão especializada de usabilidade de uma tela, fluxo ou protótipo — avaliação heurística (10 heurísticas de Nielsen com severidade 0–4), cognitive walkthrough da tarefa principal, leis cognitivas (Fitts, Hick, Gestalt, carga cognitiva), hierarquia visual, estados, texto e aderência aos padrões do catálogo — e entrega achados priorizados com evidência e correção. Use quando pedirem "revisa essa tela", "o que está ruim aqui", "avaliação heurística", "auditoria de UX", antes de entregar uma tela, ou quando um fluxo parecer confuso ou burocrático.
+description: "Revisão de usabilidade de tela ou fluxo: heurísticas de Nielsen com severidade 0–4, cognitive walkthrough, hierarquia, estados, texto e padrões. Use para \"revisa essa tela\", auditoria de UX ou antes de entregar."
 ---
 
 # Revisão de UX

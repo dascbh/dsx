@@ -1,6 +1,6 @@
 ---
 name: design-md
-description: Cria, atualiza ou avalia o DESIGN.md de um projeto — o arquivo que traduz a linguagem visual (tokens, tipografia, layout, componentes, estados, faça/não faça) em contexto legível por agentes. Três modos — extrair de um produto/código existente, definir para projeto novo, ou auditar um DESIGN.md existente com rubrica de 100 pontos e gates de reprovação. Use quando o projeto não tiver DESIGN.md, quando agentes gerarem UI inconsistente, quando os tokens mudarem, ou quando pedirem para "avaliar/validar/melhorar o DESIGN.md".
+description: "Cria, atualiza ou avalia o DESIGN.md do projeto (rubrica de 100 pontos e gates): extrai do código, define para projeto novo ou audita o existente. Use quando faltar DESIGN.md, agentes gerarem UI inconsistente ou pedirem para avaliá-lo."
 ---
 
 # DESIGN.md: criar, atualizar, avaliar

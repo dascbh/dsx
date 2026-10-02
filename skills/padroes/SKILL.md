@@ -1,6 +1,6 @@
 ---
 name: padroes
-description: Consulta o catálogo de padrões de interface para tomar uma decisão de UI com critério — modal ou página, toast ou mensagem inline, paginação ou scroll infinito, tabela ou cards, quando validar campo, quando pedir confirmação, quando oferecer desfazer, como mostrar filtros ativos, como sinalizar conteúdo de IA, entre ~80 decisões. Use quando estiver em dúvida entre dois componentes ou comportamentos, quando alguém perguntar "qual o jeito certo de fazer X na interface", ou para justificar/contestar uma decisão de interação numa revisão.
+description: "Consulta o catálogo de 77 padrões de interface para decidir com critério: modal ou página, toast ou inline, tabela ou cards, quando validar, confirmar ou oferecer desfazer. Use em qualquer dúvida entre componentes ou comportamentos."
 ---
 
 # Consultar padrões de interface

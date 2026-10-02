@@ -1,6 +1,6 @@
 ---
 name: discovery
-description: Conduz product discovery antes de construir — enquadra o problema (problem framing), escreve jobs-to-be-done, monta a opportunity solution tree, mapeia e prioriza suposições (desejabilidade, viabilidade, factibilidade, usabilidade, ética), escolhe o teste mais barato (fake door, teste de conceito, protótipo, MVP) e define métricas de sucesso e escopo negativo num brief enxuto. Use quando o pedido chegar como solução pronta ("faz uma tela de X") sem problema definido, no início de uma feature, ou quando ninguém souber dizer como medir se deu certo.
+description: "Product discovery antes de construir: enquadra o problema, JTBD, opportunity solution tree, mapa de suposições, teste mais barato e brief com métricas. Use quando o pedido chega como solução pronta ou no início de uma feature."
 ---
 
 # Discovery de produto

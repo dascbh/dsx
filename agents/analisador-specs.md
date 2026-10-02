@@ -1,6 +1,6 @@
 ---
 name: analisador-specs
-description: Confronta os seis mapas do `mapear` (mapa-projeto, mapa-ui, fluxos, tarefas, jornada, dominio) com as specs e docs do próprio projeto — README, ADRs, PRDs, specs de API, arquivos de schema, docs de produto — e devolve um relatório de divergências e lacunas. Diferente do `mapeador-jornada`, que só procura uma declaração de missão — este agente reconcilia cada mapa com cada doc que conseguir achar. Somente leitura — nunca chama `use_figma`, nunca grava arquivos, devolve um relatório. Use como parte de `/dsx:confirmar-mapas`, depois que o `mapear` rodou, para montar a lista de perguntas do assistente. Os achados alimentam o assistente diretamente — não cole este relatório ao usuário sem edição.
+description: "Confronta os seis mapas do `mapear` (mapa-projeto, mapa-ui, fluxos, tarefas, jornada, dominio) com as specs e docs do próprio projeto — README, ADRs, PRDs, specs de API, arquivos de schema, docs de produto — e devolve um relatório de divergências e lacunas. Diferente do `mapeador-jornada`, que só procura uma declaração de missão — este agente reconcilia cada mapa com cada doc que conseguir achar. Somente leitura — nunca chama `use_figma`, nunca grava arquivos, devolve um relatório. Use como parte de `/dsx:confirmar-mapas`, depois que o `mapear` rodou, para montar a lista de perguntas do assistente. Os achados alimentam o assistente diretamente — não cole este relatório ao usuário sem edição."
 model: inherit
 ---
 

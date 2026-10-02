@@ -1,6 +1,6 @@
 ---
 name: leitor-figma
-description: Leitor do arquivo do Figma — tira o retrato canônico, roda o diff contra o baseline e devolve o relatório classificado (token, primitivo, composição, frames novos), com as mudanças de variável já traduzidas para tokens DTCG quando o projeto os tem. Não escreve no Figma nem no código. Use quando o inventário ou o diff for grande o bastante para poluir a conversa principal — tipicamente a pedido de `figma-diff` ou `figma-trazer`.
+description: "Leitor do arquivo do Figma — tira o retrato canônico, roda o diff contra o baseline e devolve o relatório classificado (token, primitivo, composição, frames novos), com as mudanças de variável já traduzidas para tokens DTCG quando o projeto os tem. Não escreve no Figma nem no código. Use quando o inventário ou o diff for grande o bastante para poluir a conversa principal — tipicamente a pedido de `figma-diff` ou `figma-trazer`."
 model: inherit
 ---
 

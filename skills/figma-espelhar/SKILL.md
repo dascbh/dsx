@@ -1,6 +1,6 @@
 ---
 name: figma-espelhar
-description: Roda a ida do ciclo — reconstrói no Figma as telas de um app que já existe em código, uma tela por rota, um frame por diálogo e por estado, os fluxos em raias, tudo derivado do código e não redesenhado, na trilha essencial ou completa (e, da rodada 2 em diante, só o que o código mudou). Use quando pedirem "põe o app no Figma", "recria as telas no Figma", "espelha o produto no Figma", quando o time não tem arquivo de design e o código é a única fonte de verdade, quando precisar de um "antes" fiel para embasar um redesenho, ou para reespelhar telas que mudaram no código. Não use para desenhar tela nova — para isso, wireframe primeiro.
+description: "Reconstrói no Figma as telas que já existem em código (uma por rota, diálogos e estados), sem redesenhar, e registra achados. Use para pôr o app no Figma ou reespelhar telas alteradas na vez do código."
 ---
 
 # figma-espelhar — o código é a fonte, o Figma é o espelho

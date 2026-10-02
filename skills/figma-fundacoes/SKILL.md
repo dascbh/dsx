@@ -1,6 +1,6 @@
 ---
 name: figma-fundacoes
-description: Leva para o Figma a fundação visual de um projeto que já existe em código — tokens DTCG (ou o tema do projeto) viram variáveis nas coleções Primitivos/Semântico/Componente com modos Claro/Escuro no Semântico, a escala de espaçamento vira variáveis de número, a escala tipográfica vira estilos de texto, as regras de uso do DESIGN.md viram descrição das variáveis e legenda das amostras, e os ícones reais do pacote do projeto viram componentes. Use quando pedirem "põe meu design system no Figma", "cria as variáveis do tema no Figma", "leva os tokens/ícones pro Figma", ou como primeira fase de um espelho completo do app (skill `figma-espelhar`).
+description: "Leva a fundação do código ao Figma: tokens DTCG viram variáveis em 3 coleções com modos Claro/Escuro, tipografia vira estilos e ícones reais viram componentes. Use para pôr o design system ou os tokens no Figma."
 ---
 
 # figma-fundacoes — os tokens do código, não uma paleta nova
