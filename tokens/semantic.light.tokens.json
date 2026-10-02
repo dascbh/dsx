@@ -1,0 +1,84 @@
+{
+  "$description": "Camada 2 — semânticos (tema claro). Nomeiam INTENÇÃO, não aparência. Componentes só consomem esta camada ou a camada 3.",
+  "color": {
+    "bg": {
+      "canvas":   { "$type": "color", "$value": "{color.white}", "$description": "Fundo da página" },
+      "surface":  { "$type": "color", "$value": "{color.neutral.50}", "$description": "Cards, painéis" },
+      "sunken":   { "$type": "color", "$value": "{color.neutral.100}", "$description": "Áreas rebaixadas, trilhas" },
+      "overlay":  { "$type": "color", "$value": "#0f172a99", "$description": "Scrim atrás de modal" },
+      "inverse":  { "$type": "color", "$value": "{color.neutral.900}" }
+    },
+    "text": {
+      "primary":   { "$type": "color", "$value": "{color.neutral.950}" },
+      "secondary": { "$type": "color", "$value": "{color.neutral.700}" },
+      "muted":     { "$type": "color", "$value": "{color.neutral.600}", "$description": "Mínimo permitido para texto: >= 4.5:1 sobre canvas" },
+      "inverse":   { "$type": "color", "$value": "{color.white}" },
+      "link":      { "$type": "color", "$value": "{color.brand.700}" },
+      "on-action": { "$type": "color", "$value": "{color.white}" }
+    },
+    "border": {
+      "default": { "$type": "color", "$value": "{color.neutral.200}", "$description": "Divisores decorativos" },
+      "strong":  { "$type": "color", "$value": "{color.neutral.500}", "$description": "Contorno de campos: >= 3:1 (WCAG 1.4.11)" },
+      "focus":   { "$type": "color", "$value": "{color.brand.600}" }
+    },
+    "action": {
+      "primary":         { "$type": "color", "$value": "{color.brand.600}" },
+      "primary-hover":   { "$type": "color", "$value": "{color.brand.700}" },
+      "primary-active":  { "$type": "color", "$value": "{color.brand.800}" },
+      "secondary":       { "$type": "color", "$value": "{color.neutral.100}" },
+      "secondary-hover": { "$type": "color", "$value": "{color.neutral.200}" },
+      "danger":          { "$type": "color", "$value": "{color.danger.600}" },
+      "danger-hover":    { "$type": "color", "$value": "{color.danger.700}" },
+      "disabled":        { "$type": "color", "$value": "{color.neutral.100}" },
+      "disabled-text":   { "$type": "color", "$value": "{color.neutral.500}" }
+    },
+    "feedback": {
+      "success-bg":   { "$type": "color", "$value": "{color.success.50}" },
+      "success-text": { "$type": "color", "$value": "{color.success.800}" },
+      "success-icon": { "$type": "color", "$value": "{color.success.600}" },
+      "danger-bg":    { "$type": "color", "$value": "{color.danger.50}" },
+      "danger-text":  { "$type": "color", "$value": "{color.danger.800}" },
+      "danger-icon":  { "$type": "color", "$value": "{color.danger.600}" },
+      "warning-bg":   { "$type": "color", "$value": "{color.warning.50}" },
+      "warning-text": { "$type": "color", "$value": "{color.warning.800}" },
+      "warning-icon": { "$type": "color", "$value": "{color.warning.600}" },
+      "info-bg":      { "$type": "color", "$value": "{color.info.50}" },
+      "info-text":    { "$type": "color", "$value": "{color.info.800}" },
+      "info-icon":    { "$type": "color", "$value": "{color.info.600}" }
+    },
+    "ai": {
+      "accent":  { "$type": "color", "$value": "{color.brand.600}", "$description": "Marca discreta de conteúdo gerado por IA" },
+      "surface": { "$type": "color", "$value": "{color.brand.50}" }
+    }
+  },
+  "space": {
+    "inset-xs":  { "$type": "dimension", "$value": "{space.1}" },
+    "inset-sm":  { "$type": "dimension", "$value": "{space.2}" },
+    "inset-md":  { "$type": "dimension", "$value": "{space.4}" },
+    "inset-lg":  { "$type": "dimension", "$value": "{space.6}" },
+    "stack-sm":  { "$type": "dimension", "$value": "{space.2}", "$description": "Entre label e campo" },
+    "stack-md":  { "$type": "dimension", "$value": "{space.4}", "$description": "Entre campos" },
+    "stack-lg":  { "$type": "dimension", "$value": "{space.8}", "$description": "Entre grupos" },
+    "section":   { "$type": "dimension", "$value": "{space.16}", "$description": "Entre seções de página" },
+    "inline-sm": { "$type": "dimension", "$value": "{space.2}" },
+    "inline-md": { "$type": "dimension", "$value": "{space.3}" }
+  },
+  "size": {
+    "touch-target": { "$type": "dimension", "$value": "44px", "$description": "Alvo mínimo de toque (24px é o piso WCAG 2.5.8; 44px é o padrão do sistema)" },
+    "control-sm":   { "$type": "dimension", "$value": "32px" },
+    "control-md":   { "$type": "dimension", "$value": "40px" },
+    "control-lg":   { "$type": "dimension", "$value": "48px" },
+    "focus-ring":   { "$type": "dimension", "$value": "2px" },
+    "measure":      { "$type": "dimension", "$value": "68ch", "$description": "Largura máxima de linha de texto corrido" }
+  },
+  "radius": {
+    "control": { "$type": "dimension", "$value": "{radius.md}" },
+    "card":    { "$type": "dimension", "$value": "{radius.lg}" },
+    "pill":    { "$type": "dimension", "$value": "{radius.full}" }
+  },
+  "motion": {
+    "feedback":   { "$type": "duration", "$value": "{duration.fast}" },
+    "transition": { "$type": "duration", "$value": "{duration.base}" },
+    "overlay":    { "$type": "duration", "$value": "{duration.slow}" }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "headlabs-dsx",
+  "owner": { "name": "Headlabs" },
+  "plugins": [
+    {
+      "name": "dsx",
+      "source": "./",
+      "description": "Framework de design system, UI e UX para agentes de IA."
+    }
+  ]
+}

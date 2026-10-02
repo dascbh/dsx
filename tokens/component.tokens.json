@@ -1,0 +1,25 @@
+{
+  "$description": "Camada 3 — componente (opcional). Só referencia tokens semânticos. Crie aqui apenas quando um componente precisa variar independentemente da intenção semântica.",
+  "button": {
+    "primary": {
+      "bg":       { "$type": "color", "$value": "{color.action.primary}" },
+      "bg-hover": { "$type": "color", "$value": "{color.action.primary-hover}" },
+      "text":     { "$type": "color", "$value": "{color.text.on-action}" }
+    },
+    "height": { "$type": "dimension", "$value": "{size.control-md}" },
+    "radius": { "$type": "dimension", "$value": "{radius.control}" },
+    "padding-x": { "$type": "dimension", "$value": "{space.inset-md}" }
+  },
+  "input": {
+    "bg":     { "$type": "color", "$value": "{color.bg.canvas}" },
+    "border": { "$type": "color", "$value": "{color.border.strong}" },
+    "height": { "$type": "dimension", "$value": "{size.control-md}" },
+    "radius": { "$type": "dimension", "$value": "{radius.control}" }
+  },
+  "card": {
+    "bg":      { "$type": "color", "$value": "{color.bg.surface}" },
+    "border":  { "$type": "color", "$value": "{color.border.default}" },
+    "radius":  { "$type": "dimension", "$value": "{radius.card}" },
+    "padding": { "$type": "dimension", "$value": "{space.inset-lg}" }
+  }
+}

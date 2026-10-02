@@ -1,0 +1,17 @@
+{
+  "name": "dsx",
+  "version": "0.1.0",
+  "description": "DSX — framework de design system, UI e UX para agentes de IA: skills, padrões, conhecimento, tokens e ferramentas de verificação.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build:tokens": "node tools/build-tokens.mjs",
+    "check:tokens": "node tools/build-tokens.mjs --check",
+    "lint:design-md": "node tools/lint-design-md.mjs examples/DESIGN.md",
+    "lint:patterns": "node tools/lint-patterns.mjs",
+    "lint:links": "node tools/check-links.mjs",
+    "check": "npm run check:tokens && npm run lint:design-md && npm run lint:patterns && npm run lint:links && npm test",
+    "test": "node --test tools/test/*.test.mjs"
+  }
+}
