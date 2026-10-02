@@ -11,7 +11,7 @@ Referências: `knowledge/design-system/governanca-e-maturidade.md`, `componentes
 
 ## 1. Inventário (medido, não estimado)
 
-Para bases grandes, delegue ao subagente `extrator-design-system`. Colete:
+Parta de `.dsx/mapas/design-system.json` se existir (skill `mapear`); senão, delegue ao subagente `extrator-design-system`, que grava esse arquivo. Os `hazards[]` dele (hex duplicado, cor fora da paleta, raio/sombra duplicados, cor condicionada ao modo, fonte não carregada, texto em canvas com fonte diferente) entram direto no diagnóstico. Se o projeto tem arquivo no Figma, `figma-cobertura` diz o que falta de cada lado. Colete:
 
 - **Tokens:** onde estão definidos, quantos por categoria, se há camada semântica, se há tema escuro.
 - **Drift:**

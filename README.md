@@ -8,12 +8,13 @@ A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou c
 
 | Pasta | Conteúdo |
 |---|---|
-| [`skills/`](skills) | 13 skills: `iniciar`, `design-md`, `tokens`, `construir-ui`, `padroes`, `revisar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals` |
-| [`agents/`](agents) | Subagentes: `revisor-ux` (revisão independente), `extrator-design-system` (inventário do DS em código), `juiz-de-evals` |
+| [`skills/`](skills) | 27 skills. **Núcleo:** `iniciar`, `design-md`, `tokens`, `construir-ui`, `padroes`, `revisar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
+| [`agents/`](agents) | 11 subagentes: `revisor-ux`, `extrator-design-system`, `juiz-de-evals`, `leitor-figma`, `analisador-specs` e os mapeadores de projeto, UI, fluxos, tarefas, jornada e domínio |
+| [`hooks/`](hooks) | `guarda-vez`: impede reespelhar o Figma por cima do refino do design |
 | [`patterns/`](patterns) | 77 padrões de interação — formulários, feedback, ações, navegação, dados, modais, autenticação, acessibilidade, UX writing, IA, e-commerce — cada um com regra, árvore de decisão SE→ENTÃO, acessibilidade, microcópia e checklist |
 | [`knowledge/`](knowledge) | ~40 documentos de referência em 4 áreas: [fundamentos](knowledge/fundamentos), [design system](knowledge/design-system), [pesquisa](knowledge/pesquisa), [IA](knowledge/ia) |
 | [`tokens/`](tokens) | Tokens W3C DTCG em 3 camadas (primitivo → semântico → componente), temas claro/escuro, pares de contraste verificados |
-| [`tools/`](tools) | Ferramentas Node sem dependências: build de tokens, contraste, paleta OKLCH, escalas tipográfica e de espaçamento, linters de DESIGN.md, de valores crus e de padrões |
+| [`tools/`](tools) | Ferramentas Node sem dependências: build de tokens, contraste, paleta OKLCH, escalas tipográfica e de espaçamento, linters de DESIGN.md, de valores crus e de padrões; em [`tools/figma/`](tools/figma) snapshot e diff do arquivo, prelúdio de helpers e as pontes tokens DTCG ↔ variáveis do Figma |
 | [`templates/`](templates) | DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, persona, JTBD, OST, mapa de suposições, relatório heurístico |
 | [`evals/`](evals) | Rubricas (UI gerada, DESIGN.md, feature de IA) e casos de teste |
 | [`examples/`](examples) | DESIGN.md de referência, aprovado no linter |
@@ -56,6 +57,12 @@ npm run check                                # verificação completa do framewo
 ```
 
 Antes de construir, `discovery` e `pesquisa` garantem que o problema é o certo; depois, `pesquisa` valida com pessoas reais.
+
+## Figma: levar, explorar, trazer
+
+O DSX mantém um **ciclo contínuo entre código e Figma**: leva o projeto ao Figma (tokens viram variáveis em 3 coleções com modos Claro/Escuro, uma tela por rota, diálogos e estados), deixa você explorar e refinar lá — inclusive pedindo alternativas ao agente na página `09 · Propostas` — e traz de volta para o código **na camada certa** (token → componente → tela), passando pelos mesmos gates de contraste, padrões, acessibilidade e texto. Um diff versionado no git diz exatamente o que mudou, e um hook impede que alguém reespelhe por cima do refino do design.
+
+Guia completo: [`docs/fluxo-figma.md`](docs/fluxo-figma.md). Requer o MCP oficial do Figma.
 
 ## Princípios
 

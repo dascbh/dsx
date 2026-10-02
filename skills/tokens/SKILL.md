@@ -54,6 +54,18 @@ node tools/build-tokens.mjs --check   # só verifica (CI)
 node tools/contrast.mjs "#4f5a6b" "#ffffff"
 ```
 
+**Tokens de um projeto (não do DSX)**
+```bash
+node tools/build-tokens.mjs --tokens <projeto>/tokens          # gera <projeto>/tokens/build/ e verifica contraste
+```
+
+**Ponte com o Figma**
+```bash
+node tools/figma/tokens-para-figma.mjs --tokens <pasta> --script > /tmp/vars.js   # colar em use_figma (skill figma-fundacoes)
+node tools/figma/figma-para-tokens.mjs --snapshot <snapshot-full.json> --tokens <pasta> [--write]
+```
+A volta (`--write`) só altera tokens existentes e roda o gate de contraste; variável nova no Figma é decisão desta skill, nunca criação automática.
+
 ## Fluxo para alterar tokens
 
 1. Mude o **primitivo** se o valor muda em todo lugar; mude o **semântico** se a intenção passa a apontar para outro valor.

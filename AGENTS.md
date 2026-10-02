@@ -19,8 +19,29 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Pedido chega como solução sem problema definido; início de feature | `discovery` |
 | Saúde/maturidade de um design system existente | `auditar-ds` |
 | Medir qualidade de UI gerada ou de feature de IA | `evals` |
+| Mapear projeto: estrutura, UI, fluxos, tarefas, jornada, domínio, design system real | `mapear` |
+| Confirmar com o usuário o que os mapas inferiram; gerar AS-IS/TO-BE | `confirmar-mapas` |
 
-Subagentes (`agents/`): `revisor-ux` (revisão independente, só leitura), `extrator-design-system` (inventário do DS em código), `juiz-de-evals` (LLM-juiz de um critério).
+### Figma (ciclo código ↔ Figma — guia completo em `docs/fluxo-figma.md`)
+
+| Situação | Skill |
+|---|---|
+| Montar o ciclo num projeto (registro, Code Connect, baseline) | `figma-iniciar` |
+| Levar o projeto ao Figma (fundação + telas + estados, retomável) | `figma-levar` |
+| Tokens/tema → variáveis do Figma com modos | `figma-fundacoes` |
+| Reespelhar telas do código (incremental) | `figma-espelhar` |
+| Explorar alternativas no Figma / criticar propostas do design antes de trazer | `figma-propostas` |
+| Ver o que mudou no Figma (diff classificado) | `figma-diff` |
+| Trazer mudanças do Figma para o código, com os gates do DSX | `figma-trazer` |
+| Projeto que nasce no Figma | `figma-primeiro` |
+| De quem é a vez (código/design/aplicando) | `figma-vez` |
+| Governança da rodada, gates, registro | `figma-ciclo` |
+| Faltou alguma tela no Figma? Matriz código × frames | `figma-cobertura` |
+| Convenções de nomes/páginas e reusar vs criar componente; nota no próprio arquivo | `figma-convencoes` |
+
+Subagentes (`agents/`): `revisor-ux` (revisão independente, só leitura), `extrator-design-system` (design system real do código, com adaptadores e hazards), `juiz-de-evals` (LLM-juiz de um critério), `leitor-figma` (snapshot e diff do arquivo, só leitura), `mapeador-projeto`, `mapeador-ui`, `mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada`, `mapeador-dominio` (mapas em `.dsx/mapas/`) e `analisador-specs` (confronta mapas com as specs).
+
+Hook (`hooks/`): `guarda-vez` nega escrita no Figma enquanto `design/figma-sync.md` disser `vez: design`.
 
 ## Mapa do repositório
 
@@ -30,7 +51,8 @@ patterns/     ~80 padrões de interação com regra SE→ENTÃO, a11y e checklis
 knowledge/    referência por área: fundamentos/, design-system/, pesquisa/, ia/
 templates/    DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, JTBD, OST…
 tokens/       tokens W3C DTCG em 3 camadas + pares de contraste; build/ é gerado
-tools/        verificadores sem dependências (Node ≥ 20)
+tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens
+hooks/        guarda-vez (ciclo Figma)
 evals/        rubricas e casos para avaliar UI gerada, DESIGN.md e features de IA
 examples/     DESIGN.md de referência (aprovado no linter)
 docs/         princípios e integrações com agentes
@@ -52,6 +74,9 @@ node tools/lint-design-md.mjs DESIGN.md        # gates objetivos do DESIGN.md
 node tools/lint-raw-values.mjs <pasta>         # valores crus (drift) no código de UI
 node tools/lint-patterns.mjs [--index]         # valida o catálogo e regenera o índice
 node tools/check-links.mjs                     # referências internas quebradas
+node tools/figma/tokens-para-figma.mjs --tokens <pasta> --script   # tokens DTCG → script de variáveis p/ use_figma
+node tools/figma/figma-para-tokens.mjs --snapshot <s.json> --tokens <pasta> [--write]  # variáveis do Figma → diff DTCG + gate de contraste
+node tools/figma/diff-baseline.cjs <baseline.json> <atual.json>    # diff classificado (token/primitivo/composição)
 npm run check                                  # tudo acima + testes
 ```
 

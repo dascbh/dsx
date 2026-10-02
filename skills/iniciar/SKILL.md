@@ -15,6 +15,8 @@ Levante e anote:
 - Arquivos de contexto de agente existentes: `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `DESIGN.md`.
 - Glossário implícito: 10–20 termos de domínio mais frequentes nas strings da UI.
 
+Para projetos médios ou grandes, rode antes a skill `mapear` (estrutura, UI, fluxos, tarefas, jornada, domínio e design system real em `.dsx/mapas/`) e, se houver dúvidas marcadas como `uncertain`, `confirmar-mapas`. Os passos abaixo passam a ler os mapas em vez de redescobrir.
+
 ## 2. Perguntar (uma rodada, só o que falta)
 
 - Produto e público em uma frase; contexto de uso (dispositivo, frequência).
@@ -57,7 +59,11 @@ Sugira ao usuário (não instale dependências sem pedir):
 - CI: `node <DSX>/tools/build-tokens.mjs --check` (se usar tokens DTCG), `lint-raw-values` nas pastas de UI, `lint-design-md`.
 - Regressão visual e axe com Playwright, se já houver Playwright.
 
-## 7. Relatório
+## 7. Figma (opcional)
+
+Se o time usa Figma, ofereça montar o ciclo depois da fundação: `figma-iniciar` → `figma-levar` (guia em `docs/fluxo-figma.md`). Requer o MCP oficial do Figma conectado.
+
+## 8. Relatório
 
 ```
 Stack: …   Tokens: <onde> (<camadas>)   Componentes: <onde> (N)

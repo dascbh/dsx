@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // Compila os tokens DTCG (tokens/*.tokens.json) em CSS custom properties e JSON resolvido,
 // e valida os pares de contraste declarados em tokens/contrast-pairs.json para cada tema.
-// Uso: node tools/build-tokens.mjs [--check]   (--check: só valida, não escreve arquivos)
+// Uso: node tools/build-tokens.mjs [--tokens <pasta>] [--check]
+//   --tokens: pasta com primitives/semantic.light/semantic.dark[/component].tokens.json e contrast-pairs.json
+//             (padrão: tokens/ do DSX). Use para compilar os tokens de um projeto.
+//   --check:  só valida, não escreve arquivos. Saída em <pasta>/build/.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +12,10 @@ import { contrast } from './lib/color.mjs';
 import { parseArgs } from './lib/cli.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const T = (f) => join(ROOT, 'tokens', f);
+let DIR = join(ROOT, 'tokens');
+/** Aponta o build para outra pasta de tokens (ex.: a do projeto do usuário). */
+export const useTokensDir = (dir) => { DIR = dir; };
+const T = (f) => join(DIR, f);
 const read = (f) => JSON.parse(readFileSync(T(f), 'utf8'));
 
 /** Achata a árvore DTCG em { "a.b.c": { value, type, description } }. */
@@ -101,6 +107,7 @@ export function checkContrast(resolved) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = parseArgs();
+  if (args.tokens) useTokensDir(args.tokens);
   const { css, resolved } = build();
   const results = checkContrast(resolved);
   for (const r of results) {
@@ -112,7 +119,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     writeFileSync(T('build/tokens.css'), css);
     writeFileSync(T('build/tokens.light.json'), JSON.stringify(resolved.light, null, 2) + '\n');
     writeFileSync(T('build/tokens.dark.json'), JSON.stringify(resolved.dark, null, 2) + '\n');
-    console.log('\nGerado: tokens/build/tokens.css, tokens.light.json, tokens.dark.json');
+    console.log(`\nGerado: ${T('build')}/tokens.css, tokens.light.json, tokens.dark.json`);
   }
   if (fails.length) {
     console.error(`\n${fails.length} par(es) de contraste abaixo do mínimo.`);

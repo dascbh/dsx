@@ -13,7 +13,9 @@ O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pe
 
 1. Procure `DESIGN.md` na raiz do projeto. **Se não existir**, pare e rode a skill `iniciar` (ou `design-md` no modo "extrair do código"). Construir sem fonte visual é a principal causa de drift.
 2. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
-3. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
+3. Se existirem mapas do projeto (`.dsx/mapas/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `fluxos.json` (de onde a tela é alcançada e para onde leva), `tarefas.json` (passos e dependências), `dominio.json` (de onde vêm os dados, cardinalidades), `jornada.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
+4. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `codigo`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
+5. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
 
 ## 1. Descoberta antes de escrever código
 
