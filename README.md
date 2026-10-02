@@ -8,7 +8,7 @@ A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou c
 
 | Pasta | Conteúdo |
 |---|---|
-| [`skills/`](skills) | 27 skills. **Núcleo:** `iniciar`, `design-md`, `tokens`, `construir-ui`, `padroes`, `revisar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
+| [`skills/`](skills) | 28 skills. **Núcleo:** `iniciar`, `design-md`, `tokens`, `construir-ui`, `padroes`, `revisar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
 | [`agents/`](agents) | 11 subagentes: `revisor-ux`, `extrator-design-system`, `juiz-de-evals`, `leitor-figma`, `analisador-specs` e os mapeadores de projeto, UI, fluxos, tarefas, jornada e domínio |
 | [`hooks/`](hooks) | `guarda-vez`: impede reespelhar o Figma por cima do refino do design |
 | [`patterns/`](patterns) | 77 padrões de interação — formulários, feedback, ações, navegação, dados, modais, autenticação, acessibilidade, UX writing, IA, e-commerce — cada um com regra, árvore de decisão SE→ENTÃO, acessibilidade, microcópia e checklist |
@@ -57,6 +57,10 @@ npm run check                                # verificação completa do framewo
 ```
 
 Antes de construir, `discovery` e `pesquisa` garantem que o problema é o certo; depois, `pesquisa` valida com pessoas reais.
+
+## Stitch: gerar e iterar telas sem edição manual
+
+Com o MCP do Google Stitch e as skills oficiais instaladas, a skill `stitch` fecha o loop **gerar → criticar → iterar → trazer** só com agentes. Ela sincroniza o DESIGN.md do projeto com o Stitch e confere o que ele preservou (`tools/stitch/design-system.mjs`), gera telas e variantes a partir do problema e dos padrões do catálogo, critica cada tela com os gates do DSX (`tools/stitch/analisar-html.mjs`: papéis de cor, contraste, acessibilidade) e as lentes de UX, aplica só as críticas que você aceitou e traz a escolhida para o código com os tokens e componentes reais do projeto.
 
 ## Figma: levar, explorar, trazer
 

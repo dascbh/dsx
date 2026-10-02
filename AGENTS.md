@@ -22,6 +22,12 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Mapear projeto: estrutura, UI, fluxos, tarefas, jornada, domínio, design system real | `mapear` |
 | Confirmar com o usuário o que os mapas inferiram; gerar AS-IS/TO-BE | `confirmar-mapas` |
 
+### Stitch (exploração gerada por agentes, sem edição manual)
+
+| Situação | Skill |
+|---|---|
+| Ver uma tela antes de codar, gerar variantes, criticar e iterar por agentes, trazer para o código | `stitch` (usa as skills oficiais `stitch-design`, `stitch-utilities`, `stitch-build` para a mecânica) |
+
 ### Figma (ciclo código ↔ Figma — guia completo em `docs/fluxo-figma.md`)
 
 | Situação | Skill |
@@ -51,7 +57,7 @@ patterns/     ~80 padrões de interação com regra SE→ENTÃO, a11y e checklis
 knowledge/    referência por área: fundamentos/, design-system/, pesquisa/, ia/
 templates/    DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, JTBD, OST…
 tokens/       tokens W3C DTCG em 3 camadas + pares de contraste; build/ é gerado
-tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens
+tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens; tools/stitch/ = design system e análise de HTML
 hooks/        guarda-vez (ciclo Figma)
 evals/        rubricas e casos para avaliar UI gerada, DESIGN.md e features de IA
 examples/     DESIGN.md de referência (aprovado no linter)
@@ -76,6 +82,9 @@ node tools/lint-patterns.mjs [--index]         # valida o catálogo e regenera o
 node tools/check-links.mjs                     # referências internas quebradas
 node tools/figma/tokens-para-figma.mjs --tokens <pasta> --script   # tokens DTCG → script de variáveis p/ use_figma
 node tools/figma/figma-para-tokens.mjs --snapshot <s.json> --tokens <pasta> [--write]  # variáveis do Figma → diff DTCG + gate de contraste
+node tools/stitch/design-system.mjs exportar DESIGN.md -o .stitch/DESIGN.md   # DESIGN.md ajustado para importar no Stitch
+node tools/stitch/design-system.mjs conferir DESIGN.md <list_design_systems.json>  # o que o Stitch preservou/mudou
+node tools/stitch/analisar-html.mjs <tela.html> --design-md DESIGN.md      # papéis de cor, contraste e a11y da tela gerada
 node tools/figma/diff-baseline.cjs <baseline.json> <atual.json>    # diff classificado (token/primitivo/composição)
 npm run check                                  # tudo acima + testes
 ```
