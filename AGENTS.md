@@ -9,6 +9,8 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Primeiro uso do DSX num projeto; projeto sem DESIGN.md | `iniciar` |
 | Escolher o design system (projeto novo, redesenho, "usa o estilo X") a partir de referências curadas | `escolher-ds` |
 | Criar, atualizar ou avaliar o DESIGN.md | `design-md` |
+| Criar, extrair do código ou avaliar o UX.md (tipos de tela, regiões, ações, navegação, feedback, fluxos) | `ux-md` |
+| Montar ou rearranjar o layout de uma tela a partir do arquétipo (2–3 arranjos para escolher) | `arranjar-tela` |
 | Criar/alterar tokens, paleta, escalas, tema escuro, contraste | `tokens` |
 | Escrever ou modificar código de interface | `construir-ui` |
 | Dúvida entre componentes/comportamentos ("modal ou página?") | `padroes` |
@@ -54,6 +56,7 @@ Hook (`hooks/`): `guarda-vez` nega escrita no Figma enquanto `design/figma-sync.
 
 ```
 skills/       procedimentos executáveis (SKILL.md) — o que fazer, em que ordem, o que entregar
+arquetipos/   12 arquétipos de tela (regiões, ação primária, estados, variações/arranjos) — index.json para busca
 patterns/     ~80 padrões de interação com regra SE→ENTÃO, a11y e checklist (index.json para busca)
 knowledge/    referência por área: fundamentos/, design-system/, pesquisa/, ia/
 templates/    DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, JTBD, OST…
@@ -61,7 +64,7 @@ tokens/       tokens W3C DTCG em 3 camadas + pares de contraste; build/ é gerad
 tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens; tools/stitch/ = design system e análise de HTML
 hooks/        guarda-vez (ciclo Figma)
 evals/        rubricas e casos para avaliar UI gerada, DESIGN.md e features de IA
-examples/     DESIGN.md de referência (aprovado no linter)
+examples/     DESIGN.md e UX.md de referência (aprovados nos linters)
 referencias/  conteúdo de terceiros para consulta: biblioteca de DESIGN.md (designmd.app, CC BY 4.0) — índice, curados e notas
 docs/         princípios e integrações com agentes
 ```
@@ -79,6 +82,10 @@ node tools/palette.mjs "#hex" [--format dtcg]  # rampa 50–950 em OKLCH com con
 node tools/type-scale.mjs --ratio major-third  # escala tipográfica (ou --fluid)
 node tools/spacing-scale.mjs --base 4          # escala de espaçamento
 node tools/lint-design-md.mjs DESIGN.md        # gates objetivos do DESIGN.md
+node tools/lint-ux-md.mjs UX.md [--json]       # gates objetivos do UX.md
+node tools/lint-arquetipos.mjs [--index]       # valida o catálogo de arquétipos e regenera arquetipos/index.json
+node tools/ux-lint/tela.mjs <capturas.html|pasta> [--ux UX.md] [--json]          # regras T1–T7 nas capturas de tela
+node tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json [--ux UX.md] [--json]  # regras F1–F5 no mapa de fluxo
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
 node tools/referencias.mjs buscar --registro operacional --uso "termos" --curados   # referências de DESIGN.md (também indice, baixar, avaliar, curar)
 node tools/lint-raw-values.mjs <pasta>         # valores crus (drift) no código de UI
@@ -95,6 +102,7 @@ npm run check                                  # tudo acima + testes
 
 ## Mantendo o framework
 
+- Arquétipo novo: copie um cartão de `arquetipos/` → `node tools/lint-arquetipos.mjs --index`.
 - Padrão novo: `templates/padrao.md` → `patterns/<categoria>/<id>.md` → `node tools/lint-patterns.mjs --index`.
 - Conhecimento novo: arquivo em `knowledge/<area>/` começando com "Quando consultar", regras imperativas, decisões SE→ENTÃO e checklist; adicione ao `README.md` da área.
 - Skill nova: `skills/<nome>/SKILL.md` com `name` e `description` (a descrição diz **quando** usar); registre na tabela acima.

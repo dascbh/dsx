@@ -20,7 +20,20 @@ Escreva em 3 linhas:
 
 Se você não consegue responder, isso já é o primeiro achado (falta de clareza de propósito).
 
-## 2. Inspecione a tela renderizada
+SE o projeto tem `UX.md` → ENTÃO leia-o antes: o arquétipo declarado para a tela (e o cartão em `arquetipos/`), as políticas de ações, confirmação e feedback, e os "Não faça". Divergência da tela em relação ao `UX.md` é achado; arquétipo que não casa com a tarefa também.
+
+## 2. Gate objetivo (ux-lint)
+
+Se houver captura HTML da tela e mapa de fluxo (`.dsx/mapas/fluxos-<modulo>.json`), rode antes do julgamento:
+
+```bash
+node <DSX>/tools/ux-lint/tela.mjs <capturas> --ux UX.md        # T1–T7: primárias por região, ordem no diálogo, h1, rótulos, destrutiva, termos proibidos
+node <DSX>/tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json --ux UX.md   # F1–F5: becos sem saída, órfãs, jornada longa, diálogos empilhados, retorno
+```
+
+Os achados entram no relatório com a regra e a severidade que a ferramenta deu. O julgamento abaixo cobre o que ela não mede (adequação do arquétipo, clareza, carga cognitiva).
+
+## 2.1 Inspecione a tela renderizada
 
 Prefira a interface rodando (navegador/screenshot) ao código. Verifique: desktop e 320px de largura, tema claro e escuro, teclado, estados (vazio, carregando, erro). Se só houver código, diga isso no relatório — a confiança é menor.
 

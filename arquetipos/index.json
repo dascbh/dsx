@@ -1,0 +1,662 @@
+[
+  {
+    "id": "assistente-em-etapas",
+    "titulo": "Assistente em etapas",
+    "resumo": "Fluxo guiado que divide uma tarefa longa ou rara em etapas ordenadas, com uma decisão por vez e revisão antes de concluir.",
+    "registro": [
+      "operacional",
+      "consumo"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "trilha-de-etapas",
+      "corpo-da-etapa",
+      "rodape-de-navegacao"
+    ],
+    "acao-primaria": {
+      "regiao": "rodape-de-navegacao",
+      "posicao": "rodape-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "erro-de-campo",
+      "erro",
+      "enviando",
+      "sucesso",
+      "rascunho-retomado"
+    ],
+    "padroes": [
+      "dividir-formulario",
+      "etapas-de-formulario",
+      "momento-da-validacao",
+      "erros-em-formularios",
+      "onde-exibir-erros",
+      "preservar-dados-apos-erro",
+      "campos-obrigatorios",
+      "label-vs-placeholder",
+      "clique-duplo-em-envio",
+      "confirmacao-de-sucesso",
+      "posicao-de-acoes",
+      "upload-de-arquivos"
+    ],
+    "variacoes": [
+      "trilha-horizontal",
+      "trilha-vertical-lateral",
+      "etapa-de-revisao-final",
+      "assistente-em-dialogo"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T4",
+      "T6",
+      "T7",
+      "F3",
+      "F5"
+    ],
+    "arquivo": "arquetipos/assistente-em-etapas.md"
+  },
+  {
+    "id": "biblioteca",
+    "titulo": "Biblioteca",
+    "resumo": "Acervo de itens reutilizáveis (modelos, cláusulas, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.",
+    "registro": [
+      "operacional",
+      "editorial"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "navegacao-de-colecoes",
+      "barra-de-busca",
+      "conteudo",
+      "visualizacao-rapida"
+    ],
+    "acao-primaria": {
+      "regiao": "cabecalho-da-pagina",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "vazio",
+      "vazio-por-filtro",
+      "erro",
+      "sem-acesso",
+      "sucesso"
+    ],
+    "padroes": [
+      "estrutura-de-filtros",
+      "busca-sem-resultados",
+      "filtros-ativos",
+      "tabela-vs-cards",
+      "estado-vazio",
+      "upload-de-arquivos",
+      "paginacao-vs-scroll",
+      "confirmar-exclusao",
+      "botao-desabilitado"
+    ],
+    "variacoes": [
+      "grade-de-cartoes",
+      "lista-densa",
+      "colecoes-em-arvore",
+      "com-visualizacao-rapida"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "arquivo": "arquetipos/biblioteca.md"
+  },
+  {
+    "id": "configuracoes",
+    "titulo": "Configurações",
+    "resumo": "Tela de ajustes persistentes de conta, módulo ou organização, agrupados em seções, com salvamento previsível e uma zona separada para ações de risco.",
+    "registro": [
+      "operacional",
+      "consumo"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "menu-de-secoes",
+      "corpo-da-secao",
+      "rodape-da-secao",
+      "zona-de-risco"
+    ],
+    "acao-primaria": {
+      "regiao": "rodape-da-secao",
+      "posicao": "rodape-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "alteracoes-nao-salvas",
+      "salvando",
+      "erro-de-campo",
+      "erro",
+      "sem-acesso",
+      "sucesso"
+    ],
+    "padroes": [
+      "autosave-vs-salvar",
+      "campos-obrigatorios",
+      "momento-da-validacao",
+      "erros-em-formularios",
+      "acao-destrutiva",
+      "confirmar-acao",
+      "botao-desabilitado",
+      "confirmacao-de-sucesso",
+      "abas",
+      "preservar-dados-apos-erro",
+      "label-vs-placeholder"
+    ],
+    "variacoes": [
+      "salvar-por-secao",
+      "salvar-ao-alterar",
+      "abas-no-topo"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "arquivo": "arquetipos/configuracoes.md"
+  },
+  {
+    "id": "dialogo-de-confirmacao",
+    "titulo": "Diálogo de confirmação",
+    "resumo": "Interrupção curta que pede uma decisão explícita antes de uma ação de consequência séria, dizendo o que vai acontecer e com o quê.",
+    "registro": [
+      "operacional",
+      "consumo"
+    ],
+    "regioes": [
+      "cabecalho-do-dialogo",
+      "corpo-do-dialogo",
+      "rodape-do-dialogo"
+    ],
+    "acao-primaria": {
+      "regiao": "rodape-do-dialogo",
+      "posicao": "rodape-direita",
+      "max": 1
+    },
+    "estados": [
+      "aberto",
+      "executando",
+      "erro",
+      "sucesso"
+    ],
+    "padroes": [
+      "confirmar-acao",
+      "confirmar-exclusao",
+      "acao-destrutiva",
+      "desfazer",
+      "texto-de-botao",
+      "fechar-modal",
+      "foco-de-teclado",
+      "hierarquia-de-botoes",
+      "clique-duplo-em-envio",
+      "confirmar-acao-da-ia",
+      "quando-usar-modal"
+    ],
+    "variacoes": [
+      "confirmacao-simples",
+      "digitar-para-confirmar",
+      "desfazer-em-vez-de-confirmar",
+      "confirmacao-com-consequencias-listadas"
+    ],
+    "regras": [
+      "T1",
+      "T2",
+      "T5",
+      "T6",
+      "T7",
+      "F4"
+    ],
+    "arquivo": "arquetipos/dialogo-de-confirmacao.md"
+  },
+  {
+    "id": "dialogo-de-formulario",
+    "titulo": "Diálogo de formulário",
+    "resumo": "Janela modal curta que coleta poucos dados para criar ou alterar algo sem tirar a pessoa da tela em que ela está.",
+    "registro": [
+      "operacional",
+      "consumo"
+    ],
+    "regioes": [
+      "cabecalho-do-dialogo",
+      "corpo-do-dialogo",
+      "rodape-do-dialogo"
+    ],
+    "acao-primaria": {
+      "regiao": "rodape-do-dialogo",
+      "posicao": "rodape-direita",
+      "max": 1
+    },
+    "estados": [
+      "aberto",
+      "erro-de-campo",
+      "enviando",
+      "erro",
+      "sucesso"
+    ],
+    "padroes": [
+      "quando-usar-modal",
+      "quando-evitar-modal",
+      "fechar-modal",
+      "label-vs-placeholder",
+      "campos-obrigatorios",
+      "momento-da-validacao",
+      "onde-exibir-erros",
+      "preservar-dados-apos-erro",
+      "clique-duplo-em-envio",
+      "posicao-de-acoes",
+      "foco-de-teclado",
+      "ordem-dos-campos"
+    ],
+    "variacoes": [
+      "dialogo-curto",
+      "dialogo-com-secoes",
+      "promover-a-pagina"
+    ],
+    "regras": [
+      "T1",
+      "T2",
+      "T4",
+      "T6",
+      "T7",
+      "F4"
+    ],
+    "arquivo": "arquetipos/dialogo-de-formulario.md"
+  },
+  {
+    "id": "documento-com-visor",
+    "titulo": "Documento com visor",
+    "resumo": "Tela de leitura de um documento pronto (contrato, parecer, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.",
+    "registro": [
+      "operacional",
+      "editorial"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "barra-do-visor",
+      "visor",
+      "painel-de-informacoes"
+    ],
+    "acao-primaria": {
+      "regiao": "cabecalho-da-pagina",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "processando",
+      "erro",
+      "sem-acesso",
+      "indisponivel",
+      "sucesso"
+    ],
+    "padroes": [
+      "breadcrumbs",
+      "abas",
+      "carregamento-longo",
+      "skeleton-screen",
+      "link-em-nova-aba",
+      "icone-sem-texto",
+      "falha-temporaria",
+      "tentar-novamente",
+      "botao-desabilitado"
+    ],
+    "variacoes": [
+      "visor-com-painel-a-direita",
+      "visor-em-tela-cheia",
+      "comparacao-lado-a-lado"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "arquivo": "arquetipos/documento-com-visor.md"
+  },
+  {
+    "id": "editor-com-painel",
+    "titulo": "Editor com painel",
+    "resumo": "Tela de produção de um documento ou objeto complexo, com a área de edição ao centro e um painel lateral de apoio (comentários, variáveis, sugestões, verificação).",
+    "registro": [
+      "operacional",
+      "editorial"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "barra-de-ferramentas",
+      "area-de-edicao",
+      "painel-lateral",
+      "barra-de-status"
+    ],
+    "acao-primaria": {
+      "regiao": "cabecalho-da-pagina",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "salvando",
+      "salvo",
+      "conflito",
+      "erro",
+      "sem-acesso",
+      "somente-leitura",
+      "sucesso"
+    ],
+    "padroes": [
+      "autosave-vs-salvar",
+      "desfazer",
+      "preservar-dados-apos-erro",
+      "abas",
+      "revisar-resultado-da-ia",
+      "rotular-conteudo-ia",
+      "fontes-da-ia",
+      "sessao-expirada",
+      "icone-sem-texto",
+      "botao-desabilitado",
+      "confirmacao-de-sucesso"
+    ],
+    "variacoes": [
+      "painel-fixo-a-direita",
+      "painel-recolhivel",
+      "painel-com-abas",
+      "foco-sem-painel"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T4",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "arquivo": "arquetipos/editor-com-painel.md"
+  },
+  {
+    "id": "lista-operacional",
+    "titulo": "Lista operacional",
+    "resumo": "Tela de trabalho diário que mostra muitos registros do mesmo tipo para a pessoa encontrar, comparar e agir sobre eles.",
+    "registro": [
+      "operacional"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "barra-de-filtros",
+      "barra-de-acoes-em-lote",
+      "conteudo",
+      "rodape-da-lista"
+    ],
+    "acao-primaria": {
+      "regiao": "cabecalho-da-pagina",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "vazio",
+      "vazio-por-filtro",
+      "erro",
+      "sem-acesso",
+      "sucesso"
+    ],
+    "padroes": [
+      "estrutura-de-filtros",
+      "filtros-ativos",
+      "aplicacao-de-filtros",
+      "paginacao-de-tabela",
+      "ordenacao-de-tabela",
+      "estado-vazio",
+      "busca-sem-resultados",
+      "tabela-vs-cards",
+      "tabela-responsiva",
+      "skeleton-screen",
+      "acao-destrutiva"
+    ],
+    "variacoes": [
+      "com-acoes-em-lote",
+      "cards-no-mobile",
+      "filtros-em-painel-lateral",
+      "agrupada-por-status"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "arquivo": "arquetipos/lista-operacional.md"
+  },
+  {
+    "id": "mestre-detalhe",
+    "titulo": "Mestre-detalhe",
+    "resumo": "Duas colunas na mesma tela, a lista à esquerda e o registro selecionado à direita, para percorrer itens em sequência sem trocar de página.",
+    "registro": [
+      "operacional"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "coluna-mestre",
+      "coluna-detalhe"
+    ],
+    "acao-primaria": {
+      "regiao": "coluna-detalhe",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "vazio",
+      "nada-selecionado",
+      "vazio-por-filtro",
+      "erro",
+      "sem-acesso",
+      "sucesso"
+    ],
+    "padroes": [
+      "paginacao-vs-scroll",
+      "estado-vazio",
+      "busca-sem-resultados",
+      "filtros-ativos",
+      "abas",
+      "skeleton-vs-spinner",
+      "foco-de-teclado",
+      "breadcrumbs"
+    ],
+    "variacoes": [
+      "duas-colunas-fixas",
+      "mestre-recolhivel",
+      "detalhe-empilhado-no-mobile"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T6",
+      "T7",
+      "F1",
+      "F5"
+    ],
+    "arquivo": "arquetipos/mestre-detalhe.md"
+  },
+  {
+    "id": "pagina-publica-de-decisao",
+    "titulo": "Página pública de decisão",
+    "resumo": "Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (de acordo, não concordância, aprovação, recusa).",
+    "registro": [
+      "consumo"
+    ],
+    "regioes": [
+      "cabecalho-publico",
+      "resumo-do-pedido",
+      "documento-ou-detalhe",
+      "area-de-decisao",
+      "rodape-publico"
+    ],
+    "acao-primaria": {
+      "regiao": "area-de-decisao",
+      "posicao": "junto-ao-conteudo",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "link-invalido",
+      "link-expirado",
+      "ja-respondido",
+      "enviando",
+      "erro",
+      "sucesso"
+    ],
+    "padroes": [
+      "hierarquia-de-botoes",
+      "texto-de-botao",
+      "confirmar-acao",
+      "clique-duplo-em-envio",
+      "confirmacao-de-sucesso",
+      "mensagem-de-erro-util",
+      "label-vs-placeholder",
+      "erros-em-formularios",
+      "alvo-de-toque",
+      "link-em-nova-aba",
+      "codigo-de-erro-tecnico",
+      "campos-obrigatorios"
+    ],
+    "variacoes": [
+      "decisao-binaria",
+      "decisao-com-motivo",
+      "decisao-com-identificacao",
+      "documento-longo-com-decisao-fixa"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "arquivo": "arquetipos/pagina-publica-de-decisao.md"
+  },
+  {
+    "id": "painel-de-acompanhamento",
+    "titulo": "Painel de acompanhamento",
+    "resumo": "Tela de visão geral que responde como as coisas estão e o que pede atenção agora, com indicadores, tendências e uma lista curta de pendências.",
+    "registro": [
+      "operacional"
+    ],
+    "regioes": [
+      "cabecalho-da-pagina",
+      "barra-de-periodo",
+      "faixa-de-indicadores",
+      "area-de-graficos",
+      "lista-de-pendencias"
+    ],
+    "acao-primaria": {
+      "regiao": "cabecalho-da-pagina",
+      "posicao": "topo-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "vazio",
+      "sem-dados-no-periodo",
+      "parcial",
+      "desatualizado",
+      "erro",
+      "sem-acesso"
+    ],
+    "padroes": [
+      "filtro-de-periodo",
+      "skeleton-screen",
+      "estado-vazio",
+      "falha-temporaria",
+      "tentar-novamente",
+      "nao-so-cor",
+      "tabela-vs-cards",
+      "carregamento-longo"
+    ],
+    "variacoes": [
+      "indicadores-acima-da-lista",
+      "pendencias-primeiro",
+      "painel-por-perfil"
+    ],
+    "regras": [
+      "T1",
+      "T3",
+      "T6",
+      "F1",
+      "F2"
+    ],
+    "arquivo": "arquetipos/painel-de-acompanhamento.md"
+  },
+  {
+    "id": "painel-lateral-de-detalhe",
+    "titulo": "Painel lateral de detalhe",
+    "resumo": "Painel que desliza da borda sobre a tela atual para mostrar ou editar um registro sem perder a lista ou o contexto de onde a pessoa veio.",
+    "registro": [
+      "operacional"
+    ],
+    "regioes": [
+      "cabecalho-do-painel",
+      "corpo-do-painel",
+      "rodape-do-painel"
+    ],
+    "acao-primaria": {
+      "regiao": "rodape-do-painel",
+      "posicao": "rodape-direita",
+      "max": 1
+    },
+    "estados": [
+      "carregando",
+      "erro",
+      "sem-acesso",
+      "item-removido",
+      "editando",
+      "sucesso"
+    ],
+    "padroes": [
+      "quando-usar-modal",
+      "quando-evitar-modal",
+      "fechar-modal",
+      "foco-de-teclado",
+      "abas",
+      "posicao-de-acoes",
+      "skeleton-vs-spinner",
+      "autosave-vs-salvar",
+      "link-vs-botao",
+      "preservar-dados-apos-erro"
+    ],
+    "variacoes": [
+      "sobreposto",
+      "empurrando-o-conteudo",
+      "leitura-com-link-para-pagina"
+    ],
+    "regras": [
+      "T1",
+      "T2",
+      "T3",
+      "T6",
+      "T7",
+      "F4",
+      "F5"
+    ],
+    "arquivo": "arquetipos/painel-lateral-de-detalhe.md"
+  }
+]

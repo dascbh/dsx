@@ -9,7 +9,7 @@ import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['knowledge', 'patterns', 'templates', 'tools', 'skills', 'agents', 'evals', 'examples', 'tokens', 'docs', 'hooks'];
+const ROOTS = ['knowledge', 'patterns', 'arquetipos', 'referencias', 'templates', 'tools', 'skills', 'agents', 'evals', 'examples', 'tokens', 'docs', 'hooks'];
 const SKIP = new Set(['node_modules', '.git', 'build']);
 
 function* mdFiles(dir) {
@@ -31,7 +31,7 @@ export function checkLinks() {
       if (!target || /^[a-z]+:/i.test(target)) continue;
       if (!existsSync(join(dirname(file), target))) broken.push(`${rel}: link → ${m[1]}`);
     }
-    for (const m of text.matchAll(/`((?:\.\.\/)*(?:[a-z-]+\/)*?(?:knowledge|patterns|templates|tools|skills|agents|evals|examples|tokens|docs|hooks)\/[^`\s*<>{}]+?)`/g)) {
+    for (const m of text.matchAll(/`((?:\.\.\/)*(?:[a-z-]+\/)*?(?:knowledge|patterns|arquetipos|referencias|templates|tools|skills|agents|evals|examples|tokens|docs|hooks)\/[^`\s*<>{}]+?)`/g)) {
       let p = m[1].replace(/^(\.\.\/)+/, '');
       if (/[*<>]/.test(p) || p.includes('build/')) continue; // globs, placeholders e artefatos gerados
       if (!ROOTS.some((r) => p.startsWith(r + '/'))) continue;

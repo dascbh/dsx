@@ -12,11 +12,12 @@ O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pe
 ## 0. Pré-condições
 
 1. Procure `DESIGN.md` na raiz do projeto. **Se não existir**, pare e rode a skill `iniciar` (ou `design-md` no modo "extrair do código"). Construir sem fonte visual é a principal causa de drift.
-2. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
-3. Se existirem mapas do projeto (`.dsx/mapas/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `fluxos.json` (de onde a tela é alcançada e para onde leva), `tarefas.json` (passos e dependências), `dominio.json` (de onde vêm os dados, cardinalidades), `jornada.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
-4. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `codigo`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
-5. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
-6. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
+2. Procure `UX.md` na raiz do projeto. **Se existir**, leia antes de desenhar: o arquétipo da tela (seção "Arquétipos de tela", cartão em `arquetipos/`), a posição e o limite de ações primárias, a política de confirmação e feedback, os estados obrigatórios e os termos proibidos. Tela sem arquétipo na tabela: proponha um e registre (skill `ux-md`); para escolher entre arranjos, skill `arranjar-tela`.
+3. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
+4. Se existirem mapas do projeto (`.dsx/mapas/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `fluxos.json` (de onde a tela é alcançada e para onde leva), `tarefas.json` (passos e dependências), `dominio.json` (de onde vêm os dados, cardinalidades), `jornada.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
+5. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `codigo`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
+6. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
+7. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
 
 ## 1. Descoberta antes de escrever código
 
@@ -74,6 +75,7 @@ Rode e corrija até passar:
 node <DSX>/tools/lint-raw-values.mjs <pastas-alteradas>     # zero valores crus
 node <DSX>/tools/contrast.mjs "<texto>" "<fundo>"           # para cada par novo de cor
 node <DSX>/tools/lint-design-md.mjs DESIGN.md               # se você alterou o DESIGN.md
+node <DSX>/tools/ux-lint/tela.mjs <captura.html> --ux UX.md  # se o projeto tem UX.md e captura da tela
 ```
 
 Se houver app rodando, abra a tela (navegador ou screenshot) e confira: largura 320px, zoom 200%, navegação só por teclado (Tab/Shift+Tab/Enter/Esc), tema escuro.
