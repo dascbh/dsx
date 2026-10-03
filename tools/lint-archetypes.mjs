@@ -20,7 +20,10 @@ export const REQUIRED_SECTIONS = ['Quando usar', 'Mapa de regiões', 'O que vai 
   'Variações', 'Anti-padrões', 'Checklist'];
 export const REGISTERS = ['operational', 'consumer', 'editorial', 'brand'];
 export const POSITIONS = ['top-right', 'bottom-right', 'inline'];
-export const RULES = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'F1', 'F2', 'F3', 'F4', 'F5'];
+export const RULES = [
+  'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'F1', 'F2', 'F3', 'F4', 'F5',
+  'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'S1', 'S2', 'S3', 'C1', 'C2', 'C3',
+];
 const ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /** Ids de padrão existentes (patterns/index.json). */
@@ -79,7 +82,7 @@ export function lintCard(card, patternIds) {
   }
 
   for (const p of asList(fm.patterns)) if (!patternIds.has(p)) e(`padrão inexistente em patterns/index.json: ${p}`);
-  for (const r of asList(fm.rules)) if (!RULES.includes(r)) e(`regra "${r}" fora de T1–T7/F1–F5`);
+  for (const r of asList(fm.rules)) if (!RULES.includes(r)) e(`regra "${r}" fora de T1–T7/F1–F5/L1–L9/S1–S3/C1–C3`);
   if (Array.isArray(fm.variations) && fm.variations.length < 2) e(`variations precisa de ao menos 2 (tem ${fm.variations.length})`);
 
   const ap = fm['primary-action'];

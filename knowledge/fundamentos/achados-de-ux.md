@@ -29,8 +29,8 @@ Os três ficam separados de propósito: registrar de novo reescreve só `finding
   "updated": "2026-10-03",
   "runs": [{ "at": "2026-10-03T12:00:00Z", "sources": ["text", "screen", "flow"], "commit": "602d8c2" }],
   "items": [{
-    "id": "t-7f3a9c2e",              // prefixo da família (t | s | f) + 8 hex do hash estável
-    "family": "text",                // text (X) | screen (T) | flow (F)
+    "id": "t-7f3a9c2e",              // prefixo da família (t | s | f | st | c) + 8 hex do hash estável
+    "family": "text",                // text (X) | screen (T) | flow (F) | states (S) | consistency (C)
     "rule": "X1",
     "severity": 2,                   // 0–4
     "element": "button",             // button | title | label | placeholder | tooltip | helper | alert | tab | menu | cell | accessible-name
@@ -47,9 +47,9 @@ Os três ficam separados de propósito: registrar de novo reescreve só `finding
   }]
 }
 ```
-Itens da família `screen` levam também `region`. `source` é relativo à raiz do projeto; na família `screen` aponta a captura (`.html:linha`), nas outras o código.
+Itens das famílias `screen` e `states` levam também `region` (em `states`, o estado + a região: `error · main`). `source` é relativo à raiz do projeto; nas famílias `screen`, `states` e `consistency` aponta a captura (`.html:linha`), nas outras o código.
 
-**Id estável** = hash de `family | rule | âncora`, onde a âncora é, nesta ordem: a primeira origem no código sem o número da linha (o arquivo) + o texto normalizado (minúsculas, espaços únicos, dados variáveis trocados por `{}` — números, datas, horas, valores e, quando há `variants`, o trecho que muda entre elas); sem origem no código, a tela + região + texto. Mudar a linha do arquivo não muda o id; mudar o texto ou o arquivo muda. Dois ajustes declarados: na família `flow` a âncora é sempre a tela (ou jornada) do mapa, porque a evidência dela lista transições de entrada que mudam sem o achado mudar; e na família `text` sem origem no código a âncora não leva tela, porque um achado de texto agrupa várias telas. Quando o conjunto de variantes muda e com ele o texto-modelo, o item herda o id registrado de mesma família, regra e arquivo que tenha uma variante em comum.
+**Id estável** = hash de `family | rule | âncora`, onde a âncora é, nesta ordem: a primeira origem no código sem o número da linha (o arquivo) + o texto normalizado (minúsculas, espaços únicos, dados variáveis trocados por `{}` — números, datas, horas, valores e, quando há `variants`, o trecho que muda entre elas); sem origem no código, a tela + região + texto. Mudar a linha do arquivo não muda o id; mudar o texto ou o arquivo muda. Dois ajustes declarados: na família `flow` a âncora é sempre a tela (ou jornada) do mapa, porque a evidência dela lista transições de entrada que mudam sem o achado mudar; e nas famílias `text` e `consistency` sem origem no código a âncora não leva tela, porque o achado agrupa várias telas (em `consistency`, o texto é a função ou o conceito — "excluir minuta" —, não os rótulos achados). Quando o conjunto de variantes muda e com ele o texto-modelo, o item herda o id registrado de mesma família, regra e arquivo que tenha uma variante em comum.
 
 `options.json`
 ```json

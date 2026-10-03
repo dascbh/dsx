@@ -20,9 +20,9 @@ import { normalizeCases } from './lib/legacy.mjs';
 const ELEMENT_LABEL = {
   button: 'Botões', title: 'Títulos', label: 'Rótulos de campo', tooltip: 'Dicas (tooltip)', helper: 'Descrições e textos de apoio',
   alert: 'Alertas e mensagens', placeholder: 'Textos dentro do campo', tab: 'Abas', 'accessible-name': 'Nomes acessíveis', cell: 'Células de tabela', menu: 'Itens de menu',
-  screen: 'Tela (estrutura)', flow: 'Fluxo',
+  screen: 'Tela (estrutura)', flow: 'Fluxo', states: 'Estados', layout: 'Layout e hierarquia', consistency: 'Consistência entre telas',
 };
-const ELEMENT_ORDER = ['title', 'helper', 'button', 'label', 'placeholder', 'tooltip', 'alert', 'tab', 'menu', 'cell', 'accessible-name', 'screen', 'flow'];
+const ELEMENT_ORDER = ['title', 'helper', 'button', 'label', 'placeholder', 'tooltip', 'alert', 'tab', 'menu', 'cell', 'accessible-name', 'screen', 'layout', 'states', 'consistency', 'flow'];
 /** Nomes antigos (pt-BR) de elemento → nome atual. */
 export const ELEMENT_ALIAS = {
   botao: 'button', title: 'title', rotulo: 'label', dica: 'tooltip', apoio: 'helper', alerta: 'alert', aba: 'tab',

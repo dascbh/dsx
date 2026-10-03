@@ -123,6 +123,18 @@ Tela vazia é oportunidade de orientar. Explique a causa, nomeie o que falta e o
 
 Ver [empty-state](../../patterns/feedback/empty-state.md).
 
+### Estados conferidos pela máquina
+
+Cada estado da tela vira uma captura própria, para a revisão olhar o que a pessoa vê quando a lista vem vazia ou o servidor falha, não só o caso feliz. A convenção é `<nn>-<tela>.<estado>.html` ao lado da captura principal (`02-acervo.html`, `02-acervo.empty.html`, `02-acervo.error.html`); a lista de estados obrigatórios vem do `UX.md` e do arquétipo da tela. O verificador `tools/ux-lint/states.mjs` aplica três regras ([ux-md.md](ux-md.md), "Estados"):
+
+| Id | O que reprova | Como corrigir |
+|---|---|---|
+| S1 | Estado obrigatório sem captura (a tela não foi vista naquele estado) | Capture o estado; se ele não existe no produto, esse é o achado |
+| S2 | Vazio ou erro sem botão ou link de saída na região do estado | Ofereça o próximo passo: tentar de novo, limpar filtros, criar o primeiro item, voltar |
+| S3 | Mensagem de erro sem orientação ("Erro", "Falhou", código, ou só a explicação) | Diga o que aconteceu e o que fazer: "Não foi possível falar com o servidor agora. Tente de novo em instantes." |
+
+Carregar, erro e sem acesso valem para a tela que busca o dado; a aba ou o painel que mora dentro dela herdam esses estados da mãe. Diálogo exige só o erro da própria ação (e o erro de campo, quando tem campo obrigatório): não tem carregar nem vazio.
+
 ---
 
 ## 6. Onboarding
@@ -158,6 +170,8 @@ Objetivo: levar a pessoa ao **primeiro valor real**, não a concluir um tour.
 - [ ] Mensagens importantes anunciadas a tecnologias assistivas sem roubar o foco.
 - [ ] Animações funcionais entre 100 e 400 ms, respeitando movimento reduzido.
 - [ ] Vazio, carregando e erro são estados distintos, cada um com texto e ação apropriados.
+- [ ] Cada estado obrigatório tem captura `<nn>-<tela>.<estado>.html` e passa no `states.mjs` (S1–S3).
+- [ ] Mensagem de erro diz o que aconteceu e o que fazer; vazio e erro têm uma saída na própria região.
 - [ ] Busca e filtros vazios preservam o que a pessoa digitou e mostram como sair.
 - [ ] Onboarding leva a uma tarefa de valor definida, pode ser pulado e revisto.
 - [ ] Permissões pedidas no contexto, com benefício explicado.

@@ -10,6 +10,7 @@
 //    "Faça e não faça" com ≥ 3 itens em cada bloco, texto vago.
 // O que a máquina não mede (adequação do arquétipo, clareza) fica com a skill ux-md (Modo C).
 // Uso: node tools/lint-ux-md.mjs [caminho/UX.md] [--archetypes <pasta>] [--json]
+import { LAYOUT_DEFAULTS } from './ux-lint/lib/geometry.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,7 +44,7 @@ export const SECTIONS = [
 ];
 
 // Tipos: 'str' | 'int' | 'bool' | 'list' | string[] (enum) | objeto (grupo aninhado).
-const STR = 'str', INT = 'int', BOOL = 'bool', LIST = 'list', ARCH = 'archetypes';
+const STR = 'str', INT = 'int', BOOL = 'bool', LIST = 'list', ARCH = 'archetypes', NUM = 'num', MAP = 'map';
 export const SCHEMA = {
   version: STR, name: STR, description: STR, owner: STR, updated: STR,
   product: {
@@ -70,8 +71,9 @@ export const SCHEMA = {
   },
   content: { glossary: STR, buttons: STR, forbidden: LIST, 'proper-nouns': LIST },
   flows: { 'max-journey-steps': INT, 'max-stacked-dialogs': INT, 'dead-ends': INT },
+  layout: Object.fromEntries(Object.keys(LAYOUT_DEFAULTS).map((k) => [k, NUM])),
   verification: {
-    selectors: { regions: LIST, dialog: STR, 'dialog-footer': STR, primary: STR, destructive: STR, button: STR, field: STR },
+    selectors: { regions: LIST, dialog: STR, 'dialog-footer': STR, primary: STR, destructive: STR, button: STR, field: STR, 'archetype-regions': MAP },
   },
 };
 
@@ -87,6 +89,8 @@ function validateGroup(obj, schema, prefix, errors, warnings) {
     const def = schema[k];
     if (def === undefined) { warnings.push(`Chave desconhecida: ${path} (fora do contrato; será ignorada pelo ux-lint).`); continue; }
     if (def === ARCH) continue; // validado à parte
+    if (def === MAP) { if (kindOf(v) !== 'grupo') errors.push(`${path}: esperado mapa região → seletor.`); continue; }
+    if (def === NUM) { if (!Number.isFinite(Number(v)) || Number(v) < 0) errors.push(`${path}: esperado número ≥ 0, veio "${v}".`); continue; }
     if (Array.isArray(def)) {
       if (!def.includes(v)) errors.push(`${path}: valor "${v}" inválido; use um de: ${def.join(' | ')}.`);
     } else if (typeof def === 'object') {

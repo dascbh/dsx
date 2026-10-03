@@ -123,7 +123,30 @@ Densidade é quanta informação cabe por área. Não existe "certa"; existe ade
 
 ---
 
-## 8. Anti-padrões
+## 8. O que a máquina mede (regras L1–L9)
+
+Parte desta página vira regra medida sobre a tela renderizada. A captura estática é aberta num navegador headless (`tools/ux-lint/measure.mjs`, Playwright do projeto), que grava caixa, fonte, cor e região de cada elemento; `tools/ux-lint/layout.mjs` aplica as regras sobre essa geometria, sem navegador. Detalhe de cada medida, limites configuráveis (chave `layout` do UX.md) e falsos positivos conhecidos: [ux-md.md](ux-md.md), seção "Verificação".
+
+| Regra | O que reprova | Como é medido | Sev. |
+|---|---|---|---|
+| L1 | Ação primária fora da posição declarada | Centro da primária contra a caixa do conteúdo ou do diálogo, na posição do arquétipo da tela (`primary-action.position`) ou do UX.md | 2 |
+| L2 | Ênfases concorrentes (teste do borrão automatizado) | Na primeira dobra: botões cheios, textos ≥ 1,25× o corpo em negrito e blocos de cor saturada; mais de 3 (padrão) reprova | 2 |
+| L3 | Escala de títulos quebrada | `h1` menor que outro texto da tela, ou nível inferior com fonte maior que o superior | 2 |
+| L4 | Desalinhamento | Bordas esquerdas de campos e rótulos de um formulário (ou de cartões irmãos) em mais de 2 posições, tolerância 4 px, ou mais posições que colunas da grade | 1 |
+| L5 | Proximidade | Rótulo a mais de 16 px do campo; botões do mesmo grupo a mais de 48 px; elemento mais perto do grupo vizinho que do próprio | 1 |
+| L6 | Primeira dobra | Título ou ação primária abaixo de 900 px (no diálogo, a partir do topo dele) | 2 |
+| L7 | Linha longa | Texto corrido com mais de 90 caracteres por linha, contados pelas linhas renderizadas | 1 |
+| L8 | Alvo pequeno | Elemento clicável menor que 24×24 px sem espaço livre em volta (WCAG 2.5.8) | 2 |
+| L9 | Região do arquétipo ausente | Região do cartão do arquétipo não encontrada, pela marcação `data-region` ou por heurística geométrica | 1 |
+
+- SE um achado L contradiz um desvio declarado no UX.md ENTÃO confira na captura e registre a decisão; a regra mede a geometria, não o motivo.
+- SE o L2 reprova ENTÃO rebaixe o que não é ponto de entrada nem ação principal (botão cheio vira contornado, bloco saturado vira tom suave) antes de mexer no título.
+- SE o L3 aponta título em sobrelinha (caixa alta pequena acima de cartões) ENTÃO decida entre trocar o nível semântico ou aumentar o título — a ordem visual e a do leitor de tela precisam coincidir.
+- O que a geometria não decide — se o primeiro elemento percebido é o certo para a tarefa — continua no teste do borrão da seção 6.
+
+---
+
+## 9. Anti-padrões
 
 - **Destacar tudo:** vários elementos em negrito, cor de destaque e tamanho grande; a prioridade desaparece.
 - **Ação principal escondida:** abaixo da dobra, com o mesmo peso das secundárias ou longe do conteúdo.
@@ -148,3 +171,4 @@ Densidade é quanta informação cabe por área. Não existe "certa"; existe ade
 - [ ] Hierarquia validada com conteúdo real longo, estados vazios/erro/carregando, 320 px e zoom de 200%.
 - [ ] Títulos semânticos, ordem de leitura e ordem de foco coincidem com a ordem visual.
 - [ ] A hierarquia continua legível em escala de cinza.
+- [ ] `measure.mjs` + `layout.mjs` rodados nas capturas; achados L de severidade 2 conferidos na captura.

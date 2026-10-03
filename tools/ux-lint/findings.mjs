@@ -3,7 +3,8 @@
 // Junta o resultado dos verificadores de texto, tela e fluxo num registro durável por módulo, com id estável,
 // decisão do dono separada do resultado da máquina e status calculado entre execuções.
 //
-//   node tools/ux-lint/findings.mjs register --module <m> [--dir .dsx/findings] [--text t.json] [--screen s.json] [--flow f.json] [--root <repo>] [--include-sev0]
+//   node tools/ux-lint/findings.mjs register --module <m> [--dir .dsx/findings] [--text t.json] [--screen s.json] [--flow f.json]
+//                                            [--states st.json] [--consistency c.json] [--layout l.json] [--root <repo>] [--include-sev0]
 //   node tools/ux-lint/findings.mjs options  --module <m> --from cases.json
 //   node tools/ux-lint/findings.mjs decide   --module <m> <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
 //   node tools/ux-lint/findings.mjs import   --module <m> decisions.json
@@ -22,9 +23,14 @@ import { renderTextPage, normalizeElement, sortCases } from './text-page.mjs';
 import { normalizeCases, normalizeDetectorJson } from './lib/legacy.mjs';
 
 /** Verificadores que produzem a entrada de cada família (nomes isolados aqui para renomear sem caçar no código). */
-export const DETECTORS = { text: 'tools/ux-lint/text.mjs', screen: 'tools/ux-lint/screen.mjs', flow: 'tools/ux-lint/flow.mjs' };
-export const FAMILIES = ['text', 'screen', 'flow'];
-const PREFIX = { text: 't', screen: 's', flow: 'f' };
+export const DETECTORS = {
+  text: 'tools/ux-lint/text.mjs', screen: 'tools/ux-lint/screen.mjs', flow: 'tools/ux-lint/flow.mjs',
+  states: 'tools/ux-lint/states.mjs', consistency: 'tools/ux-lint/consistency.mjs', layout: 'tools/ux-lint/layout.mjs',
+};
+export const FAMILIES = ['text', 'screen', 'flow', 'states', 'consistency', 'layout'];
+const PREFIX = { text: 't', screen: 's', flow: 'f', states: 'st', consistency: 'c', layout: 'l' };
+/** Famílias cujo achado compara telas entre si: a âncora do id é só o texto, sem tela nem região. */
+const CROSS_SCREEN = ['text', 'consistency'];
 export const STATUSES = ['open', 'decided', 'ignored', 'fixed', 'regression'];
 const STATUS_PT = { open: 'aberto', decided: 'decidido', ignored: 'ignorado', fixed: 'corrigido', regression: 'regressão' };
 
@@ -72,7 +78,7 @@ export function stableId(item) {
   const code = item.family === 'flow' ? null : (item.source ?? []).find(isCode);
   const anchor = code
     ? `${fileOf(code)}|${normText(item.text)}`
-    : `${item.family === 'text' ? '' : (item.screens ?? [])[0] ?? ''}|${item.region ?? ''}|${normText(item.text)}`;
+    : `${CROSS_SCREEN.includes(item.family) ? '' : (item.screens ?? [])[0] ?? ''}|${item.region ?? ''}|${normText(item.text)}`;
   return `${PREFIX[item.family]}-${sha(`${item.family}|${item.rule}|${anchor}`).slice(0, 8)}`;
 }
 
@@ -150,6 +156,58 @@ export function fromFlow(input, { root = null } = {}) {
   return out;
 }
 
+/**
+ * Saída do verificador de estados (`--json`) → itens. A tela é a do nome da captura sem o estado (`02-acervo`); a
+ * região leva o estado (`error · main`), para o mesmo problema em estados diferentes não colapsar num id só.
+ */
+export function fromStates(input, { root = null } = {}) {
+  const json = normalizeDetectorJson(input);
+  const rel = makeRel(root);
+  const out = [];
+  for (const t of json.screens ?? []) for (const a of t.findings ?? []) {
+    out.push({
+      family: 'states', rule: a.rule, severity: a.severity, element: a.rule === 'S3' ? 'alert' : null,
+      text: maskData(a.message), variants: maskData(a.message) !== clean(a.message) ? [clean(a.message)] : [],
+      screens: [`${t.nn}-${t.screen}`], region: `${a.state ?? ''} · ${a.region ?? ''}`,
+      source: [...new Set(String(a.evidence ?? '').split(/,\s*/).filter(Boolean).map((e) => rel(e.replace(/:(\d+):\d+$/, ':$1'))))],
+      message: a.message,
+    });
+  }
+  return out;
+}
+
+const ELEMENT_FROM_CONSISTENCY_RULE = { C1: 'button', C2: 'button', C3: 'title' };
+/** Saída do verificador de consistência (`--json`) → itens (âncora: a chave da função ou do conceito, sem tela). */
+export function fromConsistency(input, { root = null } = {}) {
+  const json = normalizeDetectorJson(input);
+  const rel = makeRel(root);
+  return (json.findings ?? []).map((a) => ({
+    family: 'consistency', rule: a.rule, severity: a.severity, element: ELEMENT_FROM_CONSISTENCY_RULE[a.rule] ?? null,
+    text: clean(a.text ?? a.key), variants: [...new Set((a.occurrences ?? []).map((o) => clean(o.text)))],
+    screens: [...new Set((a.occurrences ?? []).flatMap((o) => o.screens ?? []))].sort(), region: '',
+    source: [...new Set((a.occurrences ?? []).flatMap((o) => o.evidence ?? []).map((e) => rel(String(e).replace(/:(\d+):\d+$/, ':$1'))))],
+    message: a.message,
+  }));
+}
+
+const ELEMENT_FROM_LAYOUT_RULE = { L1: 'button', L3: 'title', L5: 'label', L6: 'button', L8: 'button' };
+/**
+ * Saída do verificador de layout (`--json`) → itens. Âncora do id: tela + regra + região + `anchor` (rótulo ou
+ * seletor do elemento, sem coordenadas); a medida fica na mensagem, que pode mudar sem mudar o id.
+ */
+export function fromLayout(input) {
+  const json = normalizeDetectorJson(input);
+  const out = [];
+  for (const t of json.screens ?? []) for (const a of t.findings ?? []) {
+    out.push({
+      family: 'layout', rule: a.rule, severity: a.severity, element: ELEMENT_FROM_LAYOUT_RULE[a.rule] ?? null,
+      text: clean(a.anchor ?? a.message), variants: [], screens: [screenName(t.screen ?? t.file)], region: a.region ?? '',
+      source: [basename(String(t.file ?? `${t.screen}.html`))], message: a.message,
+    });
+  }
+  return out;
+}
+
 /** Junta itens de mesmo id dentro de uma execução (ex.: dois textos que só diferem por um número). */
 function collapse(items) {
   const by = new Map();
@@ -187,13 +245,16 @@ export function assignIds(items, registry = []) {
 }
 
 /** Lê as entradas da execução (arquivos JSON de cada família). Devolve { items, families }. */
-export function collect({ text, screen, flow, root = null, includeSev0 = false }, registry = []) {
+export function collect({ text, screen, flow, states, consistency, layout, root = null, includeSev0 = false }, registry = []) {
   const items = [];
   const families = [];
   const read = (f) => JSON.parse(readFileSync(f, 'utf8'));
   if (text) { items.push(...fromText(read(text), { root, includeSev0 })); families.push('text'); }
   if (screen) { items.push(...fromScreen(read(screen), { root })); families.push('screen'); }
   if (flow) { items.push(...fromFlow(read(flow), { root })); families.push('flow'); }
+  if (states) { items.push(...fromStates(read(states), { root })); families.push('states'); }
+  if (consistency) { items.push(...fromConsistency(read(consistency), { root })); families.push('consistency'); }
+  if (layout) { items.push(...fromLayout(read(layout))); families.push('layout'); }
   return { items: assignIds(items, registry), families };
 }
 
@@ -470,12 +531,12 @@ export function renderPage(reg, options, decisions, { product = '', color = '#0E
 // ---------- CLI ----------
 
 const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|import|status|check|page> --module <m> [opções]
-  register --text t.json --screen s.json --flow f.json [--root <repo>] [--include-sev0]
+  register --text t.json --screen s.json --flow f.json --states st.json --consistency c.json --layout l.json [--root <repo>] [--include-sev0]
   options  --from cases.json
   decide   <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
   import   decisions.json
   status   [--json]
-  check    [--min 2] --text … --screen … --flow … [--root <repo>]
+  check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>]
   page     <saida.html> [--product …] [--color …]
   (--dir padrão: <root ou diretório atual>/.dsx/findings; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
 
@@ -489,11 +550,11 @@ function main() {
   const st = load(p, a.module);
   const now = process.env.DSX_NOW ? new Date(process.env.DSX_NOW) : new Date();
   const str = (v) => (typeof v === 'string' ? v : null);
-  const inputs = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), root, includeSev0: !!a['include-sev0'] };
+  const inputs = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), states: str(a.states), consistency: str(a.consistency), layout: str(a.layout), root, includeSev0: !!a['include-sev0'] };
   const loc = (i) => (i.source?.[0] ?? (i.screens ?? []).join(', '));
 
   if (cmd === 'register') {
-    if (!inputs.text && !inputs.screen && !inputs.flow) { console.error('register: informe ao menos --text, --screen ou --flow'); process.exit(2); }
+    if (!FAMILIES.some((f) => inputs[f])) { console.error(`register: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     st.findings.module = a.module;
     merge(st.findings, run, { now, commit: gitCommit(root), decisions: st.decisions });
@@ -552,7 +613,7 @@ function main() {
     return;
   }
   if (cmd === 'check') {
-    if (!inputs.text && !inputs.screen && !inputs.flow) { console.error('check: informe ao menos --text, --screen ou --flow'); process.exit(2); }
+    if (!FAMILIES.some((f) => inputs[f])) { console.error(`check: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     const min = Number(a.min ?? 2);
     const r = check(st.findings, run, { min, decisions: st.decisions });
