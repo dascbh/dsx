@@ -1,0 +1,91 @@
+# Rubrica: qualidade de um UX.md (espelha skills/ux-md, Modo C, e evals/rubrics/design-md.yaml).
+# A nota de 100 pontos é calculada por código (node tools/lint-ux-md.mjs UX.md --score [--map …] [--screens …]).
+# O que a máquina não mede entra como gate de julgamento (human/judge) e como critérios abertos para o juiz-de-evals,
+# que não somam pontos: reprovam ou registram lacunas.
+id: ux-md
+version: 1
+max-score: 100
+bands:
+  robust: [90, 100]
+  usable-with-gaps: [75, 89]
+  review-before-use: [60, 74]
+  high-risk: [0, 59]
+
+gates:
+  - id: lint
+    evaluator: code
+    how: "node tools/lint-ux-md.mjs UX.md → 0 erros"
+  - id: essential-coverage
+    evaluator: code
+    how: "toda tela do mapa de fluxo e das capturas tem arquétipo no front matter ou está num desvio declarado (--score com --map/--screens; drift U1)"
+  - id: policy-fidelity
+    evaluator: code+human
+    how: "nenhuma política do front matter contrariada pela maioria das telas de um arquétipo (drift U3, com T1, T2, T5 e L1); amostra de 5 telas confirma o resto"
+  - id: connected-to-agent
+    evaluator: code
+    how: "CLAUDE.md, AGENTS.md ou regra da ferramenta do projeto cita UX.md"
+  - id: no-conflict
+    evaluator: judge
+    how: "nenhuma regra de ferramenta, DESIGN.md ou documento de produto contradiz o UX.md para o mesmo contexto"
+
+criteria:
+  - id: screen-coverage
+    weight: 20
+    evaluator: code
+    how: "telas do inventário (mapa + capturas) com arquétipo ou desvio ÷ total, × fração das entradas de archetypes que nomeiam tela do mapa; sem inventário, no máximo 50%"
+  - id: policies-with-evidence
+    weight: 15
+    evaluator: code
+    how: "metade: políticas declaradas das 15 chaves (navigation, actions, confirmation, feedback, forms); metade: evidências no corpo (arquivo:linha + ids de padrões citados), cheia com 15"
+  - id: declared-states
+    weight: 10
+    evaluator: code
+    how: "metade: os 5 estados base em states; metade: os 5 descritos na seção Feedback e estados"
+  - id: flow-limits
+    weight: 10
+    evaluator: code
+    how: "0,4 limites em flows (3 chaves) + 0,3 jornadas na seção Fluxos (≥ 2) + 0,3 limites citados e justificados no texto"
+  - id: glossary
+    weight: 10
+    evaluator: code
+    how: "por fonte (única ou por módulo, média): 0,3 declarada + 0,3 resolve (arquivo existe, tabela inline ou mapa) + 0,4 termos com 'nunca chamar de' (cheia com 8)"
+  - id: dos-donts
+    weight: 10
+    evaluator: code
+    how: "0,4 se Faça e Não faça têm ≥ 3 itens + 0,6 × fração de itens com âncora concreta (tela, arquivo, número, rótulo entre aspas, código)"
+  - id: verification-selectors
+    weight: 10
+    evaluator: code
+    how: "0,8 × seletores básicos (regions, dialog, primary, destructive, button, field) + 0,2 com dialog-footer ou archetype-regions"
+  - id: freshness
+    weight: 10
+    evaluator: code
+    how: "0,3 version em semver + 0,2 updated AAAA-MM-DD + 0,5 idade (≤ 90 dias cheio, 0 em 365); zera a idade se as telas mudaram depois do updated (drift U5)"
+  - id: declared-deviations
+    weight: 5
+    evaluator: code
+    how: "desvios da tabela do corpo (D1…) e do bloco deviations do front matter coincidem (interseção ÷ união); sem desvio nenhum, cheio"
+
+# Critérios abertos: o juiz-de-evals avalia um por vez, com o UX.md e as capturas, e devolve evidência + âncora.
+# Não somam pontos à nota de código; âncora ≤ 0,33 em qualquer um é lacuna a corrigir antes de o arquivo virar autoridade.
+judge-criteria:
+  - id: archetype-fit
+    question: "O arquétipo atribuído casa com a tarefa de cada tela (quando-usar e evitar-quando do cartão), não só com a aparência?"
+  - id: policies-are-real
+    question: "As políticas do front matter descrevem o que o produto faz hoje (ou a contradição está registrada como desvio ou Não faça), em vez de aspiração?"
+  - id: dos-donts-from-real-problems
+    question: "Cada item de Faça e não faça vem de um problema real (tela, achado, chamado) e diz o critério observável?"
+  - id: agent-instructions-actionable
+    question: "As Instruções para agentes dizem quando consultar, o que preservar e como validar (comandos), a ponto de um agente novo seguir sem perguntar?"
+  - id: deviations-justified
+    question: "Cada desvio declarado tem motivo de produto e custo explícitos, e não é dívida disfarçada (que deveria ser Não faça com prazo)?"
+
+generic-anchors:
+  0.0: "Ausente ou contraditório."
+  0.33: "Presente, mas genérico: o agente ainda precisaria adivinhar onde fica cada coisa ou como a tela se comporta."
+  0.67: "Específico na maior parte; lacunas pontuais."
+  1.0: "Específico, verificável e com evidência; a geração controlada não revela invenção de comportamento neste critério."
+
+acceptance-test:
+  description: "Geração controlada: peça uma tela nova de um arquétipo já usado, só com o UX.md, o DESIGN.md e o código; cada posição de ação, confirmação, estado ou rótulo inventado é uma lacuna do UX.md."
+  attempts: 3

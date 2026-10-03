@@ -27,7 +27,7 @@ O DSX trata código e Figma como **dois lados de um ciclo contínuo**. O código
 |---|---|---|---|
 | 1 | Mapear o projeto: estrutura, UI, fluxos, tarefas, jornada, domínio, design system real (com hazards) | `/dsx:mapear` | não |
 | 2 | Confirmar o que os mapas inferiram, contra suas specs; gera o AS-IS/TO-BE | `/dsx:confirmar-mapas` | não |
-| 3 | Fundação no código: DESIGN.md e tokens com contraste verificado | `/dsx:iniciar` (usa `design-md` e `tokens`) | não |
+| 3 | Fundação no código: DESIGN.md, UX.md e tokens com contraste verificado | `/dsx:iniciar` (usa `design-md`, `ux-md` e `tokens`) | não |
 | 4 | Montar o ciclo: registro de sincronia, Code Connect, primeiro baseline | `/dsx:figma-iniciar` | sim |
 | 5 | Levar ao Figma: variáveis (3 coleções, Claro/Escuro), estilos, ícones reais, uma tela por rota, diálogos e estados, seções por jornada | `/dsx:figma-levar` | sim |
 | 6 | Convenções no próprio arquivo, para quem abrir sem o DSX | `/dsx:figma-convencoes` | sim |

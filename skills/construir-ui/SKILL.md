@@ -1,18 +1,18 @@
 ---
 name: construir-ui
-description: "Constrói ou altera UI dentro do design system: lê DESIGN.md e tokens, reusa componentes, segue o catálogo de padrões, implementa todos os estados e verifica contraste e valores crus. Use sempre que escrever ou modificar código de interface."
+description: "Constrói ou altera UI dentro do design system: lê DESIGN.md (como parece) e UX.md (arquétipo da tela, ações, estados), reusa componentes, segue o catálogo de padrões, implementa todos os estados e verifica contraste, valores crus e ux-lint. Use sempre que escrever ou modificar código de interface."
 ---
 
 # Construir UI dentro do sistema
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Todos os caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` abaixo são relativos a ela. Caminhos sem prefixo (`DESIGN.md`, `src/`) são do projeto do usuário.
+> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Todos os caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` abaixo são relativos a ela. Caminhos sem prefixo (`DESIGN.md`, `UX.md`, `src/`) são do projeto do usuário.
 
 O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pelo mesmo time que fez o resto do produto** e que funciona em todos os estados, para todas as pessoas.
 
 ## 0. Pré-condições
 
 1. Procure `DESIGN.md` na raiz do projeto. **Se não existir**, pare e rode a skill `iniciar` (ou `design-md` no modo "extrair do código"). Construir sem fonte visual é a principal causa de drift.
-2. Procure `UX.md` na raiz do projeto. **Se existir**, leia antes de desenhar: o arquétipo da tela (seção "Arquétipos de tela", cartão em `archetypes/`), a posição e o limite de ações primárias, a política de confirmação e feedback, os estados obrigatórios e os termos proibidos. Tela sem arquétipo na tabela: proponha um e registre (skill `ux-md`); para escolher entre arranjos, skill `arranjar-tela`.
+2. Procure `UX.md` na raiz do projeto. **Se não existir**, pare e rode a skill `iniciar` (ou `ux-md` no Modo A, "extrair do código"): construir sem saber que tipo de tela é, onde fica a primária e quais estados são obrigatórios é a principal causa de telas do mesmo tipo divergirem. **Antes de desenhar, leia o arquétipo da tela**: a linha dela na seção "Arquétipos de tela" (e os desvios D… que a citam), o cartão `archetypes/<id>.md` (regiões, ação primária, estados, variações), a posição e o limite de ações primárias, a política de confirmação e feedback, os estados obrigatórios e os termos proibidos. Tela sem arquétipo na tabela: proponha um e registre no `UX.md` antes de construir (skill `ux-md`); para escolher entre arranjos, skill `arranjar-tela`.
 3. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
 4. Se existirem mapas do projeto (`.dsx/maps/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `flows.json` (de onde a tela é alcançada e para onde leva), `tasks.json` (passos e dependências), `domain.json` (de onde vêm os dados, cardinalidades), `journey.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
 5. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `code`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
@@ -75,8 +75,15 @@ Rode e corrija até passar:
 node <DSX>/tools/lint-raw-values.mjs <pastas-alteradas>     # zero valores crus
 node <DSX>/tools/contrast.mjs "<texto>" "<fundo>"           # para cada par novo de cor
 node <DSX>/tools/lint-design-md.mjs DESIGN.md               # se você alterou o DESIGN.md
-node <DSX>/tools/ux-lint/screen.mjs <captura.html> --ux UX.md  # se o projeto tem UX.md e captura da tela
+node <DSX>/tools/ux-lint/screen.mjs <captura.html> --ux UX.md   # gate de UX da tela (T1–T7), sobre a captura nova
+node <DSX>/tools/ux-lint/states.mjs <capturas> --ux UX.md       # estados obrigatórios do arquétipo capturados (S1–S3)
+node <DSX>/tools/lint-ux-md.mjs UX.md                           # se você alterou o UX.md
+node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .   # o UX.md ainda descreve as telas (U1–U6)
 ```
+
+Achado de severidade ≥ 3 do ux-lint bloqueia a entrega (ou vira dívida registrada em `.dsx/findings/<modulo>/` com dono). Captura pela skill de captura do projeto (ex.: `code-to-stitch`); sem captura, diga no relatório que o gate de UX não rodou.
+
+**Mudou comportamento, atualize o `UX.md` no mesmo commit.** Tela nova ou removida, arquétipo, posição de ação, confirmação, feedback, estado ou fluxo diferente do que o `UX.md` diz: atualize a linha da tela (seção 5), a política ou o desvio (bloco `deviations` + tabela D…), o mapa `.dsx/maps/flows-<module>.json` se a navegação mudou, e suba `version` (política ou arquétipo → menor; só texto → patch) e `updated`. O drift (U5) acusa `updated` mais velho que as telas.
 
 Se houver app rodando, abra a tela (navegador ou screenshot) e confira: largura 320px, zoom 200%, navegação só por teclado (Tab/Shift+Tab/Enter/Esc), tema escuro.
 
@@ -96,8 +103,10 @@ Componentes reutilizados: …
 Componentes/variantes novos (com motivo): …
 Tokens usados: … | Tokens propostos: …
 Decisões de interação: <decisão> → <padrão>
+Arquétipo: <id> (UX.md <version>) · desvios aplicados: D… ou nenhum
 Estados implementados: carregando ✔ vazio ✔ erro ✔ sucesso ✔ foco ✔ …
-Verificações: lint-raw-values 0 ocorrências · contraste OK · teclado OK · 320px OK
+Verificações: lint-raw-values 0 ocorrências · contraste OK · ux-lint sem sev ≥ 3 · drift 0 · teclado OK · 320px OK
+UX.md: atualizado para <version> (o que mudou) | sem mudança de comportamento
 Pendências / riscos: …
 ```
 

@@ -39,6 +39,7 @@ description: "Consulta o catálogo de 77 padrões de interface para decidir com 
 - Padrão com `status: avoid` só pode ser usado com justificativa explícita registrada.
 - Se dois padrões recomendados apontarem caminhos diferentes, prefira o que reduz **custo de erro** para a pessoa (reversibilidade > velocidade).
 - Se o DESIGN.md do projeto contradizer um padrão, siga o DESIGN.md **e** aponte a divergência no relatório — pode ser decisão consciente ou dívida.
+- Antes de abrir o catálogo, veja se o `UX.md` do projeto já fixou a decisão (posição da primária, ordem do diálogo, confirmação, feedback, validação, obrigatórios): o `UX.md` **escolhe** entre as opções que o padrão deixa abertas, e a escolha dele vale para todas as telas daquele arquétipo. Se o `UX.md` contradizer um padrão, siga o `UX.md` e aponte a divergência; se a decisão não está lá e vale para mais de uma tela, proponha acrescentá-la ao `UX.md` (skill `ux-md`, sobe a versão menor) em vez de decidir tela a tela.
 
 ## Formato de resposta
 

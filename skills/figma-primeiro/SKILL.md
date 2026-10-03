@@ -116,6 +116,8 @@ Onde aparece | Onde NUNCA aparece) sai das descrições das variáveis e das
 legendas das amostras do arquivo; o que não estiver escrito lá, pergunte ao
 designer.
 
+**Telas → `UX.md`.** Antes da primeira tela, gere o `UX.md` com a skill `ux-md` no **Modo B (definir)**, partindo das telas do arquivo: cada frame de tela recebe um arquétipo de `archetypes/` pela tarefa que ela resolve, e as políticas (posição da primária, ordem do diálogo, confirmação, feedback, estados) saem do que as telas do arquivo fazem — o que divergir entre telas do mesmo tipo é pergunta ao designer, não escolha silenciosa. Sem o `UX.md`, a skill `construir-ui` para.
+
 **Componentes → primitivos do kit.** Os componentes do arquivo dizem quais peças
 o design assume que existem. Implemente as que se repetem em ≥ 2 telas, pelas
 regras da skill `construir-ui` (só tokens semânticos, todos os estados).

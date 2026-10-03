@@ -76,6 +76,7 @@ Confira que existem, **antes de escrever qualquer coisa**:
 | `.dsx/maps/design-system.json` (com `hazards[]`) | skill `mapear` | pare: rode `mapear` |
 | `DESIGN.md` | skill `design-md` (Modo A extrai do código e do `design-system.json`) | pare: rode `design-md` |
 | tokens DTCG do projeto (`tokens/*.tokens.json` ou `*.tokens.json`) | skill `tokens` | **não bloqueia** — sem eles, os valores vêm do `design-system.json` |
+| `UX.md` | skill `ux-md` (Modo A extrai do código e dos mapas) | **não bloqueia** — com ele, os estados levados por tela são os de `states` + os do arquétipo da tela, e as seções podem agrupar por arquétipo; sem ele, os estados vêm do código e o relatório diz isso |
 | `.dsx/maps/tasks.json` | skill `mapear` | não bloqueia — sem ele, a fase Diálogos conta passos pelo componente |
 | `design/as-is-to-be.md` | skill `confirmar-mapas` | não bloqueia — sem ele, a fase Cobertura não tem contra o que cruzar; diga isso no relatório |
 

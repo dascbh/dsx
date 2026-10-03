@@ -60,7 +60,7 @@ Nunca rebaixe uma barreira grave de acessibilidade por ser difícil de corrigir.
 | 1 | Fundação | Tokens de cor, tipografia e espaço; poucos componentes; documentação mínima | Componentes de alto uso com estados |
 | 2 | Biblioteca | Componentes em design e código com estados e acessibilidade básica; página por componente | Governança, versão, métricas |
 | 3 | Sistema | Dono, SemVer, contribuição definida, métricas de adoção e drift, testes de acessibilidade e contraste no CI | Roadmap, depreciação planejada, consumo por agentes |
-| 4 | Produto | Roadmap e suporte, depreciação com prazo, métricas ligadas a resultado de produto, consumo legível por agentes e ferramentas (`DESIGN.md`, tokens DTCG, linters) | Manter e medir |
+| 4 | Produto | Roadmap e suporte, depreciação com prazo, métricas ligadas a resultado de produto, consumo legível por agentes e ferramentas (`DESIGN.md`, `UX.md`, tokens DTCG, linters) | Manter e medir |
 
 Regras de pontuação:
 

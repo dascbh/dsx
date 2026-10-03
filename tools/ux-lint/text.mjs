@@ -6,13 +6,16 @@
 // Sem dependências.
 //
 // Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md]
-//                                  [--ignore <nomes...>] [--json]
+//                                  [--module <m>] [--ignore <nomes...>] [--json]
+// --module escolhe o glossário do módulo (`content.glossary` por módulo): os termos canônicos com maiúscula no
+// meio ("Termo Aditivo", "Radar Tributário") valem como nomes próprios no X10, junto de `content.proper-nouns`.
 // --code procura cada texto apontado nas fontes (.ts/.tsx/.js/.jsx/.mjs/.py/.json) e devolve
 // arquivo:linha, para corrigir onde o texto nasce.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadConfig, configFrom } from './lib/config.mjs';
+import { loadGlossary, glossarySource } from './lib/glossary.mjs';
 import { normalizeArgv } from '../lib/legacy-cli.mjs';
 import { parseHtml, querySelectorAll, matches, closest, isHidden, getById, walk, contains, decodeEntities } from './lib/html.mjs';
 
@@ -257,7 +260,7 @@ export function rulesForItem(it, cfg = configFrom({}), extras = {}) {
   // `piece`: o pedaço que a regra acusa; com --code, se ele não está na linha de origem, veio do dado.
   const add = (rule, message, suggestion, piece) => out.push({ rule, severity: SEVERITY[rule], message, ...(suggestion ? { suggestion } : {}), ...(piece ? { piece } : {}) });
   const t = it.text;
-  const properNouns = (cfg.content['proper-nouns'] || []).map(String);
+  const properNouns = [...(cfg.content['proper-nouns'] || []).map(String), ...(extras.properNouns ?? [])];
   const structural = ['title', 'button', 'tab'].includes(it.type);
 
   // X1 / X1b
@@ -352,6 +355,12 @@ export function rulesForItem(it, cfg = configFrom({}), extras = {}) {
   return out;
 }
 
+/** Termos canônicos do glossário com maiúscula depois da primeira letra viram nomes próprios do X10. */
+export function glossaryProperNouns(glossary = []) {
+  const terms = glossary.flatMap((g) => clean(g.term).replace(/\([^)]*\)/g, ' ').split(/\s+\/\s+/)).map(clean);
+  return [...new Set(terms.filter((t) => t.length > 1 && /\p{Lu}/u.test(t.slice(1))))];
+}
+
 export function termsFrom(cfg) {
   const list = [...(cfg.content.forbidden || []).map(String), ...TECHNICAL_TERMS, 'OCR'];
   const seen = new Set();
@@ -369,12 +378,12 @@ export function termsFrom(cfg) {
 }
 
 /** Inventário + achados de uma tela. */
-export function analyzeText(html, cfg = configFrom({}), file = 'tela.html') {
+export function analyzeText(html, cfg = configFrom({}), file = 'tela.html', { properNouns = [] } = {}) {
   const terms = termsFrom(cfg);
   const inventory = takeInventory(html, cfg);
   const findings = [];
   for (const it of inventory) {
-    for (const a of rulesForItem(it, cfg, { terms })) {
+    for (const a of rulesForItem(it, cfg, { terms, properNouns })) {
       findings.push({ ...a, type: it.type, text: it.text, evidence: `${file}:${it.line}:${it.col}` });
     }
   }
@@ -664,12 +673,13 @@ export function summarize(results, groups) {
 /** Interpreta os argumentos; flags antigas (--telas, --codigo, --ignorar) viram as novas com aviso (tools/lib/legacy-cli.mjs). */
 export function parseTextArgs(argv, warn) {
   argv = normalizeArgv('ux-lint/text.mjs', argv, warn);
-  const out = { screens: [], code: [], ignore: [], ux: null, json: false };
+  const out = { screens: [], code: [], ignore: [], ux: null, module: null, json: false };
   let current = 'screens';
   for (const a of argv) {
     if (a === '--json') { out.json = true; continue; }
     if (a.startsWith('--')) { current = a.slice(2); if (!(current in out)) throw new Error(`opção desconhecida: ${a}`); continue; }
     if (current === 'ux') { out.ux = a; current = 'screens'; continue; }
+    if (current === 'module') { out.module = a; current = 'screens'; continue; }
     out[current].push(a);
   }
   return out;
@@ -690,14 +700,16 @@ function main() {
   let args;
   try { args = parseTextArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
   if (!args.screens.length) {
-    console.error('Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md] [--ignore <nomes...>] [--json]');
+    console.error('Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md] [--module <m>] [--ignore <nomes...>] [--json]');
     process.exit(2);
   }
   const cfg = loadConfig(args.ux);
-  const results = listHtml(args.screens, args.ignore).map((f) => analyzeText(readFileSync(f, 'utf8'), cfg, f));
+  const properNouns = glossaryProperNouns(loadGlossary(cfg, args.ux, args.module));
+  const glossaryKey = glossarySource(cfg.content?.glossary, args.module).module;
+  const results = listHtml(args.screens, args.ignore).map((f) => analyzeText(readFileSync(f, 'utf8'), cfg, f, { properNouns }));
   const index = args.code.length ? indexCode(args.code) : null;
   const groups = group(results, index);
-  const summary = summarize(results, groups);
+  const summary = { ...summarize(results, groups), glossary_proper_nouns: properNouns.length, ...(glossaryKey ? { glossary_module: glossaryKey } : {}) };
   const top = ranking(groups);
   if (args.json) {
     console.log(JSON.stringify({ summary, ranking: top, findings: groups, screens: results, ...(cfg.legacyWarnings.length ? { warnings: cfg.legacyWarnings } : {}) }, null, 2));

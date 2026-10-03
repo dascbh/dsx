@@ -44,9 +44,11 @@ Os três ficam separados de propósito: registrar de novo reescreve só `finding
     "present": true,                 // apareceu na última execução da sua família
     "fixed_at": null,                // dia em que deixou de aparecer pela última vez (guarda a memória para `regression`)
     "status": "open"                 // calculado (ver ciclo)
-  }]
+  }],
+  "deviations": [{ "id": "D3", "screens": ["modelo-editor"], "rules": ["T3"], "reason": "…", "decided_by": "dono", "until": null }]
 }
 ```
+`deviations` é a cópia dos desvios declarados no `UX.md` na última execução que o leu (`register --ux`, ou `<root>/UX.md`). Item coberto por um deles leva também `"deviation": { "id", "reason", "decided_by", "until" }` e status `accepted-deviation`.
 Itens das famílias `screen` e `states` levam também `region` (em `states`, o estado + a região: `error · main`). `source` é relativo à raiz do projeto; nas famílias `screen`, `states` e `consistency` aponta a captura (`.html:linha`), nas outras o código.
 
 **Id estável** = hash de `family | rule | âncora`, onde a âncora é, nesta ordem: a primeira origem no código sem o número da linha (o arquivo) + o texto normalizado (minúsculas, espaços únicos, dados variáveis trocados por `{}` — números, datas, horas, valores e, quando há `variants`, o trecho que muda entre elas); sem origem no código, a tela + região + texto. Mudar a linha do arquivo não muda o id; mudar o texto ou o arquivo muda. Dois ajustes declarados: na família `flow` a âncora é sempre a tela (ou jornada) do mapa, porque a evidência dela lista transições de entrada que mudam sem o achado mudar; e nas famílias `text` e `consistency` sem origem no código a âncora não leva tela, porque o achado agrupa várias telas (em `consistency`, o texto é a função ou o conceito — "excluir minuta" —, não os rótulos achados). Quando o conjunto de variantes muda e com ele o texto-modelo, o item herda o id registrado de mesma família, regra e arquivo que tenha uma variante em comum.
@@ -91,8 +93,11 @@ Itens das famílias `screen` e `states` levam também `region` (em `states`, o e
 | `open` (aberto) | presente na última execução, sem decisão |
 | `decided` (decidido) | presente, com decisão de opção ou texto livre (falta aplicar) |
 | `ignored` (ignorado) | decisão `ignore` com motivo (não conta na trava) |
+| `accepted-deviation` (desvio aceito) | presente, e coberto por um desvio vigente do bloco `deviations` do `UX.md` (regra em `rules`, todas as telas em `screens`, `until` não vencido). Não conta como aberto nem na trava; aparece na página com o motivo |
 | `fixed` (corrigido) | não apareceu na última execução da sua família, depois de ter aparecido |
 | `regression` (regressão) | voltou a aparecer depois de `fixed` |
+
+Precedência: `ignored` (decisão do dono) → `fixed` → `accepted-deviation` → `regression` → `decided` → `open`. O desvio é recalculado a cada registro: se ele sai do `UX.md`, vence ou deixa de listar a regra ou a tela, o achado volta a `open` (ou `regression`). A diferença para `ignored`: o desvio é uma decisão de produto escrita no `UX.md`, que vale para todo achado da mesma regra naquelas telas, inclusive os que ainda não apareceram; `ignore` é a decisão sobre um id só.
 
 Itens de revisão manual (`origin: "review"`) não são vistos pelos verificadores: uma execução nunca os marca como ausentes, então ficam `open`, `decided` ou `ignored` até alguém revisar de novo.
 
@@ -101,14 +106,15 @@ Itens de revisão manual (`origin: "review"`) não são vistos pelos verificador
 Roda os mesmos verificadores (ou lê o JSON de uma execução) e compara com o registro:
 - **achado novo** (id que não existe no registro) de severidade ≥ `--min` (padrão 2) → reprova;
 - **regressão** → reprova;
-- achados já registrados e abertos → toleram (a dívida é conhecida), mas aparecem no resumo.
+- achados já registrados e abertos → toleram (a dívida é conhecida), mas aparecem no resumo;
+- achados cobertos por desvio declarado no `UX.md` (lido de `--ux` ou de `<root>/UX.md`) → passam, mesmo novos, e aparecem na contagem "coberto(s) por desvio declarado".
 
 Assim o produto só melhora: nada novo entra pior, e o que foi corrigido não volta.
 
 ## Fluxo de trabalho
 
 1. **Detectar**: rodar `text.mjs`/`screen.mjs`/`flow.mjs` com `--json`.
-2. **Registrar**: `node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json --root <repo>`.
+2. **Registrar**: `node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json --root <repo> [--ux UX.md]` (o `UX.md` dá os desvios aceitos).
 3. **Propor**: a skill escreve as opções (`findings.mjs options --module <m> --from cases.json`); caso que não casa com nenhum achado entra como item de revisão manual.
 4. **Decidir**: o dono escolhe na página (`findings.mjs page`, que gera o formulário e um JSON de decisões para colar) ou no chat; `findings.mjs import` / `decide` grava em `decisions.json`.
 5. **Aplicar**: corrigir na origem (`arquivo:linha`), uma decisão por vez ou em lote.
@@ -119,5 +125,6 @@ Assim o produto só melhora: nada novo entra pior, e o que foi corrigido não vo
 
 - [ ] Todo resultado de verificador de UX entra em `.dsx/findings/<modulo>/` (não fica em pasta temporária nem só na conversa).
 - [ ] Decisões do dono gravadas em `decisions.json`, com quem e quando; `ignore` sempre com motivo.
+- [ ] Desvio de produto (vale para uma regra em várias telas) declarado no bloco `deviations` do `UX.md`, não como vários `ignore`.
 - [ ] Depois de corrigir, registrar de novo e conferir o status `fixed`.
 - [ ] `findings.mjs check` ligado no pre-commit ou CI do projeto.

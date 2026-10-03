@@ -15,7 +15,7 @@ Referência: `knowledge/design-system/escolher-design-system.md` (registro, aval
 
 Levante, do código, dos mapas (`.dsx/maps/`) ou perguntando o mínimo:
 - persona e tarefa principal; frequência e duração de uso;
-- **registro**: `operational`, `consumer`, `editorial`, `brand` ou `experimental` (tabela no knowledge);
+- **registro**: `operational`, `consumer`, `editorial`, `brand` ou `experimental` (tabela no knowledge). SE o projeto tem `UX.md` → ENTÃO use o `product.register` e a `product.density` dele (os arquétipos das telas já dependem desse registro); escolher outro registro aqui é mudança maior do `UX.md` (skill `ux-md`, `version` 2.0.0) e precisa do dono;
 - densidade-alvo, plataforma (desktop, mobile), tema claro/escuro (`--theme light|dark`);
 - o que já é fixo: cor de marca, fonte licenciada, componentes existentes;
 - exigências de acessibilidade além do AA.
@@ -41,7 +41,7 @@ Liste por opção: nota, contraste reprovado (componente e razão), componentes 
 ## 4. Apresentar 3 + 1
 
 - Três opções no registro e **uma contrastante**. Para cada uma: o que favorece, o que piora, nota/defeitos, esforço de adaptação, e o crédito (designmd.app, CC BY 4.0).
-- **Mostrar no produto:**
+- **Mostrar no produto** (as telas mostradas cobrem os arquétipos principais do `UX.md`, quando existe — uma lista, um detalhe ou editor, um diálogo —, porque o tema quebra de jeitos diferentes em cada tipo de tela):
   - Projeto com telas e captura pelo código (ex. skill `code-to-stitch`): **renderize as telas reais com o tema de cada opção** — um tema por cima do tema do produto, montado do front matter da referência (paleta, fonte, raio e as cores fixas que o tema do produto tiver). Envie ao Stitch uma linha por opção, mesma tela na mesma coluna, mais a linha do atual. Escolha um ou dois fluxos curtos, não o produto inteiro.
   - **Não use `apply_design_system` em telas capturadas do código**: elas carregam o CSS real com cores fixas, e a ferramenta quase não muda nada (testado em 2026-10-02: só um selo mudou). Ela funciona em telas geradas pelo próprio Stitch.
   - Projeto sem telas: gere a mesma tela-chave com cada design system (skill `stitch`, modo Gerar) e critique cada uma (modo Criticar).

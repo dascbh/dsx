@@ -5,7 +5,7 @@ Estas regras decidem conflitos entre skills, padrões e pedidos. Quando duas ori
 1. **Pessoas antes de pixels.** Acessibilidade e prevenção de perda de dados ou dinheiro vencem estética, conveniência e prazo. Barreira que impede uma tarefa é sempre severidade máxima.
 2. **Honestidade de interface.** Nada de dark patterns, nem a pedido. A interface não esconde custo, não engana sobre o que é gerado por IA e não dificulta sair, cancelar ou recusar.
 3. **Evidência rotulada.** Toda afirmação sobre usuários tem nível de evidência. Saída de modelo e usuário sintético são hipóteses; nunca se fabricam citações, números ou resultados.
-4. **Uma fonte de verdade.** `DESIGN.md` e tokens definem o visual; o catálogo de padrões define a interação. Ferramentas apontam para eles, não os copiam. Divergência é corrigida na fonte.
+4. **Uma fonte de verdade.** `DESIGN.md` e tokens definem o visual; o `UX.md` define como o produto se organiza e se comporta (escolhendo entre as opções do catálogo de padrões, que define a interação em geral). Ferramentas apontam para eles, não os copiam. Divergência é corrigida na fonte.
 5. **Sistema antes de improviso.** Reutilize tokens e componentes. Valor cru e componente paralelo são dívida — se forem necessários, registre o motivo.
 6. **Todos os estados, sempre.** Carregando, vazio, erro, sucesso, foco e desabilitado fazem parte da tela, não são extras.
 7. **Reversibilidade proporcional ao risco.** Prefira desfazer a confirmar; confirme de forma específica o que é irreversível; agentes nunca executam ação crítica sem aprovação.

@@ -1,6 +1,6 @@
 # DSX — Design System eXperience para agentes de IA
 
-Framework aberto de **design system, UI e UX feito para ser usado por agentes de IA**: em vez de documentação para pessoas lerem, ele traz procedimentos que agentes executam (skills), decisões que agentes consultam (padrões), referência que agentes carregam sob demanda (conhecimento) e **ferramentas que verificam** o que foi feito (tokens, contraste, DESIGN.md, drift).
+Framework aberto de **design system, UI e UX feito para ser usado por agentes de IA**: em vez de documentação para pessoas lerem, ele traz procedimentos que agentes executam (skills), decisões que agentes consultam (padrões), referência que agentes carregam sob demanda (conhecimento) e **ferramentas que verificam** o que foi feito (tokens, contraste, DESIGN.md, UX.md, drift).
 
 A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou caro. O DSX dá ao agente o critério que falta — e a quem revisa, uma forma de checar.
 
@@ -8,16 +8,16 @@ A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou c
 
 | Pasta | Conteúdo |
 |---|---|
-| [`skills/`](skills) | 28 skills. **Núcleo:** `iniciar`, `design-md`, `tokens`, `construir-ui`, `padroes`, `revisar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
+| [`skills/`](skills) | 32 skills. **Núcleo:** `iniciar`, `design-md`, `ux-md`, `tokens`, `construir-ui`, `arranjar-tela`, `padroes`, `revisar-ux`, `auditar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
 | [`agents/`](agents) | 11 subagentes: `revisor-ux`, `extrator-design-system`, `juiz-de-evals`, `leitor-figma`, `analisador-specs` e os mapeadores de projeto, UI, fluxos, tarefas, jornada e domínio |
 | [`hooks/`](hooks) | `turn-guard`: impede reespelhar o Figma por cima do refino do design |
 | [`patterns/`](patterns) | 77 padrões de interação — formulários, feedback, ações, navegação, dados, modais, autenticação, acessibilidade, UX writing, IA, e-commerce — cada um com regra, árvore de decisão SE→ENTÃO, acessibilidade, microcópia e checklist |
 | [`knowledge/`](knowledge) | ~40 documentos de referência em 4 áreas: [fundamentos](knowledge/fundamentos), [design system](knowledge/design-system), [pesquisa](knowledge/pesquisa), [IA](knowledge/ia) |
 | [`tokens/`](tokens) | Tokens W3C DTCG em 3 camadas (primitivo → semântico → componente), temas claro/escuro, pares de contraste verificados |
-| [`tools/`](tools) | Ferramentas Node sem dependências: build de tokens, contraste, paleta OKLCH, escalas tipográfica e de espaçamento, linters de DESIGN.md, de valores crus e de padrões; em [`tools/figma/`](tools/figma) snapshot e diff do arquivo, prelúdio de helpers e as pontes tokens DTCG ↔ variáveis do Figma |
-| [`templates/`](templates) | DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, persona, JTBD, OST, mapa de suposições, relatório heurístico |
-| [`evals/`](evals) | Rubricas (UI gerada, DESIGN.md, feature de IA) e casos de teste |
-| [`examples/`](examples) | DESIGN.md de referência, aprovado no linter |
+| [`tools/`](tools) | Ferramentas Node sem dependências: build de tokens, contraste, paleta OKLCH, escalas tipográfica e de espaçamento, linters de DESIGN.md e de UX.md (com nota de 100 pontos), de valores crus, de padrões e de arquétipos; em [`tools/ux-lint/`](tools/ux-lint) os verificadores de UX (texto, tela, fluxo, layout, estados, consistência), o drift UX.md × produto e o registro de achados; em [`tools/figma/`](tools/figma) snapshot e diff do arquivo, prelúdio de helpers e as pontes tokens DTCG ↔ variáveis do Figma |
+| [`templates/`](templates) | DESIGN.md, UX.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, persona, JTBD, OST, mapa de suposições, relatório heurístico |
+| [`evals/`](evals) | Rubricas (UI gerada, DESIGN.md, UX.md, feature de IA) e casos de teste |
+| [`examples/`](examples) | DESIGN.md e UX.md de referência, aprovados nos linters |
 
 ## Começando
 
@@ -35,6 +35,8 @@ Depois, no seu projeto: `/dsx:iniciar`.
 npm run build:tokens                         # compila tokens/build/tokens.css e verifica contraste
 node tools/palette.mjs "#3d5afe"             # rampa de cor com contraste por passo
 node tools/lint-design-md.mjs DESIGN.md      # valida o DESIGN.md do seu projeto
+node tools/lint-ux-md.mjs UX.md --score      # valida e pontua o UX.md (nota de 100 e gates)
+node tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .   # o UX.md ainda descreve as telas?
 node tools/lint-raw-values.mjs src           # encontra valores crus (drift do design system)
 npm run check                                # verificação completa do framework
 ```
@@ -43,12 +45,14 @@ npm run check                                # verificação completa do framewo
 
 ```
                ┌──────────── fonte de verdade do projeto ────────────┐
-               │   DESIGN.md  +  tokens (DTCG)  +  componentes        │
+               │  DESIGN.md (como parece) + UX.md (como se comporta)  │
+               │       + tokens (DTCG) + componentes + archetypes/    │
                └───────────────▲───────────────────────┬─────────────┘
-                               │ cria/avalia           │ lê
-   iniciar · design-md · tokens│                       ▼
+                               │ cria/avalia/drift     │ lê
+ iniciar · design-md · ux-md · │                       ▼
+ tokens                        │
                                │            construir-ui ──consulta──► patterns/
-   auditar-ds ─────────────────┘                 │                    knowledge/
+   auditar-ds · auditar-ux ────┘                 │                    knowledge/
                                                  ▼
                          revisar-ux · acessibilidade · ux-writing · ux-ia
                                                  │

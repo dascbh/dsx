@@ -2,7 +2,7 @@
 // ux-lint, nível consistência: aplica as regras C1–C3 do contrato do UX.md (knowledge/fundamentos/ux-md.md,
 // "Consistência") sobre a pasta de capturas HTML, comparando as telas entre si. Sem dependências.
 //
-// Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--json] [--fail-at 3]
+// Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]
 //
 // Inventário: botões, títulos e abas de cada captura (o mesmo do text.mjs, `takeInventory`). Com diálogo aberto, só o
 // diálogo. Capturas de estado (`<nn>-<tela>.<estado>.html`) contam como a mesma tela.
@@ -15,15 +15,16 @@
 //    não tem.
 // C2 mesmo rótulo de botão com variantes visuais diferentes (cheio × contornado × texto) entre capturas.
 // C3 mesmo conceito com nomes diferentes nos títulos e abas: termo da coluna "nunca chamar de"/"evitar" do glossário
-//    (`content.glossary` do UX.md: caminho de um .md com tabela, mapa termo → sinônimos, ou "inline" = tabela no
-//    próprio UX.md) e pares de sinônimos conhecidos (KNOWN_SYNONYMS), que valem com ou sem glossário.
+//    (`content.glossary` do UX.md: caminho de um .md com tabela, mapa termo → sinônimos, "inline" = tabela no
+//    próprio UX.md, ou mapa por módulo { default: …, <módulo>: … } escolhido por --module) e pares de sinônimos
+//    conhecidos (KNOWN_SYNONYMS), que valem com ou sem glossário.
 // JSON (--json): { summary, findings: [{ rule, severity, key, text, message, occurrences: [{ text, kind, variant,
 //                  screens, evidence }] }] }.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, basename, dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseCli } from '../lib/legacy-cli.mjs';
-import { splitFrontMatter } from '../lib/yaml-lite.mjs';
+import { loadGlossary, glossarySource } from './lib/glossary.mjs';
 import { loadConfig, configFrom } from './lib/config.mjs';
 import { closest, querySelectorAll, matches, isHidden } from './lib/html.mjs';
 import { takeInventory, visibleText } from './text.mjs';
@@ -116,40 +117,8 @@ function dialogTitle(dialog) {
 
 // ---------- glossário ----------
 
-/** Tabelas Markdown com coluna de termo e coluna de sinônimo a evitar → [{ term, avoid: [...] }]. */
-export function glossaryFromMarkdown(md) {
-  const out = [];
-  const lines = md.split('\n');
-  for (let i = 0; i < lines.length - 1; i++) {
-    if (!/^\s*\|/.test(lines[i]) || !/^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) continue;
-    const cells = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
-    const head = cells(lines[i]).map(fold);
-    const ti = head.findIndex((h) => /^(termo|term|conceito|concept)$/.test(h));
-    const ai = head.findIndex((h) => /nunca|evitar|avoid|nao use|nao chamar|sinonimo|synonym|deny/.test(h));
-    if (ti < 0 || ai < 0) continue;
-    for (let j = i + 2; j < lines.length && /^\s*\|/.test(lines[j]); j++) {
-      const c = cells(lines[j]);
-      const term = clean((c[ti] ?? '').replace(/\*\*/g, ''));
-      const raw = c[ai] ?? '';
-      const quoted = [...raw.matchAll(/["“]([^"”]+)["”]/g)].map((m) => m[1]);
-      const avoid = (quoted.length ? quoted : raw.replace(/\*\*[^*]*\*\*/g, '').replace(/\([^)]*\)/g, '').split(/[,;]/))
-        .map((x) => clean(x.replace(/[—–].*$/, ''))).filter((x) => x.length >= 3);
-      if (term && avoid.length) out.push({ term, avoid });
-    }
-  }
-  return out;
-}
-
-/** Glossário de `content.glossary`: mapa YAML, caminho de .md (relativo ao UX.md) ou "inline" (tabela no UX.md). */
-export function loadGlossary(cfg, uxPath = null) {
-  const g = cfg.content?.glossary;
-  if (!g) return [];
-  if (typeof g === 'object' && !Array.isArray(g)) return Object.entries(g).map(([term, avoid]) => ({ term, avoid: [].concat(avoid ?? []).map(String) }));
-  if (typeof g !== 'string' || !uxPath) return [];
-  if (g === 'inline') return glossaryFromMarkdown(splitFrontMatter(readFileSync(uxPath, 'utf8')).body ?? '');
-  const file = resolve(dirname(uxPath), g);
-  return existsSync(file) ? glossaryFromMarkdown(readFileSync(file, 'utf8')) : [];
-}
+// Leitura do glossário (único ou por módulo) em lib/glossary.mjs; reexportado aqui por compatibilidade.
+export { glossaryFromMarkdown, loadGlossary } from './lib/glossary.mjs';
 
 // ---------- regras ----------
 
@@ -259,18 +228,20 @@ export function summarize(findings, files, entries) {
   };
 }
 
-const USAGE = 'Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--json] [--fail-at 3]';
+const USAGE = 'Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]';
 
 function main() {
   const args = parseCli('ux-lint/consistency.mjs');
   if (!args._.length) { console.error(USAGE); process.exit(2); }
   const uxPath = typeof args.ux === 'string' ? args.ux : null;
   const cfg = loadConfig(uxPath);
-  const glossary = loadGlossary(cfg, uxPath);
+  const module = typeof args.module === 'string' ? args.module : null;
+  const glossary = loadGlossary(cfg, uxPath, module);
+  const glossaryKey = glossarySource(cfg.content?.glossary, module).module;
   const files = listHtml(args._);
   const entries = files.flatMap((f) => inventory(readFileSync(f, 'utf8'), cfg, f));
   const findings = analyzeConsistency(entries, { glossary });
-  const summary = { ...summarize(findings, files, entries), glossary_terms: glossary.length };
+  const summary = { ...summarize(findings, files, entries), glossary_terms: glossary.length, ...(glossaryKey ? { glossary_module: glossaryKey } : {}) };
   const threshold = Number(args['fail-at'] ?? 3);
   if (args.json) console.log(JSON.stringify({ summary, findings, ...(cfg.legacyWarnings.length ? { warnings: cfg.legacyWarnings } : {}) }, null, 2));
   else {
@@ -279,7 +250,7 @@ function main() {
       for (const o of f.occurrences) console.log(`      "${o.text}"${o.variant ? ` [${o.variant}]` : ''} · ${o.evidence[0]}`);
     }
     const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum';
-    console.log(`\nResumo: ${summary.captures} capturas (${summary.screens} telas), ${summary.inventory.button} botões, ${summary.inventory.title} títulos, ${summary.inventory.tab} abas; glossário com ${glossary.length} termos; ${summary.findings} achados (${rules})`);
+    console.log(`\nResumo: ${summary.captures} capturas (${summary.screens} telas), ${summary.inventory.button} botões, ${summary.inventory.title} títulos, ${summary.inventory.tab} abas; glossário${glossaryKey ? ` (${glossaryKey})` : ''} com ${glossary.length} termos; ${summary.findings} achados (${rules})`);
   }
   process.exit(findings.some((f) => f.severity >= threshold) ? 1 : 0);
 }

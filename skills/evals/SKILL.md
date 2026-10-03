@@ -24,7 +24,7 @@ Escreva: *quem* usa, *para fazer o quê*, *o que é um resultado bom* — em lin
 
 ## 3. Avaliador certo para cada critério
 
-- **Código** (preferir sempre que possível): `tools/lint-raw-values.mjs`, `tools/contrast.mjs`, `tools/lint-design-md.mjs`, axe/Playwright, validação de schema, estado final do sistema.
+- **Código** (preferir sempre que possível): `tools/lint-raw-values.mjs`, `tools/contrast.mjs`, `tools/lint-design-md.mjs`, `tools/lint-ux-md.mjs --score` (nota de 100 do UX.md), `tools/ux-lint/*` (comportamento da tela gerada contra o `UX.md`: T, S, L), axe/Playwright, validação de schema, estado final do sistema.
 - **LLM-juiz:** critérios abertos (clareza do texto, adequação do padrão de interação). Rubrica com âncoras descritivas por nota e exemplos de aprovado/reprovado; um critério por chamada; peça evidência antes da nota. **Calibre** contra ≥ 20 julgamentos humanos e reporte concordância.
 - **Humano:** julgamento de domínio, segurança, casos ambíguos, calibração do juiz.
 
@@ -39,7 +39,7 @@ Arquivo JSONL em `evals/cases/` (veja `evals/cases/generated-ui.jsonl`), uma lin
 ## 5. Rode e reporte
 
 - **N ≥ 3 tentativas por caso** — sistemas generativos variam; reporte taxa de aprovação e variância, não um único resultado.
-- Compare versões (prompt, skill, DESIGN.md, modelo) no **mesmo** conjunto.
+- Compare versões (prompt, skill, DESIGN.md, UX.md, modelo) no **mesmo** conjunto.
 - Para RAG: avalie separado recuperação, suficiência do contexto, fidelidade da resposta e acerto da citação.
 - Para agentes: avalie trajetória (ferramenta certa, ações proibidas não executadas, confirmação pedida nos riscos altos) **e** estado final.
 
@@ -47,6 +47,7 @@ Arquivo JSONL em `evals/cases/` (veja `evals/cases/generated-ui.jsonl`), uma lin
 
 - `evals/rubrics/generated-ui.yaml` — tela gerada por agente dentro do design system.
 - `evals/rubrics/design-md.yaml` — qualidade do DESIGN.md (espelha a skill `design-md`).
+- `evals/rubrics/ux-md.yaml` — qualidade do UX.md (espelha a skill `ux-md`): nota de 100 por código (`lint-ux-md.mjs --score`), gates e `judge-criteria` para o juiz (arquétipo casa com a tarefa, políticas reais, desvios justificados).
 - `evals/rubrics/ai-feature.yaml` — UX de feature com IA/agente.
 
 ## Saída

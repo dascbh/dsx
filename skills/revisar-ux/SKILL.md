@@ -20,7 +20,9 @@ Escreva em 3 linhas:
 
 Se você não consegue responder, isso já é o primeiro achado (falta de clareza de propósito).
 
-SE o projeto tem `UX.md` → ENTÃO leia-o antes: o arquétipo declarado para a tela (e o cartão em `archetypes/`), as políticas de ações, confirmação e feedback, e os "Não faça". Divergência da tela em relação ao `UX.md` é achado; arquétipo que não casa com a tarefa também.
+SE o projeto tem `UX.md` → ENTÃO leia-o antes: o arquétipo declarado para a tela (e o cartão em `archetypes/`), as políticas de ações, confirmação e feedback, os desvios (`deviations`) que citam a tela e os "Não faça". Divergência da tela em relação ao `UX.md` é achado; arquétipo que não casa com a tarefa também. Divergência coberta por desvio declarado **não** é achado da tela — no máximo, achado do desvio (motivo fraco, vencido, dívida disfarçada).
+SE o projeto não tem `UX.md` → ENTÃO revise com os padrões do DSX e registre como primeiro achado a falta dele (sem arquétipo declarado, a revisão não tem contra o que comparar); sugira a skill `ux-md`.
+SE `node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .` acusa drift → ENTÃO diga no relatório que o `UX.md` está desatualizado naquele ponto e não trate a regra velha como verdade.
 
 ## 2. Gate objetivo (ux-lint)
 
@@ -33,7 +35,7 @@ node <DSX>/tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json --ux UX.md   # F
 
 Os achados entram no relatório com a regra e a severidade que a ferramenta deu. O julgamento abaixo cobre o que ela não mede (adequação do arquétipo, clareza, carga cognitiva).
 
-**Registre em `.dsx/findings` e decida pelo registro** (contrato: `knowledge/fundamentos/achados-de-ux.md`): rode os verificadores com `--json` e `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen screen.json --flow flow.json [--text text.json] --root <repo>`. O relatório cita o id de cada achado; o dono decide pela página (`findings.mjs page`) ou no chat (`findings.mjs decide`), e a próxima revisão começa por `findings.mjs status` (regressões e decididos sem aplicar) em vez de recomeçar do zero.
+**Registre em `.dsx/findings` e decida pelo registro** (contrato: `knowledge/fundamentos/achados-de-ux.md`): rode os verificadores com `--json` e `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen screen.json --flow flow.json [--text text.json] --root <repo>` (lê os desvios do `<repo>/UX.md`: achado coberto fica `accepted-deviation`, com o motivo, e não entra como aberto). O relatório cita o id de cada achado; o dono decide pela página (`findings.mjs page`) ou no chat (`findings.mjs decide`), e a próxima revisão começa por `findings.mjs status` (regressões e decididos sem aplicar) em vez de recomeçar do zero.
 
 ## 2.1 Inspecione a tela renderizada
 

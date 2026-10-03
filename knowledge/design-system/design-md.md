@@ -21,8 +21,8 @@ O formato é uma especificação aberta em estágio alfa (`version: alpha`). Tra
 ### O que ele não é
 
 - **Não é o design system inteiro.** Biblioteca de componentes, código, governança e contribuição continuam existindo; o `DESIGN.md` é a porta de entrada legível.
-- **Não decide UX.** Não resolve arquitetura de informação, jornada ou adequação do problema; isso pertence à camada de contexto de UX (ver `design-system-para-ia.md`).
-- **Não é `CLAUDE.md`/`AGENTS.md`.** Esses carregam instruções operacionais (comandos, arquitetura de código, restrições técnicas) e apenas **apontam** para o `DESIGN.md`.
+- **Não decide UX.** Não resolve arquitetura de informação, jornada ou adequação do problema; isso pertence à camada de contexto de UX (ver `design-system-para-ia.md`). Que tipo de tela é cada uma, onde fica a ação primária, quando confirmar e quais estados são obrigatórios vão no par dele, o `UX.md` (`knowledge/fundamentos/ux-md.md`), que tem a mesma rubrica de 100 pontos, os mesmos gates e a mesma regra de manutenção.
+- **Não é `CLAUDE.md`/`AGENTS.md`.** Esses carregam instruções operacionais (comandos, arquitetura de código, restrições técnicas) e apenas **apontam** para o `DESIGN.md` e o `UX.md`.
 
 ## Schema do front matter (como no template do repo)
 

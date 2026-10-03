@@ -94,5 +94,5 @@ Correções priorizadas (máx. 7): …
 
 1. `node tools/lint-design-md.mjs DESIGN.md` sem erros.
 2. Se o projeto usa tokens DTCG: `node tools/build-tokens.mjs` sem falhas de contraste, e os valores do front matter batem com `tokens/build/*.json`.
-3. Conecte ao agente — a skill `iniciar` faz isso; mínimo: uma linha em `CLAUDE.md`/`AGENTS.md` dizendo "Antes de qualquer mudança de interface, leia `DESIGN.md`".
+3. Conecte ao agente — a skill `iniciar` faz isso, num bloco único com o par do `DESIGN.md`, o `UX.md` (skill `ux-md`); mínimo: uma linha em `CLAUDE.md`/`AGENTS.md` dizendo "Antes de criar ou alterar UI, leia `DESIGN.md` (como parece) e `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta)".
 4. Registre `owner` e `updated` no front matter.

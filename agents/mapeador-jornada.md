@@ -38,7 +38,7 @@ projeto.
 **1. Encontre a missão da plataforma — para que este produto existe.**
 
 Leia `README.md`, a `description` do `package.json`, o `DESIGN.md` (quando
-descreve produto e público) e `.claude/prancheta/produto.md` se existir.
+descreve produto e público), o `UX.md` (persona, tarefas e jornadas declaradas) e `.claude/prancheta/produto.md` se existir.
 Declare a missão com as palavras do próprio produto sempre que puder citá-las;
 não invente um texto de marketing que ele não tem. Se nada a declarar, diga
 isso — não fabrique uma declaração de missão.

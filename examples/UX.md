@@ -1,5 +1,6 @@
 ---
-version: alpha
+version: 1.4.0
+format: alpha
 name: Pactum
 description: Plataforma web de gestão de contratos comerciais de uma distribuidora de alimentos (fictícia), desktop, densidade alta, uso diário pelo time comercial e jurídico.
 owner: time-de-produto-pactum
@@ -45,7 +46,7 @@ forms:
   validation: on-blur
   required: mark-optional
 content:
-  glossary: docs/glossario.md
+  glossary: inline                # tabela na seção "Conteúdo e microcopy"; por módulo: { default: <caminho>, <módulo>: <caminho> }
   buttons: verb-object
   forbidden: [tenant, payload, job, status_code, null, ERP_ID]
 flows:
@@ -60,6 +61,25 @@ verification:
     destructive: ".MuiButton-containedError, .MuiButton-colorError"
     button: "button, [role=button]"
     field: "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select"
+# Desvios aceitos (seção "Arquétipos de tela"). Achado de uma regra de `rules` em tela de `screens` vira
+# accepted-deviation no registro de achados; rules vazio = desvio só documental.
+deviations:
+  - id: D1
+    screens: [inicio]
+    rules: [L9]
+    reason: "Painel sem gráficos: cada bloco é uma lista curta clicável, porque a pergunta é o que fazer hoje"
+    decided-by: "time-de-produto-pactum"
+  - id: D2
+    screens: [reajustes]
+    rules: []
+    reason: "Lista agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo"
+    decided-by: "time-de-produto-pactum"
+  - id: D3
+    screens: [minuta]
+    rules: []
+    reason: "Painel abre em Diferenças em relação ao modelo, não em Propriedades"
+    decided-by: "jurídico"
+    until: 2027-06-30
 ---
 
 # Pactum — UX
@@ -100,19 +120,19 @@ O número do contrato (ex.: CT-2026-0412) é o identificador que aparece em toda
 
 Menu lateral fixo, sempre visível, com a área atual marcada. Na página de detalhe, migalha "Contratos › CT-2026-0412" no topo e abas logo abaixo do título. Profundidade máxima 3: área → detalhe → aba ou editor. O editor de minuta é o nível mais fundo e tem botão "Voltar ao contrato" no cabeçalho.
 
-Filtros da lista vivem na URL: voltar do detalhe devolve a lista com os mesmos filtros, a mesma página e a linha de onde se saiu destacada por 2 s.
+Filtros da lista vivem na URL (padrão `applying-filters`): voltar do detalhe devolve a lista com os mesmos filtros, a mesma página e a linha de onde se saiu destacada por 2 s.
 
 ## Arquétipos de tela
 
 | Tela | Arquétipo | Variação | Desvio |
 |---|---|---|---|
-| `/inicio` | monitoring-dashboard | três blocos de fila com contagem | Sem gráficos: cada bloco é uma lista curta clicável, porque a pergunta é "o que fazer", não "como está" |
+| `/inicio` | monitoring-dashboard | três blocos de fila com contagem | D1 |
 | `/contratos` | operational-list | with-bulk-actions | — |
-| `/reajustes` | operational-list | with-bulk-actions | Agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo |
+| `/reajustes` | operational-list | with-bulk-actions | D2 |
 | painel do cliente em `/contratos` | detail-side-panel | — | — |
 | `/clientes` | master-detail | lista à esquerda | — |
 | `/contratos/:id/documento` | document-viewer | metadados à direita | — |
-| `/minutas/:id` | editor-with-panel | painel de comparação | O painel abre por padrão em "Diferenças em relação ao modelo", não em "Propriedades" |
+| `/minutas/:id` | editor-with-panel | painel de comparação | D3 |
 | `/contratos/novo` | step-wizard | 4 etapas | — |
 | `/modelos` | library | — | — |
 | `/configuracoes` | settings | — | — |
@@ -120,7 +140,15 @@ Filtros da lista vivem na URL: voltar do detalhe devolve a lista com os mesmos f
 | "Registrar reajuste", "Adicionar responsável" | form-dialog | — | — |
 | "Encerrar contrato", "Descartar minuta" | confirmation-dialog | digitar o número | — |
 
-Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os desvios desta tabela valem só para o Pactum.
+Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os desvios valem só para o Pactum e estão também no bloco `deviations` do front matter, que é o que o ux-lint lê.
+
+### Desvios declarados
+
+| # | Tela | Desvio | Motivo |
+|---|---|---|---|
+| D1 | `/inicio` (`inicio`) | Sem gráficos nem a região de indicadores do cartão | A pergunta da tela é "o que fazer", não "como está"; cada bloco é uma lista curta clicável |
+| D2 | `/reajustes` (`reajustes`) | Agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo | O trabalho é em lote por índice e mês |
+| D3 | `/minutas/:id` (`minuta`) | O painel abre em "Diferenças em relação ao modelo", não em "Propriedades" | A advogada aprova olhando o que mudou; vale até 30/06/2027, quando a comparação vira aba própria |
 
 ## Layout e regiões
 
@@ -132,18 +160,18 @@ Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os 
 
 ## Ações
 
-- Uma ação primária (botão cheio) por região, no canto superior direito do cabeçalho da página: "Novo contrato", "Registrar reajustes selecionados", "Aprovar minuta".
+- Uma ação primária (botão cheio) por região, no canto superior direito do cabeçalho da página: "Novo contrato", "Registrar reajustes selecionados", "Aprovar minuta" (padrões `action-placement` e `button-hierarchy`).
 - Secundárias em botão contornado ao lado da primária, no máximo duas; o resto vai no menu "Mais ações".
 - Ações por linha aparecem como ícone com rótulo acessível e dica ao passar o mouse; no máximo três por linha.
-- Destrutiva com rótulo específico: "Encerrar contrato", "Descartar minuta". Nunca "Confirmar", "OK" ou "Sim".
-- Ação que a pessoa não pode executar por permissão fica **escondida**; ação que ela poderá executar depois de cumprir uma condição fica **visível e desabilitada com o motivo ao lado** ("Aprovar minuta — falta a revisão do jurídico").
+- Destrutiva com rótulo específico: "Encerrar contrato", "Descartar minuta". Nunca "Confirmar", "OK" ou "Sim" (padrões `destructive-action` e `confirm-deletion`).
+- Ação que a pessoa não pode executar por permissão fica **escondida**; ação que ela poderá executar depois de cumprir uma condição fica **visível e desabilitada com o motivo ao lado** ("Aprovar minuta — falta a revisão do jurídico"; padrão `disabled-button`).
 
 ## Feedback e estados
 
-- Sucesso: toast de 6 s com o que aconteceu e, quando reversível, "Desfazer" ("Reajuste registrado em 14 contratos. Desfazer").
+- Sucesso: toast de 6 s com o que aconteceu e, quando reversível, "Desfazer" ("Reajuste registrado em 14 contratos. Desfazer"; padrões `toast-vs-inline-alert`, `toast-duration` e `undo`).
 - Erro de campo: abaixo do campo, ao sair dele. Erro de sistema: alerta no topo do conteúdo, com "Tentar de novo" e o que já foi salvo.
-- Carregando: esqueleto com a forma da tela quando a espera passa de 1 s; antes disso, nada.
-- Vazio: diz por que está vazio e oferece o próximo passo. Lista vazia por filtro tem "Limpar filtros", nunca o convite de primeiro uso.
+- Carregando: esqueleto com a forma da tela quando a espera passa de 1 s; antes disso, nada (padrão `skeleton-vs-spinner`).
+- Vazio: diz por que está vazio e oferece o próximo passo. Lista vazia por filtro tem "Limpar filtros", nunca o convite de primeiro uso (padrões `empty-state` e `no-search-results`).
 - Sem acesso: página com o nome da área, o motivo e quem concede o acesso.
 
 | Tipo de tela | Vazio | Erro |
@@ -154,15 +182,26 @@ Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os 
 
 ## Formulários
 
-- Rótulo sempre visível acima do campo; o exemplo vai no texto de apoio, nunca só no placeholder.
-- Quase todos os campos são obrigatórios, então se marca o que é **opcional**.
-- Até 5 campos e uma decisão: diálogo ("Registrar reajuste"). Mais que isso, ou com etapas que dependem umas das outras: página ou assistente ("Novo contrato").
+- Rótulo sempre visível acima do campo; o exemplo vai no texto de apoio, nunca só no placeholder (padrão `label-vs-placeholder`).
+- Quase todos os campos são obrigatórios, então se marca o que é **opcional** (padrão `required-fields`).
+- Até 5 campos e uma decisão: diálogo ("Registrar reajuste"; padrão `when-to-use-modal`). Mais que isso, ou com etapas que dependem umas das outras: página ou assistente ("Novo contrato").
 - Valor monetário com máscara de real e duas casas; data no formato dd/mm/aaaa com calendário opcional.
 - O botão de envio nunca fica desabilitado para impedir erro: ao clicar com pendência, o foco vai ao primeiro campo com problema.
 
 ## Conteúdo e microcopy
 
-- Glossário no arquivo `glossario.md` da pasta de documentação do projeto; "contrato", "aditivo", "minuta", "reajuste" e "renovação" têm um único sentido cada.
+- Glossário: a tabela abaixo (`content.glossary: inline`). "Contrato", "aditivo", "minuta", "reajuste" e "renovação" têm um único sentido cada.
+
+| Termo | Significado | Nunca chamar de |
+|---|---|---|
+| Contrato | Acordo comercial vigente com um varejista ou fornecedor | "acordo", "pedido" |
+| Aditivo | Instrumento que altera um contrato vigente | "adendo", "anexo" |
+| Minuta | Rascunho editável de um aditivo ou contrato | "rascunho", "documento" |
+| Reajuste | Atualização anual do preço pelo índice do contrato | "aumento", "correção" |
+| Renovação | Prorrogação do contrato por novo período | "extensão", "renovamento" |
+| Aceite | Concordância do cliente com a renovação, pela página pública | "aprovação", "assinatura" |
+| Modelo | Minuta-base aprovada pelo jurídico | "template", "padrão" |
+| Situação | Fase do contrato (vigente, em negociação, encerrado) | "status" |
 - Botões com verbo + objeto: "Registrar reajuste", "Enviar para aceite", "Aprovar minuta".
 - Termos de implementação nunca aparecem: tenant, payload, job, status_code, null, ERP_ID.
 - Tom direto, na segunda pessoa implícita: "Revise o novo valor antes de enviar."
@@ -185,20 +224,21 @@ Limites: nenhuma jornada passa de 10 passos; nunca mais de um diálogo aberto; o
 ### Faça
 
 - Devolva a lista com filtros, página e linha de origem ao voltar do detalhe — 3 chamados por semana pediam isso antes da mudança.
-- Mostre o valor antigo, o índice e o valor novo lado a lado antes de registrar um reajuste.
-- Abra o editor de minuta com as diferenças em relação ao modelo à vista; a advogada aprova olhando o que mudou.
+- Mostre o valor antigo, o índice e o valor novo lado a lado antes de registrar um reajuste no diálogo "Registrar reajuste".
+- Abra o editor de minuta (`/minutas/:id`) com as diferenças em relação ao modelo à vista; a advogada aprova olhando o que mudou.
 - Use o número do contrato como título do detalhe e na migalha.
 
 ### Não faça
 
 - Não use diálogo de confirmação para ação reversível; ofereça "Desfazer" no toast. O diálogo antigo em "Arquivar" era confirmado sem leitura.
 - Não empilhe diálogo sobre diálogo: "Adicionar responsável" de dentro de "Registrar reajuste" fazia a pessoa perder o reajuste digitado.
-- Não mostre o código do ERP nem a situação técnica de integração na tela do analista.
-- Não esconda o botão de aprovar quando falta uma condição; deixe visível, desabilitado, com o motivo.
+- Não mostre o código do ERP (`ERP_ID`) nem a situação técnica de integração na tela do analista.
+- Não esconda o botão "Aprovar minuta" quando falta uma condição; deixe visível, desabilitado, com o motivo.
 
 ## Instruções para agentes
 
 - Consulte este arquivo antes de criar ou rearranjar qualquer tela do Pactum; ache o arquétipo da tela na seção "Arquétipos de tela" e leia o cartão correspondente.
 - Preserve: uma primária por região no topo direito, menu lateral com as seis áreas, filtros na URL, retorno visível em toda tela não raiz.
 - Tela nova sem arquétipo na tabela: proponha o arquétipo e registre a linha antes de construir.
-- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md` e rode o ux-lint de tela e de fluxo sobre as capturas; achado de severidade 3 ou 4 bloqueia a entrega.
+- Mudou comportamento de UI (tela, arquétipo, política, fluxo, estado): atualize este arquivo no mesmo commit, suba `version` (política ou arquétipo → menor; só texto → patch) e `updated`.
+- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md --score` (com `--map` e `--screens`) e `node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md`, e rode o ux-lint de tela e de fluxo sobre as capturas; achado de severidade 3 ou 4 bloqueia a entrega.

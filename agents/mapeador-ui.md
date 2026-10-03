@@ -96,7 +96,7 @@ agentes ainda precisa ser útil sozinho.
 ```bash
 ls src/theme.ts src/theme/* tailwind.config.* tokens.json design-tokens.* 2>/dev/null
 ls tokens/*.tokens.json *.tokens.json 2>/dev/null
-ls DESIGN.md design/foundation.md docs/design-system.md .claude/*/design.md 2>/dev/null
+ls DESIGN.md UX.md design/foundation.md docs/design-system.md .claude/*/design.md 2>/dev/null
 ```
 
 Se existir um arquivo de tema, **leia-o** e extraia: os tokens semânticos

@@ -1,6 +1,6 @@
 # Integrações com agentes
 
-O DSX funciona com qualquer agente que leia arquivos. A regra é sempre a mesma: **uma fonte de verdade (`DESIGN.md` + tokens + este framework), e cada ferramenta só aponta para ela.** Copiar regras para vários arquivos gera contradição na primeira mudança.
+O DSX funciona com qualquer agente que leia arquivos. A regra é sempre a mesma: **uma fonte de verdade (`DESIGN.md` para a aparência, `UX.md` para o comportamento, tokens e este framework), e cada ferramenta só aponta para ela.** Copiar regras para vários arquivos gera contradição na primeira mudança.
 
 ## Claude Code (plugin)
 
@@ -14,13 +14,14 @@ O repositório é um plugin e um marketplace ao mesmo tempo.
 
 As skills ficam disponíveis como `/dsx:iniciar`, `/dsx:construir-ui`, `/dsx:revisar-ux` etc., e também são acionadas automaticamente pela descrição. Os subagentes `revisor-ux`, `extrator-design-system` e `juiz-de-evals` ficam disponíveis para delegação.
 
-No projeto, conecte o design com uma linha no `CLAUDE.md`:
+No projeto, conecte o design e o comportamento no `CLAUDE.md`:
 
 ```markdown
 @DESIGN.md
+@UX.md
 ```
 
-(O `@` importa o arquivo no contexto da sessão. Se o arquivo for grande, prefira a instrução "leia `DESIGN.md` antes de mudar UI" em vez do import.)
+(O `@` importa o arquivo no contexto da sessão. Se os arquivos forem grandes, prefira a instrução "antes de criar ou alterar UI, leia `DESIGN.md` (como parece) e `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta)" em vez do import — é o bloco da skill `iniciar`, passo 6.)
 
 ### Sem plugin (cópia local)
 
@@ -28,12 +29,12 @@ Copie `skills/` para `.claude/skills/` e `agents/` para `.claude/agents/` do pro
 
 ## AGENTS.md (Codex, Gemini CLI, Aider, Jules e outros)
 
-Muitos agentes leem `AGENTS.md` na raiz. Adicione o bloco da seção 5 de `skills/iniciar/SKILL.md` e um ponteiro para o DSX:
+Muitos agentes leem `AGENTS.md` na raiz. Adicione o bloco da seção 6 de `skills/iniciar/SKILL.md` e um ponteiro para o DSX:
 
 ```markdown
 ## Interface e design
 Siga o framework DSX em `vendor/dsx/` (ou caminho equivalente):
-- Antes de mudar UI: leia `DESIGN.md` e `vendor/dsx/skills/construir-ui/SKILL.md`.
+- Antes de mudar UI: leia `DESIGN.md` (como parece), `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta) e `vendor/dsx/skills/construir-ui/SKILL.md`.
 - Decisões de interação: `vendor/dsx/patterns/index.json`.
 - Revisão: `vendor/dsx/skills/revisar-ux/SKILL.md` e `vendor/dsx/skills/acessibilidade/SKILL.md`.
 ```
@@ -48,7 +49,7 @@ description: Regras de interface do projeto (design system DSX)
 globs: ["src/**/*.tsx", "src/**/*.css", "app/**/*.tsx"]
 alwaysApply: false
 ---
-- Leia `DESIGN.md` antes de alterar este arquivo.
+- Leia `DESIGN.md` e `UX.md` (arquétipo da tela) antes de alterar este arquivo.
 - Use só tokens semânticos e componentes de `src/components/ui`.
 - Siga o catálogo `vendor/dsx/patterns/index.json` para decisões de interação.
 - Implemente estados de carregando, vazio, erro e sucesso.
@@ -56,7 +57,7 @@ alwaysApply: false
 
 ## GitHub Copilot
 
-`.github/copilot-instructions.md` com o mesmo bloco curto. Não cole o DESIGN.md inteiro.
+`.github/copilot-instructions.md` com o mesmo bloco curto. Não cole o DESIGN.md nem o UX.md inteiros.
 
 ## Ferramentas de prototipagem com suporte a DESIGN.md
 

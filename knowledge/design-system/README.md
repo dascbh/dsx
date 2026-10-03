@@ -30,7 +30,7 @@ Esta pasta é a referência normativa do framework para tudo que é **sistema**:
 | `governanca-e-maturidade.md` | Critérios de qualidade, rubrica de maturidade, adoção, drift, SemVer, contribuição, argumentos de ROI | Avaliar um DS, propor mudança, versionar, defender investimento |
 | `design-md.md` | O que é o DESIGN.md, schema do front matter, 8 seções, regras de escrita, conexão com agentes, rubrica de 100 pontos com 5 gates, auditoria em 5 passes, manutenção | Escrever, revisar ou pontuar um DESIGN.md |
 | `escolher-design-system.md` | Escolher e construir o design system a partir de referências curadas (biblioteca designmd.app): registro do produto, avaliação por dois linters, 3 opções + 1 contrastante, adaptação ao projeto | Projeto novo, redesenho, "usa o estilo X", avaliar DESIGN.md de terceiros |
-| `design-system-para-ia.md` | Três camadas de documentação, checklist de legibilidade por máquina, limites declarativos de autonomia, rastreabilidade, governança de UI generativa | Preparar o sistema para agentes, definir o que um agente pode decidir sozinho |
+| `design-system-para-ia.md` | Quatro camadas de documentação (visual no DESIGN.md, comportamento no UX.md, operação, contexto de UX), checklist de legibilidade por máquina, limites declarativos de autonomia, rastreabilidade, governança de UI generativa | Preparar o sistema para agentes, definir o que um agente pode decidir sozinho |
 
 ## Rotas rápidas (SE → ENTÃO)
 

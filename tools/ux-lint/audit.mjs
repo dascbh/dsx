@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Auditoria de UX: ponto de entrada único. Sem dependências.
-// Confere os pré-requisitos (capturas, mapa de fluxo, UX.md, código), roda os detectores do registro abaixo
+// Confere os pré-requisitos (capturas, mapa de fluxo, UX.md e se ele está em dia com o produto, código), roda os
+// detectores do registro abaixo
 // (os que existirem), opcionalmente registra o resultado em .dsx/findings/<módulo>/ e imprime o relatório por
 // dimensão, lido da matriz data/ux-dimensions.json. Com --page, gera a página de decisão.
 //
@@ -16,6 +17,7 @@ import { tmpdir } from 'node:os';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import * as findings from './findings.mjs';
+import { analyzeDrift, driftHeadline } from './ux-md-drift.mjs';
 
 const DSX = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const MATRIX_PATH = join(DSX, 'data', 'ux-dimensions.json');
@@ -27,7 +29,7 @@ export const MATRIX_PATH = join(DSX, 'data', 'ux-dimensions.json');
  */
 export const DETECTOR_REGISTRY = [
   { family: 'text', path: 'tools/ux-lint/text.mjs', needs: ['screens'],
-    args: (c) => ['--screens', c.screens, ...(c.code.length ? ['--code', ...c.code] : []), ...(c.ux ? ['--ux', c.ux] : []), '--json'] },
+    args: (c) => ['--screens', c.screens, ...(c.code.length ? ['--code', ...c.code] : []), ...(c.ux ? ['--ux', c.ux] : []), ...(c.module ? ['--module', c.module] : []), '--json'] },
   { family: 'screen', path: 'tools/ux-lint/screen.mjs', needs: ['screens'],
     args: (c) => [c.screens, ...(c.ux ? ['--ux', c.ux] : []), '--json'] },
   { family: 'flow', path: 'tools/ux-lint/flow.mjs', needs: ['map'],
@@ -37,12 +39,12 @@ export const DETECTOR_REGISTRY = [
   { family: 'states', path: 'tools/ux-lint/states.mjs', needs: ['screens'],
     args: (c) => [c.screens, ...(c.ux ? ['--ux', c.ux] : []), '--json'] },
   { family: 'consistency', path: 'tools/ux-lint/consistency.mjs', needs: ['screens'],
-    args: (c) => [c.screens, ...(c.ux ? ['--ux', c.ux] : []), '--json'] },
+    args: (c) => [c.screens, ...(c.ux ? ['--ux', c.ux] : []), ...(c.module ? ['--module', c.module] : []), '--json'] },
 ];
 
 const COVERAGE_PT = { automated: 'automática', partial: 'parcial', judgment: 'julgamento', reference: 'referência' };
 const FAMILY_PT = { text: 'texto (X)', screen: 'tela (T)', flow: 'fluxo (F)', layout: 'layout (L)', states: 'estados (S)', consistency: 'consistência (C)' };
-const OPEN = new Set(['open', 'decided', 'regression']);
+const OPEN = new Set(findings.OPEN_STATUSES);
 
 export function loadMatrix(path = MATRIX_PATH) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -115,6 +117,19 @@ export function checkPrerequisites(opt) {
     ? { id: 'ux', ok: true, path: opt.ux, detail: rel(opt.ux) }
     : { id: 'ux', ok: false, path: opt.ux, detail: `sem UX.md em ${rel(opt.ux)} (vale o padrão do DSX)`,
       fix: `extraia o UX.md com a skill ux-md e valide: node ${join(DSX, 'tools', 'lint-ux-md.mjs')} ${rel(opt.ux)}` });
+  let drift = null;
+  if (isFile(opt.ux)) {
+    try {
+      drift = analyzeDrift(readFileSync(opt.ux, 'utf8'), { map: isFile(opt.map) ? opt.map : null, screens: html.length ? opt.screens : null, geometry: isDir(opt.geometry) ? opt.geometry : null, root: opt.root, now: opt.now ?? new Date() });
+      const tool = join(DSX, 'tools', 'ux-lint', 'ux-md-drift.mjs');
+      items.push(drift.findings.length
+        ? { id: 'ux-fresh', ok: false, warning: true, path: opt.ux, detail: `UX.md desatualizado: ${driftHeadline(drift)}`,
+          fix: `atualize o UX.md (skill ux-md, Modo C) e suba version/updated no mesmo commit; detalhe: node ${tool} ${rel(opt.ux)} --module ${opt.module} --root ${opt.root}` }
+        : { id: 'ux-fresh', ok: true, path: opt.ux, detail: 'UX.md em dia com o mapa e as capturas (arquétipos, políticas, estados, updated)' });
+    } catch (e) {
+      items.push({ id: 'ux-fresh', ok: false, warning: true, path: opt.ux, detail: `drift do UX.md não calculado: ${e.message}` });
+    }
+  }
   const geo = isDir(opt.geometry) ? readdirSync(opt.geometry).filter((f) => f.endsWith('.geometry.json')) : [];
   const newest = (dir, files) => Math.max(0, ...files.map((f) => statSync(join(dir, f)).mtimeMs));
   const stale = geo.length && html.length && newest(opt.screens, html) > newest(opt.geometry, geo);
@@ -129,8 +144,8 @@ export function checkPrerequisites(opt) {
     : { id: 'code', ok: false, path: null, detail: 'sem pastas de código: o texto não aponta arquivo:linha da origem',
       fix: 'passe --code <pastas do front e das constantes de texto>' });
   return {
-    items,
-    available: { screens: html.length ? opt.screens : null, geometry: geo.length ? opt.geometry : null, map: isFile(opt.map) ? opt.map : null, ux: isFile(opt.ux) ? opt.ux : null, code },
+    items, drift,
+    available: { screens: html.length ? opt.screens : null, geometry: geo.length ? opt.geometry : null, map: isFile(opt.map) ? opt.map : null, ux: isFile(opt.ux) ? opt.ux : null, code, module: opt.module },
   };
 }
 
@@ -204,7 +219,7 @@ export function mergeRun(detectors, opt, { write = false, now = new Date() } = {
     const run = findings.collect(inputs, st.findings.items);
     st.findings.module = opt.module;
     try { commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: opt.root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null; } catch { /* sem git */ }
-    findings.merge(st.findings, run, { now, commit, decisions: st.decisions });
+    findings.merge(st.findings, run, { now, commit, decisions: st.decisions, deviations: findings.deviationsFromUx(opt.ux) });
     if (write) {
       mkdirSync(p.base, { recursive: true });
       writeFileSync(p.findings, `${JSON.stringify(st.findings, null, 2)}\n`);
@@ -229,7 +244,7 @@ export function dimensionReport(matrix, merged, detectors) {
   const beforeById = new Map((merged.before.items ?? []).map((i) => [i.id, i]));
   const status = new Map(detectors.map((d) => [d.family, d.status]));
   const out = [];
-  const empty = () => ({ open: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0, 0: 0 }, added: 0, fixed: 0, regressions: 0, review: 0, unregistered: 0, unregistered_by_severity: { 4: 0, 3: 0, 2: 0, 1: 0, 0: 0 } });
+  const empty = () => ({ open: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0, 0: 0 }, added: 0, fixed: 0, regressions: 0, accepted: 0, review: 0, unregistered: 0, unregistered_by_severity: { 4: 0, 3: 0, 2: 0, 1: 0, 0: 0 } });
   const buckets = new Map(matrix.dimensions.map((d) => [d.id, empty()]));
   buckets.set('(none)', empty());
   for (const it of merged.after.items ?? []) {
@@ -240,6 +255,7 @@ export function dimensionReport(matrix, merged, detectors) {
     if (!prev && it.present) b.added++;
     if (prev?.present && !it.present) b.fixed++;
     if (it.status === 'regression') b.regressions++;
+    if (it.status === 'accepted-deviation') b.accepted++;
   }
   for (const d of detectors.filter((x) => x.status === 'ran' && merged.unregistered.includes(x.family))) {
     for (const h of d.hits) {
@@ -273,7 +289,7 @@ export function formatReport(r) {
   L.push(`Auditoria de UX · módulo ${r.module} · ${r.root}`);
   L.push('\nPré-requisitos');
   for (const p of r.prerequisites) {
-    L.push(`  ${p.ok ? '✓' : '✗'} ${p.id}: ${p.detail}`);
+    L.push(`  ${p.ok ? '✓' : p.warning ? '!' : '✗'} ${p.id}: ${p.detail}`);
     if (!p.ok && p.fix) L.push(`      como gerar: ${p.fix}`);
   }
   L.push('\nDetectores');
@@ -284,18 +300,22 @@ export function formatReport(r) {
     else if (d.status === 'skipped') L.push(`  – ${what}: não rodou (${d.reason})`);
     else L.push(`  ✗ ${what}: erro (${d.error})`);
   }
+  if (r.ux_drift?.findings.length) {
+    L.push(`\nUX.md × produto (${r.ux_drift.findings.length} achado(s) de drift)`);
+    for (const f of r.ux_drift.findings) L.push(`  ${f.rule} sev ${f.severity}${f.screen ? ` | ${f.screen}` : ''} | ${f.message}`);
+  }
   L.push(`\nRegistro: ${r.registered ? `gravado em ${r.findings_file}` : `não gravado (use --register); comparado com ${r.findings_file}`}`);
   L.push('\nRelatório por dimensão');
   for (const d of r.dimensions) {
     const cov = d.coverage ? `${COVERAGE_PT[d.coverage]}${d.effective_coverage !== d.coverage ? ` → ${COVERAGE_PT[d.effective_coverage]} nesta execução` : ''}` : '';
     const miss = d.missing_families.length ? ` · sem detector: ${d.missing_families.map((m) => m.family).join(', ')}` : '';
     L.push(`\n${d.name_pt} [${d.id}] · cobertura ${cov}${miss}`);
-    L.push(`  abertos ${d.open} (${sevLine(d.by_severity)})${d.review ? `, ${d.review} de revisão` : ''} · novos ${d.added} · corrigidos ${d.fixed} · regressões ${d.regressions}${d.unregistered ? ` · ${d.unregistered} fora do registro (${sevLine(d.unregistered_by_severity)})` : ''}`);
+    L.push(`  abertos ${d.open} (${sevLine(d.by_severity)})${d.review ? `, ${d.review} de revisão` : ''} · novos ${d.added} · corrigidos ${d.fixed} · regressões ${d.regressions}${d.accepted ? ` · ${d.accepted} desvio(s) aceito(s)` : ''}${d.unregistered ? ` · ${d.unregistered} fora do registro (${sevLine(d.unregistered_by_severity)})` : ''}`);
     if (d.coverage !== 'automated' || d.missing_families.length) L.push(`  lacunas: ${d.gaps_pt}`);
     if (['judgment', 'reference'].includes(d.effective_coverage) && d.knowledge.length) L.push(`  revisar com: ${d.knowledge.join(', ')}`);
   }
   const t = r.totals;
-  L.push(`\nTotal: ${t.open} abertos (${sevLine(t.by_severity)}) · ${t.added} novos · ${t.fixed} corrigidos · ${t.regressions} regressões${t.unregistered ? ` · ${t.unregistered} fora do registro (família que o findings.mjs ainda não registra)` : ''}`);
+  L.push(`\nTotal: ${t.open} abertos (${sevLine(t.by_severity)}) · ${t.added} novos · ${t.fixed} corrigidos · ${t.regressions} regressões${t.accepted ? ` · ${t.accepted} desvios aceitos (não contam)` : ''}${t.unregistered ? ` · ${t.unregistered} fora do registro (família que o findings.mjs ainda não registra)` : ''}`);
   if (r.page) L.push(`Página de decisão: ${r.page}`);
   return L.join('\n');
 }
@@ -339,7 +359,7 @@ export function measureGeometry(opt) {
 
 /** Executa a auditoria. `registry` permite trocar o registro de detectores (testes). */
 export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatrix(), now = new Date() } = {}) {
-  const opt = resolveOptions(raw);
+  const opt = { ...resolveOptions(raw), now };
   const measured = opt.measure ? measureGeometry(opt) : null;
   const pre = checkPrerequisites(opt);
   if (measured) pre.items.push(measured);
@@ -349,10 +369,10 @@ export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatri
     const merged = mergeRun(detectors, opt, { write: opt.register, now });
     const dimensions = dimensionReport(matrix, merged, detectors);
     const totals = dimensions.reduce((t, d) => {
-      t.open += d.open; t.added += d.added; t.fixed += d.fixed; t.regressions += d.regressions; t.unregistered += d.unregistered;
+      t.open += d.open; t.added += d.added; t.fixed += d.fixed; t.regressions += d.regressions; t.unregistered += d.unregistered; t.accepted += d.accepted;
       for (const k of [4, 3, 2, 1]) t.by_severity[k] += d.by_severity[k] ?? 0;
       return t;
-    }, { open: 0, added: 0, fixed: 0, regressions: 0, unregistered: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0 } });
+    }, { open: 0, added: 0, fixed: 0, regressions: 0, unregistered: 0, accepted: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0 } });
     let page = null;
     if (opt.page) {
       findings.restatus(merged.after, merged.decisions);
@@ -361,7 +381,7 @@ export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatri
     }
     return {
       module: opt.module, root: opt.root, registered: opt.register && merged.registeredFamilies.length > 0,
-      findings_file: merged.paths.findings, prerequisites: pre.items,
+      findings_file: merged.paths.findings, prerequisites: pre.items, ux_drift: pre.drift ? { findings: pre.drift.findings, summary: pre.drift.summary } : null,
       detectors: detectors.map(({ hits, file, ...d }) => d), unregistered: merged.unregistered,
       dimensions, totals, page,
     };

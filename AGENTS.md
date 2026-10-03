@@ -6,13 +6,13 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 
 | Situação | Skill (`skills/<nome>/SKILL.md`) |
 |---|---|
-| Primeiro uso do DSX num projeto; projeto sem DESIGN.md | `iniciar` |
+| Primeiro uso do DSX num projeto; projeto sem DESIGN.md ou sem UX.md | `iniciar` |
 | Escolher o design system (projeto novo, redesenho, "usa o estilo X") a partir de referências curadas | `escolher-ds` |
 | Criar, atualizar ou avaliar o DESIGN.md | `design-md` |
-| Criar, extrair do código ou avaliar o UX.md (tipos de tela, regiões, ações, navegação, feedback, fluxos) | `ux-md` |
+| Criar, extrair do código ou avaliar o UX.md (tipos de tela, regiões, ações, navegação, feedback, fluxos); nota de 100, drift UX.md × produto, desvios declarados | `ux-md` |
 | Montar ou rearranjar o layout de uma tela a partir do arquétipo (2–3 arranjos para escolher) | `arranjar-tela` |
 | Criar/alterar tokens, paleta, escalas, tema escuro, contraste | `tokens` |
-| Escrever ou modificar código de interface | `construir-ui` |
+| Escrever ou modificar código de interface (para sem DESIGN.md e sem UX.md) | `construir-ui` |
 | Dúvida entre componentes/comportamentos ("modal ou página?") | `padroes` |
 | Revisar usabilidade de tela ou fluxo | `revisar-ux` |
 | Auditar a UX de um módulo inteiro, por dimensão, com registro e re-auditoria | `auditar-ux` |
@@ -64,7 +64,7 @@ templates/    DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de
 tokens/       tokens W3C DTCG em 3 camadas + pares de contraste; build/ é gerado
 tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens; tools/stitch/ = design system e análise de HTML
 hooks/        turn-guard (ciclo Figma)
-evals/        rubricas e casos para avaliar UI gerada, DESIGN.md e features de IA
+evals/        rubricas e casos para avaliar UI gerada, DESIGN.md, UX.md e features de IA
 examples/     DESIGN.md e UX.md de referência (aprovados nos linters)
 references/   conteúdo de terceiros para consulta: biblioteca de DESIGN.md (designmd.app, CC BY 4.0) — índice, curados e notas
 docs/         princípios e integrações com agentes
@@ -92,16 +92,18 @@ node tools/type-scale.mjs --ratio major-third  # escala tipográfica (ou --fluid
 node tools/spacing-scale.mjs --base 4          # escala de espaçamento
 node tools/lint-design-md.mjs DESIGN.md        # gates objetivos do DESIGN.md
 node tools/lint-ux-md.mjs UX.md [--archetypes <pasta>] [--json]   # gates objetivos do UX.md (aceita nomes antigos com aviso)
+node tools/lint-ux-md.mjs UX.md --score [--map <flows.json>] [--screens <capturas>] [--geometry <pasta>] [--json]   # nota de 100 por critério e gates (evals/rubrics/ux-md.yaml)
+node tools/ux-lint/ux-md-drift.mjs UX.md [--map …] [--screens …] [--geometry …] [--module <m> --root <projeto>] [--json] [--fail-at 2]   # drift UX.md × produto U1–U6
 node tools/lint-archetypes.mjs [--index]       # valida o catálogo de arquétipos e regenera archetypes/index.json
 node tools/ux-lint/screen.mjs <capturas.html|pasta> [--ux UX.md] [--json] [--fail-at 3]          # regras T1–T7 nas capturas de tela
 node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]  # regras F1–F5 no mapa de fluxo
-node tools/ux-lint/text.mjs --screens <capturas> [--code <pastas>] [--ux UX.md] [--ignore <nomes>] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
-node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--register] [--measure] [--page <saida.html>] [--json]  # auditoria única: pré-requisitos, todos os detectores, relatório por dimensão (data/ux-dimensions.json)
+node tools/ux-lint/text.mjs --screens <capturas> [--code <pastas>] [--ux UX.md] [--module <m>] [--ignore <nomes>] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
+node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--register] [--measure] [--page <saida.html>] [--json]  # auditoria única: pré-requisitos (com drift do UX.md), todos os detectores, relatório por dimensão (data/ux-dimensions.json)
 node tools/ux-lint/measure.mjs <capturas> --out <pasta-geometria> [--ux UX.md] [--width 1440]  # geometria das capturas (Playwright do projeto; rodar de uma pasta que o tenha)
 node tools/ux-lint/layout.mjs <pasta-geometria> [--ux UX.md] [--archetypes <pasta>] [--json] [--fail-at 3]  # layout e hierarquia L1–L9
 node tools/ux-lint/states.mjs <capturas> [--ux UX.md] [--archetypes <pasta>] [--json]  # estados S1–S3 (captura <nn>-<tela>.<estado>.html)
-node tools/ux-lint/consistency.mjs <capturas> [--ux UX.md] [--json]  # consistência entre telas C1–C3
-node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json [--layout l.json --states st.json --consistency c.json] --root <repo>  # registro de achados em .dsx/findings/<m>/ (id estável, status)
+node tools/ux-lint/consistency.mjs <capturas> [--ux UX.md] [--module <m>] [--json]  # consistência entre telas C1–C3 (glossário do módulo)
+node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json [--layout l.json --states st.json --consistency c.json] --root <repo> [--ux UX.md]  # registro de achados em .dsx/findings/<m>/ (id estável, status; desvios do UX.md → accepted-deviation)
 node tools/ux-lint/findings.mjs options --module <m> --from cases.json     # liga opções (2–3 por caso) aos ids; caso sem achado vira item de revisão
 node tools/ux-lint/findings.mjs decide --module <m> <id> <índice|ignore|free> [--reason …] [--text …] [--by …]  # grava decisão do dono
 node tools/ux-lint/findings.mjs import --module <m> decisions.json         # decisões copiadas da página

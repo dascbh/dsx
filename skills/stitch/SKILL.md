@@ -5,7 +5,7 @@ description: "Usa o Google Stitch sem edição manual: sincroniza o DESIGN.md, g
 
 # Stitch no DSX: gerar, criticar, iterar, trazer
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`DESIGN.md`, `.stitch/`, `src/`) são do projeto do usuário.
+> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`DESIGN.md`, `UX.md`, `.stitch/`, `src/`) são do projeto do usuário.
 
 **Papel do Stitch:** espaço de **exploração gerada**. O código continua sendo a fonte de verdade. Nada do Stitch entra no projeto sem passar pelos gates do DSX, e o HTML dele é referência de layout, **nunca código colado**.
 
@@ -68,13 +68,15 @@ O ciclo completo é **sincronizar → gerar → criticar → (você decide) → 
 1. **Contexto antes do prompt.** Se a tela não tem problema declarado, use a skill `discovery` primeiro. Reúna:
    - persona e tarefa principal;
    - de onde a tela é alcançada e para onde leva (`.dsx/maps/flows.json`, se existir);
-   - entidades e dados (`.dsx/maps/domain.json`).
-2. **Padrões que se aplicam:** consulte `patterns/index.json`, por exemplo `table-vs-cards`, `active-filters`, `table-pagination`, `empty-state`, `button-hierarchy`. Traduza cada regra em **comportamento descrito**, sem o id. Exemplo: "filtros ativos visíveis como chips removíveis, com 'Limpar filtros'".
+   - entidades e dados (`.dsx/maps/domain.json`);
+   - **o arquétipo da tela no `UX.md`** (seção "Arquétipos de tela" e cartão `archetypes/<id>.md`): regiões, onde fica a primária, estados obrigatórios, desvios que valem para ela. Tela nova sem arquétipo: escolha um e registre no `UX.md` antes de gerar. O Stitch não conhece o `UX.md` (só importa o `DESIGN.md`), então o comportamento vai **descrito no prompt**.
+2. **Padrões que se aplicam:** primeiro as políticas que o `UX.md` fixou (posição da primária, ordem do diálogo, feedback, confirmação); depois o catálogo: consulte `patterns/index.json`, por exemplo `table-vs-cards`, `active-filters`, `table-pagination`, `empty-state`, `button-hierarchy`. Traduza cada regra em **comportamento descrito**, sem o id. Exemplo: "filtros ativos visíveis como chips removíveis, com 'Limpar filtros'".
 3. **Monte o prompt** no template da skill oficial `stitch-design:generate-design`: propósito e intenção, plataforma e estrutura da página numerada.
    - **Sem cores, fontes, raios ou hex.** O design system do projeto cuida disso; repetir causa conflito. Vale a regra da skill oficial `generate-design`. A `enhance-prompt` injeta o design system no prompt, então **não** siga essa parte dela.
    - **Texto em pt-BR, no glossário do produto,** com botões no formato verbo + objeto (skill `ux-writing`).
    - **Dados fictícios realistas.** **Nunca** use dados reais de clientes ou pessoas: o prompt sai para um serviço externo.
-   - **Uma ação primária por região,** dita explicitamente.
+   - **Uma ação primária por região,** dita explicitamente, na posição de `actions.primary-position` do `UX.md` (ou a do cartão do arquétipo).
+   - **Termos de `content.forbidden` do `UX.md` nunca aparecem** no texto pedido.
 4. Chame `generate_screen_from_text` com o `projectId`, o prompt, `deviceType` e `designSystem: "assets/<assetId>"`.
    - A geração leva de 1 a 3 minutos.
    - **Não repita a chamada:** se der timeout, consulte `get_screen` a cada 30s, até 10 vezes.
@@ -106,6 +108,8 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
    - triagem de acessibilidade: nome acessível, rótulos, teclado, h1, lang, `aria-sort`.
 
    **REPROVADO vira achado de severidade ≥ 3.**
+
+   Se o projeto tem `UX.md`, rode também o gate de comportamento sobre o HTML gerado: `node <DSX>/tools/ux-lint/screen.mjs .stitch/designs/<slug>.html --ux UX.md` (primárias por região, ordem do diálogo, h1, rótulos, destrutiva, termos proibidos). A tela gerada que fere uma política do `UX.md` é achado, salvo se o dono decidir mudar a política (aí o `UX.md` sobe de versão antes de trazer).
 2. **Olhe o screenshot.** Leia a imagem; não critique só pelo HTML.
 3. **Lentes do DSX,** citando a fonte de cada achado:
    - `revisar-ux`: tese da tela, walkthrough da tarefa, heurísticas, severidade 0–4;
@@ -138,7 +142,8 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
    - `lint-raw-values` com zero ocorrências;
    - contraste;
    - teclado;
-   - 320px.
+   - 320px;
+   - ux-lint da captura da tela construída sem severidade ≥ 3 e, se a tela é nova ou mudou de arquétipo, `UX.md` atualizado no mesmo commit (skill `construir-ui`, seção 4).
 
    Depois, revisão independente.
 

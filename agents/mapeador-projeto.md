@@ -63,7 +63,7 @@ ls src/theme.ts src/theme/* tailwind.config.* tokens.json design-tokens.* 2>/dev
 ls tokens/*.tokens.json *.tokens.json 2>/dev/null
 
 # docs de fundação/design já existentes
-ls DESIGN.md design/foundation.md docs/design-system.md .claude/*/design.md 2>/dev/null
+ls DESIGN.md UX.md design/foundation.md docs/design-system.md .claude/*/design.md 2>/dev/null
 ```
 
 Se nenhum desses sinais existir, diga isso com franqueza nos dois arquivos
@@ -87,7 +87,7 @@ ls .claude/prancheta/produto.md .claude/prancheta/design.md 2>/dev/null
 **6. O estado do próprio DSX — registre presença, não duplique conteúdo:**
 
 ```bash
-ls DESIGN.md design/as-is-to-be.md design/figma-sync.md 2>/dev/null
+ls DESIGN.md UX.md design/as-is-to-be.md design/figma-sync.md 2>/dev/null
 ls design/figma-baseline/*.json 2>/dev/null | wc -l
 ls .dsx/maps/ .dsx/figma/ 2>/dev/null
 ```

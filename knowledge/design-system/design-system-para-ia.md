@@ -13,19 +13,20 @@ Consistência visual não é qualidade de experiência. Um agente com acesso só
 
 Automação amplifica a estrutura que recebe: sistema inconsistente gera código inconsistente mais rápido.
 
-## Três camadas de documentação (mais governança)
+## Quatro camadas de documentação (mais governança)
 
 | Camada | Documenta | Arquivo / lugar | Serve a |
 |---|---|---|---|
 | Linguagem visual | Tokens, tipografia, formas, componentes, racional de aplicação | `DESIGN.md` + `tokens/` | Agentes, design, desenvolvimento |
 | Operação | Comandos, arquitetura de código, convenções técnicas, limites do agente | `CLAUDE.md` / `AGENTS.md` / regras de ferramenta | Agentes de código |
+| Comportamento | Tipos de tela (arquétipos), regiões, posição de ações, confirmação, feedback, estados, fluxos, vocabulário, desvios | `UX.md` (par do `DESIGN.md`; ver `knowledge/fundamentos/ux-md.md`) | Agentes, design, desenvolvimento |
 | Contexto de UX | Usuários, problemas, evidências, modelos mentais, vocabulário real, padrões de interação validados, riscos | Base de contexto de UX do projeto (pesquisa, personas, JTBD, achados) | Produto, design, pesquisa, agentes |
 | Governança (transversal) | Revisão, acessibilidade, aprovação, reversibilidade, autonomia | Política do projeto + gates automatizados | Time responsável |
 
 Regras:
 
 1. **Não misture camadas.** Decisão de pesquisa no `DESIGN.md` incha o arquivo e fica sem sustentação; regra de experiência espalhada em instruções operacionais se perde.
-2. **Cada camada referencia as outras**, não as copia. `CLAUDE.md` aponta para o `DESIGN.md`; o `DESIGN.md` aponta para o contexto de UX quando uma regra visual depende de uma necessidade documentada.
+2. **Cada camada referencia as outras**, não as copia. `CLAUDE.md` aponta para o `DESIGN.md` e o `UX.md`; o `DESIGN.md` aponta para o contexto de UX quando uma regra visual depende de uma necessidade documentada.
 3. **O contexto de UX não precisa ser um arquivo gigante.** Precisa ser encontrável a partir da decisão que ele sustenta.
 
 Exemplo: numa tarefa contínua de comparação de itens, um agente só com componentes escolhe um modal de confirmação porque o componente existe. Com o contexto registrando que as pessoas comparam antes de decidir e que a ação é reversível, a composição muda: confirmação no fluxo, comparação visível, opção de desfazer. Mesmas peças, decisão diferente, justificada por evidência.
@@ -147,7 +148,7 @@ Comece no nível 1. Suba de nível só com gates do nível atual automatizados.
 
 ## Checklist
 
-- [ ] Três camadas separadas e referenciadas entre si (visual, operação, contexto de UX), mais política de governança.
+- [ ] Quatro camadas separadas e referenciadas entre si (visual, comportamento, operação, contexto de UX), mais política de governança.
 - [ ] Itens do checklist de legibilidade por máquina atendidos.
 - [ ] Tabela de autonomia (autônomo / revisão / aprovação / proibido) registrada no projeto.
 - [ ] Regras de contexto com origem, evidência, data, escopo, dono e revisão.

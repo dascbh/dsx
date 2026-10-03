@@ -262,6 +262,7 @@ decisão.
 | **classe `token`** | skill `tokens` | ver "mudança de token" |
 | **classe `primitivo` / `composição`** | regras da skill `construir-ui`: só tokens semânticos (nunca valor cru, nunca primitivo direto), estados obrigatórios (vazio, carregando, erro, sucesso, foco, desabilitado), `node <DSX>/tools/lint-raw-values.mjs` limpo | valor cru introduzido, estado faltando |
 | **regra nova de uso** (componente, variante ou token novo, ou nova regra de quando usar) | atualizar o `DESIGN.md` via skill `design-md` na mesma rodada | a regra fica só no Figma ou só no código |
+| **mudança de comportamento** (tela nova, arranjo ou arquétipo diferente, ação primária em outro lugar, confirmação, estado, fluxo) | atualizar o `UX.md` via skill `ux-md` na mesma rodada (linha da tela, política ou desvio; `version` e `updated`) e rodar `node <DSX>/tools/ux-lint/screen.mjs` na captura | a mudança contraria uma política do `UX.md` sem a política mudar, ou fica só no Figma ou só no código |
 
 Um item só é dado como aplicado quando passou em todos os gates que se aplicam a
 ele — registre no `figma-sync.md` qual gate travou cada recusada, para a

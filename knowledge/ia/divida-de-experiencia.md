@@ -86,7 +86,7 @@ Causa estrutural: sem contexto compartilhado, **cada geração é isolada**. Dua
 **Antídoto:** estrutura desde o primeiro prompt.
 - Defina tokens antes de gerar telas.
 - Documente padrões antes de adicionar fluxos.
-- Entregue um documento de contexto único (DESIGN.md: tokens, escalas, componentes, estados, voz) que toda geração lê.
+- Entregue os documentos de contexto que toda geração lê: DESIGN.md (tokens, escalas, componentes, voz) e UX.md (tipo de cada tela, posição das ações, estados obrigatórios, fluxos).
 - Trate cada geração como parte de um sistema; rode o portão de coerência e os gates de eval (tokens, contraste, catálogo).
 
 Vibe coding amplifica o que já existe: com processo, acelera; sem processo, faz aparecer em horas problemas que antes levavam semanas.
@@ -140,7 +140,7 @@ O trabalho se desloca de velocidade de execução para **qualidade de decisão**
 ## 9. Checklist
 
 - [ ] Problema, público, contexto, evidência, restrição e resultado esperado registrados antes do primeiro prompt.
-- [ ] Documento de contexto (DESIGN.md) e catálogo entregues a toda geração.
+- [ ] Documentos de contexto (DESIGN.md e UX.md) e catálogo entregues a toda geração.
 - [ ] Portão de coerência aplicado a cada saída.
 - [ ] Nível de validação proporcional ao risco.
 - [ ] Acessibilidade na definição de pronto.

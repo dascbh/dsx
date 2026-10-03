@@ -22,7 +22,7 @@ Parta de `.dsx/maps/design-system.json` se existir (skill `mapear`); senão, del
 - **Componentes:** lista do kit compartilhado; para cada um, nº de usos (grep de import) e nº de implementações paralelas (ex.: 3 botões diferentes).
 - **Estados:** matriz componente × estado (padrão, hover, foco visível, ativo, desabilitado, carregando, erro, vazio). Marque ✔/✘/n.a.
 - **Acessibilidade por componente:** nome acessível, teclado, contraste — amostra mínima: botão, campo, select, modal, abas, tabela, toast.
-- **Documentação:** existe DESIGN.md? Storybook/catálogo? Documentação diz quando usar e quando não usar?
+- **Documentação:** existe DESIGN.md (como parece) e UX.md (que tipo de tela, onde fica cada coisa, como se comporta)? Notas de cada um (`lint-design-md.mjs`; `lint-ux-md.mjs --score`) e drift do UX.md (`tools/ux-lint/ux-md-drift.mjs`). Storybook/catálogo? Documentação diz quando usar e quando não usar?
 - **Governança:** dono, versionamento, processo de contribuição, changelog.
 
 ## 2. Diagnóstico
@@ -47,7 +47,7 @@ Classifique cada problema:
 | 1 — Biblioteca | componentes reutilizáveis, valores repetidos | tokens só primitivos ou soltos |
 | 2 — Sistema | tokens em camadas, kit com estados, doc de uso | drift < 5/1000 linhas |
 | 3 — Governado | dono, versão, contribuição, a11y no CI, métricas de adoção | regressão visual/a11y automatizada |
-| 4 — Legível por agentes | DESIGN.md aprovado (≥ 90), padrões e gates automáticos usados por agentes | geração controlada sem invenções |
+| 4 — Legível por agentes | DESIGN.md e UX.md aprovados (≥ 90, gates ✔, UX.md sem drift), padrões e gates automáticos usados por agentes | geração controlada sem invenções de aparência nem de comportamento |
 
 ## 4. Plano de correção
 
@@ -56,8 +56,8 @@ Ordem padrão (cada etapa destrava a seguinte):
 2. Criar/organizar camada semântica; mapear cores cruas mais frequentes para tokens.
 3. Consolidar duplicatas no componente mais usado; deprecar os outros com caminho de migração.
 4. Completar estados nos componentes de fluxos críticos.
-5. Escrever/atualizar DESIGN.md (skill `design-md`) e conectar aos agentes.
-6. Colocar gates no CI: `tools/build-tokens.mjs --check`, `lint-raw-values`, axe.
+5. Escrever/atualizar DESIGN.md (skill `design-md`) e UX.md (skill `ux-md`) e conectar os dois aos agentes (skill `iniciar`, passo 6). A auditoria de comportamento por módulo é a skill `auditar-ux`.
+6. Colocar gates no CI: `tools/build-tokens.mjs --check`, `lint-raw-values`, `lint-ux-md` e `ux-md-drift.mjs`, axe.
 
 ## Saída
 
@@ -67,5 +67,5 @@ Drift: X ocorrências em Y linhas (Z/1000) — top 5 valores crus → token suge
 Componentes: N no kit; duplicatas: …; estados ausentes críticos: …
 Acessibilidade: bloqueadores: …
 Plano (máx. 8 itens, em ordem): item — esforço (P/M/G) — impacto
-Métrica para acompanhar: drift/1000 linhas, % de telas usando só o kit, nota do DESIGN.md
+Métrica para acompanhar: drift/1000 linhas, % de telas usando só o kit, nota do DESIGN.md, nota do UX.md e % de telas com arquétipo
 ```

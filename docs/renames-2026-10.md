@@ -19,6 +19,7 @@ Renomear quebra quem chama os nomes antigos. O DSX ainda está em 0.x, então a 
 ## O que continua funcionando (leitura compatível)
 
 - **`UX.md`** (lido por `lint-ux-md`, `screen.mjs`, `text.mjs`, `flow.mjs`): chaves e valores antigos do front matter, ids antigos de arquétipo e de estado, e o caminho `arquetipos/<id>.md` no corpo. Convertidos com aviso; tabela única em `tools/ux-lint/lib/legacy.mjs`.
+- **`version: alpha` no `UX.md`** (DSX 0.7): até a 0.6 era a versão do formato; agora `version` é a versão do documento em semver e o formato vai em `format: alpha`. O `lint-ux-md` aceita `alpha` com aviso e a nota (`--score`) não dá os pontos de versão até a troca.
 - **Mapa de fluxo `flows-<module>.json`** no formato antigo (`telas`, `transicoes`, `de`/`para`, `gatilho`, `jornadas`, tipo `dialogo`), em qualquer caminho, inclusive `.dsx/mapas/fluxos-<modulo>.json`.
 - **`cases.json`** no formato antigo, em `text-page.mjs` e `findings.mjs options`; saída `--json` antiga dos verificadores em `findings.mjs register`/`check` (sem aviso).
 - **Mapas em `.dsx/mapas/`** com os nomes em português (e o legado `.claude/figma-claude/`): agentes e skills leem e regravam em `.dsx/maps/`.

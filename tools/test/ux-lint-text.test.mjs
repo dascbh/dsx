@@ -213,9 +213,9 @@ test('group: same text on several screens = one finding; template with data beco
 });
 
 test('CLI: args with several folders, --ignore, --json with inventory and source', () => {
-  assert.deepEqual(parseTextArgs(['--screens', 'a', 'b', '--code', 'c', 'd', '--ux', 'U.md', '--json']), { screens: ['a', 'b'], code: ['c', 'd'], ignore: [], ux: 'U.md', json: true });
+  assert.deepEqual(parseTextArgs(['--screens', 'a', 'b', '--code', 'c', 'd', '--ux', 'U.md', '--json']), { screens: ['a', 'b'], code: ['c', 'd'], ignore: [], ux: 'U.md', module: null, json: true });
   const warned = [];
-  assert.deepEqual(parseTextArgs(['--telas', 'a', '--codigo', 'c'], (m) => warned.push(m)), { screens: ['a'], code: ['c'], ignore: [], ux: null, json: false });
+  assert.deepEqual(parseTextArgs(['--telas', 'a', '--codigo', 'c'], (m) => warned.push(m)), { screens: ['a'], code: ['c'], ignore: [], ux: null, module: null, json: false });
   assert.ok(warned.some((w) => /--telas é nome antigo, use --screens/.test(w)) && warned.length === 2);
   const dir = mkdtempSync(join(tmpdir(), 'texto-'));
   try {

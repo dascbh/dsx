@@ -35,7 +35,7 @@ O resultado não fica na conversa nem em pasta temporária (contrato: `knowledge
 
 ## Antes de escrever
 
-1. Leia o glossário do projeto, se existir (DESIGN.md, `docs/`, ou strings existentes). **Mesmo conceito = mesma palavra em todas as telas.** Se não existir, monte um com os 10–20 termos do domínio a partir das strings atuais e aponte divergências.
+1. Leia o glossário do projeto, se existir: o de `content.glossary` do `UX.md` (por módulo, quando o produto tem vocabulários diferentes: `{ default: …, <módulo>: … }`), senão DESIGN.md, `docs/` ou strings existentes. Rode `text.mjs` e `consistency.mjs` com `--module <m>` para usar o glossário certo. **Mesmo conceito = mesma palavra em todas as telas.** Se não existir, monte um com os 10–20 termos do domínio a partir das strings atuais e aponte divergências.
 2. Identifique o tom de voz nas 4 dimensões (formal↔casual, sério↔divertido, respeitoso↔irreverente, entusiasmado↔objetivo). Interface de tarefa tende a objetivo e respeitoso. O tom **muda com o momento**: erro e perda de dinheiro pedem mais sobriedade que boas-vindas.
 
 ## Fórmulas

@@ -17,7 +17,7 @@ A auditoria só vale com três insumos do projeto, nesta ordem de importância:
 
 1. **Capturas das telas pelo código do projeto** (HTML renderizado a partir dos componentes reais, nunca tela gerada por texto). Padrão: `<projeto>/.stitch/<módulo>/code/<nn>-<tela>.html`. Estados (vazio, erro, carregando, sem acesso…) ficam ao lado: `<nn>-<tela>.<estado>.html`. No AURIS a captura é a skill `code-to-stitch` do projeto.
 2. **Mapa de fluxo conferido**: `<projeto>/.dsx/maps/flows-<módulo>.json`, gerado pela skill `mapear` (mapeador de fluxos) com evidência arquivo:linha e confirmado com o dono pela skill `confirmar-mapas`. Mapa não conferido gera F1/F5 falsos.
-3. **`UX.md`** na raiz do projeto, válido em `node <DSX>/tools/lint-ux-md.mjs UX.md`. Sem ele valem os padrões do DSX, e as regras que dependem de declaração (posição da ação primária, estados obrigatórios, termos proibidos) perdem força.
+3. **`UX.md`** na raiz do projeto, válido em `node <DSX>/tools/lint-ux-md.mjs UX.md` e **em dia com o produto**: a auditoria roda o drift (`tools/ux-lint/ux-md-drift.mjs`) como pré-requisito e avisa "UX.md desatualizado: …" (tela sem arquétipo, arquétipo de tela que sumiu, política que a maioria das telas não segue, estado sem captura, `updated` velho, desvio vencido). Sem `UX.md` valem os padrões do DSX, e as regras que dependem de declaração (posição da ação primária, estados obrigatórios, termos proibidos, desvios aceitos) perdem força; com `UX.md` desatualizado, os achados medem contra uma regra velha. Atualize-o (skill `ux-md`, Modo C) antes de decidir achados que dependem do ponto acusado.
 
 Também: as pastas de código onde o texto nasce (`--code`), para o texto apontar arquivo:linha; e a **geometria medida** das capturas (`<projeto>/.stitch/<módulo>/geometry/*.geometry.json`, gerada por `node <DSX>/tools/ux-lint/measure.mjs <capturas> --out <pasta> --ux UX.md`, que precisa do Playwright no projeto), sem a qual as regras L de layout e hierarquia não rodam. Com `--measure` a auditoria mede antes de rodar.
 
@@ -32,6 +32,8 @@ O comando confere os pré-requisitos (e diz como gerar o que falta), roda os det
 - **SE** um pré-requisito falta **ENTÃO** gere-o com o comando indicado e rode de novo; não substitua captura ausente por julgamento.
 - **SE** um detector aparece como ausente ou fora do registro **ENTÃO** a dimensão dele vai para o julgamento (passo 3) nesta rodada e o relatório final diz isso.
 - **SE** aparecem novos ou regressões **ENTÃO** comece por eles.
+- **SE** um achado é diferença de propósito do produto (vale para uma regra em várias telas) **ENTÃO** declare o desvio no bloco `deviations` do `UX.md` (com `rules` e `screens`) em vez de `ignore` um por um; na próxima execução ele aparece como "desvio aceito", com o motivo, e não conta como aberto. Desvio que sai do `UX.md` reabre o achado.
+- O glossário do C3 e do X10 é o do módulo (`content.glossary: { default: …, <m>: … }`); a auditoria repassa o `--module`.
 
 ## 3. Julgamento do que a máquina não mede
 

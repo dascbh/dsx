@@ -1,5 +1,11 @@
 ---
-version: alpha
+# version é a versão DESTE documento (semver). Suba no mesmo commit da mudança de UI:
+#   arquétipo novo ou trocado, política (actions, confirmation, feedback, forms, navigation, flows, states) ou desvio → menor (1.2.0 → 1.3.0)
+#   só texto, exemplo, evidência ou correção de redação → patch (1.2.0 → 1.2.1)
+#   mudança que invalida o que agentes já construíram (troca de modelo de navegação, de register) → maior (1.x → 2.0.0)
+# e atualize `updated`. format é a versão do formato UX.md do DSX.
+version: 1.0.0
+format: alpha
 name: <Nome do produto>
 description: <Tipo de produto, público e densidade. Ex.: "Plataforma B2B de contratos para o jurídico interno, desktop, densidade alta.">
 owner: <time ou pessoa que mantém este arquivo>
@@ -38,7 +44,7 @@ forms:
   validation: <on-blur | on-submit | realtime>
   required: <mark-required | mark-optional>
 content:
-  glossary: <caminho do glossário ou "inline">
+  glossary: <caminho do glossário ou "inline">   # por módulo: { default: <caminho>, <módulo>: <caminho ou inline> }
   buttons: verb-object
   forbidden: [<termo de implementação>, <outro termo>]   # nunca aparecem na tela
   proper-nouns: []                # nomes próprios do domínio que podem ter maiúscula no meio (X10)
@@ -55,6 +61,16 @@ verification:
     destructive: "<seletor do botão destrutivo>"
     button: "button, [role=button]"
     field: "input:not([type=hidden]), textarea, select"
+# Desvios aceitos: o que difere do cartão do arquétipo ou de uma política, com motivo e dono. Achado de regra listada
+# em `rules` numa tela de `screens` (ids do mapa de fluxo/capturas) vira "desvio aceito" no registro de achados e não
+# conta como aberto. Apague o bloco se não houver desvio.
+deviations:
+  - id: D1
+    screens: [<id da tela>]
+    rules: [<id da regra, ex.: L9>]
+    reason: "<por que o produto difere aqui>"
+    decided-by: "<quem aceitou>"
+    until: <AAAA-MM-DD, opcional>
 ---
 
 # <Nome do produto> — UX
@@ -96,7 +112,15 @@ verification:
 
 | Tela | Arquétipo | Variação | Desvio |
 |---|---|---|---|
-| <rota> | <id do arquétipo> | <variação> | <desvio e motivo, ou —> |
+| <rota> | <id do arquétipo> | <variação> | <id do desvio (D1) ou —> |
+
+### Desvios declarados
+
+<!-- Uma linha por desvio, com o mesmo id do bloco `deviations` do front matter (o linter confere os dois). -->
+
+| # | Tela | Desvio | Motivo |
+|---|---|---|---|
+| D1 | <id da tela> | <o que difere do cartão ou da política> | <motivo e custo> |
 
 ## Layout e regiões
 
@@ -155,4 +179,5 @@ verification:
 <!-- Quando consultar este arquivo, o que preservar, como validar (comandos). -->
 
 - Consulte antes de criar ou rearranjar qualquer tela; identifique o arquétipo pela seção 5.
-- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md` e com o ux-lint de tela e fluxo.
+- Toda mudança de UI que altera comportamento (tela nova, arquétipo, política, fluxo, estado) atualiza este arquivo no mesmo commit, com `version` e `updated`.
+- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md --score --map <mapa> --screens <capturas>`, com o drift (`node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .`) e com o ux-lint de tela e fluxo.

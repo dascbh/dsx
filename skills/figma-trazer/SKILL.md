@@ -120,6 +120,7 @@ entrega a classificação pronta — a **mesma mudança em ≥ 2 frames** cai em
 | **composição** | ordem, agrupamento, o que aparece e o que some numa tela específica | o arquivo daquela página | regras da skill `construir-ui` + `lint-raw-values` |
 | **texto** | rótulo, microcópia, mensagem de erro/vazio | a string no lugar de origem — nunca duplicada na tela | skill `ux-writing` (glossário, fórmulas) |
 | **padrão novo** | não existe primitivo que resolva | **pare e proponha**; não invente um componente no meio de uma tela | `patterns/index.json` primeiro; regra nova → `DESIGN.md` via skill `design-md` |
+| **comportamento** | tela nova, arranjo ou arquétipo diferente, primária em outro lugar, estado ou fluxo | a tela e o `UX.md` (linha da tela, política ou desvio) | skill `ux-md` + `ux-lint/screen.mjs` na captura; política contrariada sem mudar o `UX.md` é recusa |
 
 Escreva a classificação antes de codar e mostre ao usuário quando houver
 `token` ou `padrão novo` na lista — os dois têm custo muito além da tela onde
@@ -259,7 +260,9 @@ contradiz o glossário, o glossário ganha e a divergência vai no motivo.
   nova ou token com papel novo que a rodada aprovou → atualize o `DESIGN.md`
   pela skill `design-md` (componentes: variantes, estados, contraindicações;
   cores: a tabela Colors). Sem isso, o próximo agente que construir tela não
-  sabe que a regra existe.
+  sabe que a regra existe. O mesmo vale para comportamento: tela nova, arranjo
+  ou política de ação/estado que a rodada aprovou → atualize o `UX.md` pela skill
+  `ux-md` (e suba `version`).
 
 ## 4. Code Connect — pague uma vez, colha sempre
 

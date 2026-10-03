@@ -27,7 +27,7 @@ Conhecimento de fundo, escrito para agentes, sobre como projetar, avaliar e docu
 - **SE** a resposta da IA cita documentos ou bases **ENTÃO** carregue `rag-e-fontes.md`.
 - **SE** a IA decide entre tabela, formulário, gráfico ou controles **ENTÃO** carregue `generative-ui.md` + `evals.md` (rubrica da seção 8).
 - **SE** entra voz ou câmera **ENTÃO** carregue `multimodal.md`.
-- **SE** um agente de código vai gerar telas a partir do DESIGN.md **ENTÃO** carregue `divida-de-experiencia.md` + `evals.md`.
+- **SE** um agente de código vai gerar telas a partir do DESIGN.md e do UX.md **ENTÃO** carregue `divida-de-experiencia.md` + `evals.md`.
 - **SE** alguém quer "validar com usuários sintéticos" ou "a IA sintetizou as entrevistas" **ENTÃO** carregue `pesquisa-com-ia.md`.
 - **SE** você está escrevendo uma skill, card ou documento deste framework **ENTÃO** carregue `evidencia-e-fontes.md` e marque o nível de cada afirmação.
 - **SE** a tela exibe conteúdo gerado ou lida com upload/exportação de imagens **ENTÃO** carregue `conteudo-sintetico.md`.

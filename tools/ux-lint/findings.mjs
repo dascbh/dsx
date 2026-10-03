@@ -4,16 +4,21 @@
 // decisão do dono separada do resultado da máquina e status calculado entre execuções.
 //
 //   node tools/ux-lint/findings.mjs register --module <m> [--dir .dsx/findings] [--text t.json] [--screen s.json] [--flow f.json]
-//                                            [--states st.json] [--consistency c.json] [--layout l.json] [--root <repo>] [--include-sev0]
+//                                            [--states st.json] [--consistency c.json] [--layout l.json] [--root <repo>] [--ux UX.md] [--include-sev0]
 //   node tools/ux-lint/findings.mjs options  --module <m> --from cases.json
 //   node tools/ux-lint/findings.mjs decide   --module <m> <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
 //   node tools/ux-lint/findings.mjs import   --module <m> decisions.json
 //   node tools/ux-lint/findings.mjs status   --module <m> [--json]
-//   node tools/ux-lint/findings.mjs check    --module <m> [--min 2] [--text …] [--screen …] [--flow …] [--root <repo>]
+//   node tools/ux-lint/findings.mjs check    --module <m> [--min 2] [--text …] [--screen …] [--flow …] [--root <repo>] [--ux UX.md]
 //   node tools/ux-lint/findings.mjs page     --module <m> <saida.html> [--product …] [--color …]
 //
 // Arquivos em <dir>/<módulo>/: findings.json (escrito aqui), options.json (opções da skill), decisions.json (dono).
+// Desvios declarados no UX.md (`deviations:`, lido de --ux ou de <root>/UX.md) marcam o achado coberto como
+// `accepted-deviation`; a cópia vigente fica em findings.json (`deviations`) e o status volta a `open` quando o
+// desvio sai do UX.md ou vence.
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { parseYaml, splitFrontMatter } from '../lib/yaml-lite.mjs';
+import { parseDeviations, coveringDeviation } from './lib/deviations.mjs';
 import { join, relative, isAbsolute, basename, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -31,8 +36,18 @@ export const FAMILIES = ['text', 'screen', 'flow', 'states', 'consistency', 'lay
 const PREFIX = { text: 't', screen: 's', flow: 'f', states: 'st', consistency: 'c', layout: 'l' };
 /** Famílias cujo achado compara telas entre si: a âncora do id é só o texto, sem tela nem região. */
 const CROSS_SCREEN = ['text', 'consistency'];
-export const STATUSES = ['open', 'decided', 'ignored', 'fixed', 'regression'];
-const STATUS_PT = { open: 'aberto', decided: 'decidido', ignored: 'ignorado', fixed: 'corrigido', regression: 'regressão' };
+export const STATUSES = ['open', 'decided', 'ignored', 'accepted-deviation', 'fixed', 'regression'];
+const STATUS_PT = { open: 'aberto', decided: 'decidido', ignored: 'ignorado', 'accepted-deviation': 'desvio aceito', fixed: 'corrigido', regression: 'regressão' };
+/** Status que contam como abertos (dívida a tratar). `ignored` e `accepted-deviation` não contam. */
+export const OPEN_STATUSES = ['open', 'decided', 'regression'];
+
+/** Desvios do front matter de um UX.md (caminho). Sem arquivo, null (o registro mantém os que tinha). */
+export function deviationsFromUx(uxPath) {
+  if (!uxPath || !existsSync(uxPath)) return null;
+  const { frontMatter } = splitFrontMatter(readFileSync(uxPath, 'utf8').replace(/\r\n/g, '\n'));
+  if (!frontMatter) return [];
+  try { return parseDeviations(parseYaml(frontMatter).deviations).deviations; } catch { return []; }
+}
 
 // ---------- normalização ----------
 
@@ -260,17 +275,27 @@ export function collect({ text, screen, flow, states, consistency, layout, root 
 
 // ---------- status ----------
 
-export function statusOf(item, decisions = {}) {
+export function statusOf(item, decisions = {}, deviations = [], now = new Date()) {
   const d = decisions.items?.[item.id];
   if (d?.choice === 'ignore') return 'ignored';
   if (!item.present) return 'fixed';
+  if (coveringDeviation(item, deviations, now)) return 'accepted-deviation';
   if (item.fixed_at) return 'regression';
   if (d && (typeof d.choice === 'number' || d.choice === 'free')) return 'decided';
   return 'open';
 }
 
-export function restatus(reg, decisions) {
-  for (const it of reg.items) it.status = statusOf(it, decisions);
+/**
+ * Recalcula o status de todos os itens. Desvios: os passados em `deviations` ou, sem eles, a cópia guardada no
+ * registro (`reg.deviations`). Item coberto ganha `deviation: { id, reason, decided_by, until }`.
+ */
+export function restatus(reg, decisions, { deviations = reg.deviations ?? [], now = new Date() } = {}) {
+  for (const it of reg.items) {
+    const dev = it.present ? coveringDeviation(it, deviations, now) : null;
+    it.status = statusOf(it, decisions, deviations, now);
+    if (dev && it.status === 'accepted-deviation') it.deviation = { id: dev.id, reason: dev.reason, decided_by: dev.decided_by, until: dev.until };
+    else delete it.deviation;
+  }
   return reg;
 }
 
@@ -293,8 +318,9 @@ export const load = (p, module) => ({
  * Funde uma execução no registro. Só as famílias que vieram nesta execução podem marcar ausência; itens de
  * revisão manual (`origin: "review"`) não são vistos pelos verificadores e nunca ficam ausentes por eles.
  */
-export function merge(reg, run, { now = new Date(), commit = null, decisions = { items: {} } } = {}) {
+export function merge(reg, run, { now = new Date(), commit = null, decisions = { items: {} }, deviations = null } = {}) {
   const day = today(now);
+  if (Array.isArray(deviations)) reg.deviations = deviations;
   const byId = new Map(reg.items.map((i) => [i.id, i]));
   const seen = new Set();
   for (const it of run.items) {
@@ -320,7 +346,7 @@ export function merge(reg, run, { now = new Date(), commit = null, decisions = {
   reg.updated = day;
   reg.runs.push({ at: now.toISOString().replace(/\.\d{3}Z$/, 'Z'), sources: run.families, ...(commit ? { commit } : {}) });
   reg.items.sort((a, b) => FAMILIES.indexOf(a.family) - FAMILIES.indexOf(b.family) || b.severity - a.severity || a.rule.localeCompare(b.rule, 'pt', { numeric: true }) || a.id.localeCompare(b.id));
-  return restatus(reg, decisions);
+  return restatus(reg, decisions, { now });
 }
 
 function gitCommit(root) {
@@ -415,18 +441,19 @@ export function importDecisions(reg, decisions, data, { now = new Date() } = {})
 // ---------- check ----------
 
 /** Compara uma execução com o registro, sem gravar. Devolve { pass, added, regressions, known }. */
-export function check(reg, run, { min = 2, decisions = { items: {} } } = {}) {
+export function check(reg, run, { min = 2, decisions = { items: {} }, deviations = reg.deviations ?? [], now = new Date() } = {}) {
   const byId = new Map(reg.items.map((i) => [i.id, i]));
-  const added = [], regressions = [], known = [];
+  const added = [], regressions = [], known = [], accepted = [];
   for (const it of run.items) {
+    if (coveringDeviation({ ...it, present: true }, deviations, now)) { accepted.push(it); continue; }
     const already = byId.get(it.id);
     if (!already) { if (it.severity >= min) added.push(it); continue; }
-    const st = statusOf(already, decisions);
+    const st = statusOf(already, decisions, deviations, now);
     if (st === 'ignored') continue;
     if (st === 'fixed' || st === 'regression') regressions.push({ ...it, was: st });
     else known.push({ ...it, status: st });
   }
-  return { pass: !added.length && !regressions.length, added, regressions, known };
+  return { pass: !added.length && !regressions.length, added, regressions, known, accepted };
 }
 
 // ---------- status (resumo) ----------
@@ -438,6 +465,7 @@ export function summary(reg) {
     by_status: countBy((i) => i.status), by_family: countBy((i) => i.family), by_rule: countBy((i) => i.rule), by_severity: countBy((i) => i.severity),
     regression: reg.items.filter((i) => i.status === 'regression').map(({ id, rule, text, source, screens }) => ({ id, rule, text, source, screens })),
     decided: reg.items.filter((i) => i.status === 'decided').map(({ id, rule, text, source, screens }) => ({ id, rule, text, source, screens })),
+    accepted_deviation: reg.items.filter((i) => i.status === 'accepted-deviation').map(({ id, rule, text, screens, deviation }) => ({ id, rule, text, screens, deviation: deviation?.id ?? null })),
   };
 }
 
@@ -468,6 +496,7 @@ export function pageCases(reg, options, decisions) {
       problem: op?.problem || it.message, options: (op?.options ?? []).map((o) => ({ text: o.text, convention: o.convention, note: o.note })),
       recommended: op?.recommended ? { index: op.recommended.index, why: op.recommended.why } : null,
       decision: ds.length === items.length && ds.every((d) => JSON.stringify(d.choice) === JSON.stringify(ds[0].choice)) ? ds[0] : null,
+      deviation: items.every((i) => i.status === 'accepted-deviation') ? items[0].deviation ?? null : null,
     });
   }
   return sortCases(cases);
@@ -478,7 +507,8 @@ const PAGE_STYLE = `
 .meta code{font:11.5px var(--mono);color:var(--muted)}
 .st{border-radius:999px;padding:1px 8px;font-weight:600;font-size:12px}
 .st-open{background:var(--accent-soft);color:var(--accent)}.st-decided{background:var(--ok-soft);color:var(--ok)}
-.st-ignored{background:var(--line);color:var(--muted)}.st-regression{background:var(--bad-soft);color:var(--bad)}.st-fixed{background:var(--ok-soft);color:var(--ok)}
+.st-ignored{background:var(--line);color:var(--muted)}.st-accepted-deviation{background:var(--line);color:var(--fg)}
+.desvio{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin:0;font-size:13px}.st-regression{background:var(--bad-soft);color:var(--bad)}.st-fixed{background:var(--ok-soft);color:var(--ok)}
 .decisao{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin:0;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
 .decisao legend{font-size:12px;font-weight:600;padding:0 4px}
 .decisao label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;min-height:32px}
@@ -511,8 +541,13 @@ catch(e){saida.focus();saida.select();aviso.textContent=n+' decisão(ões) no ca
 export function renderPage(reg, options, decisions, { product = '', color = '#0E71B8' } = {}) {
   const cases = pageCases(reg, options, decisions);
   const fixed = reg.items.filter((i) => i.status === 'fixed').length;
+  const acceptedCount = reg.items.filter((i) => i.status === 'accepted-deviation').length;
   const header = (c) => `<span class="meta">${[...new Set(c.statuses)].map((s) => `<span class="st st-${s}">${STATUS_PT[s] ?? s}</span>`).join('')}<code>${c.ids.slice(0, 4).map(escH).join(' ')}${c.ids.length > 4 ? ` +${c.ids.length - 4}` : ''}</code></span>`;
   const footer = (c) => {
+    if (c.deviation) {
+      const v = c.deviation;
+      return `<p class="desvio"><strong>Desvio aceito ${escH(v.id)}</strong> (declarado no UX.md${v.decided_by ? `, decidido por ${escH(v.decided_by)}` : ''}${v.until ? `, vale até ${escH(v.until)}` : ''}): ${escH(v.reason)}. Para reabrir, tire o desvio do UX.md e registre de novo.</p>`;
+    }
     const d = c.decision;
     const checked = (v) => (d && String(d.choice) === String(v) ? ' checked' : '');
     const ops = c.options.map((_, i) => `<label><input type="radio" name="d-${escH(c.id)}" value="${i}"${checked(i)}> ${String.fromCharCode(65 + i)}</label>`).join('');
@@ -523,7 +558,7 @@ export function renderPage(reg, options, decisions, { product = '', color = '#0E
   <textarea id="saida" hidden readonly aria-label="Decisões em JSON"></textarea></div>`;
   return renderTextPage(cases, {
     title: `Achados de UX · ${reg.module}`, product, color, eyebrow: 'Registro de achados de UX',
-    lede: `Cada caso mostra o elemento como aparece hoje e as opções. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.`,
+    lede: `Cada caso mostra o elemento como aparece hoje e as opções. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.${acceptedCount ? ` ${acceptedCount} achado(s) cobertos por desvio declarado no UX.md aparecem com o motivo e não contam como abertos.` : ''}`,
     card: { header, footer }, style: PAGE_STYLE, script: PAGE_SCRIPT, bottom,
   });
 }
@@ -531,12 +566,12 @@ export function renderPage(reg, options, decisions, { product = '', color = '#0E
 // ---------- CLI ----------
 
 const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|import|status|check|page> --module <m> [opções]
-  register --text t.json --screen s.json --flow f.json --states st.json --consistency c.json --layout l.json [--root <repo>] [--include-sev0]
+  register --text t.json --screen s.json --flow f.json --states st.json --consistency c.json --layout l.json [--root <repo>] [--ux UX.md] [--include-sev0]
   options  --from cases.json
   decide   <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
   import   decisions.json
   status   [--json]
-  check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>]
+  check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>] [--ux UX.md]
   page     <saida.html> [--product …] [--color …]
   (--dir padrão: <root ou diretório atual>/.dsx/findings; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
 
@@ -552,12 +587,14 @@ function main() {
   const str = (v) => (typeof v === 'string' ? v : null);
   const inputs = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), states: str(a.states), consistency: str(a.consistency), layout: str(a.layout), root, includeSev0: !!a['include-sev0'] };
   const loc = (i) => (i.source?.[0] ?? (i.screens ?? []).join(', '));
+  const uxPath = str(a.ux) ? resolve(a.ux) : root && existsSync(join(root, 'UX.md')) ? join(root, 'UX.md') : null;
+  const uxDeviations = deviationsFromUx(uxPath);
 
   if (cmd === 'register') {
     if (!FAMILIES.some((f) => inputs[f])) { console.error(`register: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     st.findings.module = a.module;
-    merge(st.findings, run, { now, commit: gitCommit(root), decisions: st.decisions });
+    merge(st.findings, run, { now, commit: gitCommit(root), decisions: st.decisions, deviations: uxDeviations });
     writeJson(p.findings, st.findings);
     const s = summary(st.findings);
     console.log(`${relative(process.cwd(), p.findings) || p.findings} · ${run.items.length} achados nesta execução (${run.families.join(', ')}); registro com ${s.total}: ${Object.entries(s.by_status).map(([k, v]) => `${STATUS_PT[k]} ${v}`).join(', ')}`);
@@ -606,9 +643,9 @@ function main() {
     console.log(`  família: ${line(s.by_family)}`);
     console.log(`  regra: ${Object.entries(s.by_rule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
     console.log(`  severidade: ${line(s.by_severity)}`);
-    for (const [label, l] of [['Regressões', s.regression], ['Decididos, falta aplicar', s.decided]]) {
+    for (const [label, l] of [['Regressões', s.regression], ['Decididos, falta aplicar', s.decided], ['Desvios aceitos (UX.md)', s.accepted_deviation]]) {
       console.log(`\n${label} (${l.length})`);
-      for (const i of l) console.log(`  ${i.id} ${i.rule} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
+      for (const i of l) console.log(`  ${i.id} ${i.rule}${i.deviation ? ` [${i.deviation}]` : ''} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
     }
     return;
   }
@@ -616,10 +653,10 @@ function main() {
     if (!FAMILIES.some((f) => inputs[f])) { console.error(`check: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     const min = Number(a.min ?? 2);
-    const r = check(st.findings, run, { min, decisions: st.decisions });
+    const r = check(st.findings, run, { min, decisions: st.decisions, now, ...(uxDeviations ? { deviations: uxDeviations } : {}) });
     for (const i of r.added) console.log(`NOVO ${i.id} ${i.rule} sev ${i.severity} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
     for (const i of r.regressions) console.log(`REGRESSÃO ${i.id} ${i.rule} (estava ${STATUS_PT[i.was]}) "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
-    console.log(`${r.pass ? 'Passou' : 'Reprovou'}: ${r.added.length} novo(s) de severidade ≥ ${min}, ${r.regressions.length} regressão(ões), ${r.known.length} conhecido(s) em aberto tolerado(s).`);
+    console.log(`${r.pass ? 'Passou' : 'Reprovou'}: ${r.added.length} novo(s) de severidade ≥ ${min}, ${r.regressions.length} regressão(ões), ${r.known.length} conhecido(s) em aberto tolerado(s), ${r.accepted.length} coberto(s) por desvio declarado.`);
     process.exit(r.pass ? 0 : 1);
   }
   if (cmd === 'page') {
