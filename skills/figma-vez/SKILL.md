@@ -1,7 +1,7 @@
 ---
 name: figma-vez
-description: "Lê ou troca de quem é a vez no ciclo com o Figma (código, design, aplicando), validando o que a troca exige. Use ao passar o arquivo para o design ou ao fechar uma rodada de refino."
-argument-hint: "[codigo|design|aplicando]"
+description: "Lê ou troca de quem é a vez no ciclo com o Figma (code, design, applying), validando o que a troca exige. Use ao passar o arquivo para o design ou ao fechar uma rodada de refino."
+argument-hint: "[code|design|applying]"
 ---
 
 # figma-vez — ler ou trocar a vez
@@ -9,12 +9,13 @@ argument-hint: "[codigo|design|aplicando]"
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`design/`, `.dsx/`, `src/`) são do projeto do usuário.
 
 Leia ou troque a vez no registro de sincronia (`design/figma-sync.md` ou
-equivalente — o hook `guarda-vez` também aceita o mesmo
+equivalente — o hook `turn-guard` também aceita o mesmo
 `figma-sync.md` numa pasta `design` dentro de `docs`, ou `.figma-sync.md` na raiz). Doutrina na skill `figma-ciclo`.
 
-O registro aceita o legado `turn:` (`code` → `codigo`, `applying` →
-`aplicando`, `design` → `design`) — compatível com projetos que já usavam o
-fluxo anterior. Ao escrever, grave sempre `vez:` com o valor em pt-BR.
+O registro aceita os nomes antigos em português (`vez:` no lugar de `turn:`;
+`codigo` → `code`, `aplicando` → `applying`) com o aviso "nome antigo,
+renomeie para X". Ao escrever, grave sempre `turn:` com o valor novo
+(`code | design | applying`). O argumento também aceita `codigo` e `aplicando`.
 
 **Sem argumento**: diga de quem é a vez, desde quando, e o que isso proíbe agora
 (tabela "A regra" da skill `figma-ciclo`). Se `## Pendentes` tiver itens,
@@ -28,8 +29,8 @@ vez, e a resposta correta é perguntar antes de escrever em qualquer um dos lado
 | para | exige |
 |---|---|
 | `design` | baseline atual comitado em `design/figma-baseline/` (senão o diff da volta não tem "antes") **e** `## Pendentes` vazio no registro — baseline comitado prova que existe um "antes" contra o qual diferenciar, não que esta rodada terminou o que se propôs a construir |
-| `aplicando` | relatório de diff produzido (`/dsx:figma-diff`) e revisado |
-| `codigo` | rodada fechada: aplicadas e recusadas registradas (com o gate que travou cada recusada), baseline regerado, uma linha nova em `design/figma-changelog.jsonl`, achados salvos em `design/figma-achados/<rodada>.md` se houver |
+| `applying` | relatório de diff produzido (`/dsx:figma-diff`) e revisado |
+| `code` | rodada fechada: aplicadas e recusadas registradas (com o gate que travou cada recusada), baseline regerado, uma linha nova em `design/figma-changelog.jsonl`, achados salvos em `design/figma-findings/<rodada>.md` se houver |
 
 Se o pré-requisito não estiver cumprido, **não troque**: diga o que falta. Trocar
 a vez sem baseline é o jeito silencioso de perder o refino do design na rodada

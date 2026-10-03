@@ -5,7 +5,7 @@ description: "Escolhe e constrói o design system a partir de referências curad
 
 # Escolher e construir o design system
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `referencias/`, `tools/` são relativos a ela.
+> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `references/`, `tools/` são relativos a ela.
 
 Referência: `knowledge/design-system/escolher-design-system.md` (registro, avaliação, apresentação, construção). Formato e linter oficial: `knowledge/design-system/design-md.md`.
 
@@ -13,10 +13,10 @@ Referência: `knowledge/design-system/escolher-design-system.md` (registro, aval
 
 ## 1. Contexto (antes de olhar estilos)
 
-Levante, do código, dos mapas (`.dsx/mapas/`) ou perguntando o mínimo:
+Levante, do código, dos mapas (`.dsx/maps/`) ou perguntando o mínimo:
 - persona e tarefa principal; frequência e duração de uso;
-- **registro**: `operacional`, `consumo`, `editorial`, `marca` ou `experimental` (tabela no knowledge);
-- densidade-alvo, plataforma (desktop, mobile), tema claro/escuro;
+- **registro**: `operational`, `consumer`, `editorial`, `brand` ou `experimental` (tabela no knowledge);
+- densidade-alvo, plataforma (desktop, mobile), tema claro/escuro (`--theme light|dark`);
 - o que já é fixo: cor de marca, fonte licenciada, componentes existentes;
 - exigências de acessibilidade além do AA.
 Sem problema declarado, passe pela skill `discovery` primeiro.
@@ -24,17 +24,17 @@ Sem problema declarado, passe pela skill `discovery` primeiro.
 ## 2. Triagem no catálogo
 
 ```bash
-node tools/referencias.mjs buscar --registro <registro> --uso "<palavras da persona e do domínio>" --curados --n 8
-node tools/referencias.mjs buscar --registro <registro> --uso "<...>" --n 15      # também os não curados
+node tools/references.mjs search --register <registro> --use "<palavras da persona e do domínio>" --curated --n 8
+node tools/references.mjs search --register <registro> --use "<...>" --n 15          # também os não curados
 ```
-- Curados (`referencias/design-md/curados.json`) já têm nota e defeitos. Fora deles, baixe o candidato: `node tools/referencias.mjs baixar <slug>`.
+- Curados (`references/design-md/curated.json`) já têm nota (`score`) e defeitos (`contrast_failures`, `errors`, `warnings`). Fora deles, baixe o candidato: `node tools/references.mjs fetch <slug>`.
 - Descarte `experimental` para produto operacional; desconfie de estilo cujo caso de uso é só "landing page".
 
 ## 3. Avaliação objetiva de cada candidata
 
 ```bash
-node tools/referencias.mjs avaliar referencias/design-md/designmd-app/<slug>.md
-npx -y @google/design.md lint referencias/design-md/designmd-app/<slug>.md
+node tools/references.mjs evaluate references/design-md/designmd-app/<slug>.md
+npx -y @google/design.md lint references/design-md/designmd-app/<slug>.md
 ```
 Liste por opção: nota, contraste reprovado (componente e razão), componentes ausentes, avisos do linter oficial. Contraste < 4,5:1 → a opção só entra como "adaptável", com a correção proposta.
 
@@ -59,7 +59,7 @@ node tools/lint-design-md.mjs DESIGN.md
 npx -y @google/design.md lint DESIGN.md
 npx -y @google/design.md export --format dtcg DESIGN.md > tokens.dtcg.json   # se o projeto usa DTCG
 ```
-Leve ao Stitch (skill `stitch`, modo Sincronizar) e confira com `node tools/stitch/design-system.mjs conferir`.
+Leve ao Stitch (skill `stitch`, modo Sincronizar) e confira com `node tools/stitch/design-system.mjs check`.
 
 ## Saída
 

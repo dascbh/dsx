@@ -31,8 +31,8 @@ qualquer `use_figma` de descoberta, leia `design/figma-reference.json`
 (seção 8).
 
 **A vez vale aqui também.** Toda edição desta skill escreve no Figma: leia
-`design/figma-sync.md` (skill `figma-ciclo`) antes. Com `vez: design` (ou o
-legado `turn: design`), edição vinda do código não acontece — e mesmo a nota
+`design/figma-sync.md` (skill `figma-ciclo`) antes. Com `turn: design` (ou o
+legado `vez: design`), edição vinda do código não acontece — e mesmo a nota
 da Parte B, que é pequena, pode colidir visualmente com o que está sendo
 trabalhado: diga ao usuário que há refino em curso e **confirme antes** de
 acrescentar qualquer coisa. Sem registro, o ciclo ainda não foi montado:
@@ -112,7 +112,7 @@ Antes de escrever o script que compõe uma tela, diálogo ou estado:
 
 1. **Busque primeiro.** Liste o que já existe na página `01 · Componentes`
    (as specs "Spec · X" e suas descrições de uso) e nas funções de
-   `tools/figma/preludio.js`. `figma.currentPage.query()` no frame do kit é
+   `tools/figma/prelude.js`. `figma.currentPage.query()` no frame do kit é
    mais barato e mais confiável do que confiar em memória de uma rodada
    anterior. Se o arquivo usa biblioteca publicada, `search_design_system`
    também (skill `figma-levar`, "Reusar antes de criar").
@@ -188,7 +188,7 @@ resolveu sozinho. Siga nesta ordem, sem pular etapa:
    - **variável/token**: só existe se tiver valor real correspondente nos
      tokens do projeto (DTCG, `theme.ts` ou equivalente) — nunca invente
      porque "faria sentido"; token novo nasce no código pela skill `tokens` e
-     chega ao Figma pela ponte `tools/figma/tokens-para-figma.mjs`, nunca o
+     chega ao Figma pela ponte `tools/figma/tokens-to-figma.mjs`, nunca o
      contrário. Nome = caminho DTCG com `/` no lugar de `.`
      (`color/feedback/danger-icon`, `space/stack-md`); ponto dentro do nome
      falha (`space/0.5` não — o DSX grava `space/0_5`); `scopes` explícito;
@@ -196,12 +196,12 @@ resolveu sozinho. Siga nesta ordem, sem pular etapa:
      coleção `Semântico`; regra de uso copiada da tabela "Colors" do
      `DESIGN.md` para a `description`.
    - **ícone**: `COMPONENT` 24×24, path normalizado para `M/L/C/Q/Z` absolutos
-     com todo subpath fechado com `Z` (`node <DSX>/tools/figma/normalizar-svg-path.cjs "<d>"`),
+     com todo subpath fechado com `Z` (`node <DSX>/tools/figma/normalize-svg-path.cjs "<d>"`),
      nome exato `Ícone/<NomeExportadoPeloPacote>`, `constraints: SCALE` em
      **todo** vetor filho — não só no primeiro, se o ícone tiver mais de um
      path interno (contorno + furo, como `Visibility`/`DeleteOutline`). Na
      instância, o tamanho muda com `rescale(tamanho / 24)`, não `resize`
-     (`icon()` de `tools/figma/preludio.js`).
+     (`icon()` de `tools/figma/prelude.js`).
    - **primitivo**: mesma densidade, raio, hierarquia de botão e escala
      tipográfica que o resto do kit já define — um primitivo novo não é
      licença para reabrir essas decisões.
@@ -209,7 +209,7 @@ resolveu sozinho. Siga nesta ordem, sem pular etapa:
      peças existentes: nome, descrição de uso, exemplo populado com dado real
      — e a `.description` nativa do componente (seção 12);
    - se a composição depende de script, adicione a função helper equivalente
-     em `tools/figma/preludio.js` (ou na cópia do projeto) na mesma rodada —
+     em `tools/figma/prelude.js` (ou na cópia do projeto) na mesma rodada —
      senão o próximo agente reinventa de novo, e a seção 3 falha
      silenciosamente para ele.
 6. **Retrocompatibilidade não é opcional ao atualizar — e não se prova por
@@ -228,7 +228,7 @@ resolveu sozinho. Siga nesta ordem, sem pular etapa:
 7. **Registre a decisão**, não só o resultado — "evoluí X em vez de criar Y
    porque Z" é o dado que evita que outro agente desfaça sua escolha na
    próxima rodada por não saber que ela foi deliberada. Lugar: a linha da
-   rodada em `design/figma-changelog.jsonl` (campo `resumo`) e, se a peça
+   rodada em `design/figma-changelog.jsonl` (campo `summary`) e, se a peça
    ganhou regra de uso nova, o `DESIGN.md` (skill `design-md`).
 
 ## 6. Posicionar conteúdo novo sem colidir
@@ -257,9 +257,9 @@ sequenciais por arquivo — skill `figma-levar`.)
 Editar um componente ou complementar uma tela não é licença para "já que estou
 aqui, deixa eu ajeitar". Se o código está feio, inconsistente ou faltando
 tratamento de erro, **desenhe como está** e registre o achado — a mesma regra
-de `figma-espelhar` (formato em `design/figma-achados/<rodada>.md`, severidade
+de `figma-espelhar` (formato em `design/figma-findings/<rodada>.md`, severidade
 0–4). Uma correção estética deliberada é refino de design, e refino de design
-só acontece com `vez: design` no registro de sincronia (`figma-ciclo`) — nunca
+só acontece com `turn: design` no registro de sincronia (`figma-ciclo`) — nunca
 como efeito colateral de uma edição vinda do código.
 
 ## 8. Referência de agente — não redescubra, leia
@@ -280,23 +280,23 @@ matriz, e sempre que a seção 5 desta skill criar ou atualizar um componente):
 ```json
 {
   "fileKey": "6I4VlpwuCYRfpx4yYQqHx3",
-  "fileUrl": "https://www.figma.com/design/6I4VlpwuCYRfpx4yYQqHx3",
-  "atualizadoEm": "2026-08-18",
-  "paginas": { "00 · Fundamentos": "0:1", "01 · Componentes": "2:2", "…": "…" },
-  "fundacao": {
-    "colecoes": {
-      "Primitivos": { "id": "VariableCollectionId:3:1", "modos": { "Valor": "3:0" } },
-      "Semântico": { "id": "VariableCollectionId:3:2", "modos": { "Claro": "3:1", "Escuro": "3:2" } },
-      "Componente": { "id": "VariableCollectionId:3:3", "modos": { "Valor": "3:3" } }
+  "file_url": "https://www.figma.com/design/6I4VlpwuCYRfpx4yYQqHx3",
+  "updated_at": "2026-08-18",
+  "pages": { "00 · Fundamentos": "0:1", "01 · Componentes": "2:2", "…": "…" },
+  "foundation": {
+    "collections": {
+      "Primitivos": { "id": "VariableCollectionId:3:1", "modes": { "Valor": "3:0" } },
+      "Semântico": { "id": "VariableCollectionId:3:2", "modes": { "Claro": "3:1", "Escuro": "3:2" } },
+      "Componente": { "id": "VariableCollectionId:3:3", "modes": { "Valor": "3:3" } }
     },
-    "variaveis": ["color/bg/canvas", "color/bg/surface", "color/text/primary", "…"],
-    "estilosTexto": ["Título/Página (h4)", "…"],
-    "icones": { "frameId": "5:2", "nomes": ["Add", "Cancel", "…"] },
-    "chrome": { "appbar": "13:13", "drawerAberto": "13:14", "drawerRecolhido": "13:40" },
-    "kitPrimitivosFrameId": "14:20"
+    "variables": ["color/bg/canvas", "color/bg/surface", "color/text/primary", "…"],
+    "text_styles": ["Título/Página (h4)", "…"],
+    "icons": { "frame_id": "5:2", "names": ["Add", "Cancel", "…"] },
+    "chrome": { "appbar": "13:13", "drawer_open": "13:14", "drawer_collapsed": "13:40" },
+    "kit_primitives_frame_id": "14:20"
   },
   "frames": [
-    { "id": "27:1428", "name": "Demandas · Lista (/demandas)", "origem": "DemandsPage.tsx", "pagina": "02 · App do patrocinador" }
+    { "id": "27:1428", "name": "Demandas · Lista (/demandas)", "source": "DemandsPage.tsx", "page": "02 · App do patrocinador" }
   ]
 }
 ```
@@ -304,8 +304,13 @@ matriz, e sempre que a seção 5 desta skill criar ou atualizar um componente):
 `frames` é a mesma informação da matriz de `08 · Cobertura`, só que em formato
 que um agente lê com `Read` em vez de reconstruir com `get_metadata` — as duas
 devem sempre bater; se divergirem, a matriz no Figma é a fonte de verdade e o
-JSON está desatualizado (regenere). `fundacao.icones.frameId` e os nomes de
-estilo são o que preenche o bloco CONFIGURE de `tools/figma/preludio.js`.
+JSON está desatualizado (regenere). `foundation.icons.frameId` e os nomes de
+estilo são o que preenche o bloco CONFIGURE de `tools/figma/prelude.js`.
+Um `figma-reference.json` antigo, com chaves em português (`atualizadoEm`,
+`paginas`, `fundacao`, `colecoes`, `modos`, `variaveis`, `estilosTexto`,
+`icones`, `nomes`, `drawerAberto`, `drawerRecolhido`, `kitPrimitivosFrameId`,
+`origem`, `pagina`) ou em camelCase (`fileUrl`, `updatedAt`, `textStyles`, `frameId`, `drawerOpen`, `drawerCollapsed`, `kitPrimitivesFrameId`), é lido com o aviso "nome antigo, renomeie para X" e
+regravado só com as chaves novas (snake_case; `fileKey` fica como na API do Figma) na próxima regeneração.
 
 Todo agente desta doutrina começa uma sessão de trabalho **lendo este arquivo
 primeiro**, antes de qualquer `use_figma` de descoberta — só cai para
@@ -375,7 +380,7 @@ doutrina do DSX.
 ## 11. Dois lugares onde a convenção precisa morar — escreva nos dois
 
 1. **O repositório** (`design/figma-sync.md`, `design/figma-reference.json`,
-   `.dsx/figma/ledger.json`, `.dsx/mapas/*.json`) — autoritativo, versionado,
+   `.dsx/figma/ledger.json`, `.dsx/maps/*.json`) — autoritativo, versionado,
    no git. Lido por qualquer sessão de agente com o DSX neste repo. Invisível
    para quem abre o arquivo do Figma diretamente.
 2. **O próprio arquivo do Figma** — visível para todo mundo que o abre,
@@ -397,7 +402,7 @@ mais velha, para ficar desatualizada.
 ### Antes de escrever
 
 Leia `.dsx/figma/ledger.json` (`entities.pages`), `design/figma-reference.json`
-(`paginas`) e `design/figma-sync.md` para a ordem real de páginas do projeto,
+(`pages`) e `design/figma-sync.md` para a ordem real de páginas do projeto,
 o padrão de nome de frame e o caminho do repo — **nunca** cole o modelo
 abaixo literalmente. (Legado: aceite `.claude/figma-claude/figma-registry.json`
 se o ledger novo ainda não existir.)

@@ -7,7 +7,7 @@
 
 ## O que esta pasta cobre
 
-Conhecimento de fundo, escrito para agentes, sobre como projetar, avaliar e documentar experiências com IA. Os documentos explicam **por que** e **quando**; as regras de componente ficam nos cards de padrão em `patterns/ia/`, que estes documentos referenciam em vez de repetir.
+Conhecimento de fundo, escrito para agentes, sobre como projetar, avaliar e documentar experiências com IA. Os documentos explicam **por que** e **quando**; as regras de componente ficam nos cards de padrão em `patterns/ai/`, que estes documentos referenciam em vez de repetir.
 
 | Arquivo | Assunto | Carregar quando |
 |---|---|---|
@@ -38,12 +38,12 @@ Regras de componente, com decisão, faça/evite, acessibilidade e checklist:
 
 | Card | Problema |
 |---|---|
-| [`incerteza-da-ia`](../../patterns/ia/incerteza-da-ia.md) | Comunicar limites e incerteza de forma acionável |
-| [`fontes-da-ia`](../../patterns/ia/fontes-da-ia.md) | Mostrar fontes e critérios das respostas |
-| [`revisar-resultado-da-ia`](../../patterns/ia/revisar-resultado-da-ia.md) | Revisar e editar o que a IA gerou antes de usar |
-| [`recuperar-erro-da-ia`](../../patterns/ia/recuperar-erro-da-ia.md) | Erros de IA e caminhos de recuperação |
-| [`confirmar-acao-da-ia`](../../patterns/ia/confirmar-acao-da-ia.md) | Confirmar ações executadas pela IA |
-| [`rotular-conteudo-ia`](../../patterns/ia/rotular-conteudo-ia.md) | Indicar que um conteúdo foi gerado por IA |
+| [`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md) | Comunicar limites e incerteza de forma acionável |
+| [`ai-sources`](../../patterns/ai/ai-sources.md) | Mostrar fontes e critérios das respostas |
+| [`review-ai-output`](../../patterns/ai/review-ai-output.md) | Revisar e editar o que a IA gerou antes de usar |
+| [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md) | Erros de IA e caminhos de recuperação |
+| [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md) | Confirmar ações executadas pela IA |
+| [`label-ai-content`](../../patterns/ai/label-ai-content.md) | Indicar que um conteúdo foi gerado por IA |
 
 ## Princípios transversais
 

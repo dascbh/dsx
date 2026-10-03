@@ -91,6 +91,11 @@ export function build() {
 
 export function checkContrast(resolved) {
   const pairs = JSON.parse(readFileSync(T('contrast-pairs.json'), 'utf8'));
+  // Leitura compatível (transição de 2026-10): chave antiga "uso" → "use".
+  if (pairs.some((p) => p.uso !== undefined && p.use === undefined)) {
+    console.warn('AVISO  contrast-pairs.json: chave "uso" é nome antigo, renomeie para "use" (docs/renames-2026-10.md).');
+    for (const p of pairs) if (p.use === undefined && p.uso !== undefined) { p.use = p.uso; delete p.uso; }
+  }
   const results = [];
   for (const theme of Object.keys(resolved)) {
     for (const p of pairs) {
@@ -111,7 +116,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const { css, resolved } = build();
   const results = checkContrast(resolved);
   for (const r of results) {
-    console.log(`${r.ok ? 'OK   ' : 'FALHA'} [${r.theme}] ${r.ratio}:1 (mín ${r.min}) ${r.fg} / ${r.bg} — ${r.uso}`);
+    console.log(`${r.ok ? 'OK   ' : 'FALHA'} [${r.theme}] ${r.ratio}:1 (mín ${r.min}) ${r.fg} / ${r.bg} — ${r.use}`);
   }
   const fails = results.filter((r) => !r.ok);
   if (!args.check) {

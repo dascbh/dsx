@@ -1,6 +1,6 @@
 ---
 name: mapeador-tarefas
-description: "Mapeia os passos dentro de uma única tarefa — formulários em várias etapas, sequências de envio, fluxos de confirmação e efeitos colaterais — e quais tarefas dependem de outras feitas antes. Grava um mapa de referência (`.dsx/mapas/tarefas.{md,json}`) que o `figma-trazer` e o `figma-espelhar` leem em vez de redescobrir. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
+description: "Mapeia os passos dentro de uma única tarefa — formulários em várias etapas, sequências de envio, fluxos de confirmação e efeitos colaterais — e quais tarefas dependem de outras feitas antes. Grava um mapa de referência (`.dsx/maps/tasks.{md,json}`) que o `figma-trazer` e o `figma-espelhar` leem em vez de redescobrir. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 
@@ -17,15 +17,15 @@ arquivos por completo a cada execução.
 
 ## Antes de começar
 
-Leia `.dsx/mapas/mapa-ui.json` se existir (pelo inventário de modais/diálogos)
-e `.dsx/mapas/fluxos.json` se existir — uma tarefa muitas vezes é uma aresta
+Leia `.dsx/maps/ui-map.json` se existir (pelo inventário de modais/diálogos)
+e `.dsx/maps/flows.json` se existir — uma tarefa muitas vezes é uma aresta
 de um fluxo do usuário, então não rederive o que aquele arquivo já nomeia.
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa, leia primeiro
-`.dsx/mapas/`; se não existir, aceite o legado `.claude/figma-claude/`
+`.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/`
 (`ui-map.json`, `user-flows.json`) e registre na sua linha de retorno que o
 legado foi lido e que o mapa será regravado no caminho novo na próxima
-execução. Você sempre **grava** só em `.dsx/mapas/`.
+execução. Você sempre **grava** só em `.dsx/maps/`.
 
 Comece a varredura em `$ARGUMENTS` se tiver sido passado; senão, na raiz do
 projeto.
@@ -71,15 +71,15 @@ pedido") e checagens de permissão. Registre-as como dependências dirigidas
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos por inteiro,
+Crie `.dsx/maps/` se não existir e grave os dois arquivos por inteiro,
 substituindo o que havia antes. As chaves do JSON ficam em inglês — são
 contrato de máquina; traduzir quebraria os leitores. Só a prosa vai em pt-BR.
 
-**`.dsx/mapas/tarefas.json`**:
+**`.dsx/maps/tasks.json`**:
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/caminho/absoluto",
   "scope": "projeto inteiro",
   "tasks": [
@@ -87,15 +87,15 @@ contrato de máquina; traduzir quebraria os leitores. Só a prosa vai em pt-BR.
       "name": "Criar uma demanda",
       "location": "/demands/new",
       "steps": ["preencher formulário", "validar", "enviar", "carregando", "sucesso -> navega para /demands/:id"],
-      "errorHandling": "erros inline nos campos + toast em erro de servidor",
-      "confirmationRequired": false
+      "error_handling": "erros inline nos campos + toast em erro de servidor",
+      "confirmation_required": false
     },
     {
       "name": "Excluir uma demanda",
       "location": "ação de linha em DemandsPage",
       "steps": ["diálogo de confirmação", "requisição de exclusão", "remoção otimista da lista"],
-      "errorHandling": "toast + linha restaurada em caso de falha",
-      "confirmationRequired": true,
+      "error_handling": "toast + linha restaurada em caso de falha",
+      "confirmation_required": true,
       "irreversible": true
     }
   ],
@@ -120,7 +120,7 @@ você não conseguiu rastrear inteiro. Deixe vazio se não houver nada a
 sinalizar. O `/dsx:confirmar-mapas` lê esta lista para montar o assistente de
 confirmação.
 
-**`.dsx/mapas/tarefas.md`** — narrado do mesmo jeito: `# Fluxos de tarefa`,
+**`.dsx/maps/tasks.md`** — narrado do mesmo jeito: `# Fluxos de tarefa`,
 depois `gerado:` / `raiz:` / `escopo:`, uma subseção por tarefa como uma
 lista numerada curta de passos, uma seção "Dependências entre tarefas" como
 uma tabela pequena, e uma seção "Incertos". Feche com:
@@ -128,7 +128,7 @@ uma tabela pequena, e uma seção "Incertos". Feche com:
 ```markdown
 ## Para os comandos seguintes
 
-Este arquivo e `tarefas.json` são regenerados por `/dsx:mapear` a cada
+Este arquivo e `tasks.json` são regenerados por `/dsx:mapear` a cada
 execução, sempre sobrescrevendo o que havia antes. O `figma-trazer` e o
 `figma-espelhar` devem ler isto antes de redescobrir os passos das tarefas do
 zero, e rodar o `mapear` de novo primeiro se parecer desatualizado.

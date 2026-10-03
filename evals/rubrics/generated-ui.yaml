@@ -1,0 +1,75 @@
+# Rubrica: tela gerada por agente dentro do design system.
+# Gates são binários e reprovam a versão. Critérios têm escala 0–3 com âncoras.
+# Avaliadores: code (ferramentas do DSX / axe), judge (agente juiz-de-evals), human.
+id: generated-ui
+version: 1
+attempts-per-case: 3
+approval: "todos os gates em todas as tentativas E média de cada critério >= threshold"
+
+gates:
+  - id: no-raw-values
+    evaluator: code
+    how: "node tools/lint-raw-values.mjs <arquivos gerados>  → 0 ocorrências"
+  - id: contrast
+    evaluator: code
+    how: "todo par texto/fundo >= 4.5:1 e UI não textual >= 3:1 (tools/contrast.mjs ou axe color-contrast)"
+  - id: accessible-names
+    evaluator: code
+    how: "axe: button-name, link-name, label, image-alt sem violações"
+  - id: visible-focus
+    evaluator: human
+    how: "Tab por todos os interativos; foco visível em todos, nenhum escondido"
+  - id: required-states
+    evaluator: judge
+    how: "a tela implementa carregando, vazio e erro para cada região que recebe dados"
+  - id: no-dark-patterns
+    evaluator: judge
+    how: "nenhum item de knowledge/fundamentos/dark-patterns.md (linhas vermelhas)"
+
+criteria:
+  - id: component-reuse
+    evaluator: judge
+    threshold: 2
+    anchors:
+      0: "Recria componentes que existem no kit; estilos locais por toda parte."
+      1: "Usa o kit em parte; 2+ componentes ou variantes novos sem justificativa."
+      2: "Usa o kit; no máximo 1 componente novo, com justificativa."
+      3: "Só componentes do kit; composição idêntica a telas equivalentes do produto."
+  - id: visual-hierarchy
+    evaluator: judge
+    threshold: 2
+    anchors:
+      0: "Sem ponto focal; vários elementos competem; mais de uma ação primária por região."
+      1: "Ponto focal existe mas disputa com decoração/cor; títulos pulam níveis."
+      2: "Um h1, uma ação primária por região, agrupamento por proximidade claro."
+      3: "Teste do olhar semicerrado revela exatamente a ordem de leitura pretendida."
+  - id: interaction-patterns
+    evaluator: judge
+    threshold: 2
+    anchors:
+      0: "Decisões contrariam padrões com status 'avoid' (ex.: modal para formulário longo, erro em toast)."
+      1: "Uma decisão diverge de padrão recomendado sem justificativa."
+      2: "Decisões seguem o catálogo; divergências justificadas."
+      3: "Segue o catálogo e cobre os itens do checklist de cada padrão usado."
+  - id: text
+    evaluator: judge
+    threshold: 2
+    anchors:
+      0: "Botões genéricos ('OK', 'Enviar'), erros sem solução, jargão técnico."
+      1: "Maioria clara, mas termos inconsistentes com o produto ou erros de português."
+      2: "Verbo + objeto nos botões; erros dizem o que fazer; termos do glossário."
+      3: "Além disso, o tom se ajusta ao momento (erro, sucesso, vazio) e não há palavra sobrando."
+  - id: responsiveness
+    evaluator: human
+    threshold: 2
+    anchors:
+      0: "Quebra em 320px ou exige rolagem horizontal."
+      1: "Funciona em 320px com sobreposição ou alvos pequenos."
+      2: "Uma coluna em 320px, alvos >= 44px, nada cortado."
+      3: "Além disso, ordem de conteúdo priorizada para mobile e zoom 200% sem perda."
+
+goals:
+  - "componentes novos por tela (menor é melhor)"
+  - "tempo até a primeira versão aprovada"
+guardrails:
+  - "nenhum gate antes aprovado pode passar a falhar"

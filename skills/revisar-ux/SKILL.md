@@ -20,20 +20,20 @@ Escreva em 3 linhas:
 
 Se você não consegue responder, isso já é o primeiro achado (falta de clareza de propósito).
 
-SE o projeto tem `UX.md` → ENTÃO leia-o antes: o arquétipo declarado para a tela (e o cartão em `arquetipos/`), as políticas de ações, confirmação e feedback, e os "Não faça". Divergência da tela em relação ao `UX.md` é achado; arquétipo que não casa com a tarefa também.
+SE o projeto tem `UX.md` → ENTÃO leia-o antes: o arquétipo declarado para a tela (e o cartão em `archetypes/`), as políticas de ações, confirmação e feedback, e os "Não faça". Divergência da tela em relação ao `UX.md` é achado; arquétipo que não casa com a tarefa também.
 
 ## 2. Gate objetivo (ux-lint)
 
-Se houver captura HTML da tela e mapa de fluxo (`.dsx/mapas/fluxos-<modulo>.json`), rode antes do julgamento:
+Se houver captura HTML da tela e mapa de fluxo (`.dsx/maps/flows-<module>.json`), rode antes do julgamento:
 
 ```bash
-node <DSX>/tools/ux-lint/tela.mjs <capturas> --ux UX.md        # T1–T7: primárias por região, ordem no diálogo, h1, rótulos, destrutiva, termos proibidos
-node <DSX>/tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json --ux UX.md   # F1–F5: becos sem saída, órfãs, jornada longa, diálogos empilhados, retorno
+node <DSX>/tools/ux-lint/screen.mjs <capturas> --ux UX.md        # T1–T7: primárias por região, ordem no diálogo, h1, rótulos, destrutiva, termos proibidos
+node <DSX>/tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json --ux UX.md   # F1–F5: becos sem saída, órfãs, jornada longa, diálogos empilhados, retorno
 ```
 
 Os achados entram no relatório com a regra e a severidade que a ferramenta deu. O julgamento abaixo cobre o que ela não mede (adequação do arquétipo, clareza, carga cognitiva).
 
-**Registre em `.dsx/findings` e decida pelo registro** (contrato: `knowledge/fundamentos/achados-de-ux.md`): rode os verificadores com `--json` e `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen tela.json --flow fluxo.json [--text texto.json] --root <repo>`. O relatório cita o id de cada achado; o dono decide pela página (`findings.mjs page`) ou no chat (`findings.mjs decide`), e a próxima revisão começa por `findings.mjs status` (regressões e decididos sem aplicar) em vez de recomeçar do zero.
+**Registre em `.dsx/findings` e decida pelo registro** (contrato: `knowledge/fundamentos/achados-de-ux.md`): rode os verificadores com `--json` e `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen screen.json --flow flow.json [--text text.json] --root <repo>`. O relatório cita o id de cada achado; o dono decide pela página (`findings.mjs page`) ou no chat (`findings.mjs decide`), e a próxima revisão começa por `findings.mjs status` (regressões e decididos sem aplicar) em vez de recomeçar do zero.
 
 ## 2.1 Inspecione a tela renderizada
 

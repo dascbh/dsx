@@ -19,7 +19,7 @@ if (args.pairs) {
     const min = p.min ?? 4.5;
     const ok = ratio >= min;
     if (!ok) failures++;
-    console.log(`${ok ? 'OK  ' : 'FALHA'} ${ratio.toFixed(2)}:1 (mín ${min}) ${p.fg} sobre ${p.bg}${p.uso ? ` — ${p.uso}` : ''}`);
+    console.log(`${ok ? 'OK  ' : 'FALHA'} ${ratio.toFixed(2)}:1 (mín ${min}) ${p.fg} sobre ${p.bg}${(p.use ?? p.uso) ? ` — ${p.use ?? p.uso}` : ''}`);
   }
   process.exit(failures ? 1 : 0);
 } else {

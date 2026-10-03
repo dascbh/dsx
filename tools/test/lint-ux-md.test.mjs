@@ -3,68 +3,82 @@ import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { lintUxMd, ARQUETIPOS } from '../lint-ux-md.mjs';
+import { lintUxMd, ARCHETYPES } from '../lint-ux-md.mjs';
 
-const exemplo = readFileSync('examples/UX.md', 'utf8');
-const SEM_PASTA = { arquetiposDir: join(tmpdir(), 'dsx-sem-arquetipos-inexistente') };
-const tem = (r, trecho) => r.errors.some((e) => e.includes(trecho));
+const example = readFileSync('examples/UX.md', 'utf8');
+const NO_DIR = { archetypesDir: join(tmpdir(), 'dsx-no-archetypes-dir') };
+const has = (r, snippet) => r.errors.some((e) => e.includes(snippet));
 
-test('lint UX.md: exemplo aprovado (com e sem a pasta de arquétipos)', () => {
-  const r = lintUxMd(exemplo);
+test('UX.md lint: example passes (with and without the archetypes folder)', () => {
+  const r = lintUxMd(example);
   assert.equal(r.ok, true, r.errors.join('\n'));
-  assert.equal(r.info.secoes.length, 13);
-  assert.equal(lintUxMd(exemplo, SEM_PASTA).ok, true);
+  assert.equal(r.info.sections.length, 13);
+  assert.equal(lintUxMd(example, NO_DIR).ok, true);
 });
 
-test('lint UX.md: template reprovado por placeholders', () => {
-  const r = lintUxMd(readFileSync('templates/UX.md', 'utf8'), SEM_PASTA);
+test('UX.md lint: template fails on placeholders', () => {
+  const r = lintUxMd(readFileSync('templates/UX.md', 'utf8'), NO_DIR);
   assert.equal(r.ok, false);
-  assert.ok(tem(r, 'placeholder'));
+  assert.ok(has(r, 'placeholder'));
 });
 
-test('lint UX.md: sem persona reprova', () => {
-  const md = exemplo.replace(/^  persona: .*\n/m, '');
-  assert.ok(tem(lintUxMd(md, SEM_PASTA), 'produto.persona'));
+test('UX.md lint: missing persona fails', () => {
+  const md = example.replace(/^  persona: .*\n/m, '');
+  assert.ok(has(lintUxMd(md, NO_DIR), 'product.persona'));
 });
 
-test('lint UX.md: seção faltando e seção fora de ordem reprovam', () => {
-  const semFluxos = exemplo.replace(/^## Fluxos$/m, '## Jornadas');
-  assert.ok(tem(lintUxMd(semFluxos, SEM_PASTA), 'Seção obrigatória ausente: "## Fluxos"'));
-  const trocada = exemplo.replace('## Visão geral', '## TMP').replace('## Personas e tarefas', '## Visão geral').replace('## TMP', '## Personas e tarefas');
-  assert.ok(tem(lintUxMd(trocada, SEM_PASTA), 'fora de ordem'));
+test('UX.md lint: missing and out-of-order sections fail', () => {
+  const withoutFlows = example.replace(/^## Fluxos$/m, '## Jornadas');
+  assert.ok(has(lintUxMd(withoutFlows, NO_DIR), 'Seção obrigatória ausente: "## Fluxos"'));
+  const swapped = example.replace('## Visão geral', '## TMP').replace('## Personas e tarefas', '## Visão geral').replace('## TMP', '## Personas e tarefas');
+  assert.ok(has(lintUxMd(swapped, NO_DIR), 'fora de ordem'));
 });
 
-test('lint UX.md: títulos em inglês são aceitos', () => {
-  const en = exemplo.replace('## Visão geral', '## Overview').replace('## Faça e não faça', "## Do's and Don'ts");
-  assert.equal(lintUxMd(en, SEM_PASTA).ok, true);
+test('UX.md lint: English section titles are accepted', () => {
+  const en = example.replace('## Visão geral', '## Overview').replace('## Faça e não faça', "## Do's and Don'ts");
+  assert.equal(lintUxMd(en, NO_DIR).ok, true);
 });
 
-test('lint UX.md: enum inválido e tipo errado reprovam; chave desconhecida avisa', () => {
-  const md = exemplo
-    .replace('registro: operacional', 'registro: corporativo')
-    .replace('primarias-por-regiao: 1', 'primarias-por-regiao: muitas')
-    .replace('  densidade: alta\n', '  densidade: alta\n  humor: sereno\n');
-  const r = lintUxMd(md, SEM_PASTA);
-  assert.ok(tem(r, 'produto.registro: valor "corporativo"'));
-  assert.ok(tem(r, 'acoes.primarias-por-regiao'));
-  assert.ok(r.warnings.some((w) => w.includes('produto.humor')));
+test('UX.md lint: invalid enum and wrong type fail; unknown key warns', () => {
+  const md = example
+    .replace('register: operational', 'register: corporativo')
+    .replace('primary-per-region: 1', 'primary-per-region: muitas')
+    .replace('  density: high\n', '  density: high\n  mood: sereno\n');
+  const r = lintUxMd(md, NO_DIR);
+  assert.ok(has(r, 'product.register: valor "corporativo"'));
+  assert.ok(has(r, 'actions.primary-per-region'));
+  assert.ok(r.warnings.some((w) => w.includes('product.mood')));
 });
 
-test('lint UX.md: arquétipo inexistente reprova (lista fixa e pasta)', () => {
-  const md = exemplo.replace('biblioteca: ["/modelos"]', 'galeria-magica: ["/modelos"]');
-  assert.ok(tem(lintUxMd(md, SEM_PASTA), 'arquetipos.galeria-magica'));
-  const pasta = mkdtempSync(join(tmpdir(), 'dsx-arq-'));
-  for (const id of ARQUETIPOS) writeFileSync(join(pasta, `${id}.md`), `# ${id}\n`);
-  assert.ok(tem(lintUxMd(md, { arquetiposDir: pasta }), 'arquetipos.galeria-magica'));
-  assert.equal(lintUxMd(exemplo, { arquetiposDir: pasta }).warnings.some((w) => w.includes('sem cartão')), false);
+test('UX.md lint: unknown archetype fails (fixed list and folder)', () => {
+  const md = example.replace('library: ["/modelos"]', 'magic-gallery: ["/modelos"]');
+  assert.ok(has(lintUxMd(md, NO_DIR), 'archetypes.magic-gallery'));
+  const dir = mkdtempSync(join(tmpdir(), 'dsx-arq-'));
+  for (const id of ARCHETYPES) writeFileSync(join(dir, `${id}.md`), `# ${id}\n`);
+  assert.ok(has(lintUxMd(md, { archetypesDir: dir }), 'archetypes.magic-gallery'));
+  assert.equal(lintUxMd(example, { archetypesDir: dir }).warnings.some((w) => w.includes('sem cartão')), false);
 });
 
-test('lint UX.md: Faça/Não faça com menos de 3 itens reprova; texto vago avisa', () => {
-  const md = exemplo
+test('UX.md lint: Do/Do not with fewer than 3 items fails; vague text warns', () => {
+  const md = example
     .replace(/- Use o número do contrato como título[^\n]*\n/, '')
     .replace(/- Devolva a lista com filtros[^\n]*\n/, '')
     .replace('Tom direto,', 'Tom intuitivo e direto,');
-  const r = lintUxMd(md, SEM_PASTA);
-  assert.ok(tem(r, 'Bloco "Faça" com 2'));
+  const r = lintUxMd(md, NO_DIR);
+  assert.ok(has(r, 'Bloco "Faça" com 2'));
   assert.ok(r.warnings.some((w) => w.includes('intuitivo')));
+});
+
+test('UX.md lint: legacy Portuguese front matter passes with "nome antigo" warnings', () => {
+  const legacy = example
+    .replace('product:\n', 'produto:\n').replace('  register: operational', '  registro: operacional').replace('  density: high', '  densidade: alta')
+    .replace('actions:\n', 'acoes:\n').replace('  primary-position: top-right', '  posicao-primaria: topo-direita')
+    .replace('  monitoring-dashboard: [', '  painel-de-acompanhamento: [').replace('archetypes:\n', 'arquetipos:\n')
+    .replace('states: [loading, empty,', 'estados: [carregando, vazio,');
+  const r = lintUxMd(legacy, NO_DIR);
+  assert.equal(r.ok, true, r.errors.join('\n'));
+  for (const w of ['nome antigo "produto", renomeie para "product"', 'valor antigo "operacional" em product.register', 'arquétipo com id antigo "painel-de-acompanhamento"', 'estado com nome antigo "carregando"']) {
+    assert.ok(r.warnings.some((x) => x.toLowerCase().includes(w.toLowerCase())), w);
+  }
+  assert.equal(lintUxMd(example, NO_DIR).warnings.some((w) => /antig/.test(w)), false);
 });

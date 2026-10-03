@@ -8,11 +8,11 @@ import { join, extname } from 'node:path';
 import { parseArgs } from './lib/cli.mjs';
 
 const RULES = [
-  { id: 'cor-hex',   re: /#(?:[0-9a-fA-F]{3,4}){1,2}\b/g, msg: 'Cor hex crua — use token semântico (ex.: var(--color-text-primary))' },
-  { id: 'cor-func',  re: /\b(?:rgba?|hsla?|oklch|oklab)\([^)]*\)/g, msg: 'Cor funcional crua — use token' },
-  { id: 'px-solto',  re: /(?<![\w-])(?:[2-9]|[1-9]\d{1,2})px\b/g, msg: 'Medida em px fora da escala — use token de espaço/tamanho' },
-  { id: 'z-magico',  re: /z-index:\s*(?:\d{3,})/g, msg: 'z-index mágico — use token de camada' },
-  { id: 'tw-arbitr', re: /\b[a-z-]+-\[(?:#|\d)[^\]]*\]/g, msg: 'Valor arbitrário Tailwind — use a escala do tema' },
+  { id: 'color-hex', re: /#(?:[0-9a-fA-F]{3,4}){1,2}\b/g, msg: 'Cor hex crua — use token semântico (ex.: var(--color-text-primary))' },
+  { id: 'color-func', re: /\b(?:rgba?|hsla?|oklch|oklab)\([^)]*\)/g, msg: 'Cor funcional crua — use token' },
+  { id: 'loose-px',  re: /(?<![\w-])(?:[2-9]|[1-9]\d{1,2})px\b/g, msg: 'Medida em px fora da escala — use token de espaço/tamanho' },
+  { id: 'magic-z',   re: /z-index:\s*(?:\d{3,})/g, msg: 'z-index mágico — use token de camada' },
+  { id: 'tw-arbitrary', re: /\b[a-z-]+-\[(?:#|\d)[^\]]*\]/g, msg: 'Valor arbitrário Tailwind — use a escala do tema' },
 ];
 
 // Arquivos de definição de tokens são a única fonte legítima de valores crus.
@@ -43,7 +43,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const t = readFileSync(f, 'utf8'); lines += t.split('\n').length; hits.push(...lintText(t, f));
   }
   const drift = lines ? +((hits.length / lines) * 1000).toFixed(2) : 0;
-  if (a.json) console.log(JSON.stringify({ lines, ocorrencias: hits.length, driftPorMilLinhas: drift, hits }, null, 2));
+  if (a.json) console.log(JSON.stringify({ lines, occurrences: hits.length, drift_per_1000_lines: drift, hits }, null, 2));
   else {
     for (const h of hits) console.log(`${h.file}:${h.line}  [${h.rule}] ${h.match} — ${h.msg}`);
     console.log(`\n${hits.length} ocorrência(s) em ${lines} linhas — drift: ${drift}/1000 linhas`);

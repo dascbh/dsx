@@ -12,10 +12,10 @@ O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pe
 ## 0. Pré-condições
 
 1. Procure `DESIGN.md` na raiz do projeto. **Se não existir**, pare e rode a skill `iniciar` (ou `design-md` no modo "extrair do código"). Construir sem fonte visual é a principal causa de drift.
-2. Procure `UX.md` na raiz do projeto. **Se existir**, leia antes de desenhar: o arquétipo da tela (seção "Arquétipos de tela", cartão em `arquetipos/`), a posição e o limite de ações primárias, a política de confirmação e feedback, os estados obrigatórios e os termos proibidos. Tela sem arquétipo na tabela: proponha um e registre (skill `ux-md`); para escolher entre arranjos, skill `arranjar-tela`.
+2. Procure `UX.md` na raiz do projeto. **Se existir**, leia antes de desenhar: o arquétipo da tela (seção "Arquétipos de tela", cartão em `archetypes/`), a posição e o limite de ações primárias, a política de confirmação e feedback, os estados obrigatórios e os termos proibidos. Tela sem arquétipo na tabela: proponha um e registre (skill `ux-md`); para escolher entre arranjos, skill `arranjar-tela`.
 3. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
-4. Se existirem mapas do projeto (`.dsx/mapas/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `fluxos.json` (de onde a tela é alcançada e para onde leva), `tarefas.json` (passos e dependências), `dominio.json` (de onde vêm os dados, cardinalidades), `jornada.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
-5. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `codigo`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
+4. Se existirem mapas do projeto (`.dsx/maps/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `flows.json` (de onde a tela é alcançada e para onde leva), `tasks.json` (passos e dependências), `domain.json` (de onde vêm os dados, cardinalidades), `journey.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
+5. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `code`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
 6. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
 7. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
 
@@ -41,14 +41,14 @@ Registre as decisões numa lista curta (`decisão → padrão aplicado`). Ela en
 
 **Layout e hierarquia** (detalhes: `knowledge/fundamentos/hierarquia-visual.md`, `knowledge/design-system/espacamento-e-layout.md`)
 - Um `h1` por página. Hierarquia por tamanho/peso/espaço antes de cor/caixas.
-- Uma ação primária por região. Posição consistente com telas do mesmo tipo (`patterns/acoes/posicao-de-acoes.md`, `patterns/acoes/hierarquia-de-botoes.md`).
+- Uma ação primária por região. Posição consistente com telas do mesmo tipo (`patterns/actions/action-placement.md`, `patterns/actions/button-hierarchy.md`).
 - Espaçamento só da escala; agrupe por proximidade (Gestalt).
 - Texto corrido ≤ 68ch.
 
 **Formulários** (`knowledge/fundamentos/formularios.md`)
 - Rótulo visível sempre; placeholder nunca substitui rótulo.
 - Validação ao sair do campo ou ao enviar; erro junto ao campo + resumo no topo se houver vários; nunca apagar o que a pessoa digitou.
-- Não desabilite o botão de envio para "evitar erro" — `patterns/acoes/botao-desabilitado.md`.
+- Não desabilite o botão de envio para "evitar erro" — `patterns/actions/disabled-button.md`.
 
 **Texto** — siga `skills/ux-writing/SKILL.md`: botões com verbo + objeto, erros que dizem o que houve e como resolver, vocabulário igual ao do resto do produto.
 
@@ -58,12 +58,12 @@ Toda superfície que recebe dados ou ação implementa:
 
 | Estado | Padrão de referência |
 |---|---|
-| Carregando | `patterns/feedback/skeleton-vs-spinner.md`, `patterns/feedback/carregamento-longo.md` |
-| Vazio (primeiro uso, sem resultado, limpo pelo usuário) | `patterns/feedback/estado-vazio.md`, `patterns/busca-filtros/busca-sem-resultados.md` |
-| Erro (validação, falha temporária, permissão) | `patterns/formularios/erros-em-formularios.md`, `patterns/feedback/falha-temporaria.md`, `patterns/feedback/tentar-novamente.md` |
-| Sucesso | `patterns/feedback/confirmacao-de-sucesso.md`, `patterns/feedback/toast-alerta-inline.md` |
-| Envio em andamento | `patterns/acoes/clique-duplo-em-envio.md` |
-| Interativos: hover, foco visível, ativo, desabilitado | `patterns/acessibilidade/foco-de-teclado.md` |
+| Carregando | `patterns/feedback/skeleton-vs-spinner.md`, `patterns/feedback/long-loading.md` |
+| Vazio (primeiro uso, sem resultado, limpo pelo usuário) | `patterns/feedback/empty-state.md`, `patterns/search-filters/no-search-results.md` |
+| Erro (validação, falha temporária, permissão) | `patterns/forms/form-errors.md`, `patterns/feedback/temporary-failure.md`, `patterns/feedback/retry.md` |
+| Sucesso | `patterns/feedback/success-confirmation.md`, `patterns/feedback/toast-vs-inline-alert.md` |
+| Envio em andamento | `patterns/actions/double-submit.md` |
+| Interativos: hover, foco visível, ativo, desabilitado | `patterns/accessibility/keyboard-focus.md` |
 
 Se o projeto tiver tema escuro, verifique os dois temas.
 
@@ -75,7 +75,7 @@ Rode e corrija até passar:
 node <DSX>/tools/lint-raw-values.mjs <pastas-alteradas>     # zero valores crus
 node <DSX>/tools/contrast.mjs "<texto>" "<fundo>"           # para cada par novo de cor
 node <DSX>/tools/lint-design-md.mjs DESIGN.md               # se você alterou o DESIGN.md
-node <DSX>/tools/ux-lint/tela.mjs <captura.html> --ux UX.md  # se o projeto tem UX.md e captura da tela
+node <DSX>/tools/ux-lint/screen.mjs <captura.html> --ux UX.md  # se o projeto tem UX.md e captura da tela
 ```
 
 Se houver app rodando, abra a tela (navegador ou screenshot) e confira: largura 320px, zoom 200%, navegação só por teclado (Tab/Shift+Tab/Enter/Esc), tema escuro.

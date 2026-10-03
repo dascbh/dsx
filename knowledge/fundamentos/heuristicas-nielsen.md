@@ -52,7 +52,7 @@ Avalie cada achado por três fatores e combine-os:
 - O estado exibido corresponde ao estado real do sistema (não à intenção)?
 - Existe resposta perceptível em até 0,1 s para confirmar a interação? (limiares em [interacao-e-feedback.md](interacao-e-feedback.md))
 
-**Correção típica.** Estados distintos para ocioso, carregando, sucesso e erro; "Passo 2 de 4"; toast após salvar. Ver [skeleton-vs-spinner](../../patterns/feedback/skeleton-vs-spinner.md), [carregamento-longo](../../patterns/feedback/carregamento-longo.md), [confirmacao-de-sucesso](../../patterns/feedback/confirmacao-de-sucesso.md), [porcentagem-de-progresso](../../patterns/feedback/porcentagem-de-progresso.md).
+**Correção típica.** Estados distintos para ocioso, carregando, sucesso e erro; "Passo 2 de 4"; toast após salvar. Ver [skeleton-vs-spinner](../../patterns/feedback/skeleton-vs-spinner.md), [long-loading](../../patterns/feedback/long-loading.md), [success-confirmation](../../patterns/feedback/success-confirmation.md), [progress-percentage](../../patterns/feedback/progress-percentage.md).
 
 **Severidade típica.** 3 se a ação é financeira ou irreversível e não há confirmação; 2 em ações de baixo risco.
 
@@ -70,7 +70,7 @@ Avalie cada achado por três fatores e combine-os:
 - Uma pessoa do público entende cada palavra e ícone sem treinamento?
 - Algum termo veio do organograma ou do código em vez do uso?
 
-**Correção típica.** Trocar termos pelo vocabulário observado em entrevistas, tickets e buscas; usar metáforas conhecidas (lixeira, lupa). Ver [codigo-de-erro-tecnico](../../patterns/feedback/codigo-de-erro-tecnico.md).
+**Correção típica.** Trocar termos pelo vocabulário observado em entrevistas, tickets e buscas; usar metáforas conhecidas (lixeira, lupa). Ver [technical-error-code](../../patterns/feedback/technical-error-code.md).
 
 ## H3. Controle e liberdade do usuário
 
@@ -86,7 +86,7 @@ Avalie cada achado por três fatores e combine-os:
 - Em cada passo reversível, é possível cancelar, voltar e desfazer?
 - O que acontece com os dados digitados se a pessoa sair?
 
-**Correção típica.** Desfazer por alguns segundos, rascunho automático, lixeira. Ver [desfazer](../../patterns/acoes/desfazer.md), [fechar-modal](../../patterns/modais/fechar-modal.md), [autosave-vs-salvar](../../patterns/formularios/autosave-vs-salvar.md).
+**Correção típica.** Desfazer por alguns segundos, rascunho automático, lixeira. Ver [desfazer](../../patterns/actions/undo.md), [close-modal](../../patterns/modals/close-modal.md), [autosave-vs-save](../../patterns/forms/autosave-vs-save.md).
 
 **Severidade típica.** 3–4 quando há perda irrecuperável.
 
@@ -104,7 +104,7 @@ Avalie cada achado por três fatores e combine-os:
 - Ações equivalentes têm nome, aparência e posição iguais?
 - O produto segue padrões do sistema operacional e do setor onde o público já tem hábito?
 
-**Correção típica.** Glossário único, componentes do design system, regra fixa de posição de ações. Ver [posicao-de-acoes](../../patterns/acoes/posicao-de-acoes.md), [hierarquia-de-botoes](../../patterns/acoes/hierarquia-de-botoes.md).
+**Correção típica.** Glossário único, componentes do design system, regra fixa de posição de ações. Ver [action-placement](../../patterns/actions/action-placement.md), [button-hierarchy](../../patterns/actions/button-hierarchy.md).
 
 **Atenção.** Um design system aumenta a consistência, mas não garante usabilidade: o mesmo componente pode funcionar num fluxo e falhar noutro.
 
@@ -126,7 +126,7 @@ Distinga dois tipos:
 - Quais são as ações de maior consequência e o que impede o erro nelas?
 - A confirmação nomeia o que será perdido e o botão usa o verbo da ação?
 
-**Correção típica.** Máscara e exemplo de formato; separar ações opostas; confirmação que descreve a consequência. Ver [acao-destrutiva](../../patterns/acoes/acao-destrutiva.md), [confirmar-exclusao](../../patterns/acoes/confirmar-exclusao.md), [confirmar-acao](../../patterns/acoes/confirmar-acao.md), [clique-duplo-em-envio](../../patterns/acoes/clique-duplo-em-envio.md).
+**Correção típica.** Máscara e exemplo de formato; separar ações opostas; confirmação que descreve a consequência. Ver [destructive-action](../../patterns/actions/destructive-action.md), [confirm-deletion](../../patterns/actions/confirm-deletion.md), [confirm-action](../../patterns/actions/confirm-action.md), [double-submit](../../patterns/actions/double-submit.md).
 
 ## H6. Reconhecimento em vez de memorização
 
@@ -142,7 +142,7 @@ Distinga dois tipos:
 - A pessoa precisa lembrar algo de outra tela para concluir esta?
 - Os ícones são compreensíveis sem passar o mouse?
 
-**Correção típica.** Rótulos visíveis, itens recentes, resumo do passo anterior, breadcrumbs. Ver [breadcrumbs](../../patterns/navegacao/breadcrumbs.md), [icone-sem-texto](../../patterns/acoes/icone-sem-texto.md), [botao-icone-e-texto](../../patterns/acoes/botao-icone-e-texto.md).
+**Correção típica.** Rótulos visíveis, itens recentes, resumo do passo anterior, breadcrumbs. Ver [breadcrumbs](../../patterns/navigation/breadcrumbs.md), [icon-only-button](../../patterns/actions/icon-only-button.md), [icon-and-text-button](../../patterns/actions/icon-and-text-button.md).
 
 ## H7. Flexibilidade e eficiência de uso
 
@@ -157,7 +157,7 @@ Distinga dois tipos:
 - Tarefas frequentes têm caminho curto?
 - O iniciante consegue ignorar os aceleradores sem prejuízo?
 
-**Correção típica.** Atalhos documentados, paleta de comandos, filtros salvos, revelação progressiva, [autopreenchimento](../../patterns/formularios/autopreenchimento.md).
+**Correção típica.** Atalhos documentados, paleta de comandos, filtros salvos, revelação progressiva, [autopreenchimento](../../patterns/forms/autofill.md).
 
 ## H8. Design estético e minimalista
 
@@ -200,7 +200,7 @@ Distinga dois tipos:
 | Entrada inválida | Use o formato dd/mm/aaaa |
 | Erro no envio | O arquivo tem mais de 10 MB. Escolha um menor e envie de novo. |
 
-Ver [mensagem-de-erro-util](../../patterns/ux-writing/mensagem-de-erro-util.md), [erros-em-formularios](../../patterns/formularios/erros-em-formularios.md), [preservar-dados-apos-erro](../../patterns/formularios/preservar-dados-apos-erro.md), [nao-so-cor](../../patterns/acessibilidade/nao-so-cor.md), [tentar-novamente](../../patterns/feedback/tentar-novamente.md).
+Ver [helpful-error-message](../../patterns/ux-writing/helpful-error-message.md), [form-errors](../../patterns/forms/form-errors.md), [preserve-data-after-error](../../patterns/forms/preserve-data-after-error.md), [not-color-alone](../../patterns/accessibility/not-color-alone.md), [retry](../../patterns/feedback/retry.md).
 
 **Exceção consciente.** Em login, não revelar se o e-mail existe pode ser decisão de segurança. Deve ser deliberada e documentada, nunca acidental.
 
@@ -216,7 +216,7 @@ Ver [mensagem-de-erro-util](../../patterns/ux-writing/mensagem-de-erro-util.md),
 **Perguntas de auditoria**
 - Quando a pessoa trava, onde está a ajuda e ela responde à tarefa?
 
-**Correção típica.** Texto de apoio no campo, estados vazios explicativos ([estado-vazio](../../patterns/feedback/estado-vazio.md)), artigos por tarefa, histórico de novidades.
+**Correção típica.** Texto de apoio no campo, estados vazios explicativos ([empty-state](../../patterns/feedback/empty-state.md)), artigos por tarefa, histórico de novidades.
 
 ---
 
@@ -237,10 +237,10 @@ SE o tempo permite um só fluxo ENTÃO comece pelo de maior consequência: check
 ## Extensões para produtos com IA
 
 As dez continuam válidas, mas não cobrem resultados probabilísticos e comportamento adaptativo. Acrescente:
-- Comunicar o que o sistema sabe e não sabe fazer ([incerteza-da-ia](../../patterns/ia/incerteza-da-ia.md)).
-- Distinguir respostas de baixa confiança e mostrar fontes ([fontes-da-ia](../../patterns/ia/fontes-da-ia.md)).
-- Reforçar controle quando a IA age em nome da pessoa ([confirmar-acao-da-ia](../../patterns/ia/confirmar-acao-da-ia.md)).
-- Permitir revisar, corrigir e desfazer o que a IA fez ([revisar-resultado-da-ia](../../patterns/ia/revisar-resultado-da-ia.md), [recuperar-erro-da-ia](../../patterns/ia/recuperar-erro-da-ia.md)).
+- Comunicar o que o sistema sabe e não sabe fazer ([ai-uncertainty](../../patterns/ai/ai-uncertainty.md)).
+- Distinguir respostas de baixa confiança e mostrar fontes ([ai-sources](../../patterns/ai/ai-sources.md)).
+- Reforçar controle quando a IA age em nome da pessoa ([confirm-ai-action](../../patterns/ai/confirm-ai-action.md)).
+- Permitir revisar, corrigir e desfazer o que a IA fez ([review-ai-output](../../patterns/ai/review-ai-output.md), [ai-error-recovery](../../patterns/ai/ai-error-recovery.md)).
 - Avisar quando o comportamento do sistema mudou.
 
 ## Heurística não é acessibilidade

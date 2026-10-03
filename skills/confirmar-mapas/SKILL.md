@@ -18,7 +18,7 @@ execução.
 O `mapear` é silencioso porque é rápido e barato de rodar de novo — palpite
 errado não custa nada, já que ninguém lê os mapas sem confirmação. Mas
 `figma-espelhar`, `figma-trazer` e `construir-ui` vão agir sobre
-`fluxos.md`, `tarefas.md` e `dominio.json` como se fossem fato. Onde esses
+`flows.md`, `tasks.md` e `domain.json` como se fossem fato. Onde esses
 arquivos são na verdade inferência — um fluxo nomeado por palpite, uma
 dependência lida do texto da UI, uma relação suposta a partir do formato de
 uma API — essa inferência precisa que uma pessoa olhe para ela uma vez, de
@@ -42,7 +42,7 @@ Esta skill é essa vez. É a única etapa de descoberta que fala com o usuário
 
 ## 1. Renovar a descoberta
 
-Rode `/dsx:mapear` no modo `completo` (passa o escopo, se houver). Espere
+Rode `/dsx:mapear` no modo `full` (passa o escopo, se houver). Espere
 terminar antes de continuar — o assistente só é tão bom quanto o que a
 descoberta achou. Este é o único caso em que rodar de novo, mesmo que tenha
 rodado há poucos minutos, é o certo por padrão: o trabalho inteiro desta
@@ -59,20 +59,19 @@ se ele não responder — precisão continua sendo o objetivo desta skill —
 mas nunca gaste esse tempo em silêncio em nome dele sem lhe dar a escolha.
 
 Este passo tem uma consequência que a fase 3 precisa desfazer: os agentes do
-`mapear` sempre **regeneram e sobrescrevem por completo** `fluxos.json`,
-`tarefas.json` e `dominio.json` do zero, sem memória nenhuma do que uma
+`mapear` sempre **regeneram e sobrescrevem por completo** `flows.json`,
+`tasks.json` e `domain.json` do zero, sem memória nenhuma do que uma
 pessoa confirmou numa execução anterior desta skill. Deixado assim, isso
 reverteria em silêncio toda confirmação passada a um palpite cru. O ledger
 de confirmações da fase 3 existe exatamente para sobreviver a isso e
 devolver as correções confirmadas.
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa ou o ledger,
-leia primeiro `.dsx/mapas/`; se não existir, aceite o legado
-`.claude/figma-claude/` (`user-flows.*`, `task-flows.*`, `domain-map.*`,
+leia primeiro `.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`user-flows.*`, `task-flows.*`, `domain-map.*`,
 `confirmations.json`…) e avise que ele será regravado no caminho novo. Esta
-skill sempre **grava** em `.dsx/mapas/` — em particular, um
+skill sempre **grava** em `.dsx/maps/` — em particular, um
 `confirmations.json` legado é lido como ledger e regravado como
-`.dsx/mapas/confirmacoes.json` ao final da fase 3, sem perder nenhum item.
+`.dsx/maps/confirmations.json` ao final da fase 3, sem perder nenhum item.
 
 ## 2. Confrontar specs e docs
 
@@ -89,9 +88,9 @@ direto à lista de perguntas em aberto da próxima fase.
 
 Junte, dos que existirem:
 
-- o array `uncertain` de `.dsx/mapas/fluxos.json`
-- o array `uncertain` de `.dsx/mapas/tarefas.json`
-- o array `uncertain` de `.dsx/mapas/dominio.json`
+- o array `uncertain` de `.dsx/maps/flows.json`
+- o array `uncertain` de `.dsx/maps/tasks.json`
+- o array `uncertain` de `.dsx/maps/domain.json`
 - o relatório de divergências do `analisador-specs`
 
 Essa é a lista completa de candidatos. Priorize: regras de negócio e
@@ -109,27 +108,27 @@ reexecuções seguras: a redação muda entre execuções do mesmo agente
 mapeador mesmo quando nada no código mudou, então casar por semelhança de
 frase não funciona — casar por chave funciona.
 
-`.dsx/mapas/confirmacoes.json` é um ledger **de propriedade exclusiva desta
+`.dsx/maps/confirmations.json` é um ledger **de propriedade exclusiva desta
 skill** — o `mapear` e seus agentes nunca o leem nem o gravam. O trabalho
 dele é sobreviver ao que a fase 1 acabou de fazer: o `mapear` reduzindo os
 três arquivos de origem a palpites crus, não confirmados. Formato (as chaves
 JSON ficam em inglês — são contrato de máquina; o valor de `map` é o nome do
 mapa no DSX, e na leitura os nomes legados `user-flows`, `task-flows` e
-`domain-map` valem como `fluxos`, `tarefas` e `dominio`):
+`domain-map`, e os nomes em português `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, valem como `project-map`, `ui-map`, `flows`, `tasks`, `journey`, `domain`, com o aviso "nome antigo, renomeie para X"; chaves antigas `confirmedAt`/`leftOpenAt` valem como `confirmed_at`/`left_open_at`):
 
 ```json
 {
   "confirmed": [
     {
-      "map": "fluxos",
+      "map": "flows",
       "key": "flow:/demands->/demands/new->/demands/:id",
       "why": "nenhum rótulo explícito no código para esta sequência; nomeado a partir do texto da rota/botão",
       "resolution": "confirmed as-is",
-      "confirmedAt": "2026-08-18"
+      "confirmed_at": "2026-08-18"
     }
   ],
   "open": [
-    { "map": "dominio", "key": "entity:Demand/relationship:Item", "item": "tipo da relação Demand -> Item (1:N)", "why": "nenhum schema formal encontrado; inferido do formato aninhado de uma resposta da API", "leftOpenAt": "2026-08-18" }
+    { "map": "domain", "key": "entity:Demand/relationship:Item", "item": "tipo da relação Demand -> Item (1:N)", "why": "nenhum schema formal encontrado; inferido do formato aninhado de uma resposta da API", "left_open_at": "2026-08-18" }
   ]
 }
 ```
@@ -191,10 +190,10 @@ nunca trunque a lista em silêncio.
 ### Aplicar as respostas
 
 Para cada item resolvido nesta rodada: edite a entrada real no arquivo de
-origem (`fluxos.json`/`.md`, `tarefas.json`/`.md` ou `dominio.json`/`.md`)
+origem (`flows.json`/`.md`, `tasks.json`/`.md` ou `domain.json`/`.md`)
 diretamente — aplique a correção, se houve uma, e então tire o item do array
 `uncertain` daquele arquivo — **e** acrescente ou atualize o registro dele
-no array `confirmed` de `.dsx/mapas/confirmacoes.json` (chave, mapa, `why`
+no array `confirmed` de `.dsx/maps/confirmations.json` (chave, mapa, `why`
 como estava nesta execução, a resolução, a data de hoje). Pular a gravação
 no ledger é o que causou a falha de perda de estado que este mecanismo
 existe para impedir — a edição só no arquivo de origem não sobrevive ao
@@ -209,29 +208,32 @@ arquivos.
 
 ## 4. Gravar a linha de base
 
-`.dsx/mapas/confirmacoes.json` (gravado na fase 3) agora é o registro
+`.dsx/maps/confirmations.json` (gravado na fase 3) agora é o registro
 durável, item a item — `design/as-is-to-be.md` fica um resumo curto que
 aponta para ele, a mesma relação que os seis mapas já têm com
-`mapa-projeto.md`/`mapa-ui.md` etc.: um índice, não uma duplicata.
+`project-map.md`/`ui-map.md` etc.: um índice, não uma duplicata.
 
 Crie `design/as-is-to-be.md` (ou atualize-o no lugar, se já existir — este
 arquivo é de vida longa, não é regenerado do zero como os mapas de
-`.dsx/mapas/`). Se só existir o legado `design/figma-harness.md`, leia-o
+`.dsx/maps/`). Se só existir o legado `design/figma-harness.md`, leia-o
 como ponto de partida (o histórico de validação dele continua valendo),
 grave o conteúdo atualizado em `design/as-is-to-be.md` e avise que o
-arquivo antigo pode ser removido:
+arquivo antigo pode ser removido. As linhas de cabeçalho usam os nomes em inglês dos mapas; um cabeçalho
+antigo (`validado`, `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`,
+`dominio`, `confirmacoes`) é lido com o aviso "nome antigo, renomeie para X" e
+regravado com os nomes novos:
 
 ```markdown
 # AS-IS / TO-BE
 
-validado: 2026-08-18
-mapa-projeto: .dsx/mapas/mapa-projeto.md (gerado 2026-08-18)
-mapa-ui: .dsx/mapas/mapa-ui.md (gerado 2026-08-18)
-fluxos: .dsx/mapas/fluxos.md (confirmado 2026-08-18)
-tarefas: .dsx/mapas/tarefas.md (confirmado 2026-08-18)
-jornada: .dsx/mapas/jornada.md (gerado 2026-08-18)
-dominio: .dsx/mapas/dominio.md (confirmado 2026-08-18)
-confirmacoes: .dsx/mapas/confirmacoes.json
+validated: 2026-08-18
+project-map: .dsx/maps/project-map.md (gerado 2026-08-18)
+ui-map: .dsx/maps/ui-map.md (gerado 2026-08-18)
+flows: .dsx/maps/flows.md (confirmado 2026-08-18)
+tasks: .dsx/maps/tasks.md (confirmado 2026-08-18)
+journey: .dsx/maps/journey.md (gerado 2026-08-18)
+domain: .dsx/maps/domain.md (confirmado 2026-08-18)
+confirmations: .dsx/maps/confirmations.json
 
 ## AS-IS
 
@@ -281,9 +283,9 @@ que está duplicando conteúdo que já mora nos mapas.
   Figma (`design/figma-baseline/`).** Esses pertencem à skill `figma-ciclo`
   e só existem depois que `/dsx:figma-iniciar` rodou. Se `figma-sync.md` já
   existir (o ciclo já está vivo), esta skill ainda roda com segurança — ela
-  só grava nos mapas de `.dsx/mapas/`, em `.dsx/mapas/confirmacoes.json` e
+  só grava nos mapas de `.dsx/maps/`, em `.dsx/maps/confirmations.json` e
   em `design/as-is-to-be.md`, nunca no registro de sincronia, e nunca muda
-  `vez:`.
+  `turn:`.
 - **Uma entrada em `Recusadas` de `design/figma-sync.md`, se já existir,
   pesa mais que um palpite do assistente.** Se uma proposta já foi recusada
   explicitamente num ciclo vivo, não deixe a inferência do assistente
@@ -292,9 +294,9 @@ que está duplicando conteúdo que já mora nos mapas.
 - **Nunca chame `use_figma`.** Esta skill é só código e docs, como o
   `mapear` — nunca precisa da vez e é segura em qualquer vez do ciclo.
 - **Nunca sobrescreva em silêncio um fato confirmado.** O `mapear` regenera
-  `fluxos.json`/`tarefas.json`/`dominio.json` do zero a cada execução e não
+  `flows.json`/`tasks.json`/`domain.json` do zero a cada execução e não
   tem memória do que uma pessoa confirmou — essa memória mora inteira em
-  `.dsx/mapas/confirmacoes.json`, que só esta skill grava. A prosa de
+  `.dsx/maps/confirmations.json`, que só esta skill grava. A prosa de
   `design/as-is-to-be.md` é um resumo para pessoas; o ledger, casado pela
   `key`, é contra o que a fase 3 de fato compara. Se o ledger for perdido
   ou apagado (e não houver legado `.claude/figma-claude/confirmations.json`

@@ -1,14 +1,14 @@
 ---
 id: skeleton-vs-spinner
-titulo: Skeleton ou spinner: quando usar cada um?
-categoria: feedback
-componentes: [skeleton, spinner, barra-de-progresso, loading]
-tipo: decisao-contextual
-impacto: medio
-status: usar-com-cautela
-evidencia: moderada
+title: Skeleton ou spinner: quando usar cada um?
+category: feedback
+components: [skeleton, spinner, progress-bar, loading]
+type: contextual-decision
+impact: medium
+status: caution
+evidence: moderate
 wcag: ["4.1.3", "2.2.2", "2.3.3", "1.4.1"]
-relacionados: [skeleton-screen, porcentagem-de-progresso, carregamento-longo, clique-duplo-em-envio]
+related: [skeleton-screen, progress-percentage, long-loading, double-submit]
 ---
 
 # Skeleton ou spinner: quando usar cada um?

@@ -1,9 +1,9 @@
 ---
 id: ux-para-agentes
-area: ia
-titulo: UX para agentes de IA
-evidencia: contextual
-relacionados: [generative-ui, evals, rag-e-fontes, divida-de-experiencia]
+area: ai
+title: UX para agentes de IA
+evidence: contextual
+related: [generative-ui, evals, rag-e-fontes, divida-de-experiencia]
 ---
 
 # UX para agentes de IA
@@ -58,7 +58,7 @@ Visibilidade **não** é despejar raciocínio técnico interno. É mostrar fatos
 ### 2.4 Confirmação específica
 Toda confirmação nomeia **ação + alvo + consequência**. "Continuar?" não informa nada; "Enviar esta proposta para 12 clientes da carteira Sul agora? O envio não pode ser desfeito." permite decidir.
 
-Antes do botão de confirmar, mostre o que será afetado: antes/depois em edição de conteúdo; destinatários e texto final em mensagens; quem ganha qual permissão em mudanças de acesso. Detalhes do componente: [`confirmar-acao-da-ia`](../../patterns/ia/confirmar-acao-da-ia.md).
+Antes do botão de confirmar, mostre o que será afetado: antes/depois em edição de conteúdo; destinatários e texto final em mensagens; quem ganha qual permissão em mudanças de acesso. Detalhes do componente: [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md).
 
 ### 2.5 Recuperação e reversibilidade
 Projete para a falha, não só para o caminho feliz. A pessoa deve conseguir:
@@ -68,7 +68,7 @@ Projete para a falha, não só para o caminho feliz. A pessoa deve conseguir:
 - manter salvo o que já foi concluído;
 - transferir o caso para uma pessoa com contexto.
 
-Saber que é possível desfazer reduz o risco percebido e aumenta a disposição a delegar. Padrão de erro: [`recuperar-erro-da-ia`](../../patterns/ia/recuperar-erro-da-ia.md).
+Saber que é possível desfazer reduz o risco percebido e aumenta a disposição a delegar. Padrão de erro: [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md).
 
 ### 2.6 Responsabilidade rastreável
 Depois da execução, deve ser possível reconstruir: objetivo recebido, ações feitas, ferramentas acessadas, aprovações concedidas, resultados e falhas. Isso serve para auditoria, mas também para a pessoa aprender como o agente trabalha e explicar o resultado a terceiros.
@@ -96,7 +96,7 @@ O agente não deve soar igualmente confiante em tudo. Esconder dúvida simplific
 
 - Prefira linguagem que leve a uma decisão a um percentual opaco: "Há duas pessoas chamadas Ana Lima no seu contato; qual delas recebe?" é melhor que "82% de confiança".
 - Sinalize dados ausentes, alternativas concorrentes e pontos que pedem revisão.
-- Detalhamento visual e textual: [`incerteza-da-ia`](../../patterns/ia/incerteza-da-ia.md).
+- Detalhamento visual e textual: [`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md).
 
 ## 5. Permissões como experiência
 

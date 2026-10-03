@@ -1,7 +1,7 @@
 ---
 name: mapear
-description: "Mapeia o projeto em .dsx/mapas/: estrutura, UI, fluxos, tarefas, jornada, domínio e design system real com hazards, sem tocar no código nem no Figma. Use ao herdar ou iniciar um projeto e antes de construir, auditar ou levar ao Figma."
-argument-hint: "[projeto | completo | design-system] [caminho para limitar a varredura, opcional — o padrão é o projeto inteiro]"
+description: "Mapeia o projeto em .dsx/maps/: estrutura, UI, fluxos, tarefas, jornada, domínio e design system real com hazards, sem tocar no código nem no Figma. Use ao herdar ou iniciar um projeto e antes de construir, auditar ou levar ao Figma."
+argument-hint: "[project | full | design-system] [caminho para limitar a varredura, opcional — o padrão é o projeto inteiro]"
 ---
 
 # mapear — o primeiro ato, em silêncio
@@ -9,7 +9,7 @@ argument-hint: "[projeto | completo | design-system] [caminho para limitar a var
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`design/`, `.dsx/`, `src/`) são do projeto do usuário.
 
 Esta skill varre o projeto — a estrutura física, a UI, a realidade de negócio
-por baixo dela e o design system declarado — e grava mapas em `.dsx/mapas/`.
+por baixo dela e o design system declarado — e grava mapas em `.dsx/maps/`.
 É um primeiro ato, não um relatório: o produto são os arquivos em disco, não
 uma mensagem nesta conversa.
 
@@ -20,35 +20,37 @@ zero. Quem lê o quê:
 
 | mapa | quem lê |
 |---|---|
-| `mapa-projeto.{md,json}` | todos os agentes desta skill (reaproveitam a detecção de stack), `analisador-specs` (lista de docs), qualquer skill que precise saber onde ficam rotas, componentes, tema, testes e docs |
-| `mapa-ui.{md,json}` | `figma-espelhar`, `figma-fundacoes`, `figma-cobertura`, `figma-trazer`; `construir-ui` (inventário de páginas, modais e kit antes de escrever JSX) |
-| `fluxos.{md,json}`, `tarefas.{md,json}` | `construir-ui` (para onde a tela leva, quais passos e efeitos colaterais a tarefa tem), fase de Fluxos do `figma-espelhar`, `figma-trazer` |
-| `dominio.{md,json}` | `construir-ui` (forma real dos dados, regras de negócio e validação), `figma-trazer`, `figma-primeiro`, `figma-espelhar` (dados de exemplo realistas em vez de inventados) |
-| `jornada.{md,json}` | `revisar-ux` (personas, estágios e pontos de contato para as lentes de persona e o cognitive walkthrough), `figma-espelhar` (organizar telas por papel, desenhar diagramas de fluxo) |
+| `project-map.{md,json}` | todos os agentes desta skill (reaproveitam a detecção de stack), `analisador-specs` (lista de docs), qualquer skill que precise saber onde ficam rotas, componentes, tema, testes e docs |
+| `ui-map.{md,json}` | `figma-espelhar`, `figma-fundacoes`, `figma-cobertura`, `figma-trazer`; `construir-ui` (inventário de páginas, modais e kit antes de escrever JSX) |
+| `flows.{md,json}`, `tasks.{md,json}` | `construir-ui` (para onde a tela leva, quais passos e efeitos colaterais a tarefa tem), fase de Fluxos do `figma-espelhar`, `figma-trazer` |
+| `domain.{md,json}` | `construir-ui` (forma real dos dados, regras de negócio e validação), `figma-trazer`, `figma-primeiro`, `figma-espelhar` (dados de exemplo realistas em vez de inventados) |
+| `journey.{md,json}` | `revisar-ux` (personas, estágios e pontos de contato para as lentes de persona e o cognitive walkthrough), `figma-espelhar` (organizar telas por papel, desenhar diagramas de fluxo) |
 | `design-system.{json,md}` | `design-md` Modo A (inventário real em vez de grep), `auditar-ds` (`hazards[]` como ponto de partida do drift), `figma-fundacoes` (variáveis, estilos e ícones), `figma-espelhar` |
 
-`mapa-ui.json` (do `mapeador-ui`) já traz um bloco `designSystem` mais leve —
+`ui-map.json` (do `mapeador-ui`) já traz um bloco `design_system` mais leve —
 arquivo de tema, pacote de ícones, algumas cores e espaçamentos achados de
 passagem. Ele continua sendo o sinal barato para quando o passo 3 ainda não
 rodou. Quando `design-system.json` existe, ele **substitui** o bloco
-`designSystem` do `mapa-ui.json` para tudo que precisa de fidelidade real — o
-mapa mais rico vence, a mesma regra que já vale entre `mapa-projeto.md` e
-`mapa-ui.md`.
+`design_system` do `ui-map.json` para tudo que precisa de fidelidade real — o
+mapa mais rico vence, a mesma regra que já vale entre `project-map.md` e
+`ui-map.md`.
 
 Os fatos que uma pessoa confirmou (nomes de fluxo, dependências entre tarefas,
 relações entre entidades) **não** moram nos mapas: moram em
-`.dsx/mapas/confirmacoes.json`, que só a skill `confirmar-mapas` lê e grava.
-Esta skill nunca toca nesse arquivo — e como ela regenera `fluxos.json`,
-`tarefas.json` e `dominio.json` do zero, só `confirmar-mapas` devolve as
+`.dsx/maps/confirmations.json`, que só a skill `confirmar-mapas` lê e grava.
+Esta skill nunca toca nesse arquivo — e como ela regenera `flows.json`,
+`tasks.json` e `domain.json` do zero, só `confirmar-mapas` devolve as
 confirmações a eles.
 
 ## Modos
 
 | modo | o que roda | quando |
 |---|---|---|
-| `projeto` | só o passo 1 | o projeto mudou de estrutura (pastas, docs, stack) e só o mapa físico precisa ser renovado |
-| `completo` (padrão) | passos 1, 2 e 3, nessa ordem | primeiro ato num projeto, ou quando a UI e o domínio mudaram o bastante para as outras skills redescobrirem tudo |
+| `project` | só o passo 1 | o projeto mudou de estrutura (pastas, docs, stack) e só o mapa físico precisa ser renovado |
+| `full` (padrão) | passos 1, 2 e 3, nessa ordem | primeiro ato num projeto, ou quando a UI e o domínio mudaram o bastante para as outras skills redescobrirem tudo |
 | `design-system` | só o passo 3 | o tema/config mudou e `design-md`, `auditar-ds`, `figma-fundacoes` ou `figma-espelhar` refariam a extração por conta própria |
+
+Os nomes antigos dos modos (`projeto`, `completo`) ainda são aceitos, com o aviso "nome antigo, renomeie para X".
 
 O argumento restante, se houver, é o **escopo**: um caminho que limita a
 varredura (o padrão é o projeto inteiro). Repasse-o a cada agente.
@@ -56,17 +58,17 @@ varredura (o padrão é o projeto inteiro). Repasse-o a cada agente.
 ## Passo 1 — estrutura física (`mapeador-projeto`)
 
 Rode o agente `mapeador-projeto` (`agents/mapeador-projeto.md`). Ele grava
-`.dsx/mapas/mapa-projeto.md` e `.dsx/mapas/mapa-projeto.json`.
+`.dsx/maps/project-map.md` e `.dsx/maps/project-map.json`.
 
 Rode sempre que o projeto mudou desde o último mapa, ou como o primeiríssimo
 passo num projeto que nunca rodou o DSX: o agente sempre regenera os dois
 arquivos do zero e sobrescreve o que havia, então o mapa nunca deriva do que
 mudou desde a última leitura.
 
-Nos modos `completo` e `design-system`, se `.dsx/mapas/mapa-projeto.md` ainda
+Nos modos `full` e `design-system`, se `.dsx/maps/project-map.md` ainda
 não existir, este passo é pré-requisito: todos os agentes dos passos 2 e 3
 reaproveitam a detecção de stack dele em vez de re-derivá-la. No modo
-`completo` ele roda sempre, fresco.
+`full` ele roda sempre, fresco.
 
 ## Passo 2 — UI e realidade de negócio (cinco agentes em paralelo)
 
@@ -75,17 +77,17 @@ ferramenta**:
 
 - `mapeador-ui` (`agents/mapeador-ui.md`) — páginas e subpáginas, modais,
   design system, tipografia, iconografia, kit de componentes, estados →
-  `.dsx/mapas/mapa-ui.{md,json}`
+  `.dsx/maps/ui-map.{md,json}`
 - `mapeador-fluxos` (`agents/mapeador-fluxos.md`) — como o usuário se move
   entre telas para atingir um objetivo: o grafo de navegação, desvios, pontos
-  de entrada e saída → `.dsx/mapas/fluxos.{md,json}`
+  de entrada e saída → `.dsx/maps/flows.{md,json}`
 - `mapeador-tarefas` (`agents/mapeador-tarefas.md`) — os passos dentro de uma
-  tarefa, e quais tarefas dependem de quais → `.dsx/mapas/tarefas.{md,json}`
+  tarefa, e quais tarefas dependem de quais → `.dsx/maps/tasks.{md,json}`
 - `mapeador-jornada` (`agents/mapeador-jornada.md`) — a experiência em
   estágios ao longo do tempo, por persona/papel, ligada à missão da
-  plataforma → `.dsx/mapas/jornada.{md,json}`
+  plataforma → `.dsx/maps/journey.{md,json}`
 - `mapeador-dominio` (`agents/mapeador-dominio.md`) — lógica de negócio,
-  modelagem de dados, entidades e suas relações → `.dsx/mapas/dominio.{md,json}`
+  modelagem de dados, entidades e suas relações → `.dsx/maps/domain.{md,json}`
 
 Três deles (`mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada`)
 reaproveitam oportunisticamente a saída de um irmão *se ela já existir*, para
@@ -104,7 +106,7 @@ antes.
 ## Passo 3 — design system declarado (`extrator-design-system`)
 
 Rode o agente `extrator-design-system` (`agents/extrator-design-system.md`).
-Ele grava `.dsx/mapas/design-system.json` e `.dsx/mapas/design-system.md`.
+Ele grava `.dsx/maps/design-system.json` e `.dsx/maps/design-system.md`.
 
 Este passo lê só código — **nenhuma chamada a `use_figma`**, nada criado no
 Figma. Isso vem depois, em `figma-fundacoes`, que lê esta saída em vez de
@@ -124,7 +126,7 @@ baratos, só de código, que terminam juntos; o extrator pode executar a
 chamada `createTheme()` do próprio projeto ou rodar um build real do
 Tailwind v4, o que é mais pesado — por isso roda sozinho, depois do lote, e
 por isso existe o modo `design-system` para refazê-lo sem pagar o resto (e
-os modos `projeto` e o passo 2 nunca o pagam).
+os modos `project` e o passo 2 nunca o pagam).
 
 ### Antes de prometer qualquer coisa a um designer ou usuário
 
@@ -205,18 +207,18 @@ usa `design-system.json` como inventário sem promover um hazard a decisão.
 Não cole, resuma nem encaminhe ao usuário o que os agentes acharam — eles
 também não vão devolver mais que uma linha. Quando o modo escolhido
 terminar, confirme numa única linha curta que os mapas foram renovados,
-nomeando o projeto (o `root` do `mapa-projeto.json`) para não haver
+nomeando o projeto (o `root` do `project-map.json`) para não haver
 ambiguidade numa sessão que alterna entre mais de um, e incluindo a
 contagem de hazards quando o passo 3 rodou. Depois siga em frente — nada
 além disso.
 
-Exemplo: `Mapas renovados em /caminho/do/projeto (modo completo) — design system com 7 hazards.`
+Exemplo: `Mapas renovados em /caminho/do/projeto (modo full) — design system com 7 hazards.`
 
 ## Regras
 
 - **Nunca chama `use_figma`.** Esta skill é só código e docs; não precisa
-  da vez e é segura em qualquer vez do ciclo (`codigo`, `design` ou
-  `aplicando` em `design/figma-sync.md`), sem ler nem alterar o registro.
+  da vez e é segura em qualquer vez do ciclo (`code`, `design` ou
+  `applying` em `design/figma-sync.md`), sem ler nem alterar o registro.
 - **Sempre sobrescreve.** Cada agente regenera os próprios arquivos por
   completo; nunca mescla com a versão anterior nem a remenda.
 - **Projeto sem código ainda.** Se o projeto nasceu no Figma e ainda não foi
@@ -225,19 +227,18 @@ Exemplo: `Mapas renovados em /caminho/do/projeto (modo completo) — design syst
   primeiro lote de telas for implementado (`figma-primeiro` já manda fazer
   isso).
 - **Compatibilidade com o fluxo anterior.** Ao procurar um mapa, leia
-  primeiro `.dsx/mapas/`; se não existir, aceite o legado
-  `.claude/figma-claude/` (`project-map.*`, `ui-map.*`, `user-flows.*`,
+  primeiro `.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`project-map.*`, `ui-map.*`, `user-flows.*`,
   `task-flows.*`, `journey-map.*`, `domain-map.*`, `design-system.*`) e
   avise que ele será regravado no caminho novo na próxima execução. Esta
-  skill sempre **grava** só em `.dsx/mapas/` — que é exatamente essa
+  skill sempre **grava** só em `.dsx/maps/` — que é exatamente essa
   próxima execução.
 - **Chaves JSON em inglês.** Os campos dos mapas (`entities`, `uncertain`,
-  `hazards`, `edges`, `designSystem`…) são contrato de máquina e ficam como
+  `hazards`, `edges`, `design_system`…) são contrato de máquina e ficam como
   estão; só a prosa dos `.md` é em português.
 
 ## Montando num projeto pela primeira vez
 
-1. `/dsx:mapear` (modo `completo`) — os três passos.
+1. `/dsx:mapear` (modo `full`) — os três passos.
 2. Se a precisão importa mais que a velocidade, `/dsx:confirmar-mapas` —
    confirma com o usuário o que os mapas marcaram como inferido e grava
    `design/as-is-to-be.md`.

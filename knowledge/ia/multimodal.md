@@ -1,9 +1,9 @@
 ---
 id: multimodal
-area: ia
-titulo: UX multimodal (tela, toque, texto, voz, câmera)
-evidencia: contextual
-relacionados: [ux-para-agentes, generative-ui, evals]
+area: ai
+title: UX multimodal (tela, toque, texto, voz, câmera)
+evidence: contextual
+related: [ux-para-agentes, generative-ui, evals]
 ---
 
 # UX multimodal
@@ -82,8 +82,8 @@ Voz não é "mais natural" por padrão: é ótima cozinhando, péssima num ônib
 2. **Preserve contexto na troca.** Objetos citados, filtros, escolhas, permissões e estado atravessam a mudança de modalidade. Trocar deve parecer trocar de instrumento, não de aplicativo.
 3. **Use modalidades complementares.** Uma compensa o limite da outra: voz expressa, tela permite revisar, câmera mostra, áudio libera a atenção visual.
 4. **Torne a percepção visível.** Indique quando microfone e câmera começam e param, o que está sendo analisado, o que foi enviado e como interromper. Permita conferir a referência interpretada antes de decisões importantes.
-5. **Confirme o que importa em formato persistente.** Uma fala desaparece. Valores, destinatários e consequências de ações relevantes são revisados em tela (ver [`confirmar-acao-da-ia`](../../patterns/ia/confirmar-acao-da-ia.md)).
-6. **Projete correção e fallback antes do caminho ideal.** Fala não reconhecida, câmera bloqueada, pouca luz, rede caindo, objeto identificado errado. Fallback é rota alternativa que preserva estado, não mensagem de erro final (ver [`recuperar-erro-da-ia`](../../patterns/ia/recuperar-erro-da-ia.md)).
+5. **Confirme o que importa em formato persistente.** Uma fala desaparece. Valores, destinatários e consequências de ações relevantes são revisados em tela (ver [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md)).
+6. **Projete correção e fallback antes do caminho ideal.** Fala não reconhecida, câmera bloqueada, pouca luz, rede caindo, objeto identificado errado. Fallback é rota alternativa que preserva estado, não mensagem de erro final (ver [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md)).
 7. **Nunca force uma modalidade.** Mecanismos de entrada disponíveis devem poder ser usados de forma concorrente (WCAG 2.5.6). Nova modalidade amplia caminhos; não vira requisito.
 
 ## 6. Acessibilidade não é "ter voz"

@@ -18,18 +18,19 @@ doutrina e siga a seção "Primeira montagem do ciclo num projeto".
   `figma-design-to-code` e `figma-create-new-file` disponíveis. Sem arquivo e
   sem link, crie um com `figma-create-new-file` em vez de pedir ao usuário que
   crie à mão.
-- **Registro existente?** Se `design/figma-sync.md` já existir (ou o legado com
-  `turn:`), o ciclo já foi montado: não recomece — leia a vez (`/dsx:figma-vez`)
+- **Registro existente?** Se `design/figma-sync.md` já existir (ou um legado com
+  `vez:`), o ciclo já foi montado: não recomece — leia a vez (`/dsx:figma-vez`)
   e siga a rodada da skill `figma-ciclo`.
 
 ## 1. Mapas antes de decidir
 
-Confira `.dsx/mapas/mapa-projeto.md` e `.dsx/mapas/mapa-ui.md` primeiro. Se só
-existir o legado `.claude/figma-claude/` (`project-map.md`, `ui-map.md`),
-aceite-o e avise que será regravado em `.dsx/mapas/` na próxima execução. Se
+Confira `.dsx/maps/project-map.md` e `.dsx/maps/ui-map.md` primeiro. Se só
+existir um legado — `.dsx/mapas/` (`mapa-projeto.md`, `mapa-ui.md`) ou
+`.claude/figma-claude/` (`project-map.md`, `ui-map.md`) —
+aceite-o e avise que será regravado em `.dsx/maps/` na próxima execução. Se
 faltar qualquer um, rode `/dsx:mapear` antes de qualquer outra coisa — é ele
-que diz com certeza de que lado o projeto nasceu (o campo `figmaCycle` de
-`mapa-projeto.json` registra se já existe registro de sincronia ou baseline) em
+que diz com certeza de que lado o projeto nasceu (o campo `figma_cycle` de
+`project-map.json` registra se já existe registro de sincronia ou baseline) em
 vez de adivinhar abaixo. Se `design/as-is-to-be.md` também não existir, ofereça
 `/dsx:confirmar-mapas` antes de montar o ciclo — tudo daqui em diante trata os
 mapas como fato, e é ele que confirma que merecem confiança.
@@ -38,7 +39,7 @@ mapas como fato, e é ele que confirma que merecem confiança.
 
 - **Tem código, não tem arquivo de design** → `/dsx:figma-levar` (a ida
   completa: `figma-fundacoes`, `figma-espelhar`, `figma-cobertura`, a partir do
-  `DESIGN.md` + tokens do projeto). A vez começa em `codigo`.
+  `DESIGN.md` + tokens do projeto). A vez começa em `code`.
 - **Tem arquivo de design, não tem código** → skill `figma-primeiro`. Não
   espelhe: a primeira volta é implementação, não carga. A vez começa em
   `design`, e o baseline é tirado a cada leva implementada.
@@ -65,18 +66,18 @@ mapas como fato, e é ele que confirma que merecem confiança.
    não em rodadas separadas:
 
    - `design/figma-sync.md` — com a vez definida e explicada ao usuário; é ele
-     que o hook `guarda-vez` lê para bloquear escrita indevida.
+     que o hook `turn-guard` lê para bloquear escrita indevida.
 
      ```markdown
      # Sincronia com o Figma
 
-     arquivo: <fileKey>  ·  https://figma.com/design/<fileKey>
-     vez: codigo                        # codigo | design | aplicando
-     desde: <AAAA-MM-DD>
+     file: <fileKey>  ·  https://figma.com/design/<fileKey>
+     turn: code                        # code | design | applying
+     since: <AAAA-MM-DD>
      baseline: design/figma-baseline/
 
      ## Rodadas
-     - r1 · <AAAA-MM-DD> · <espelho completo | implementação inicial> (<páginas>, <N> frames) · vez → <vez>
+     - r1 · <AAAA-MM-DD> · <espelho completo | implementação inicial> (<páginas>, <N> frames) · turn → <turn>
 
      ## Pendentes (escopo desta rodada, ainda não construído)
      - Nenhuma
@@ -98,10 +99,10 @@ mapas como fato, e é ele que confirma que merecem confiança.
      diante), com contagens reais, não estimadas:
 
      ```jsonl
-     {"rodada":"r1","data":"<AAAA-MM-DD>","direcao":"codigo->figma","autor":"figma-levar","resumo":"espelho completo, 00-08, <N> frames","framesCriados":<N>,"framesAlterados":0,"framesRemovidos":0,"tokensAlterados":[],"vezApos":"codigo","achados":"design/figma-achados/r1.md"}
+     {"round":"r1","date":"<AAAA-MM-DD>","direction":"code->figma","author":"figma-levar","summary":"espelho completo, 00-08, <N> frames","frames_created":<N>,"frames_changed":0,"frames_removed":0,"tokens_changed":[],"turn_after":"code","findings":"design/figma-findings/r1.md"}
      ```
 
-     Na porta `figma-primeiro`, `direcao` é `figma->codigo` e `autor` é
+     Na porta `figma-primeiro`, `direction` é `figma->code` e `author` é
      `figma-primeiro`.
 
    - `design/figma-reference.json` — os fatos atuais do arquivo (fileKey,
@@ -112,18 +113,18 @@ mapas como fato, e é ele que confirma que merecem confiança.
      `figma-convencoes`.
 
    Achados da primeira rodada (bug medido, ação sem efeito, token duplicado)
-   vão para `design/figma-achados/r1.md`, com a severidade 0–4 do DSX (skill
+   vão para `design/figma-findings/r1.md`, com a severidade 0–4 do DSX (skill
    `revisar-ux`) — não ficam só na conversa.
 
 ## 4. A vez inicial
 
-- Porta `figma-levar`: `vez: design` **só** se o espelho de fato cobriu tudo a
+- Porta `figma-levar`: `turn: design` **só** se o espelho de fato cobriu tudo a
   que se propôs (confira a matriz de cobertura e se alguma tela/fluxo/estado foi
   adiada em vez de construída). Sobrou algo → liste em `## Pendentes` e mantenha
-  `vez: codigo` até esvaziar. Primeiro espelho grande costuma rodar em várias
+  `turn: code` até esvaziar. Primeiro espelho grande costuma rodar em várias
   passadas com orçamento fixo; uma delas adiar parte do escopo é normal — virar
   a vez com isso pendente não é.
-- Porta `figma-primeiro`: `vez: design` desde o início; o Figma é a fonte
+- Porta `figma-primeiro`: `turn: design` desde o início; o Figma é a fonte
   enquanto o código não cobre o arquivo.
 
 Termine dizendo ao usuário, em voz alta, as duas regras que ninguém lê depois:

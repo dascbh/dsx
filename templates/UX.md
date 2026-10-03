@@ -4,61 +4,62 @@ name: <Nome do produto>
 description: <Tipo de produto, público e densidade. Ex.: "Plataforma B2B de contratos para o jurídico interno, desktop, densidade alta.">
 owner: <time ou pessoa que mantém este arquivo>
 updated: <AAAA-MM-DD>
-# Quem usa e em que registro. persona e registro são obrigatórios.
-produto:
+# Quem usa e em que registro. persona e register são obrigatórios. Chaves e valores em inglês; o texto livre, em pt-BR.
+product:
   persona: <quem usa e para quê, numa frase>
-  registro: <operacional | consumo | editorial | marca>
-  plataforma: <desktop | mobile | ambos>
-  densidade: <baixa | media | alta>
-navegacao:
-  modelo: <ex.: "menu lateral + abas na página">
-  profundidade-maxima: 3          # níveis a partir da entrada do módulo
-  retorno: obrigatorio            # toda tela não raiz tem caminho de volta visível
-# Tipo de tela → rotas/telas do produto. Ids válidos: os cartões de arquetipos/.
-arquetipos:
-  lista-operacional: ["<rota>"]
-  mestre-detalhe: ["<rota>"]
-  dialogo-de-confirmacao: ["<nome do diálogo>"]
-acoes:
-  primarias-por-regiao: 1         # máximo de botões cheios por região
-  posicao-primaria: <topo-direita | rodape-direita | junto-ao-conteudo>
-  ordem-dialogo: <cancelar-acao | acao-cancelar>
-  destrutiva-rotulo-especifico: true
-confirmacao:
-  irreversivel: <dialogo | digitar-nome>
-  reversivel: <desfazer | nenhuma>
+  register: <operational | consumer | editorial | brand>
+  platform: <desktop | mobile | both>
+  density: <low | medium | high>
+navigation:
+  model: <ex.: "menu lateral + abas na página">
+  max-depth: 3                    # níveis a partir da entrada do módulo
+  back: mandatory                 # toda tela não raiz tem caminho de volta visível (mandatory | optional)
+# Tipo de tela → rotas/telas do produto. Ids válidos: os cartões de archetypes/.
+archetypes:
+  operational-list: ["<rota>"]
+  master-detail: ["<rota>"]
+  confirmation-dialog: ["<nome do diálogo>"]
+actions:
+  primary-per-region: 1           # máximo de botões cheios por região
+  primary-position: <top-right | bottom-right | inline>
+  dialog-order: <cancel-action | action-cancel>
+  destructive-specific-label: true
+confirmation:
+  irreversible: <dialog | type-name>
+  reversible: <undo | none>
 feedback:
-  sucesso: <toast | inline | pagina>
-  erro-de-campo: inline
-  erro-de-sistema: alerta-na-pagina
-  esqueleto-acima-de-ms: 1000
-estados: [carregando, vazio, erro, sem-acesso, sucesso]
-formularios:
-  rotulo: sempre-visivel
-  validacao: <ao-sair-do-campo | ao-enviar | em-tempo-real>
-  obrigatorios: <marcar-obrigatorios | marcar-opcionais>
-conteudo:
-  glossario: <caminho do glossário ou "inline">
-  botoes: verbo-objeto
-  proibidos: [<termo de implementação>, <outro termo>]   # nunca aparecem na tela
-fluxos:
-  max-passos-jornada: 12
-  max-dialogos-empilhados: 1
-  becos-sem-saida: 0
+  success: <toast | inline | page>
+  field-error: inline
+  system-error: page-alert
+  skeleton-after-ms: 1000
+states: [loading, empty, error, no-access, success]
+forms:
+  label: always-visible
+  validation: <on-blur | on-submit | realtime>
+  required: <mark-required | mark-optional>
+content:
+  glossary: <caminho do glossário ou "inline">
+  buttons: verb-object
+  forbidden: [<termo de implementação>, <outro termo>]   # nunca aparecem na tela
+  proper-nouns: []                # nomes próprios do domínio que podem ter maiúscula no meio (X10)
+flows:
+  max-journey-steps: 12
+  max-stacked-dialogs: 1
+  dead-ends: 0
 # Como o ux-lint reconhece o kit do projeto nas capturas. Ajuste ao seu kit (MUI, shadcn, próprio).
-verificacao:
-  seletores:
-    regioes: ["header", "nav", "aside", "main", "[role=dialog]"]
-    dialogo: "[role=dialog]"
-    primaria: "<seletor do botão primário>"
-    destrutiva: "<seletor do botão destrutivo>"
-    botao: "button, [role=button]"
-    campo: "input:not([type=hidden]), textarea, select"
+verification:
+  selectors:
+    regions: ["header", "nav", "aside", "main", "[role=dialog]"]
+    dialog: "[role=dialog]"
+    primary: "<seletor do botão primário>"
+    destructive: "<seletor do botão destrutivo>"
+    button: "button, [role=button]"
+    field: "input:not([type=hidden]), textarea, select"
 ---
 
 # <Nome do produto> — UX
 
-<!-- Diga de onde vieram as decisões (código, mapas de .dsx/mapas/, pesquisa) e o que vence em caso de conflito.
+<!-- Diga de onde vieram as decisões (código, mapas de .dsx/maps/, pesquisa) e o que vence em caso de conflito.
      Marque com "(inferido)" o que foi deduzido sem evidência explícita. Apague todos os comentários ao preencher. -->
 
 ## Visão geral
@@ -90,7 +91,7 @@ verificacao:
 
 ## Arquétipos de tela
 
-<!-- Tabela: tela/rota | arquétipo (link arquetipos/<id>.md) | variação escolhida | desvio declarado (ou "—").
+<!-- Tabela: tela/rota | arquétipo (link archetypes/<id>.md) | variação escolhida | desvio declarado (ou "—").
      Toda tela do front matter aparece aqui. Desvio = o que difere do cartão e por quê. -->
 
 | Tela | Arquétipo | Variação | Desvio |

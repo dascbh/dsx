@@ -26,7 +26,7 @@ SE a resposta for vaga ENTÃO marque o campo para remoção ou coleta posterior.
 - Agrupe campos relacionados conforme o modelo mental da pessoa (dados pessoais, endereço, pagamento), com título de grupo quando houver mais de ~5 campos.
 - Use **uma coluna** para sequências lineares. Exceção: pares curtos e naturalmente ligados (cidade + UF, validade + CVV).
 - Largura do campo sugere o tamanho da resposta (CEP curto, endereço longo).
-- Ação principal logo após o último campo, alinhada à coluna de leitura ([posicao-de-acoes](../../patterns/acoes/posicao-de-acoes.md)).
+- Ação principal logo após o último campo, alinhada à coluna de leitura ([action-placement](../../patterns/actions/action-placement.md)).
 - Explique por que dados sensíveis são pedidos ("Usamos o telefone só para avisar sobre a entrega").
 
 ---
@@ -35,20 +35,20 @@ SE a resposta for vaga ENTÃO marque o campo para remoção ou coleta posterior.
 
 - Siga a ordem em que a pessoa tem as informações (o que sabe de cabeça primeiro, o que precisa buscar depois) ou a ordem de documentos físicos que ela consulta.
 - Do geral ao específico; do menos ao mais sensível.
-- Campos que determinam outros vêm antes (país antes de estado; CEP antes de rua, preenchendo o endereço automaticamente: [endereco-por-cep](../../patterns/ecommerce/endereco-por-cep.md)).
+- Campos que determinam outros vêm antes (país antes de estado; CEP antes de rua, preenchendo o endereço automaticamente: [address-by-postal-code](../../patterns/ecommerce/address-by-postal-code.md)).
 - Ordem de tabulação = ordem visual.
 
-Ver [ordem-dos-campos](../../patterns/formularios/ordem-dos-campos.md).
+Ver [field-order](../../patterns/forms/field-order.md).
 
 ---
 
 ## 3. Rótulos, ajuda e obrigatoriedade
 
-- Rótulo **visível, persistente e acima do campo** (melhor varredura e funciona em telas estreitas). Placeholder nunca substitui rótulo: some ao digitar, tem contraste baixo e parece valor preenchido ([label-vs-placeholder](../../patterns/formularios/label-vs-placeholder.md)).
+- Rótulo **visível, persistente e acima do campo** (melhor varredura e funciona em telas estreitas). Placeholder nunca substitui rótulo: some ao digitar, tem contraste baixo e parece valor preenchido ([label-vs-placeholder](../../patterns/forms/label-vs-placeholder.md)).
 - Rótulo associado programaticamente ao controle (`<label for>` ou equivalente).
 - Texto de ajuda **antes** do erro: formato, exemplo, limite ("Até 10 MB, em PDF ou JPG").
-- Marque obrigatoriedade de forma consistente. SE a maioria é obrigatória ENTÃO marque os opcionais com "(opcional)"; SE a maioria é opcional ENTÃO marque os obrigatórios. Asterisco exige legenda e texto acessível ([campos-obrigatorios](../../patterns/formularios/campos-obrigatorios.md)).
-- Requisitos de senha visíveis antes de digitar e atualizados enquanto digita ([requisitos-de-senha](../../patterns/autenticacao/requisitos-de-senha.md), [mostrar-senha](../../patterns/autenticacao/mostrar-senha.md)).
+- Marque obrigatoriedade de forma consistente. SE a maioria é obrigatória ENTÃO marque os opcionais com "(opcional)"; SE a maioria é opcional ENTÃO marque os obrigatórios. Asterisco exige legenda e texto acessível ([required-fields](../../patterns/forms/required-fields.md)).
+- Requisitos de senha visíveis antes de digitar e atualizados enquanto digita ([password-requirements](../../patterns/authentication/password-requirements.md), [show-password](../../patterns/authentication/show-password.md)).
 
 ---
 
@@ -59,13 +59,13 @@ Ver [ordem-dos-campos](../../patterns/formularios/ordem-dos-campos.md).
 | Sim/não com efeito imediato | Toggle |
 | Sim/não que vale ao enviar, ou aceite | Checkbox único |
 | 2–5 opções exclusivas | Radio visível |
-| 6–15 opções exclusivas | Select / dropdown ([dropdown](../../patterns/formularios/dropdown.md)) |
+| 6–15 opções exclusivas | Select / dropdown ([dropdown](../../patterns/forms/dropdown.md)) |
 | Mais de 15 opções ou valor conhecido de cabeça | Campo com busca/autocomplete |
 | Várias opções independentes | Checkboxes |
 | Quantidade pequena | Stepper ou campo numérico |
 | Data conhecida (nascimento) | Campo de texto com máscara dd/mm/aaaa (calendário só como apoio) |
 | Data próxima a escolher (agendamento) | Seletor de calendário |
-| Arquivo | Upload com tipos e tamanho aceitos declarados ([upload-de-arquivos](../../patterns/formularios/upload-de-arquivos.md)) |
+| Arquivo | Upload com tipos e tamanho aceitos declarados ([file-upload](../../patterns/forms/file-upload.md)) |
 
 **Regras**
 - Não use select para 2–3 opções; esconde as alternativas e custa dois cliques.
@@ -95,7 +95,7 @@ Ver [ordem-dos-campos](../../patterns/formularios/ordem-dos-campos.md).
 - Máscaras devem aceitar colagem com ou sem pontuação e não brigar com o cursor.
 - Desative autocorreção e capitalização automática em e-mail, usuário e códigos (`autocapitalize="off"`, `spellcheck="false"`).
 - Nunca bloqueie colar em senha ou e-mail.
-- Ver [autopreenchimento](../../patterns/formularios/autopreenchimento.md).
+- Ver [autopreenchimento](../../patterns/forms/autofill.md).
 
 ---
 
@@ -111,17 +111,17 @@ Ver [ordem-dos-campos](../../patterns/formularios/ordem-dos-campos.md).
 **Regras**
 - Valide também no servidor; a validação do cliente é conveniência.
 - Seja tolerante na entrada: aceite espaços, pontuação e variações e normalize você mesmo.
-- Ver [momento-da-validacao](../../patterns/formularios/momento-da-validacao.md).
+- Ver [validation-timing](../../patterns/forms/validation-timing.md).
 
 ---
 
 ## 7. Erros
 
-- Mensagem **junto ao campo**, logo abaixo dele, associada programaticamente (`aria-describedby`), com ícone + texto + cor (nunca só cor: [nao-so-cor](../../patterns/acessibilidade/nao-so-cor.md)).
+- Mensagem **junto ao campo**, logo abaixo dele, associada programaticamente (`aria-describedby`), com ícone + texto + cor (nunca só cor: [not-color-alone](../../patterns/accessibility/not-color-alone.md)).
 - Ao enviar com erros: resumo no topo com links para cada campo **e** mensagem em cada campo; mova o foco para o resumo ou para o primeiro campo com erro.
 - Texto diz como corrigir: "Informe uma data no formato dd/mm/aaaa", não "Data inválida".
 - **Preserve tudo** que foi digitado após qualquer falha, inclusive de servidor (exceto senha e dados de cartão quando a política exigir).
-- Ver [erros-em-formularios](../../patterns/formularios/erros-em-formularios.md), [onde-exibir-erros](../../patterns/formularios/onde-exibir-erros.md), [posicao-do-erro-no-campo](../../patterns/formularios/posicao-do-erro-no-campo.md), [preservar-dados-apos-erro](../../patterns/formularios/preservar-dados-apos-erro.md), [mensagem-de-erro-util](../../patterns/ux-writing/mensagem-de-erro-util.md).
+- Ver [form-errors](../../patterns/forms/form-errors.md), [error-placement](../../patterns/forms/error-placement.md), [field-error-position](../../patterns/forms/field-error-position.md), [preserve-data-after-error](../../patterns/forms/preserve-data-after-error.md), [helpful-error-message](../../patterns/ux-writing/helpful-error-message.md).
 
 ---
 
@@ -139,17 +139,17 @@ Ver [ordem-dos-campos](../../patterns/formularios/ordem-dos-campos.md).
 - Etapa de revisão antes de ações com consequência (pagamento, envio oficial), com "Editar" em cada bloco.
 - Não peça na etapa 1 o que só será usado na 4.
 
-Ver [dividir-formulario](../../patterns/formularios/dividir-formulario.md), [etapas-de-formulario](../../patterns/formularios/etapas-de-formulario.md), [autosave-vs-salvar](../../patterns/formularios/autosave-vs-salvar.md).
+Ver [split-form](../../patterns/forms/split-form.md), [form-steps](../../patterns/forms/form-steps.md), [autosave-vs-save](../../patterns/forms/autosave-vs-save.md).
 
 ---
 
 ## 9. Envio e confirmação
 
 - Botão nomeia a ação ("Solicitar orçamento", "Salvar endereço"), não "Enviar".
-- Evite botão desabilitado sem explicação; prefira deixar habilitado e mostrar os erros ao enviar ([botao-desabilitado](../../patterns/acoes/botao-desabilitado.md)).
-- Após o clique: estado de processamento no botão e bloqueio de envio duplicado ([clique-duplo-em-envio](../../patterns/acoes/clique-duplo-em-envio.md)).
-- Após o sucesso: o que foi feito, o que acontece agora e onde acompanhar ([confirmacao-de-sucesso](../../patterns/feedback/confirmacao-de-sucesso.md)).
-- Confirmação de senha ou e-mail repetido só quando o erro é caro e não há recuperação fácil ([confirmar-senha](../../patterns/autenticacao/confirmar-senha.md)).
+- Evite botão desabilitado sem explicação; prefira deixar habilitado e mostrar os erros ao enviar ([disabled-button](../../patterns/actions/disabled-button.md)).
+- Após o clique: estado de processamento no botão e bloqueio de envio duplicado ([double-submit](../../patterns/actions/double-submit.md)).
+- Após o sucesso: o que foi feito, o que acontece agora e onde acompanhar ([success-confirmation](../../patterns/feedback/success-confirmation.md)).
+- Confirmação de senha ou e-mail repetido só quando o erro é caro e não há recuperação fácil ([confirm-password](../../patterns/authentication/confirm-password.md)).
 
 ---
 
@@ -157,10 +157,10 @@ Ver [dividir-formulario](../../patterns/formularios/dividir-formulario.md), [eta
 
 - Todo controle tem nome acessível igual ou contendo o rótulo visível.
 - Grupos de radio/checkbox em `fieldset` com `legend`.
-- Foco visível em todos os campos ([foco-de-teclado](../../patterns/acessibilidade/foco-de-teclado.md)); ordem de foco lógica.
+- Foco visível em todos os campos ([keyboard-focus](../../patterns/accessibility/keyboard-focus.md)); ordem de foco lógica.
 - Instruções não dependem só de cor, ícone ou posição ("os campos em vermelho").
 - Funciona com teclado, zoom de 200%, leitor de tela e em 320 px de largura.
-- Tempo limite de sessão avisado com opção de estender ([sessao-expirada](../../patterns/autenticacao/sessao-expirada.md)).
+- Tempo limite de sessão avisado com opção de estender ([session-expired](../../patterns/authentication/session-expired.md)).
 
 ---
 

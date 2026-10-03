@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Valida os cartões de padrão (patterns/<categoria>/<id>.md) e gera o índice patterns/README.md.
+// Valida os cartões de padrão (patterns/<category>/<id>.md) e gera o índice patterns/README.md.
 // Uso: node tools/lint-patterns.mjs [--index]   (--index: reescreve patterns/README.md e patterns/index.json)
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
@@ -11,13 +11,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = join(ROOT, 'patterns');
 
 export const ENUMS = {
-  categoria: ['acoes', 'acessibilidade', 'autenticacao', 'busca-filtros', 'conteudo', 'dados', 'ecommerce', 'feedback', 'formularios', 'ia', 'modais', 'navegacao', 'ux-writing'],
-  tipo: ['recomendacao', 'antipadrao', 'decisao-contextual', 'acessibilidade'],
-  impacto: ['critico', 'alto', 'medio', 'baixo'],
-  status: ['recomendado', 'usar-com-cautela', 'evitar'],
-  evidencia: ['forte', 'moderada', 'emergente'],
+  category: ['actions', 'accessibility', 'authentication', 'search-filters', 'content', 'data', 'ecommerce', 'feedback', 'forms', 'ai', 'modals', 'navigation', 'ux-writing'],
+  type: ['recommendation', 'anti-pattern', 'contextual-decision', 'accessibility'],
+  impact: ['critical', 'high', 'medium', 'low'],
+  status: ['recommended', 'caution', 'avoid'],
+  evidence: ['strong', 'moderate', 'weak', 'emerging'],
 };
-const REQUIRED_KEYS = ['id', 'titulo', 'categoria', 'tipo', 'impacto', 'status', 'evidencia', 'relacionados'];
+const REQUIRED_KEYS = ['id', 'title', 'category', 'type', 'impact', 'status', 'evidence', 'related'];
 const REQUIRED_SECTIONS = ['Contexto', 'Decisão', 'Quando usar', 'Quando evitar', 'Faça', 'Evite', 'Acessibilidade', 'Checklist de verificação', 'Fundamentação'];
 // Termos que nunca devem aparecer no conteúdo (ex.: referência a fontes privadas). Configure em patterns/.forbidden (um por linha).
 const forbidden = (() => {
@@ -51,8 +51,8 @@ export function lintPatterns(patterns) {
     for (const k of REQUIRED_KEYS) if (p.fm[k] === undefined || p.fm[k] === '') e(`chave obrigatória ausente: ${k}`);
     for (const [k, vals] of Object.entries(ENUMS)) if (p.fm[k] && !vals.includes(p.fm[k])) e(`${k} "${p.fm[k]}" fora do enum (${vals.join(' | ')})`);
     if (p.fm.id && p.fm.id !== p.slug) e(`id "${p.fm.id}" difere do nome do arquivo "${p.slug}"`);
-    if (p.fm.categoria && p.fm.categoria !== p.dir) e(`categoria "${p.fm.categoria}" difere da pasta "${p.dir}"`);
-    for (const r of [].concat(p.fm.relacionados ?? [])) if (!ids.has(r)) e(`relacionado inexistente: ${r}`);
+    if (p.fm.category && p.fm.category !== p.dir) e(`category "${p.fm.category}" difere da pasta "${p.dir}"`);
+    for (const r of [].concat(p.fm.related ?? [])) if (!ids.has(r)) e(`related inexistente: ${r}`);
     const heads = [...p.body.matchAll(/^##\s+(.+)$/gm)].map((m) => m[1].trim());
     for (const s of REQUIRED_SECTIONS) if (!heads.includes(s)) e(`seção ausente: ## ${s}`);
     if (!/^>\s*\*\*Regra:\*\*/m.test(p.body)) e('falta a linha "> **Regra:**" logo após o título');
@@ -65,23 +65,23 @@ export function lintPatterns(patterns) {
 
 function buildIndex(patterns) {
   const byCat = {};
-  for (const p of patterns.filter((x) => x.fm)) (byCat[p.fm.categoria] ??= []).push(p);
+  for (const p of patterns.filter((x) => x.fm)) (byCat[p.fm.category] ??= []).push(p);
   const rule = (body) => (body.match(/^>\s*\*\*Regra:\*\*\s*(.+)$/m)?.[1] ?? '').trim();
   let md = `# Catálogo de padrões\n\n${patterns.length} padrões de interface com regra de decisão, critérios de uso, acessibilidade e checklist.\n` +
     `Gerado por \`node tools/lint-patterns.mjs --index\` — não edite à mão.\n\n` +
     `**Como um agente usa este catálogo:** encontre a decisão que você está tomando na tabela, leia a **Regra** e, se o caso não for trivial, abra o cartão e siga a seção **Decisão**. Antes de entregar, rode o **Checklist de verificação** do cartão.\n\n` +
-    `Legenda de status: ✅ recomendado · ⚠️ usar com cautela · ⛔ evitar\n`;
-  const icon = { recomendado: '✅', 'usar-com-cautela': '⚠️', evitar: '⛔' };
+    `Legenda de status: ✅ recommended (recomendado) · ⚠️ caution (usar com cautela) · ⛔ avoid (evitar)\n`;
+  const icon = { recommended: '✅', caution: '⚠️', avoid: '⛔' };
   for (const cat of Object.keys(byCat).sort()) {
     md += `\n## ${cat}\n\n| Padrão | Regra | Impacto | Status |\n|---|---|---|---|\n`;
-    for (const p of byCat[cat].sort((a, b) => a.fm.titulo.localeCompare(b.fm.titulo))) {
-      md += `| [${p.fm.titulo}](${p.dir}/${p.slug}.md) | ${rule(p.body).replace(/\|/g, '\\|')} | ${p.fm.impacto} | ${icon[p.fm.status] ?? ''} |\n`;
+    for (const p of byCat[cat].sort((a, b) => a.fm.title.localeCompare(b.fm.title))) {
+      md += `| [${p.fm.title}](${p.dir}/${p.slug}.md) | ${rule(p.body).replace(/\|/g, '\\|')} | ${p.fm.impact} | ${icon[p.fm.status] ?? ''} |\n`;
     }
   }
   const json = patterns.filter((p) => p.fm).map((p) => ({
-    id: p.fm.id, titulo: p.fm.titulo, categoria: p.fm.categoria, componentes: p.fm.componentes ?? [],
-    tipo: p.fm.tipo, impacto: p.fm.impacto, status: p.fm.status, evidencia: p.fm.evidencia,
-    wcag: p.fm.wcag ?? [], relacionados: p.fm.relacionados ?? [], regra: rule(p.body), arquivo: `patterns/${p.dir}/${p.slug}.md`,
+    id: p.fm.id, title: p.fm.title, category: p.fm.category, components: p.fm.components ?? [],
+    type: p.fm.type, impact: p.fm.impact, status: p.fm.status, evidence: p.fm.evidence,
+    wcag: p.fm.wcag ?? [], related: p.fm.related ?? [], rule: rule(p.body), file: `patterns/${p.dir}/${p.slug}.md`,
   }));
   return { md, json };
 }

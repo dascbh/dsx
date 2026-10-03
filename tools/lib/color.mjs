@@ -31,11 +31,11 @@ export function contrast(a, b) {
 export function wcagLevels(ratio) {
   return {
     ratio: Math.round(ratio * 100) / 100,
-    'AA-texto': ratio >= 4.5,
-    'AA-texto-grande': ratio >= 3,
-    'AA-ui-nao-textual': ratio >= 3,
-    'AAA-texto': ratio >= 7,
-    'AAA-texto-grande': ratio >= 4.5,
+    aa_text: ratio >= 4.5,
+    aa_large_text: ratio >= 3,
+    aa_non_text_ui: ratio >= 3,
+    aaa_text: ratio >= 7,
+    aaa_large_text: ratio >= 4.5,
   };
 }
 

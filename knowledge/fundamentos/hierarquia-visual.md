@@ -59,7 +59,7 @@ Hierarquia visual é a ordem em que a tela é percebida: o que vem primeiro, dep
 - Componentes de interface e gráficos informativos (bordas de campo, ícones, foco): ≥ 3:1.
 
 **Ações**
-- Uma ação primária por contexto visual (tela, dialog, card de seção). Ver [hierarquia-de-botoes](../../patterns/acoes/hierarquia-de-botoes.md) e [posicao-de-acoes](../../patterns/acoes/posicao-de-acoes.md).
+- Uma ação primária por contexto visual (tela, dialog, card de seção). Ver [button-hierarchy](../../patterns/actions/button-hierarchy.md) e [action-placement](../../patterns/actions/action-placement.md).
 - Ações secundárias com menor peso (contorno ou texto); destrutivas com tratamento próprio e afastadas.
 
 ---
@@ -93,7 +93,7 @@ Densidade é quanta informação cabe por área. Não existe "certa"; existe ade
 | Misto | Oferecer alternância | Controle de densidade persistente por usuário |
 
 **Regras**
-- SE a pessoa precisa comparar muitos itens ENTÃO priorize densidade (tabela) sobre cards decorativos ([tabela-vs-cards](../../patterns/dados/tabela-vs-cards.md)).
+- SE a pessoa precisa comparar muitos itens ENTÃO priorize densidade (tabela) sobre cards decorativos ([table-vs-cards](../../patterns/data/table-vs-cards.md)).
 - SE a pessoa está aprendendo ou decidindo algo de alto risco ENTÃO priorize espaço e foco.
 - Compacto não pode reduzir alvo de toque abaixo do mínimo nem texto abaixo de ~12–13 px.
 - Densidade alta exige hierarquia ainda mais clara: alinhamento rigoroso, separadores leves, zebra ou hover em linhas.

@@ -1,6 +1,6 @@
 ---
 name: extrator-design-system
-description: "Extrai o design system completo de um projeto a partir do código — cores, tipografia, espaçamento, raios, sombras, ícones, fontes — com adaptadores por framework (MUI, Tailwind v3/v4, variáveis CSS genéricas) em vez de heurística de grep, e detecta mecanicamente os riscos de drift mais comuns (hex duplicado, cor fora da paleta, raio/sombra duplicados, lógica de cor condicionada ao modo, fonte não carregada, texto em canvas com fonte diferente do tema real, adaptador de rendimento quase nulo). Também captura constantes visuais renderizadas em canvas/WebGL (react-force-graph-2d, Three.js/react-three-fiber, Phaser) só como referência, porque não têm representação nativa no Figma. Conta valores em uso e componentes compartilhados com seus estados, mede o drift e sugere consolidações. Grava `.dsx/mapas/design-system.{json,md}`, que `figma-fundacoes`, `figma-espelhar`, `design-md` (Modo A) e `auditar-ds` leem em vez de rederivar tokens. Nunca altera código e nunca chama `use_figma`. Use como parte de `/dsx:mapear`, antes de escrever ou auditar um DESIGN.md, ao herdar um projeto, ou quando o inventário seria grande demais para a conversa principal."
+description: "Extrai o design system completo de um projeto a partir do código — cores, tipografia, espaçamento, raios, sombras, ícones, fontes — com adaptadores por framework (MUI, Tailwind v3/v4, variáveis CSS genéricas) em vez de heurística de grep, e detecta mecanicamente os riscos de drift mais comuns (hex duplicado, cor fora da paleta, raio/sombra duplicados, lógica de cor condicionada ao modo, fonte não carregada, texto em canvas com fonte diferente do tema real, adaptador de rendimento quase nulo). Também captura constantes visuais renderizadas em canvas/WebGL (react-force-graph-2d, Three.js/react-three-fiber, Phaser) só como referência, porque não têm representação nativa no Figma. Conta valores em uso e componentes compartilhados com seus estados, mede o drift e sugere consolidações. Grava `.dsx/maps/design-system.{json,md}`, que `figma-fundacoes`, `figma-espelhar`, `design-md` (Modo A) e `auditar-ds` leem em vez de rederivar tokens. Nunca altera código e nunca chama `use_figma`. Use como parte de `/dsx:mapear`, antes de escrever ou auditar um DESIGN.md, ao herdar um projeto, ou quando o inventário seria grande demais para a conversa principal."
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 ---
@@ -14,7 +14,7 @@ deveria existir. Seu produto fica em disco: grave os arquivos e devolva o
 retorno pedido (ver "O que devolver"), nada mais.
 
 **Você nunca chama `use_figma`** e **nunca edita código do projeto.** Os
-únicos arquivos que você grava são os dois mapas em `.dsx/mapas/`; passada só
+únicos arquivos que você grava são os dois mapas em `.dsx/maps/`; passada só
 no código, sobrescrevendo os dois por completo a cada execução.
 
 ## O teto — leia isto antes de extrair qualquer coisa
@@ -39,13 +39,13 @@ fidelidade aqui é pior que um artefato mais curto e honesto.
 
 ## Antes de começar
 
-Leia `.dsx/mapas/mapa-projeto.json` se existir, para detectar a stack.
+Leia `.dsx/maps/project-map.json` se existir, para detectar a stack.
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa, leia primeiro
-`.dsx/mapas/`; se não existir, aceite o legado `.claude/figma-claude/`
+`.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/`
 (`project-map.json`; e `design-system.json` antigo, só como comparação) e
 registre no retorno que o legado foi lido e que o mapa será regravado no
-caminho novo na próxima execução. Você sempre **grava** só em `.dsx/mapas/`.
+caminho novo na próxima execução. Você sempre **grava** só em `.dsx/maps/`.
 
 Se o projeto já tem tokens DTCG (`tokens/*.tokens.json` ou `*.tokens.json`)
 ou um `DESIGN.md`, leia-os também: os tokens DTCG são uma fonte declarada a
@@ -84,7 +84,7 @@ chamada só. `ls`/`grep` saem com código diferente de zero no instante em que
 nada casa, e esse é o resultado normal e esperado para a maioria deles na
 maioria dos projetos; encadeá-los faz a primeira falta matar em silêncio todas
 as checagens seguintes, e você concluiria errado que o projeto não precisa de
-adaptador nenhum. Registre em `adaptersUsed` quais adaptadores se aplicaram de
+adaptador nenhum. Registre em `adapters_used` quais adaptadores se aplicaram de
 fato; um sinal ausente não é erro, é só um "não" para aquele adaptador.
 
 O sinal de canvas/WebGL (a última linha acima) também libera a etapa 3 abaixo
@@ -189,7 +189,7 @@ silêncio por um token.
 
 Se achar uma string de fonte (uma chamada `ctx.font = ...`, um objeto de
 estilo de texto, qualquer coisa que nomeie uma família de fonte para texto
-desenhado em canvas), marque-a explicitamente como `"fontFamily"` naquela
+desenhado em canvas), marque-a explicitamente como `"font_family"` naquela
 entrada de canvas em vez de deixá-la enterrada numa string de valor genérica
 — a checagem `canvas-font-mismatch` da etapa 4 depende de achá-la sem
 re-analisar a sua própria saída.
@@ -265,7 +265,7 @@ Os tipos (o valor de `kind` fica em inglês, é contrato de máquina):
   `ui-sans-serif` e afins nunca têm mecanismo de carga e não deveriam ter; só
   confira famílias que são claramente uma escolha de webfont específica.
 - **canvas-font-mismatch**: se a seção `canvas` tem uma entrada marcada com
-  `fontFamily` (ver etapa 3) e a seção `typography` tem ao menos uma família
+  `font_family` (ver etapa 3) e a seção `typography` tem ao menos uma família
   extraída, compare-as. Uma fonte de canvas que nomeia uma família diferente
   de todos os tokens de tipografia é um drift real e visível — texto em canvas
   não herda o `font-family` do CSS, então uma string de fonte velha ou
@@ -303,8 +303,8 @@ diretório pai de `agents/`, onde este arquivo mora):
 node <DSX>/tools/lint-raw-values.mjs src --json > /tmp/dsx-drift.json
 ```
 
-A saída traz `lines`, `ocorrencias`, `driftPorMilLinhas` e `hits[]` (por
-regra: `cor-hex`, `cor-func`, `px-solto`, `z-magico`, `tw-arbitr`). O script
+A saída traz `lines`, `occurrences`, `drift_per_1000_lines` e `hits[]` (por
+regra: `color-hex`, `color-func`, `loose-px`, `magic-z`, `tw-arbitrary`). O script
 sai com código 1 quando há ocorrências — isso é o resultado normal, não
 falha. Copie os três números para `drift` e use os `hits` para montar o top
 de cores cruas. Se o script não estiver acessível, conte com grep e marque
@@ -331,30 +331,30 @@ no `.md` e com uma entrada em `uncertain[]` no JSON.
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos por inteiro,
+Crie `.dsx/maps/` se não existir e grave os dois arquivos por inteiro,
 substituindo o que havia antes. As chaves do JSON ficam em inglês — são
-contrato de máquina (`hazards`, `uncertain`, `adaptersUsed`…); traduzir
+contrato de máquina (`hazards`, `uncertain`, `adapters_used`…); traduzir
 quebraria os leitores. Só a prosa (`detail`, `why`, notas) vai em pt-BR.
 
-**`.dsx/mapas/design-system.json`**:
+**`.dsx/maps/design-system.json`**:
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/caminho/absoluto",
   "scope": "projeto inteiro",
-  "adaptersUsed": ["mui", "tailwind-v4"],
+  "adapters_used": ["mui", "tailwind-v4"],
   "colors": {
     "brand/primary-main": { "value": "#0e71b8", "modes": { "light": "#0e71b8", "dark": "#5aa9e6" }, "evidence": "src/theme.ts:34" }
   },
   "typography": {
-    "h4": { "fontFamily": "Plus Jakarta Sans Variable", "fontSize": "20px", "fontWeight": 600, "evidence": "src/theme.ts:52" }
+    "h4": { "font_family": "Plus Jakarta Sans Variable", "font_size": "20px", "font_weight": 600, "evidence": "src/theme.ts:52" }
   },
   "spacing": { "4": { "value": "4px" } },
   "radii": { "card": { "value": "10px", "evidence": "src/theme.ts:41" } },
   "shadows": {},
   "icons": { "package": "@mui/icons-material", "used": ["LogoutOutlined"] },
-  "fonts": { "families": [{ "role": "body", "family": "Plus Jakarta Sans Variable", "loadedVia": "@fontsource-variable", "fallback": "Inter, system-ui, sans-serif" }] },
+  "fonts": { "families": [{ "role": "body", "family": "Plus Jakarta Sans Variable", "loaded_via": "@fontsource-variable", "fallback": "Inter, system-ui, sans-serif" }] },
   "canvas": {
     "force-graph:GraphPage.tsx": { "static": true, "values": { "ingredient": "#2fbf8f" }, "evidence": "GraphPage.tsx:12" }
   },
@@ -364,13 +364,13 @@ quebraria os leitores. Só a prosa (`detail`, `why`, notas) vai em pt-BR.
   ],
   "usage": {
     "colors": [{ "value": "#0e71b8", "count": 14, "tokenized": true, "token": "brand/primary-main" }, { "value": "#0f72b9", "count": 3, "tokenized": false }],
-    "fontSizes": [{ "value": "14px", "count": 41, "tokenized": true }],
+    "font_sizes": [{ "value": "14px", "count": 41, "tokenized": true }],
     "spacing": [{ "value": "12px", "count": 22, "tokenized": false }],
     "radii": [{ "value": "10px", "count": 9, "tokenized": true, "token": "card" }]
   },
-  "drift": { "source": "lint-raw-values", "lines": 18234, "occurrences": 212, "perThousandLines": 11.63 },
+  "drift": { "source": "lint-raw-values", "lines": 18234, "occurrences": 212, "per_thousand_lines": 11.63 },
   "consolidations": [
-    { "values": ["#0e71b8", "#0f72b9"], "suggestedToken": "color.action.primary", "why": "diferença de 1 em cada canal; mesmo papel (botão principal)" }
+    { "values": ["#0e71b8", "#0f72b9"], "suggested_token": "color.action.primary", "why": "diferença de 1 em cada canal; mesmo papel (botão principal)" }
   ],
   "components": [
     { "name": "Button", "imports": 87, "parallel": ["Btn", "PrimaryButton"], "states": { "hover": true, "focus-visible": false, "disabled": true, "loading": false, "error": null, "empty": null } }
@@ -383,7 +383,7 @@ As chaves `usage`, `drift`, `consolidations` e `components` são o acréscimo
 do DSX ao contrato original; leitores antigos que não as conhecem as ignoram.
 Em `states`, `null` = não se aplica ao componente.
 
-**`.dsx/mapas/design-system.md`** — narrado como os outros mapas:
+**`.dsx/maps/design-system.md`** — narrado como os outros mapas:
 `# Design system`, `gerado:` / `raiz:` / `escopo:` / `adaptadores usados:`,
 e então, nesta ordem:
 
@@ -417,7 +417,7 @@ Este arquivo e `design-system.json` são regenerados por `/dsx:mapear` (e pelo
 `design-md`/`auditar-ds` quando delegam ao extrator) a cada execução, sempre
 sobrescrevendo o que havia antes. O `figma-fundacoes` lê isto em vez de
 rederivar tokens do zero; o `figma-espelhar` lê pelo mesmo motivo que lê
-`mapa-ui.json`; o `design-md` (Modo A) parte do rascunho de front matter; o
+`ui-map.json`; o `design-md` (Modo A) parte do rascunho de front matter; o
 `auditar-ds` lê `hazards[]`, `drift` e `consolidations`. Rode o `mapear` de
 novo primeiro se algum deles parecer desatualizado.
 
@@ -446,7 +446,7 @@ Depende de quem chamou:
 ## Limites
 
 - Nunca toque no Figma e nunca edite código do projeto — os dois mapas em
-  `.dsx/mapas/` são as únicas escritas permitidas.
+  `.dsx/maps/` são as únicas escritas permitidas.
 - Nunca avalie um valor calculado/guiado por dados (uma função, uma escala,
   um acessor de prop) — registre a expressão como texto e siga.
 - Nunca afirme que conteúdo de canvas/WebGL é token utilizável; ele mora na

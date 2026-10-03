@@ -15,7 +15,7 @@ Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não 
 
 1. Rode sobre as capturas HTML, apontando o código onde os textos nascem:
    ```bash
-   node tools/ux-lint/texto.mjs --telas <pasta-de-capturas> --codigo <pastas-do-front> <pastas-de-vocabulário> --ux UX.md [--ignorar <arquivo.html>] [--json]
+   node tools/ux-lint/text.mjs --screens <pasta-de-capturas> --code <pastas-do-front> <pastas-de-vocabulário> --ux UX.md [--ignore <arquivo.html>] [--json]
    ```
    Sem capturas, gere-as antes (skill `code-to-stitch` no projeto, ou qualquer HTML renderizado).
 2. Leia o resumo por regra e o ranking "Textos mais problemáticos" (severidade × número de telas). Priorize por severidade e frequência: texto da navegação ou do cabeçalho, que aparece em todas as telas, vem primeiro.
@@ -29,7 +29,7 @@ Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não 
 O resultado não fica na conversa nem em pasta temporária (contrato: `knowledge/fundamentos/achados-de-ux.md`).
 
 1. `node tools/ux-lint/findings.mjs register --module <m> --text texto.json [--screen tela.json] [--flow fluxo.json] --root <repo>` — cada achado ganha id estável e status.
-2. Escreva as opções em `casos.json` (seção abaixo) e ligue-as aos ids: `findings.mjs options --module <m> --from casos.json`. Caso de revisão manual (descrição desnecessária) entra como item `origin: "review"`.
+2. Escreva as opções em `cases.json` (formato em `knowledge/fundamentos/achados-de-ux.md`) e ligue-as aos ids: `findings.mjs options --module <m> --from cases.json`. Caso de revisão manual (descrição desnecessária) entra como item `origin: "review"`.
 3. `findings.mjs page --module <m> pagina.html --product "<produto>" --color "<primária>"`: o dono marca A/B/C ou Ignorar (com motivo) e usa "Copiar decisões"; grave com `findings.mjs import --module <m> decisions.json` (ou `decide` para uma decisão dita no chat).
 4. Aplique na origem só o que está `decided` (`findings.mjs status --module <m>` lista com `arquivo:linha`), recapture, registre de novo e confira `fixed`. `findings.mjs check` no pre-commit ou CI impede achado novo e regressão.
 
@@ -56,7 +56,7 @@ O resultado não fica na conversa nem em pasta temporária (contrato: `knowledge
 
 - Frases curtas; uma ideia por frase; a informação mais importante primeiro.
 - Voz ativa, segunda pessoa implícita ("Informe seu e-mail"), sem "o usuário" na interface.
-- Sem jargão técnico ou interno ("payload", "erro 500", nome de tabela). Código técnico só como detalhe secundário para suporte — `patterns/feedback/codigo-de-erro-tecnico.md`.
+- Sem jargão técnico ou interno ("payload", "erro 500", nome de tabela). Código técnico só como detalhe secundário para suporte — `patterns/feedback/technical-error-code.md`.
 - Não culpe ("Você digitou errado") nem infantilize ("Ops! 🙈") em erro.
 - Números como algarismos; datas e moeda no formato brasileiro (`01/10/2026`, `R$ 1.234,56`).
 - Sentence case em títulos e botões ("Criar conta", não "Criar Conta").
@@ -76,7 +76,7 @@ Saída: a tabela `tela | elemento | atual | proposto | motivo` + glossário atua
 
 ## Levantamento com opções para o dono escolher
 
-1. `node tools/ux-lint/texto.mjs --telas <capturas> --codigo <pastas do código> --ux UX.md --json > texto.json` — achados X1–X11 com a origem `arquivo:linha`.
+1. `node tools/ux-lint/text.mjs --screens <capturas> --code <pastas do código> --ux UX.md --json > text.json` — achados X1–X11 com a origem `arquivo:linha`.
 2. Some a revisão por julgamento do que a máquina não pega bem: **descrições desnecessárias** (repetem o óbvio, explicam o que a tela já mostra, tom de manual).
 3. Para cada caso, escreva 2–3 opções prontas para colar, cada uma com a convenção de origem (`knowledge/fundamentos/elementos-comparados.md`: Material, Carbon, Polaris, GOV.UK, Atlassian, Apple HIG, DSX) e uma recomendada com o porquê. Quando a correção é de lugar (nome vai para o nome acessível, explicação sai da dica e vira texto visível), diga isso na opção.
-4. Registre e gere a página pelo registro (`findings.mjs options` + `findings.mjs page`, seção anterior): mostra cada elemento renderizado hoje e em cada opção, com id, status e o formulário de decisão. Sem registro, `node tools/ux-lint/text-page.mjs casos.json pagina.html --produto "<produto>" --cor "<primária>"` gera só a página. O dono escolhe; a correção é feita na origem.
+4. Registre e gere a página pelo registro (`findings.mjs options` + `findings.mjs page`, seção anterior): mostra cada elemento renderizado hoje e em cada opção, com id, status e o formulário de decisão. Sem registro, `node tools/ux-lint/text-page.mjs cases.json pagina.html --product "<produto>" --color "<primária>"` gera só a página. O dono escolhe; a correção é feita na origem.

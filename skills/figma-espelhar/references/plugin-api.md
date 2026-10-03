@@ -28,7 +28,7 @@ Célula de ação sem botão, slot condicional que não renderizou.
 absoluto com `y` negativo (o rótulo no entalhe de um campo MUI outlined) fica
 fora da caixa e é cortado — no frame do campo **e** em qualquer wrapper acima.
 → `clipsContent = false` no frame **e** no wrapper (achado 2026-08-18, fase
-Fundações; corrigido em `field()` de `tools/figma/preludio.js`).
+Fundações; corrigido em `field()` de `tools/figma/prelude.js`).
 
 **Nome do nó não vem do objeto de props.**
 Não confie em `createAutoLayout(dir, { name })`.
@@ -88,13 +88,13 @@ Subpath não fechado: o preenchimento do SVG fecha implicitamente, o Figma não.
 acompanha se a constraint dele for `SCALE` — e o Plugin API aceita `MIN/MIN`
 sem reclamar (uma fundação inteira de 51 ícones já saiu assim).
 → Na instância, use `i.rescale(tamanho / 24)` em vez de `resize` (é o que
-`icon()` de `tools/figma/preludio.js` faz). No componente, `constraints: SCALE`
+`icon()` de `tools/figma/prelude.js` faz). No componente, `constraints: SCALE`
 em **todo** vetor filho. Confira instanciando em ≤ 16px e olhando
 (skill `figma-convencoes`, retrocompatibilidade).
 
 **`vectorPaths` rejeita o `d`.**
 O parser só entende `M/L/C/Q/Z` absolutos — `H`, `V`, `S`, `T`, `A` falham.
-→ Normalize antes: `node <DSX>/tools/figma/normalizar-svg-path.cjs "<d>"`
+→ Normalize antes: `node <DSX>/tools/figma/normalize-svg-path.cjs "<d>"`
 (ou `require` do mesmo arquivo — converte para absolutos e fecha todo subpath
 com `Z`; arco `A` lança erro, use a variante do ícone sem arco).
 

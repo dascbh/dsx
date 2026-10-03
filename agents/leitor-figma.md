@@ -22,11 +22,11 @@ usuário.
    (o script não roda no Node — só dentro do sandbox do Plugin API).
 3. Compare com o baseline do projeto (`design/figma-baseline/`). Só nos frames com
    hash diferente, rode de novo com `MODE = 'full'` e `TARGETS` preenchido.
-4. Se `.dsx/mapas/mapa-ui.json` e `.dsx/mapas/fluxos.json` existirem, confira o
+4. Se `.dsx/maps/ui-map.json` e `.dsx/maps/flows.json` existirem, confira o
    nome de um frame novo contra o inventário de páginas/modais/fluxos deles antes
    de adivinhar o que ele é — isso transforma o "se der para dizer" (abaixo) em
    "bate com" ou "não bate com nada registrado". Compatibilidade: na falta de
-   `.dsx/mapas/`, aceite o legado `.claude/figma-claude/` (`ui-map.json`,
+   `.dsx/maps/`, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`ui-map.json`,
    `user-flows.json`) e avise no relatório que ele será regravado no caminho novo
    na próxima execução de `mapear`.
 5. Salve o retrato atual num arquivo temporário e rode:
@@ -41,7 +41,7 @@ node <DSX>/tools/figma/diff-baseline.cjs design/figma-baseline/app.json /tmp/atu
    **sem `--write`** — ela só imprime:
 
 ```bash
-node <DSX>/tools/figma/figma-para-tokens.mjs --snapshot /tmp/atual-full.json --tokens tokens/
+node <DSX>/tools/figma/figma-to-tokens.mjs --snapshot /tmp/atual-full.json --tokens tokens/
 ```
 
    A saída lista as mudanças por token — valor ou alias, por modo
@@ -65,7 +65,7 @@ gates (contraste, padrões, acessibilidade): seu produto é o relatório. A deci
 ## Limites
 
 - Nunca chame `use_figma` com script que cria, altera ou remove nó. Se a vez do
-  projeto for do design, o guarda-vez (`hooks/guarda-vez.py`) bloqueia — e ele
+  projeto for do design, o turn-guard (`hooks/turn-guard.py`) bloqueia — e ele
   está certo.
 - Nunca escreva em arquivo do projeto: nem tokens (`--write`), nem baseline, nem
   `design/figma-sync.md`, nem changelog. Arquivos temporários (`/tmp/…`) são o

@@ -1,6 +1,6 @@
 ---
 name: mapeador-jornada
-description: "Mapeia a experiência em etapas que um usuário ou persona tem com o produto ao longo do tempo — do onboarding ao uso habitual —, os pontos de contato fora da UI (e-mail, notificações) e como os fluxos achados pelo `mapeador-fluxos` e pelo `mapeador-tarefas` se ligam à missão da plataforma. Grava um mapa de referência (`.dsx/mapas/jornada.{md,json}`) que o `figma-espelhar` lê ao organizar telas por papel e ao desenhar diagramas de fluxo. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-tarefas` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
+description: "Mapeia a experiência em etapas que um usuário ou persona tem com o produto ao longo do tempo — do onboarding ao uso habitual —, os pontos de contato fora da UI (e-mail, notificações) e como os fluxos achados pelo `mapeador-fluxos` e pelo `mapeador-tarefas` se ligam à missão da plataforma. Grava um mapa de referência (`.dsx/maps/journey.{md,json}`) que o `figma-espelhar` lê ao organizar telas por papel e ao desenhar diagramas de fluxo. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-fluxos`, `mapeador-tarefas` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 
@@ -18,17 +18,17 @@ sobrescreva os dois arquivos por completo a cada execução.
 
 ## Antes de começar
 
-Leia, se existirem: `.dsx/mapas/mapa-projeto.md` (pelos documentos
+Leia, se existirem: `.dsx/maps/project-map.md` (pelos documentos
 encontrados — README, documentação de produto, `DESIGN.md`),
-`.dsx/mapas/fluxos.json` (reaproveite os fluxos nomeados como pontos de
-contato da jornada em vez de rederivá-los) e `.dsx/mapas/mapa-ui.json` (pela
+`.dsx/maps/flows.json` (reaproveite os fluxos nomeados como pontos de
+contato da jornada em vez de rederivá-los) e `.dsx/maps/ui-map.json` (pela
 estrutura de páginas/papéis).
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa, leia primeiro
-`.dsx/mapas/`; se não existir, aceite o legado `.claude/figma-claude/`
+`.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/`
 (`project-map.md`, `user-flows.json`, `ui-map.json`) e registre na sua linha
 de retorno que o legado foi lido e que o mapa será regravado no caminho novo
-na próxima execução. Você sempre **grava** só em `.dsx/mapas/`.
+na próxima execução. Você sempre **grava** só em `.dsx/maps/`.
 
 Comece a varredura em `$ARGUMENTS` se tiver sido passado; senão, na raiz do
 projeto.
@@ -79,15 +79,15 @@ sem evidência — uma jornada curta e honesta vale mais que uma inflada.
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos por inteiro,
+Crie `.dsx/maps/` se não existir e grave os dois arquivos por inteiro,
 substituindo o que havia antes. As chaves do JSON ficam em inglês — são
 contrato de máquina; traduzir quebraria os leitores. Só a prosa vai em pt-BR.
 
-**`.dsx/mapas/jornada.json`**:
+**`.dsx/maps/journey.json`**:
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/caminho/absoluto",
   "scope": "projeto inteiro",
   "mission": "citada ou parafraseada de README.md / package.json, ou null se não declarada",
@@ -102,11 +102,11 @@ contrato de máquina; traduzir quebraria os leitores. Só a prosa vai em pt-BR.
       ]
     }
   ],
-  "outOfUiTouchpoints": [{ "channel": "email", "trigger": "demanda aprovada", "source": "src/emails/DemandApproved.tsx" }]
+  "out_of_ui_touchpoints": [{ "channel": "email", "trigger": "demanda aprovada", "source": "src/emails/DemandApproved.tsx" }]
 }
 ```
 
-**`.dsx/mapas/jornada.md`** — narrado: `# Mapa de jornada`, depois
+**`.dsx/maps/journey.md`** — narrado: `# Mapa de jornada`, depois
 `gerado:` / `raiz:` / `escopo:`, uma seção "Missão" (ou "não declarada no
 projeto"), uma subseção por persona com suas etapas como uma linha do tempo
 simples, e uma seção "Fora da UI" para os pontos de contato de
@@ -115,7 +115,7 @@ e-mail/notificação. Feche com:
 ```markdown
 ## Para os comandos seguintes
 
-Este arquivo e `jornada.json` são regenerados por `/dsx:mapear` a cada
+Este arquivo e `journey.json` são regenerados por `/dsx:mapear` a cada
 execução, sempre sobrescrevendo o que havia antes. A organização de páginas e
 a fase de Fluxos do `figma-espelhar` devem ler isto antes de redescobrir
 personas e etapas do zero, e rodar o `mapear` de novo primeiro se parecer

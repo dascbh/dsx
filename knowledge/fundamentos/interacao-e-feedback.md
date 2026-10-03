@@ -38,9 +38,9 @@ Princípios de Norman que cada controle precisa responder: **visibilidade** (o q
 **Regras**
 - SE a resposta pode levar entre ~0,3 e 1 s ENTÃO atrase o indicador em ~300 ms para evitar flash, e quando aparecer mantenha-o por pelo menos ~500 ms.
 - SE a estrutura do conteúdo é previsível ENTÃO use skeleton; SE não é, ou a ação é um envio, use spinner no próprio botão. Ver [skeleton-vs-spinner](../../patterns/feedback/skeleton-vs-spinner.md), [skeleton-screen](../../patterns/feedback/skeleton-screen.md).
-- SE a operação passa de 10 s ENTÃO mostre progresso real e permita cancelar. Ver [carregamento-longo](../../patterns/feedback/carregamento-longo.md).
-- Só mostre porcentagem se ela corresponder a trabalho medido ([porcentagem-de-progresso](../../patterns/feedback/porcentagem-de-progresso.md)).
-- Ao enviar, bloqueie reenvio e mostre estado de carregamento no botão ([clique-duplo-em-envio](../../patterns/acoes/clique-duplo-em-envio.md)).
+- SE a operação passa de 10 s ENTÃO mostre progresso real e permita cancelar. Ver [long-loading](../../patterns/feedback/long-loading.md).
+- Só mostre porcentagem se ela corresponder a trabalho medido ([progress-percentage](../../patterns/feedback/progress-percentage.md)).
+- Ao enviar, bloqueie reenvio e mostre estado de carregamento no botão ([double-submit](../../patterns/actions/double-submit.md)).
 - Em ações de baixo risco com alta taxa de sucesso, considere atualização otimista com reversão clara se falhar. Em pagamentos, **nunca** declare sucesso antes da confirmação real.
 
 ---
@@ -63,10 +63,10 @@ Toda ação relevante tem resposta perceptível e fiel ao estado real.
 - Feedback proporcional ao risco: discreto para salvar um campo, explícito para pagar.
 - Explique consequência e próximo passo, não só "Sucesso".
 - Use mais de um canal: texto + visual + anúncio programático (região `aria-live`) para tecnologias assistivas.
-- Escolha o veículo pelo escopo: inline para o campo, alerta para a seção ou página, toast para confirmação passageira e não crítica. Ver [toast-alerta-inline](../../patterns/feedback/toast-alerta-inline.md), [duracao-de-toast](../../patterns/feedback/duracao-de-toast.md).
+- Escolha o veículo pelo escopo: inline para o campo, alerta para a seção ou página, toast para confirmação passageira e não crítica. Ver [toast-vs-inline-alert](../../patterns/feedback/toast-vs-inline-alert.md), [toast-duration](../../patterns/feedback/toast-duration.md).
 - Toast não carrega erro que exige ação nem informação que a pessoa precisa reler; não mova o foco para ele.
-- Validação imediata não é agressiva: não acuse erro antes de a pessoa ter chance de terminar ([momento-da-validacao](../../patterns/formularios/momento-da-validacao.md)).
-- Falhas temporárias: diga que é temporário, preserve o que foi feito e ofereça nova tentativa ([falha-temporaria](../../patterns/feedback/falha-temporaria.md), [tentar-novamente](../../patterns/feedback/tentar-novamente.md)).
+- Validação imediata não é agressiva: não acuse erro antes de a pessoa ter chance de terminar ([validation-timing](../../patterns/forms/validation-timing.md)).
+- Falhas temporárias: diga que é temporário, preserve o que foi feito e ofereça nova tentativa ([temporary-failure](../../patterns/feedback/temporary-failure.md), [retry](../../patterns/feedback/retry.md)).
 
 **Anti-padrões:** mensagem genérica; notificações empilhadas sem prioridade; feedback só por cor, som ou animação; descartar dados na falha; progresso inventado.
 
@@ -107,8 +107,8 @@ Tela vazia é oportunidade de orientar. Explique a causa, nomeie o que falta e o
 | Tipo | Objetivo | Conteúdo mínimo | Ação |
 |---|---|---|---|
 | Primeiro uso | Mostrar valor e iniciar | O que vai aparecer aqui e por que importa | Criar o primeiro item |
-| Busca sem resultado | Recuperar a busca | Termo buscado, sugestões de grafia/termos | Ajustar busca ([busca-sem-resultados](../../patterns/busca-filtros/busca-sem-resultados.md)) |
-| Filtros que excluem tudo | Mostrar a causa | Filtros ativos | Remover um filtro ou limpar todos ([filtros-ativos](../../patterns/busca-filtros/filtros-ativos.md)) |
+| Busca sem resultado | Recuperar a busca | Termo buscado, sugestões de grafia/termos | Ajustar busca ([no-search-results](../../patterns/search-filters/no-search-results.md)) |
+| Filtros que excluem tudo | Mostrar a causa | Filtros ativos | Remover um filtro ou limpar todos ([active-filters](../../patterns/search-filters/active-filters.md)) |
 | Concluído | Reconhecer a conquista | "Tudo em dia" | Nenhuma ou próxima tarefa opcional |
 | Sem permissão | Explicar o requisito | Quem pode conceder acesso | Pedir acesso |
 | Falha temporária | Não confundir com ausência | É erro, não vazio | Tentar novamente |
@@ -121,7 +121,7 @@ Tela vazia é oportunidade de orientar. Explique a causa, nomeie o que falta e o
 - Dados de exemplo identificados como fictícios e removíveis.
 - Nunca limpe o termo de busca nem os filtros da pessoa.
 
-Ver [estado-vazio](../../patterns/feedback/estado-vazio.md).
+Ver [empty-state](../../patterns/feedback/empty-state.md).
 
 ---
 

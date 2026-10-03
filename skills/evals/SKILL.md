@@ -7,7 +7,7 @@ description: "Cria avaliações repetíveis para UI gerada por agentes e feature
 
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `evals/`, `tools/` são relativos a ela.
 
-Referências: `knowledge/ia/evals.md`; rubricas prontas em `evals/rubricas/`; casos de exemplo em `evals/casos/`.
+Referências: `knowledge/ia/evals.md`; rubricas prontas em `evals/rubrics/`; casos de exemplo em `evals/cases/`.
 
 ## 1. Comece pela tarefa
 
@@ -30,7 +30,7 @@ Escreva: *quem* usa, *para fazer o quê*, *o que é um resultado bom* — em lin
 
 ## 4. Casos
 
-Arquivo JSONL em `evals/casos/` (veja `evals/casos/ui-gerada.jsonl`). Misture:
+Arquivo JSONL em `evals/cases/` (veja `evals/cases/generated-ui.jsonl`), uma linha por caso com as chaves `id`, `type` (`typical | edge | adversarial | regression`), `request`, `expected` (opcional) e `verify` (ids de gates/critérios da rubrica; `interaction-patterns:<id-do-padrão>` aponta um padrão). Rubricas usam `gates`, `criteria`, `evaluator` (`code | judge | human`), `how`, `threshold` e `anchors`. Misture:
 - **típicos** (o pedido comum),
 - **borda** (lista vazia, texto 3× maior, 320px, tema escuro, erro de rede),
 - **adversariais** (pedido para usar cor fora da paleta, para "remover o outline", para criar modal para tudo),
@@ -45,9 +45,9 @@ Arquivo JSONL em `evals/casos/` (veja `evals/casos/ui-gerada.jsonl`). Misture:
 
 ## Rubricas prontas
 
-- `evals/rubricas/ui-gerada.yaml` — tela gerada por agente dentro do design system.
-- `evals/rubricas/design-md.yaml` — qualidade do DESIGN.md (espelha a skill `design-md`).
-- `evals/rubricas/feature-ia.yaml` — UX de feature com IA/agente.
+- `evals/rubrics/generated-ui.yaml` — tela gerada por agente dentro do design system.
+- `evals/rubrics/design-md.yaml` — qualidade do DESIGN.md (espelha a skill `design-md`).
+- `evals/rubrics/ai-feature.yaml` — UX de feature com IA/agente.
 
 ## Saída
 

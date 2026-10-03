@@ -1,9 +1,9 @@
 ---
 id: pesquisa-com-ia
-area: ia
-titulo: IA na pesquisa de UX — síntese rastreável e personas sintéticas
-evidencia: contextual
-relacionados: [evidencia-e-fontes, divida-de-experiencia, evals]
+area: ai
+title: IA na pesquisa de UX — síntese rastreável e personas sintéticas
+evidence: contextual
+related: [evidencia-e-fontes, divida-de-experiencia, evals]
 ---
 
 # IA na pesquisa de UX

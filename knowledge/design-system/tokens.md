@@ -161,7 +161,7 @@ SE → ENTÃO:
 Formato de um par em `contrast-pairs.json`:
 
 ```json
-{ "fg": "color.text.muted", "bg": "color.bg.surface", "min": 4.5, "uso": "texto de apoio em card" }
+{ "fg": "color.text.muted", "bg": "color.bg.surface", "min": 4.5, "use": "texto de apoio em card" }
 ```
 
 Cores com alfa (hex de 8 dígitos, como `color.bg.overlay`) são ignoradas na checagem, pois o contraste depende do que está atrás; valide-as manualmente sobre o conteúdo real.

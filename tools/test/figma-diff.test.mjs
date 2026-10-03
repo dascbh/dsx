@@ -47,7 +47,7 @@ const section = (report, heading) => {
   return j < 0 ? rest : rest.slice(0, j);
 };
 
-test('diff do Figma: mesma mudança em 2 frames vira primitivo; mudança única vira composição', () => {
+test('Figma diff: same change in 2 frames is a primitive; single change is a composition', () => {
   const report = runDiff(snapshot({ pad: 16, title: 'Demandas' }), snapshot({ pad: 12, title: 'Demanda em risco' }));
 
   const prim = section(report, '## Agrupadas (≥ 2 frames) — classe `primitivo`');
@@ -63,7 +63,7 @@ test('diff do Figma: mesma mudança em 2 frames vira primitivo; mudança única 
   assert.match(report, /## Tokens e estilos\n\nSem mudança\./);
 });
 
-test('diff do Figma: mesma mudança sob nomes sem família comum acusa problema de nomenclatura', () => {
+test('Figma diff: same change under names without a common family flags a naming problem', () => {
   const cardName = (id) => (id === '1' ? 'CardA' : 'CardB');
   const report = runDiff(snapshot({ pad: 16, title: 'x', cardName }), snapshot({ pad: 12, title: 'x', cardName }));
   assert.equal(section(report, '## Agrupadas (≥ 2 frames) — classe `primitivo`'), null);
@@ -74,7 +74,7 @@ test('diff do Figma: mesma mudança sob nomes sem família comum acusa problema 
   assert.match(naming, /`CardB`/);
 });
 
-test('diff do Figma: aceita baseline legado com chaves em pt-BR', () => {
+test('Figma diff: accepts legacy baseline with pt-BR keys', () => {
   const report = runDiff(snapshot({ pad: 16, title: 'Demandas', legacy: true }), snapshot({ pad: 12, title: 'Demandas' }));
   assert.match(report, /`SectionCard` · auto-layout · padTop 16 → 12, padBaixo 16 → 12 · \*\*2 frames\*\*/);
   assert.doesNotMatch(report, /Mudaram, mas o baseline não tem detalhe/);

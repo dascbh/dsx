@@ -1,27 +1,29 @@
 // Configuração do ux-lint: lê o front matter de um UX.md e completa com os padrões do contrato
 // (knowledge/fundamentos/ux-md.md, "Schema do front matter"). Omitido = vale o padrão do DSX.
+// Front matter com nomes antigos em português é aceito (lib/legacy.mjs): convertido, com aviso.
 import { readFileSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from '../../lib/yaml-lite.mjs';
+import { normalizeUxFrontMatter } from './legacy.mjs';
 
-export const PADROES = Object.freeze({
-  navegacao: { 'profundidade-maxima': 3, retorno: 'obrigatorio' },
-  acoes: {
-    'primarias-por-regiao': 1,
-    'posicao-primaria': 'topo-direita',
-    'ordem-dialogo': 'cancelar-acao',
-    'destrutiva-rotulo-especifico': true,
+export const DEFAULTS = Object.freeze({
+  navigation: { 'max-depth': 3, back: 'mandatory' },
+  actions: {
+    'primary-per-region': 1,
+    'primary-position': 'top-right',
+    'dialog-order': 'cancel-action',
+    'destructive-specific-label': true,
   },
-  formularios: { rotulo: 'sempre-visivel', validacao: 'ao-sair-do-campo', obrigatorios: 'marcar-obrigatorios' },
-  conteudo: { botoes: 'verbo-objeto', proibidos: [] },
-  fluxos: { 'max-passos-jornada': 12, 'max-dialogos-empilhados': 1, 'becos-sem-saida': 0 },
-  verificacao: {
-    seletores: {
-      regioes: ['header', 'nav', 'aside', 'main', '[role=dialog]'],
-      dialogo: '[role=dialog]',
-      primaria: '.MuiButton-contained',
-      destrutiva: '.MuiButton-containedError, .MuiButton-colorError',
-      botao: 'button, [role=button]',
-      campo: 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select',
+  forms: { label: 'always-visible', validation: 'on-blur', required: 'mark-required' },
+  content: { buttons: 'verb-object', forbidden: [] },
+  flows: { 'max-journey-steps': 12, 'max-stacked-dialogs': 1, 'dead-ends': 0 },
+  verification: {
+    selectors: {
+      regions: ['header', 'nav', 'aside', 'main', '[role=dialog]'],
+      dialog: '[role=dialog]',
+      primary: '.MuiButton-contained',
+      destructive: '.MuiButton-containedError, .MuiButton-colorError',
+      button: 'button, [role=button]',
+      field: 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select',
     },
   },
 });
@@ -36,21 +38,28 @@ function merge(base, over) {
   return out;
 }
 
-/** Front matter (objeto) → configuração completa. */
+/**
+ * Front matter (objeto) → configuração completa. Nomes antigos viram os novos; os avisos ficam em
+ * `legacyWarnings` (propriedade não enumerável, para não entrar em comparações nem no JSON).
+ */
 export function configFrom(frontMatter = {}) {
-  const cfg = merge(PADROES, frontMatter);
-  const s = cfg.verificacao.seletores;
+  const { frontMatter: fm, warnings } = normalizeUxFrontMatter(frontMatter || {});
+  const cfg = merge(DEFAULTS, fm);
+  const s = cfg.verification.selectors;
   // Seletores aceitam string única ou lista; normaliza para string (lista com vírgula).
-  for (const k of Object.keys(s)) if (Array.isArray(s[k]) && k !== 'regioes') s[k] = s[k].join(', ');
-  if (typeof s.regioes === 'string') s.regioes = s.regioes.split(',').map((x) => x.trim()).filter(Boolean);
-  if (!Array.isArray(cfg.conteudo.proibidos)) cfg.conteudo.proibidos = [cfg.conteudo.proibidos].filter(Boolean);
+  for (const k of Object.keys(s)) if (Array.isArray(s[k]) && k !== 'regions') s[k] = s[k].join(', ');
+  if (typeof s.regions === 'string') s.regions = s.regions.split(',').map((x) => x.trim()).filter(Boolean);
+  if (!Array.isArray(cfg.content.forbidden)) cfg.content.forbidden = [cfg.content.forbidden].filter(Boolean);
+  Object.defineProperty(cfg, 'legacyWarnings', { value: warnings, enumerable: false });
   return cfg;
 }
 
-/** Lê um UX.md (ou nada) e devolve a configuração. */
+/** Lê um UX.md (ou nada) e devolve a configuração. Avisos de nome antigo vão para stderr. */
 export function loadConfig(uxPath) {
   if (!uxPath) return configFrom({});
   const { frontMatter } = splitFrontMatter(readFileSync(uxPath, 'utf8'));
   if (!frontMatter) throw new Error(`${uxPath}: sem front matter (--- ... ---)`);
-  return configFrom(parseYaml(frontMatter));
+  const cfg = configFrom(parseYaml(frontMatter));
+  for (const w of cfg.legacyWarnings) console.error(`AVISO ${uxPath}: ${w}`);
+  return cfg;
 }

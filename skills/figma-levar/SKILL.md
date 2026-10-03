@@ -17,9 +17,9 @@ adaptadores por framework e checado contra hazards já existem como arquivos.
 a fase 1 delas ainda diz "use o artefato se existir, senão grep". Esta skill
 transforma os artefatos em **pré-requisito duro**: sem artefato, não há
 construção — falhe rápido e diga qual skill rodar. Essa é a alavanca real que
-a descoberta acrescenta — `fluxos.json` dá arestas reais
+a descoberta acrescenta — `flows.json` dá arestas reais
 from/to/trigger/condition em vez de chamadas de navegação retraçadas,
-`jornada.json` dá personas reais em vez de papéis adivinhados, e os
+`journey.json` dá personas reais em vez de papéis adivinhados, e os
 `hazards[]` de `design-system.json` dão um registro estruturado de deriva em
 vez de achados em prosa encontrados no olho.
 
@@ -51,8 +51,8 @@ Não rederive essas mecânicas do zero; siga-as.
 **Nunca chame `use_figma` com script que altera o arquivo enquanto a vez é do
 design.** Leia `design/figma-sync.md` antes (skill `figma-ciclo`):
 
-- Se `vez: design` (ou o legado `turn: design`), **pare** e diga ao usuário.
-  Há refino em curso; escrever agora sobrescreve. (O hook `guarda-vez` também
+- Se `turn: design` (ou o legado `vez: design`), **pare** e diga ao usuário.
+  Há refino em curso; escrever agora sobrescreve. (O hook `turn-guard` também
   bloqueia, mas não deixe o hook ser o primeiro a avisar.)
 - Se não houver registro, o projeto ainda não tem ciclo: ofereça
   `/dsx:figma-iniciar`.
@@ -69,22 +69,22 @@ Confira que existem, **antes de escrever qualquer coisa**:
 
 | artefato | produzido por | sem ele |
 |---|---|---|
-| `.dsx/mapas/mapa-ui.json` | skill `mapear` | pare: rode `mapear` |
-| `.dsx/mapas/fluxos.json` | skill `mapear` | pare: rode `mapear` |
-| `.dsx/mapas/jornada.json` | skill `mapear` | pare: rode `mapear` |
-| `.dsx/mapas/dominio.json` | skill `mapear` | pare: rode `mapear` |
-| `.dsx/mapas/design-system.json` (com `hazards[]`) | skill `mapear` | pare: rode `mapear` |
+| `.dsx/maps/ui-map.json` | skill `mapear` | pare: rode `mapear` |
+| `.dsx/maps/flows.json` | skill `mapear` | pare: rode `mapear` |
+| `.dsx/maps/journey.json` | skill `mapear` | pare: rode `mapear` |
+| `.dsx/maps/domain.json` | skill `mapear` | pare: rode `mapear` |
+| `.dsx/maps/design-system.json` (com `hazards[]`) | skill `mapear` | pare: rode `mapear` |
 | `DESIGN.md` | skill `design-md` (Modo A extrai do código e do `design-system.json`) | pare: rode `design-md` |
 | tokens DTCG do projeto (`tokens/*.tokens.json` ou `*.tokens.json`) | skill `tokens` | **não bloqueia** — sem eles, os valores vêm do `design-system.json` |
-| `.dsx/mapas/tarefas.json` | skill `mapear` | não bloqueia — sem ele, a fase Diálogos conta passos pelo componente |
+| `.dsx/maps/tasks.json` | skill `mapear` | não bloqueia — sem ele, a fase Diálogos conta passos pelo componente |
 | `design/as-is-to-be.md` | skill `confirmar-mapas` | não bloqueia — sem ele, a fase Cobertura não tem contra o que cruzar; diga isso no relatório |
 
 Se algum obrigatório falta, **pare e diga qual skill rodar antes** — não caia
 em silêncio para redescobrir pelo código. Tudo daqui para frente trata esses
 arquivos como fato.
 
-**Compatibilidade com o fluxo anterior:** procure primeiro em `.dsx/mapas/`;
-se não existir, aceite o legado `.claude/figma-claude/` (`ui-map.json`,
+**Compatibilidade com o fluxo anterior:** procure primeiro em `.dsx/maps/`;
+se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`ui-map.json`,
 `user-flows.json`, `task-flows.json`, `journey-map.json`, `domain-map.json`,
 `design-system.json`, `figma-harness.md` em `design/`) e avise que ele será
 regravado no caminho novo na próxima execução de `mapear`. As chaves JSON dos
@@ -110,15 +110,15 @@ Antes de qualquer `use_figma` de descoberta, leia `design/figma-reference.json`
 ## Fonte de verdade das fundações — DESIGN.md + tokens
 
 Ordem de busca dos valores: tokens DTCG (`tokens/*.tokens.json` ou
-`*.tokens.json`) → `.dsx/mapas/design-system.json` → `mapa-ui` → tema
+`*.tokens.json`) → `.dsx/maps/design-system.json` → `ui-map` → tema
 detectado no código.
 
 Com tokens DTCG, gere o plano de variáveis com a ponte do DSX em vez de
 montar variável por variável:
 
 ```bash
-node <DSX>/tools/figma/tokens-para-figma.mjs --tokens <pasta-dos-tokens>           # plano (JSON) — leia antes
-node <DSX>/tools/figma/tokens-para-figma.mjs --tokens <pasta-dos-tokens> --script > /tmp/vars.js
+node <DSX>/tools/figma/tokens-to-figma.mjs --tokens <pasta-dos-tokens>           # plano (JSON) — leia antes
+node <DSX>/tools/figma/tokens-to-figma.mjs --tokens <pasta-dos-tokens> --script > /tmp/vars.js
 ```
 
 Cole o script gerado (`/tmp/vars.js`) em `use_figma`. Ele é idempotente: reusa
@@ -140,19 +140,19 @@ arquivo, não só no fim. Formato (chaves em inglês — contrato de máquina):
 
 ```json
 {
-  "runId": "levar-2026-08-18",
+  "run_id": "levar-2026-08-18",
   "phase": "screens",
   "step": "route:/demandas",
   "entities": {
     "collections": { "Primitivos": "id:...", "Semântico": "id:...", "Componente": "id:..." },
     "variables": { "color/action/primary": "id:..." },
-    "textStyles": { "Título/Página (h4)": "id:..." },
+    "text_styles": { "Título/Página (h4)": "id:..." },
     "components": { "Chip": "key:...", "Botão": "key:..." },
     "pages": { "00 · Fundamentos": "id:...", "02 · Demandas": "id:..." },
     "wrappers": { "/demandas": "id:..." }
   },
-  "pendingValidations": ["/demandas:screenshot"],
-  "completedSteps": ["foundations", "chrome"]
+  "pending_validations": ["/demandas:screenshot"],
+  "completed_steps": ["foundations", "chrome"]
 }
 ```
 
@@ -165,9 +165,9 @@ usar. É esse o mecanismo que torna uma execução de 50–100+ chamadas
 retomável em vez de um script tudo-ou-nada.
 
 Compatibilidade: um ledger legado em `.claude/figma-claude/figma-registry.json`
-é lido como ponto de partida e regravado em `.dsx/figma/ledger.json`.
+é lido como ponto de partida e regravado em `.dsx/figma/ledger.json`; um ledger com chaves em camelCase (`runId`, `textStyles`, `pendingValidations`, `completedSteps`) é lido com o aviso "nome antigo, renomeie para X" e regravado em snake_case.
 
-**Nunca confie em `completedSteps`/`phase`/`step` ao pé da letra numa
+**Nunca confie em `completed_steps`/`phase`/`step` ao pé da letra numa
 retomada.** A última escrita do ledger de uma execução interrompida
 frequentemente está velha — uma execução real desta skill foi retomada de um
 ledger que dizia 2 de 34 telas construídas quando uma varredura ao vivo do
@@ -217,7 +217,7 @@ token `color/feedback/warning-icon`) com o `detail` e a `evidence`
 (arquivo:linha) do hazard como legenda. É a regra zero — espelhe o que existe,
 não redesenhe — aplicada a tokens do mesmo jeito que já se aplica a telas feias
 em `figma-espelhar`. Cada hazard também vira um bloco em
-`design/figma-achados/<rodada>.md`, com severidade 0–4 (formato na skill
+`design/figma-findings/<rodada>.md`, com severidade 0–4 (formato na skill
 `figma-espelhar`, seção "Achados").
 
 ## Sections de jornada — em camada por cima, não no lugar
@@ -227,7 +227,7 @@ Mantenha o esquema de páginas de `figma-espelhar` (`02 · <app principal>`,
 páginas por persona briga com o jeito como as pessoas procuram as coisas num
 arquivo ("acha a página de configurações"), e o esquema existente já separa
 por papel. Ponha as jornadas por cima com **Sections** nativas do Figma, uma
-por fluxo nomeado de `fluxos.json`, envolvendo os frames que pertencem a ele.
+por fluxo nomeado de `flows.json`, envolvendo os frames que pertencem a ele.
 Use `devStatus` (`READY_FOR_DEV` / `COMPLETED`) em cada section como marcador
 real e ajustável de progresso de construção — **não** como detector de deriva:
 o Plugin API não rastreia se um nó mudou depois que o status foi definido (é um
@@ -243,8 +243,8 @@ Algumas pontes MCP bloqueiam `SectionNode.devStatus`. Confira o que a API ao
 vivo de fato permite antes de prometer que o status foi definido; se recusar,
 registre no relatório e no ledger, não finja.
 
-`04 · Fluxos` é construída das arestas de `fluxos.json` cruzadas com as
-personas/estágios de `jornada.json` — raias por ator, transições de estágio
+`04 · Fluxos` é construída das arestas de `flows.json` cruzadas com as
+personas/estágios de `journey.json` — raias por ator, transições de estágio
 sintetizadas com marcadores de hazard/ponto de dor, não um despejo literal de
 uma caixa por nó do grafo cru.
 
@@ -275,12 +275,12 @@ quando há imagens deixa frames de imagem em branco.
 | Fase | Lê | Escreve |
 |---|---|---|
 | 0. Gate | `design/figma-sync.md`, os artefatos obrigatórios | nada — falha rápido se algum faltar |
-| 1. Fundações | tokens DTCG (via `tokens-para-figma.mjs`) ou `design-system.json`; `DESIGN.md` (regras de uso); `hazards[]` | variáveis, estilos de texto, componentes de ícone (`figma-fundacoes`) + quadros de hazard em `00` |
-| 2. Chrome | layout compartilhado de `mapa-ui.json` | `COMPONENT`s de chrome, uma chamada |
-| 3. Telas | páginas/sub-páginas de `mapa-ui.json`, `dominio.json` para dados de exemplo | frames de `02`/`03`, envolvidos em Sections por pertencimento a fluxo — um frame por sub-página `navVisible` também, nunca dobrado no pai (`figma-espelhar` fase 4) |
-| 4. Diálogos | modais de `mapa-ui.json`, contagem de passos de `tarefas.json` | `05 · Diálogos` |
-| 5. Estados | dados de estados ausentes de `mapa-ui.json` | `06 · Estados e variações` — placeholders marcados como tal, nunca fabricados |
-| 6. Fluxos | `fluxos.json`, `jornada.json` | raias de `04 · Fluxos` + mapa de rotas |
+| 1. Fundações | tokens DTCG (via `tokens-to-figma.mjs`) ou `design-system.json`; `DESIGN.md` (regras de uso); `hazards[]` | variáveis, estilos de texto, componentes de ícone (`figma-fundacoes`) + quadros de hazard em `00` |
+| 2. Chrome | layout compartilhado de `ui-map.json` | `COMPONENT`s de chrome, uma chamada |
+| 3. Telas | páginas/sub-páginas de `ui-map.json`, `domain.json` para dados de exemplo | frames de `02`/`03`, envolvidos em Sections por pertencimento a fluxo — um frame por sub-página `nav_visible` também, nunca dobrado no pai (`figma-espelhar` fase 4) |
+| 4. Diálogos | modais de `ui-map.json`, contagem de passos de `tasks.json` | `05 · Diálogos` |
+| 5. Estados | dados de estados ausentes de `ui-map.json` | `06 · Estados e variações` — placeholders marcados como tal, nunca fabricados |
+| 6. Fluxos | `flows.json`, `journey.json` | raias de `04 · Fluxos` + mapa de rotas |
 | 7. Responsivo | só breakpoints reais encontrados no código | `07 · Responsivo` |
 | 8. Cobertura | matriz da `figma-cobertura`, cruzada com `design/as-is-to-be.md` | `08 · Cobertura` |
 
@@ -296,13 +296,13 @@ Sem estes passos, a próxima rodada de diff reapresenta tudo como novidade:
 2. **Append** de uma linha em `design/figma-changelog.jsonl`:
 
    ```jsonl
-   {"rodada":"r1","data":"2026-08-18","direcao":"codigo->figma","autor":"figma-levar","resumo":"fundações + 34 telas + fluxos, trilha essencial","framesCriados":41,"framesAlterados":0,"framesRemovidos":0,"tokensAlterados":[],"vezApos":"design","achados":"design/figma-achados/r1.md"}
+   {"round":"r1","date":"2026-08-18","direction":"code->figma","author":"figma-levar","summary":"fundações + 34 telas + fluxos, trilha essencial","frames_created":41,"frames_changed":0,"frames_removed":0,"tokens_changed":[],"turn_after":"design","findings":"design/figma-findings/r1.md"}
    ```
 
    Contagens reais (do ledger reconciliado com o arquivo ao vivo), nunca
    estimadas.
 3. **Achados** (hazards, telas que não couberam no orçamento, `devStatus`
-   recusado) em `design/figma-achados/<rodada>.md`, com severidade 0–4.
+   recusado) em `design/figma-findings/<rodada>.md`, com severidade 0–4.
 4. **Regenere** `design/figma-reference.json` (skill `figma-convencoes`) — esta
    skill sempre muda fundação e estrutura.
 5. Se é a primeira construção do arquivo, feche com a nota de convenções no

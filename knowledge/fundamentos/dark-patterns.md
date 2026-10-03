@@ -45,7 +45,7 @@ Destacar o botão principal não é dark pattern. Torna-se quando o destaque ser
 | **Interferência visual** | Recusa em cinza claro, link minúsculo, botão principal onde se espera "cancelar" | Erro induzido | Opções equivalentes com contraste legível e posição convencional |
 | **Insistência** (nagging) | Pedido repetido a cada visita após recusa; modal que volta sempre | Desgaste até ceder | Respeitar a recusa por período razoável; opção "não perguntar de novo" |
 | **Anúncio disfarçado** | Publicidade com aparência de conteúdo, resultado ou botão do sistema | Clique enganado | Rotular claramente como anúncio ou patrocinado |
-| **Cadastro forçado** | Conta obrigatória para tarefa que não precisa dela | Coleta de dados desnecessária; abandono | Opção de convidado quando possível ([checkout-convidado](../../patterns/ecommerce/checkout-convidado.md)) |
+| **Cadastro forçado** | Conta obrigatória para tarefa que não precisa dela | Coleta de dados desnecessária; abandono | Opção de convidado quando possível ([guest-checkout](../../patterns/ecommerce/guest-checkout.md)) |
 | **Ancoragem enganosa** | "De R$ 999 por R$ 199" com preço "de" nunca praticado | Percepção de valor falsa | Comparação apenas com preço real e recente |
 
 ---
@@ -92,7 +92,7 @@ SE o pedido cair numa linha vermelha ENTÃO: diga qual padrão é, qual o dano, 
 2. **Transparência:** preço, dados, renovação e condições aparecem antes do clique decisivo?
 3. **Equilíbrio:** aceitar, recusar, ajustar e sair têm linguagem neutra e destaque comparável?
 4. **Autonomia:** dá para pausar, voltar e revisar sem perder o que foi feito?
-5. **Reversibilidade:** há caminho simples para desfazer ou cancelar ([desfazer](../../patterns/acoes/desfazer.md))?
+5. **Reversibilidade:** há caminho simples para desfazer ou cancelar ([desfazer](../../patterns/actions/undo.md))?
 6. **Inclusão:** pessoas com pouca familiaridade digital entendem a consequência?
 7. **Evidência:** urgência, escassez, depoimentos e números são verdadeiros e atuais?
 8. **Métrica:** o time acompanha arrependimento, reclamação, cancelamento e estorno, não só conversão?

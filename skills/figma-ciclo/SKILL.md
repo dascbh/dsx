@@ -21,15 +21,15 @@ técnica evita isso — só uma regra de autoridade declarada em disco.
 
 | vez | significa | proibido |
 |---|---|---|
-| **`codigo`** | o Figma é espelho; o código manda | refinar no Figma esperando que sobreviva |
+| **`code`** | o Figma é espelho; o código manda | refinar no Figma esperando que sobreviva |
 | **`design`** | há refinamento em curso no Figma | **reespelhar**, sob qualquer pretexto |
-| **`aplicando`** | as propostas estão virando código | mexer nos mesmos arquivos por fora |
+| **`applying`** | as propostas estão virando código | mexer nos mesmos arquivos por fora |
 
 A vez fica escrita no repositório. Se não estiver escrita, você não sabe de quem
 é a vez — e a resposta correta é **perguntar antes de escrever qualquer coisa**,
 nos dois lados.
 
-A regra não depende só de disciplina: o hook `guarda-vez` do DSX lê o registro
+A regra não depende só de disciplina: o hook `turn-guard` do DSX lê o registro
 abaixo e **nega** qualquer `use_figma` que escreva no arquivo enquanto a vez for
 `design` (leitura — snapshot, inventário, diff — passa sempre). Para ler ou
 trocar a vez, use `/dsx:figma-vez`.
@@ -42,14 +42,14 @@ de propósito; ninguém mantém o que é longo.
 ```markdown
 # Sincronia com o Figma
 
-arquivo: S8z0…  ·  https://figma.com/design/S8z0…
-vez: design                        # codigo | design | aplicando
-desde: 2026-08-20
+file: S8z0…  ·  https://figma.com/design/S8z0…
+turn: design                        # code | design | applying
+since: 2026-08-20
 baseline: design/figma-baseline/   # retrato canônico — é o "antes" do diff
 
 ## Rodadas
-- r1 · 2026-08-14 · espelho completo (00–08, 134 frames) · vez → codigo
-- r2 · 2026-08-20 · refino de densidade das listas · vez → design
+- r1 · 2026-08-14 · espelho completo (00–08, 134 frames) · turn → code
+- r2 · 2026-08-20 · refino de densidade das listas · turn → design
 
 ## Pendentes (escopo desta rodada, ainda não construído)
 - Nenhuma
@@ -68,9 +68,10 @@ baseline: design/figma-baseline/   # retrato canônico — é o "antes" do diff
 - Nenhuma
 ```
 
-O registro aceita o legado `turn:` (`code` → `codigo`, `applying` → `aplicando`)
-— compatível com projetos que já usavam o fluxo anterior. Ao reescrever o
-arquivo, grave já com `vez:`.
+Ao ler, o registro aceita os nomes antigos em português — `vez:` no lugar de
+`turn:`, `arquivo:`/`desde:` no lugar de `file:`/`since:` e os valores `codigo`
+e `aplicando` no lugar de `code` e `applying` — com o aviso "nome antigo,
+renomeie para X". Ao reescrever o arquivo, grave sempre com os nomes novos.
 
 `Pendentes` e `Divergências conhecidas` parecem iguais e não são — confundir as
 duas foi o que deixou uma rodada se declarar fechada enquanto trabalho que ela
@@ -99,7 +100,7 @@ a outra — por isso são arquivos separados, não um mais longo:
 ```
 design/figma-sync.md            → estado atual + índice de uma linha por rodada (humano)
 design/figma-changelog.jsonl    → uma entrada estruturada por rodada (agente)
-design/figma-achados/<rodada>.md → achados completos da rodada (dado, não conversa)
+design/figma-findings/<rodada>.md → achados completos da rodada (dado, não conversa)
 design/figma-reference.json     → fatos atuais (ids, nomes) — skill figma-convencoes
 ```
 
@@ -108,23 +109,29 @@ nunca reescreve as anteriores — é o formato certo pra histórico que só cres
 e evita o custo de reparsear/reescrever um JSON array inteiro a cada rodada.
 
 ```jsonl
-{"rodada":"r1","data":"2026-08-14","direcao":"codigo->figma","autor":"figma-espelhar","resumo":"espelho completo, 00-08, 134 frames","framesCriados":134,"framesAlterados":0,"framesRemovidos":0,"tokensAlterados":[],"vezApos":"design","achados":"design/figma-achados/r1.md"}
-{"rodada":"r2","data":"2026-08-22","direcao":"figma->codigo","autor":"figma-trazer","resumo":"densidade das listas aplicada no SectionCard e no token de espaçamento","framesCriados":0,"framesAlterados":7,"framesRemovidos":0,"tokensAlterados":["space/stack-sm"],"vezApos":"codigo","achados":"design/figma-achados/r2.md"}
+{"round":"r1","date":"2026-08-14","direction":"code->figma","author":"figma-espelhar","summary":"espelho completo, 00-08, 134 frames","frames_created":134,"frames_changed":0,"frames_removed":0,"tokens_changed":[],"turn_after":"design","findings":"design/figma-findings/r1.md"}
+{"round":"r2","date":"2026-08-22","direction":"figma->code","author":"figma-trazer","summary":"densidade das listas aplicada no SectionCard e no token de espaçamento","frames_created":0,"frames_changed":7,"frames_removed":0,"tokens_changed":["space/stack-sm"],"turn_after":"code","findings":"design/figma-findings/r2.md"}
 ```
 
-Campos mínimos: `rodada`, `data`, `direcao` (`codigo->figma` ou
-`figma->codigo`), `autor` (a skill ou o fluxo que rodou), `resumo` (uma frase),
-`framesCriados`/`framesAlterados`/`framesRemovidos` (contagem real, não
-estimada), `tokensAlterados` (lista de nomes de variável, vazio se nenhum),
-`vezApos` (o estado de `vez` que a rodada deixou), `achados` (caminho pro
+Campos mínimos: `round`, `date`, `direction` (`code->figma` ou
+`figma->code`), `author` (a skill ou o fluxo que rodou), `summary` (uma frase),
+`frames_created`/`frames_changed`/`frames_removed` (contagem real, não
+estimada), `tokens_changed` (lista de nomes de variável, vazio se nenhum),
+`turn_after` (o estado de `turn` que a rodada deixou), `findings` (caminho pro
 arquivo com os achados completos daquela rodada — ver abaixo).
+Ao ler um changelog antigo, aceite as chaves em português (`rodada`, `data`,
+`direcao`, `autor`, `resumo`, `framesCriados`, `framesAlterados`,
+`framesRemovidos`, `tokensAlterados`, `vezApos`, `achados`; valores
+`codigo->figma`/`figma->codigo`/`codigo`/`aplicando`) e avise "nome antigo,
+renomeie para X"; linhas novas usam só as chaves em inglês. Não reescreva as
+linhas antigas (o arquivo é só-inclusão).
 
 **Os achados não cabem numa linha, e não devem ficar só na conversa.** Uma
 rodada de `figma-espelhar`, `figma-levar`, `figma-cobertura` ou `figma-trazer`
 frequentemente descobre coisas reais sobre o produto (bug de responsivo medido,
 botão que não faz nada, token duplicado) — se isso só existe na resposta de chat
 que gerou a rodada, some assim que a conversa for arquivada. Grave em
-`design/figma-achados/<rodada>.md`, um por achado, com a mesma precisão que uma
+`design/figma-findings/<rodada>.md`, um por achado, com a mesma precisão que uma
 revisão adversarial — é dado, não narrativa. Cada achado usa a escala de
 severidade 0–4 do DSX (skill `revisar-ux`: 0 não é problema · 1 cosmético ·
 2 menor · 3 maior · 4 catástrofe; barreira de acessibilidade que bloqueia a
@@ -142,7 +149,7 @@ tarefa é sempre 4):
 
 Todo agente que for **aplicar** uma mudança (`figma-trazer`) ou **auditar**
 (`figma-cobertura`) lê `figma-changelog.jsonl` antes de agir, não só
-`figma-sync.md` — é lá que está o `resumo` e a `direcao` precisos da última
+`figma-sync.md` — é lá que está o `summary` e a `direction` precisos da última
 rodada, e o ponteiro pros achados que talvez já expliquem algo que pareceria
 uma divergência nova.
 
@@ -162,13 +169,13 @@ git diff --name-only <ultimo-sync>..HEAD -- src/pages src/components src/theme.t
 
 Reespelho completo depois da rodada 1 é quase sempre erro: destrói refinamento e
 custa dez vezes mais que o incremental. Faça só se o registro disser que a vez é
-`codigo` e o usuário pedir explicitamente.
+`code` e o usuário pedir explicitamente.
 
 **3. Congelar o "antes" e passar a vez.** Rode o snapshot com `MODE = 'full'`
 ([tools/figma/snapshot.js](../../tools/figma/snapshot.js), colado dentro de
 `use_figma`) e **comite** `design/figma-baseline/*.json`. É esse retrato que
 torna o diff possível — e é o git que passa a dar histórico versionado ao
-arquivo de design. Só então escreva `vez: design` — e só se `## Pendentes`
+arquivo de design. Só então escreva `turn: design` — e só se `## Pendentes`
 estiver vazio. Baseline comitado é necessário, mas não suficiente: prova que
 existe um "antes" contra o qual diferenciar, não que a rodada terminou o que se
 propôs a construir. Um espelho que adiou de propósito parte do próprio escopo
@@ -176,7 +183,7 @@ propôs a construir. Um espelho que adiou de propósito parte do próprio escopo
 só porque existe baseline — virar a vez ali entrega autoridade sobre trabalho
 que ainda era do código, e a próxima pessoa a abrir o arquivo não tem como
 distinguir "designer, pode seguir" de "inacabado, volte aqui". Mantenha a vez em
-`codigo`, liste o que falta em `## Pendentes`, e só vire quando estiver de fato
+`code`, liste o que falta em `## Pendentes`, e só vire quando estiver de fato
 vazio (ou quando os itens tiverem sido reclassificados explicitamente para
 `## Divergências conhecidas`, com motivo).
 
@@ -203,12 +210,12 @@ incremental (convenção da página na skill `figma-propostas`).
 cada item pelos [gates](#gates--o-que-trava-a-rodada) antes de tocar no código.
 Mecanismo completo em [references/diff.md](references/diff.md).
 
-**5. Fechar.** Atualize o registro (aplicadas, recusadas, vez → `codigo`),
+**5. Fechar.** Atualize o registro (aplicadas, recusadas, vez → `code`),
 reespelhe **as telas tocadas** e **regere o baseline** — se o baseline ficar
 velho, a rodada seguinte vai reapresentar como novidade tudo que você acabou de
 aplicar. Rodada que não fecha vira divergência silenciosa. Feche sempre com os
 três arquivos: **append** de uma linha em `design/figma-changelog.jsonl`,
-achados completos salvos em `design/figma-achados/<rodada>.md` se houver, e
+achados completos salvos em `design/figma-findings/<rodada>.md` se houver, e
 `design/figma-reference.json` regenerado se fundação ou estrutura mudou
 (skill `figma-convencoes`).
 
@@ -248,8 +255,8 @@ decisão.
 | gate | como verificar | bloqueia quando |
 |---|---|---|
 | **contraste** | `node <DSX>/tools/contrast.mjs "#fg" "#bg"` para cada par texto/fundo e UI/fundo que a proposta toca (imprime AA/AAA texto, texto grande e UI não textual), nos dois temas | texto < 4.5 (grande < 3), UI não textual < 3 |
-| **mudança de token** | aplicar via skill `tokens` (o snapshot vira diff DTCG com `node <DSX>/tools/figma/figma-para-tokens.mjs`) e rodar `node <DSX>/tools/build-tokens.mjs` | o build falha (par de contraste reprovado, chave do tema escuro sem par no claro, alias quebrado) — falha bloqueia, não vira aviso |
-| **padrão de interação** | comparar a proposta com `patterns/index.json` (campo `regra`, `status`, `componentes`). Ex.: erro movido para toast → `toast-alerta-inline`; formulário longo dentro de modal → `quando-evitar-modal` | a proposta contraria um padrão com `status: "evitar"` ou a `regra` de um padrão recomendado |
+| **mudança de token** | aplicar via skill `tokens` (o snapshot vira diff DTCG com `node <DSX>/tools/figma/figma-to-tokens.mjs`) e rodar `node <DSX>/tools/build-tokens.mjs` | o build falha (par de contraste reprovado, chave do tema escuro sem par no claro, alias quebrado) — falha bloqueia, não vira aviso |
+| **padrão de interação** | comparar a proposta com `patterns/index.json` (campo `regra`, `status`, `componentes`). Ex.: erro movido para toast → `toast-vs-inline-alert`; formulário longo dentro de modal → `when-to-avoid-modal` | a proposta contraria um padrão com `status: "evitar"` ou a `regra` de um padrão recomendado |
 | **acessibilidade** | skill `acessibilidade`: foco visível, alvo de toque ≥ 24 × 24 px (piso AA) e 44 px em toque, informação não só por cor, ordem de leitura | qualquer barreira — e o 2º canal removido é sempre gate |
 | **texto** | skill `ux-writing`: glossário do projeto, fórmulas de botão/erro/vazio, mesmo conceito = mesma palavra | texto que muda significado sem revisão, termo fora do glossário |
 | **classe `token`** | skill `tokens` | ver "mudança de token" |
@@ -274,14 +281,14 @@ próxima rodada não reabrir a mesma discussão.
 - A matriz de cobertura não fecha há duas rodadas → rode `figma-cobertura` antes
   de qualquer coisa nova.
 - A vez está em `design`, mas `## Pendentes` tem itens → a rodada anterior foi
-  declarada fechada sem estar. Volte a vez para `codigo` e termine o escopo.
+  declarada fechada sem estar. Volte a vez para `code` e termine o escopo.
 
 ## Quando o projeto nasceu no Figma
 
 O ciclo é o mesmo; o que muda é a semente. Não há espelho inicial — há
 **implementação** inicial (skill `figma-primeiro`). Três ajustes:
 
-- **A vez começa em `design`**, não em `codigo`. O Figma é a fonte enquanto o
+- **A vez começa em `design`**, não em `code`. O Figma é a fonte enquanto o
   código ainda não cobre o arquivo.
 - **O baseline é tirado no momento em que você implementa cada leva**, não ao
   fim de um espelho. Ele congela o que virou código; o que veio depois no Figma
@@ -296,15 +303,15 @@ Quando o código passa a cobrir o arquivo, a vez alterna normalmente e o
 
 O ponto de entrada é `/dsx:figma-iniciar`, que segue esta sequência.
 
-0. `/dsx:mapear`, se `.dsx/mapas/mapa-projeto.md` ainda não existir — entrega a
+0. `/dsx:mapear`, se `.dsx/maps/project-map.md` ainda não existir — entrega a
    cada passo abaixo a estrutura física do projeto em vez de cada um
    redescobri-la, e desce uma camada: a UI em si (páginas, modais, tokens,
    tipografia, ícones), a navegação entre telas, os passos dentro de cada
    tarefa, a jornada ao longo do tempo, o domínio de negócio por baixo de tudo,
    e o design system extraído com detecção de riscos de drift
-   (`design-system.json`, `hazards[]`). Se só existir o legado
-   `.claude/figma-claude/`, aceite-o e avise que ele será regravado em
-   `.dsx/mapas/` na próxima execução. `mapear` não chama `use_figma`, então o
+   (`design-system.json`, `hazards[]`). Se só existir um legado
+   (`.dsx/mapas/` com nomes em português, ou `.claude/figma-claude/`), aceite-o e avise que ele será regravado em
+   `.dsx/maps/` na próxima execução. `mapear` não chama `use_figma`, então o
    guarda da vez nunca o vê — rode em qualquer vez, inclusive `design`. Os
    mapas servem o DSX inteiro, não só o ciclo: `construir-ui` lê fluxos e
    domínio; `design-md` e `auditar-ds` leem `design-system.json`.
@@ -318,7 +325,7 @@ O ponto de entrada é `/dsx:figma-iniciar`, que segue esta sequência.
    empurra as mesmas correções para depois, onde custam mais.
 2. `/dsx:figma-levar` — o passo que de fato escreve no Figma. A fonte de verdade
    da ida é o `DESIGN.md` + os tokens do projeto (tokens DTCG →
-   `.dsx/mapas/design-system.json` → mapa de UI → tema detectado). Orquestra
+   `.dsx/maps/design-system.json` → mapa de UI → tema detectado). Orquestra
    `figma-fundacoes`, `figma-espelhar` e `figma-cobertura`, nesta ordem,
    tratando os mapas como pré-requisito duro em vez de cair num inventário por
    grep. É o único passo de toda a sequência que chama `use_figma` para
@@ -335,10 +342,10 @@ O ponto de entrada é `/dsx:figma-iniciar`, que segue esta sequência.
 6. Registro de sincronia criado, mais a primeira linha em
    `design/figma-changelog.jsonl` e o primeiro `design/figma-reference.json`
    (skill `figma-convencoes`) — os três nascem juntos, não em rodadas
-   separadas. `vez: design` só se o espelho de fato cobriu tudo a que se propôs
+   separadas. `turn: design` só se o espelho de fato cobriu tudo a que se propôs
    (confira a matriz de cobertura, e se alguma tela/fluxo/estado foi adiada
    explicitamente em vez de construída) — liste o que sobrou em `## Pendentes`
-   e mantenha `vez: codigo` até esvaziar. Um primeiro espelho grande costuma
+   e mantenha `turn: code` até esvaziar. Um primeiro espelho grande costuma
    rodar em várias passadas de agente com orçamento fixo cada; é normal uma
    delas adiar parte do próprio escopo, e normal isso ainda precisar de uma
    passada de acompanhamento antes de o arquivo estar pronto para entregar a um

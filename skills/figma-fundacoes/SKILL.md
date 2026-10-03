@@ -35,14 +35,14 @@ nesta ordem e pare no primeiro que existir:
    camadas da skill `tokens`: `primitives`, `semantic.light`, `semantic.dark`,
    `component`). Com eles, o caminho é a ponte da seção 2A — nada de
    reinterpretar o tema à mão.
-2. **`.dsx/mapas/design-system.json`** — a skill `mapear` já fez a extração
+2. **`.dsx/maps/design-system.json`** — a skill `mapear` já fez a extração
    ciente de framework (MUI / Tailwind v3/v4 / variáveis CSS, não heurística de
    grep) mais a detecção mecânica de *hazards* de drift entre os tokens
    declarados e o que o código usa de fato.
-3. **`.dsx/mapas/mapa-ui.json`** — o bloco `designSystem`, mais leve, do
+3. **`.dsx/maps/ui-map.json`** — o bloco `design_system`, mais leve, do
    mapeamento de UI (tokens de cor, escala de espaçamento, tamanhos de fonte,
    ícones em uso): dá para trabalhar, mas é menos profundo.
-4. **`.dsx/mapas/mapa-projeto.json`** — ao menos o arquivo de tema e o pacote
+4. **`.dsx/maps/project-map.json`** — ao menos o arquivo de tema e o pacote
    de ícones.
 5. **Tema detectado** — busque e pare no primeiro que existir:
 
@@ -55,8 +55,8 @@ ls DESIGN.md design/foundation.md docs/design-system.md .claude/*/design.md 2>/d
 grep -m1 -o '"@[^"]*icons[^"]*"' package.json
 ```
 
-**Compatibilidade:** ao procurar um mapa, leia primeiro `.dsx/mapas/`; se não
-existir, aceite o legado `.claude/figma-claude/` (`design-system.json`,
+**Compatibilidade:** ao procurar um mapa, leia primeiro `.dsx/maps/`; se não
+existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`design-system.json`,
 `ui-map.json`, `project-map.json`) e avise que ele será regravado no caminho
 novo na próxima execução de `mapear`.
 
@@ -91,9 +91,9 @@ idempotente para colar em `use_figma`:
 
 ```bash
 # plano (para revisar o que vai ser criado: coleções, modos, variáveis, aliases, scopes)
-node <DSX>/tools/figma/tokens-para-figma.mjs --tokens tokens/ --json
+node <DSX>/tools/figma/tokens-to-figma.mjs --tokens tokens/ --json
 # script para use_figma
-node <DSX>/tools/figma/tokens-para-figma.mjs --tokens tokens/ --script > /tmp/vars.js
+node <DSX>/tools/figma/tokens-to-figma.mjs --tokens tokens/ --script > /tmp/vars.js
 ```
 
 `--tokens` aponta para o diretório com `primitives.tokens.json`,
@@ -156,7 +156,7 @@ diga na amostra que ela está deliberadamente fora da semântica de estado.
 `Primitivos`, papéis (`space/stack-md`, `space/inset-lg`, `radius/control`) em
 `Semântico`. Sem DTCG, crie você as variáveis numéricas com raio, espaçamento,
 alturas e larguras fixas que o app usa de fato (escala do `DESIGN.md`, seção
-Layout, ou `.dsx/mapas/design-system.json`).
+Layout, ou `.dsx/maps/design-system.json`).
 
 **Estilos de texto.** A escala tipográfica do DSX (`font.size.*`,
 `font.lineHeight.*`, `font.weight.*`, `font.family.*` nos primitivos, e o bloco
@@ -182,15 +182,15 @@ grep -o 'd: "[^"]*"' node_modules/@pkg/icons/Nome.js | sed 's/^d: "//; s/"$//'
 ```
 
 O Figma **não aceita o `d` cru**: o parser de `vectorPaths` só entende
-`M/L/C/Q/Z` absolutos. Rode `tools/figma/normalizar-svg-path.cjs` antes
-(`node <DSX>/tools/figma/normalizar-svg-path.cjs "<d>"`) — ele converte
+`M/L/C/Q/Z` absolutos. Rode `tools/figma/normalize-svg-path.cjs` antes
+(`node <DSX>/tools/figma/normalize-svg-path.cjs "<d>"`) — ele converte
 `H/V/S/T` e, o mais importante, **fecha cada subpath com `Z`**. Sem isso, todo
 ícone com furo (círculo com miolo, documento com linhas) renderiza como borrão.
 
 Crie cada ícone como `COMPONENT` de 24×24 com o vetor em `(0,0)` e
 `constraints: SCALE` — assim a instância redimensiona junto. Ao instanciar em
 outro tamanho, use `i.rescale((size||18)/24)`, não `resize` (o prelúdio
-`tools/figma/preludio.js` já faz isso): `resize` muda a caixa e deixa o glifo
+`tools/figma/prelude.js` já faz isso): `resize` muda a caixa e deixa o glifo
 para trás.
 
 ## 5. Amostras que ensinam
@@ -208,7 +208,7 @@ nesta ordem:
    Onde NUNCA aparece);
 2. o contraste medido com `tools/contrast.mjs` contra o fundo em que o app
    realmente o usa;
-3. se `.dsx/mapas/design-system.json` existir, os `hazards[]` pertinentes —
+3. se `.dsx/maps/design-system.json` existir, os `hazards[]` pertinentes —
    "usado como hex cru em 3 lugares em vez deste token" é legenda melhor que
    qualquer uma improvisada.
 
@@ -272,7 +272,7 @@ verdade, não só que você a definiu: instancie um ícone em tamanho pequeno
 
 Achados desta fase (hex cru fora da paleta, divergência entre `DESIGN.md` e
 tokens, par que falha) usam a escala de severidade 0–4 da skill `revisar-ux` e
-vão para `design/figma-achados/<rodada>.md`.
+vão para `design/figma-findings/<rodada>.md`.
 
 ## Fechamento
 
@@ -281,4 +281,4 @@ das coleções de variáveis, dos estilos de texto, do frame de ícones e do chr
 criados nesta fase — é o que as fases seguintes (telas, diálogos) leem em vez
 de redescobrir. Se esta fase foi uma rodada própria (não a primeira fase de um
 espelho), acrescente uma linha em `design/figma-changelog.jsonl` (skill
-`figma-ciclo`) com `tokensAlterados` listando as variáveis criadas ou mudadas.
+`figma-ciclo`) com `tokens_changed` listando as variáveis criadas ou mudadas.

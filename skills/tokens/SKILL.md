@@ -32,7 +32,7 @@ node tools/palette.mjs "#3d5afe" --name brand            # JSON com contraste de
 node tools/palette.mjs "#3d5afe" --name brand --format dtcg
 ```
 - Rampa 50–950 em OKLCH (passos perceptualmente uniformes). Na prática, com texto branco o passo **600** costuma ser o primeiro ≥ 4.5:1 — confirme na saída.
-- Ação primária no tema claro: o primeiro passo com `contrasteBranco ≥ 4.5`. Texto de link: um passo mais escuro que a ação.
+- Ação primária no tema claro: o primeiro passo com `contrast_white ≥ 4.5`. Texto de link: um passo mais escuro que a ação.
 - Tema escuro: **não inverta a rampa**. Use passos claros (200–300) para ação com texto escuro, e superfícies 900–950.
 
 **Escala tipográfica**
@@ -61,8 +61,8 @@ node tools/build-tokens.mjs --tokens <projeto>/tokens          # gera <projeto>/
 
 **Ponte com o Figma**
 ```bash
-node tools/figma/tokens-para-figma.mjs --tokens <pasta> --script > /tmp/vars.js   # colar em use_figma (skill figma-fundacoes)
-node tools/figma/figma-para-tokens.mjs --snapshot <snapshot-full.json> --tokens <pasta> [--write]
+node tools/figma/tokens-to-figma.mjs --tokens <pasta> --script > /tmp/vars.js   # colar em use_figma (skill figma-fundacoes)
+node tools/figma/figma-to-tokens.mjs --snapshot <snapshot-full.json> --tokens <pasta> [--write]
 ```
 A volta (`--write`) só altera tokens existentes e roda o gate de contraste; variável nova no Figma é decisão desta skill, nunca criação automática.
 

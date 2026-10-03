@@ -104,7 +104,7 @@ e os estilos de texto.
 
 Diferença aí é sempre classe `token`, com efeito no app inteiro: entra no
 relatório com aviso e exige varredura de regressão nos dois temas. No DSX, ela
-não é aplicada à mão no CSS: `node tools/figma/figma-para-tokens.mjs` converte o
+não é aplicada à mão no CSS: `node tools/figma/figma-to-tokens.mjs` converte o
 snapshot em diff DTCG, e a skill `tokens` aplica e roda `tools/build-tokens.mjs`
 (que verifica o contraste de todos os pares declarados — falha bloqueia).
 

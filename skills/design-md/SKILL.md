@@ -19,7 +19,7 @@ Referência completa: `knowledge/design-system/design-md.md`. Template: `templat
 
 ## Modo A — Extrair de produto existente
 
-1. **Inventário real**: se `.dsx/mapas/design-system.json` existir (skill `mapear`), parta dele — já traz tokens por adaptador (MUI, Tailwind v3/v4, CSS vars, DTCG), valores em uso, `hazards[]` de drift e um rascunho de front matter. Senão, delegue ao subagente `extrator-design-system`. Levante: fonte de tokens (CSS vars, tema Tailwind/MUI, `*.tokens.json`), cores efetivamente usadas (conte ocorrências), escalas de fonte/espaço/raio, componentes compartilhados e seus estados.
+1. **Inventário real**: se `.dsx/maps/design-system.json` existir (skill `mapear`), parta dele — já traz tokens por adaptador (MUI, Tailwind v3/v4, CSS vars, DTCG), valores em uso, `hazards[]` de drift e um rascunho de front matter. Senão, delegue ao subagente `extrator-design-system`. Levante: fonte de tokens (CSS vars, tema Tailwind/MUI, `*.tokens.json`), cores efetivamente usadas (conte ocorrências), escalas de fonte/espaço/raio, componentes compartilhados e seus estados.
 2. **Nomeie por papel, não por aparência**: `primary`, `text-secondary`, `danger` — nunca `blue-500` no front matter. Valores usados uma única vez são candidatos a drift, não a token.
 3. **Escreva a prosa com evidência**: para cada regra, de onde ela veio (arquivo, tela). Marque com `(inferido)` tudo o que você deduziu sem ver explicitamente.
 4. **Faça/Não faça a partir de erros reais**: inconsistências encontradas no inventário viram "Não faça".

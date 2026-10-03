@@ -20,8 +20,8 @@ export function palette(baseHex) {
     const hex = oklchToHex({ l, c, h: base.h });
     out[step] = {
       hex,
-      contrasteBranco: +contrast(hex, '#ffffff').toFixed(2),
-      contrastePreto: +contrast(hex, '#000000').toFixed(2),
+      contrast_white: +contrast(hex, '#ffffff').toFixed(2),
+      contrast_black: +contrast(hex, '#000000').toFixed(2),
     };
   }
   return out;
@@ -36,7 +36,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const fmt = args.format ?? 'json';
   if (fmt === 'css') {
     console.log(':root {');
-    for (const [s, v] of Object.entries(p)) console.log(`  --color-${name}-${s}: ${v.hex}; /* ${v.contrasteBranco}:1 vs branco */`);
+    for (const [s, v] of Object.entries(p)) console.log(`  --color-${name}-${s}: ${v.hex}; /* ${v.contrast_white}:1 vs branco */`);
     console.log('}');
   } else if (fmt === 'dtcg') {
     const group = {};

@@ -1,0 +1,49 @@
+# Rubrica: qualidade de um DESIGN.md (espelha skills/design-md, Modo C).
+id: design-md
+version: 1
+max-score: 100
+bands:
+  robust: [90, 100]
+  usable-with-gaps: [75, 89]
+  review-before-use: [60, 74]
+  high-risk: [0, 59]
+
+gates:
+  - id: lint
+    evaluator: code
+    how: "node tools/lint-design-md.mjs DESIGN.md → 0 erros"
+  - id: fidelity
+    evaluator: human
+    how: "amostra de 5 telas/arquivos não contradiz os tokens e componentes do arquivo"
+  - id: essential-contrast
+    evaluator: code
+    how: "pares on-* e text-* sobre canvas/surface dentro do mínimo (já coberto pelo lint)"
+  - id: connected-to-agent
+    evaluator: code
+    how: "CLAUDE.md, AGENTS.md ou regra da ferramenta referencia DESIGN.md"
+  - id: no-conflict
+    evaluator: judge
+    how: "nenhuma regra de ferramenta (.cursor/rules, copilot-instructions) contradiz o DESIGN.md"
+
+criteria:
+  - { id: source-fidelity,     weight: 15, evaluator: human }
+  - { id: technical-validity,       weight: 10, evaluator: code }
+  - { id: semantic-tokens,      weight: 10, evaluator: judge }
+  - { id: intent-and-prose,       weight: 15, evaluator: judge }
+  - { id: components-and-states,  weight: 15, evaluator: judge }
+  - { id: accessibility,         weight: 15, evaluator: judge }
+  - { id: responsiveness,         weight: 8,  evaluator: judge }
+  - { id: guardrails,             weight: 5,  evaluator: judge }
+  - { id: agent-operation,    weight: 4,  evaluator: code }
+  - { id: maintenance,             weight: 3,  evaluator: code }
+
+generic-anchors:
+  # Aplique a cada critério e multiplique pela fração do peso.
+  0.0: "Ausente ou contraditório."
+  0.33: "Presente, mas genérico: o agente ainda precisaria adivinhar decisões centrais."
+  0.67: "Específico na maior parte; lacunas pontuais."
+  1.0: "Específico, verificável e com exemplos; a geração controlada não revela invenções neste critério."
+
+acceptance-test:
+  description: "Geração controlada: peça uma tela nova usando só o DESIGN.md e o código; cada valor/estado/componente inventado é uma lacuna."
+  attempts: 3

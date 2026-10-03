@@ -23,7 +23,7 @@
 - **Sinal:** sistemas interpretam objetivos e executam várias etapas sozinhos.
 - **Hipótese:** o design passa a definir portões de decisão, níveis de autonomia e fricção estratégica.
 - **Risco:** autonomia sem supervisão; boa parte de projetos agênticos pode ser abandonada por custo e governança fraca.
-- **Prudente hoje:** toda ação com consequência mostra o que vai fazer e pede confirmação proporcional ao risco ([confirmar-acao-da-ia](../../patterns/ia/confirmar-acao-da-ia.md)); registro legível do que foi feito; desfazer.
+- **Prudente hoje:** toda ação com consequência mostra o que vai fazer e pede confirmação proporcional ao risco ([confirm-ai-action](../../patterns/ai/confirm-ai-action.md)); registro legível do que foi feito; desfazer.
 
 ### 2. Interfaces contextuais e generativas
 - **Sinal:** telas montadas em tempo real conforme contexto.
@@ -35,13 +35,13 @@
 - **Sinal:** transparência deixa de ser texto legal e vira parte da interface.
 - **Hipótese:** origem do conteúdo, nível de certeza e histórico de ações tornam-se componentes padrão.
 - **Risco:** rótulo genérico "gerado por IA" que não informa nada; ou explicação demais, que sobrecarrega.
-- **Prudente hoje:** rotular com propósito ([rotular-conteudo-ia](../../patterns/ia/rotular-conteudo-ia.md)), mostrar fontes ([fontes-da-ia](../../patterns/ia/fontes-da-ia.md)) e incerteza ([incerteza-da-ia](../../patterns/ia/incerteza-da-ia.md)).
+- **Prudente hoje:** rotular com propósito ([label-ai-content](../../patterns/ai/label-ai-content.md)), mostrar fontes ([ai-sources](../../patterns/ai/ai-sources.md)) e incerteza ([ai-uncertainty](../../patterns/ai/ai-uncertainty.md)).
 
 ### 4. IA invisível
 - **Sinal:** automações antecipam necessidades e removem passos.
 - **Hipótese:** menos interação explícita, mais resultado pronto.
 - **Risco:** lógica relevante escondida; difícil retomar o controle; produto "parece não fazer nada".
-- **Prudente hoje:** mostrar o que foi feito automaticamente e como reverter ([revisar-resultado-da-ia](../../patterns/ia/revisar-resultado-da-ia.md)).
+- **Prudente hoje:** mostrar o que foi feito automaticamente e como reverter ([review-ai-output](../../patterns/ai/review-ai-output.md)).
 
 ### 5. Agentes como usuários
 - **Sinal:** agentes de software navegam, preenchem formulários e compram.
@@ -69,7 +69,7 @@
 ### 9. Avaliação do comportamento da IA
 - **Sinal:** times de UX passam a usar evals.
 - **Hipótese:** critérios de UX (interpretou o objetivo? pediu confirmação? comunicou incerteza? recuperou o erro?) entram nos conjuntos de avaliação.
-- **Prudente hoje:** escrever casos de teste para ambiguidade, falha e recuperação ([recuperar-erro-da-ia](../../patterns/ia/recuperar-erro-da-ia.md)).
+- **Prudente hoje:** escrever casos de teste para ambiguidade, falha e recuperação ([ai-error-recovery](../../patterns/ai/ai-error-recovery.md)).
 
 ### 10. Prêmio humano
 - **Sinal:** execução fica barata.

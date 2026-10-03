@@ -1,14 +1,14 @@
 ---
-id: <id-kebab-case>
-titulo: <Pergunta ou decisão que o padrão responde>
-categoria: <acoes | acessibilidade | autenticacao | busca-filtros | conteudo | dados | ecommerce | feedback | formularios | ia | modais | navegacao | ux-writing>
-componentes: [<componentes envolvidos>]
-tipo: <recomendacao | antipadrao | decisao-contextual | acessibilidade>
-impacto: <critico | alto | medio | baixo>
-status: <recomendado | usar-com-cautela | evitar>
-evidencia: <forte | moderada | emergente>
+id: <id-kebab-case-em-inglês>
+title: <Pergunta ou decisão que o padrão responde>
+category: <actions | accessibility | authentication | search-filters | content | data | ecommerce | feedback | forms | ai | modals | navigation | ux-writing>
+components: [<componentes envolvidos, em inglês kebab-case: button, modal, text-field…>]
+type: <recommendation | anti-pattern | contextual-decision | accessibility>
+impact: <critical | high | medium | low>
+status: <recommended | caution | avoid>
+evidence: <strong | moderate | weak | emerging>
 wcag: [<critérios WCAG 2.2 relevantes, ex.: "1.4.11", "2.4.7">]
-relacionados: [<ids de outros padrões>]
+related: [<ids de outros padrões>]
 ---
 
 # <Título>

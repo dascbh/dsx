@@ -1,78 +1,47 @@
 [
   {
-    "id": "alvo-de-toque",
-    "titulo": "Qual deve ser o tamanho mínimo de um alvo de toque?",
-    "categoria": "acessibilidade",
-    "componentes": [
-      "botao",
-      "botao-de-icone",
-      "checkbox",
-      "radio",
-      "switch",
-      "toolbar"
-    ],
-    "tipo": "acessibilidade",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "2.5.8",
-      "2.5.5",
-      "2.4.7",
-      "4.1.2"
-    ],
-    "relacionados": [
-      "botao-icone-e-texto",
-      "icone-sem-texto",
-      "foco-de-teclado",
-      "posicao-de-acoes"
-    ],
-    "regra": "Dimensione a área interativa, não o desenho: mínimo de 24 × 24 CSS px (piso AA) e 44–48 unidades para controles de toque, com espaço entre vizinhos.",
-    "arquivo": "patterns/acessibilidade/alvo-de-toque.md"
-  },
-  {
-    "id": "foco-de-teclado",
-    "titulo": "Como indicar o foco de teclado?",
-    "categoria": "acessibilidade",
-    "componentes": [
-      "botao",
+    "id": "keyboard-focus",
+    "title": "Como indicar o foco de teclado?",
+    "category": "accessibility",
+    "components": [
+      "button",
       "link",
-      "campo",
+      "field",
       "menu"
     ],
-    "tipo": "acessibilidade",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "accessibility",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.4.7",
       "1.4.11",
       "2.4.11",
       "2.4.13"
     ],
-    "relacionados": [
-      "alvo-de-toque",
-      "nao-so-cor",
-      "fechar-modal",
-      "texto-de-link"
+    "related": [
+      "touch-target",
+      "not-color-alone",
+      "close-modal",
+      "link-text"
     ],
-    "regra": "Todo controle acionável por teclado deve mostrar indicador de foco visível, com contraste de pelo menos 3:1 frente às cores vizinhas, sem ficar coberto por elementos fixos.",
-    "arquivo": "patterns/acessibilidade/foco-de-teclado.md"
+    "rule": "Todo controle acionável por teclado deve mostrar indicador de foco visível, com contraste de pelo menos 3:1 frente às cores vizinhas, sem ficar coberto por elementos fixos.",
+    "file": "patterns/accessibility/keyboard-focus.md"
   },
   {
-    "id": "nao-so-cor",
-    "titulo": "Por que não usar apenas cor para comunicar erros?",
-    "categoria": "acessibilidade",
-    "componentes": [
-      "campo-de-formulario",
-      "mensagem-de-erro",
-      "icone",
-      "grafico"
+    "id": "not-color-alone",
+    "title": "Por que não usar apenas cor para comunicar erros?",
+    "category": "accessibility",
+    "components": [
+      "form-field",
+      "error-message",
+      "icon",
+      "chart"
     ],
-    "tipo": "acessibilidade",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "accessibility",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "1.4.1",
       "1.4.11",
@@ -80,341 +49,61 @@
       "3.3.1",
       "1.3.1"
     ],
-    "relacionados": [
-      "erros-em-formularios",
-      "campos-obrigatorios",
-      "posicao-do-erro-no-campo",
-      "confirmacao-de-sucesso"
+    "related": [
+      "form-errors",
+      "required-fields",
+      "field-error-position",
+      "success-confirmation"
     ],
-    "regra": "Cor reforça o estado, mas nunca é o único sinal: acompanhe-a de texto que diga o problema, perto do elemento afetado.",
-    "arquivo": "patterns/acessibilidade/nao-so-cor.md"
+    "rule": "Cor reforça o estado, mas nunca é o único sinal: acompanhe-a de texto que diga o problema, perto do elemento afetado.",
+    "file": "patterns/accessibility/not-color-alone.md"
   },
   {
-    "id": "acao-destrutiva",
-    "titulo": "Como tratar ações destrutivas?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "modal",
-      "snackbar"
+    "id": "touch-target",
+    "title": "Qual deve ser o tamanho mínimo de um alvo de toque?",
+    "category": "accessibility",
+    "components": [
+      "button",
+      "icon-button",
+      "checkbox",
+      "radio",
+      "switch",
+      "toolbar"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "accessibility",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
-      "3.3.4",
-      "2.4.3",
-      "1.4.1",
-      "2.1.2"
-    ],
-    "relacionados": [
-      "confirmar-exclusao",
-      "desfazer",
-      "confirmar-acao",
-      "fechar-modal",
-      "hierarquia-de-botoes"
-    ],
-    "regra": "Ajuste a proteção ao impacto, à frequência e à reversibilidade: prefira Desfazer ou arquivar; reserve confirmação com rótulo específico para ações raras, amplas ou irreversíveis.",
-    "arquivo": "patterns/acoes/acao-destrutiva.md"
-  },
-  {
-    "id": "botao-desabilitado",
-    "titulo": "Esconder ou desabilitar uma ação indisponível?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "botao-desabilitado",
-      "tooltip"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
-    "wcag": [
-      "4.1.2",
-      "2.1.1",
-      "1.4.1",
-      "1.4.3",
-      "2.4.7"
-    ],
-    "relacionados": [
-      "hierarquia-de-botoes",
-      "clique-duplo-em-envio",
-      "mensagem-de-erro-util",
-      "campos-obrigatorios"
-    ],
-    "regra": "Esconda a ação irrelevante; mantenha visível e explicada a ação central que está temporariamente bloqueada; nunca desabilite sem dizer por quê.",
-    "arquivo": "patterns/acoes/botao-desabilitado.md"
-  },
-  {
-    "id": "botao-flutuante",
-    "titulo": "Quando usar botão flutuante?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao-flutuante",
-      "fab",
-      "botao"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
-    "wcag": [
-      "4.1.2",
       "2.5.8",
-      "2.1.1",
+      "2.5.5",
       "2.4.7",
-      "2.3.3"
+      "4.1.2"
     ],
-    "relacionados": [
-      "icone-sem-texto",
-      "botao-icone-e-texto",
-      "hierarquia-de-botoes",
-      "alvo-de-toque"
+    "related": [
+      "icon-and-text-button",
+      "icon-only-button",
+      "keyboard-focus",
+      "action-placement"
     ],
-    "regra": "Use botão flutuante somente para uma única ação primária, frequente e construtiva, sem cobrir conteúdo nem competir com a navegação.",
-    "arquivo": "patterns/acoes/botao-flutuante.md"
+    "rule": "Dimensione a área interativa, não o desenho: mínimo de 24 × 24 CSS px (piso AA) e 44–48 unidades para controles de toque, com espaço entre vizinhos.",
+    "file": "patterns/accessibility/touch-target.md"
   },
   {
-    "id": "botao-icone-e-texto",
-    "titulo": "Botões devem ter ícone e texto?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "botao-de-icone",
-      "icone"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
-    "wcag": [
-      "2.5.3",
-      "4.1.2",
-      "1.1.1",
-      "2.1.1"
-    ],
-    "relacionados": [
-      "icone-sem-texto",
-      "texto-de-botao",
-      "alvo-de-toque",
-      "hierarquia-de-botoes"
-    ],
-    "regra": "Use ícone mais texto quando a ação for pouco familiar, importante ou destrutiva; use só ícone apenas em ações muito conhecidas e compactas, sempre com nome acessível.",
-    "arquivo": "patterns/acoes/botao-icone-e-texto.md"
-  },
-  {
-    "id": "clique-duplo-em-envio",
-    "titulo": "Como evitar cliques múltiplos durante o carregamento de uma ação?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "formulario"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "4.1.3",
-      "2.1.1"
-    ],
-    "relacionados": [
-      "botao-desabilitado",
-      "tentar-novamente",
-      "confirmacao-de-sucesso",
-      "preservar-dados-apos-erro"
-    ],
-    "regra": "Valide primeiro; na primeira submissão válida, mostre o processamento no próprio botão, ignore novas ativações da mesma ação e garanta idempotência no servidor.",
-    "arquivo": "patterns/acoes/clique-duplo-em-envio.md"
-  },
-  {
-    "id": "confirmar-acao",
-    "titulo": "Quando pedir confirmação antes de uma ação?",
-    "categoria": "acoes",
-    "componentes": [
-      "modal-de-confirmacao",
-      "toast",
-      "etapa-de-revisao"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "critico",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.4",
-      "2.1.1",
-      "2.4.3",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "desfazer",
-      "confirmar-exclusao",
-      "acao-destrutiva",
-      "quando-usar-modal"
-    ],
-    "regra": "Só peça confirmação para ação irreversível ou de alto custo; em ações rotineiras e recuperáveis, execute e ofereça \"Desfazer\".",
-    "arquivo": "patterns/acoes/confirmar-acao.md"
-  },
-  {
-    "id": "confirmar-exclusao",
-    "titulo": "Quando pedir confirmação antes de excluir?",
-    "categoria": "acoes",
-    "componentes": [
+    "id": "action-placement",
+    "title": "Onde posicionar ações primárias e secundárias?",
+    "category": "actions",
+    "components": [
+      "button",
+      "button-group",
+      "form",
       "modal",
-      "botao",
-      "snackbar"
+      "side-panel"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.4",
-      "2.4.3",
-      "2.1.2",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "acao-destrutiva",
-      "desfazer",
-      "confirmar-acao",
-      "fechar-modal"
-    ],
-    "regra": "Peça confirmação só quando a exclusão for irreversível, ampla ou difícil de recuperar; nos demais casos, execute e ofereça \"Desfazer\".",
-    "arquivo": "patterns/acoes/confirmar-exclusao.md"
-  },
-  {
-    "id": "desfazer",
-    "titulo": "Quando oferecer a opção Desfazer?",
-    "categoria": "acoes",
-    "componentes": [
-      "toast",
-      "snackbar",
-      "botao-desfazer"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.3",
-      "2.1.1",
-      "2.2.1",
-      "3.3.4",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "confirmar-acao",
-      "confirmar-exclusao",
-      "acao-destrutiva",
-      "duracao-de-toast",
-      "toast-alerta-inline"
-    ],
-    "regra": "Ofereça \"Desfazer\" logo após uma ação reversível iniciada pela pessoa, com texto que diga o que mudou, e só se a reversão restaurar o estado completo.",
-    "arquivo": "patterns/acoes/desfazer.md"
-  },
-  {
-    "id": "hierarquia-de-botoes",
-    "titulo": "Como definir a hierarquia entre botão primário e secundário?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "grupo-de-botoes"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "1.4.1",
-      "1.4.3",
-      "2.4.7",
-      "2.4.3"
-    ],
-    "relacionados": [
-      "posicao-de-acoes",
-      "texto-de-botao",
-      "botao-desabilitado",
-      "link-vs-botao"
-    ],
-    "regra": "Em cada grupo de ações, dê a maior ênfase a uma única ação principal e trate as alternativas com ênfase menor, sempre visíveis e nunca diferenciadas só por cor.",
-    "arquivo": "patterns/acoes/hierarquia-de-botoes.md"
-  },
-  {
-    "id": "icone-sem-texto",
-    "titulo": "Quando um botão pode ter só ícone, sem texto?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "botao-de-icone",
-      "tooltip"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
-    "wcag": [
-      "1.1.1",
-      "4.1.2",
-      "2.4.7",
-      "2.5.8",
-      "1.4.11",
-      "2.5.3"
-    ],
-    "relacionados": [
-      "botao-icone-e-texto",
-      "texto-de-botao",
-      "alvo-de-toque",
-      "link-vs-botao"
-    ],
-    "regra": "Use ícone sozinho apenas para ações universalmente reconhecidas no contexto, sempre com nome acessível; se o ícone precisa de explicação, mantenha o rótulo visível.",
-    "arquivo": "patterns/acoes/icone-sem-texto.md"
-  },
-  {
-    "id": "link-vs-botao",
-    "titulo": "Link ou botão: qual usar?",
-    "categoria": "acoes",
-    "componentes": [
-      "link",
-      "botao"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.2",
-      "2.1.1",
-      "2.4.4",
-      "2.4.7",
-      "1.3.1"
-    ],
-    "relacionados": [
-      "texto-de-link",
-      "texto-de-botao",
-      "link-em-nova-aba",
-      "icone-sem-texto"
-    ],
-    "regra": "Se a pessoa é levada a outro lugar, use link (`<a href>`); se algo acontece no ponto em que ela está, use botão (`<button>`). Defina a semântica antes do visual.",
-    "arquivo": "patterns/acoes/link-vs-botao.md"
-  },
-  {
-    "id": "posicao-de-acoes",
-    "titulo": "Onde posicionar ações primárias e secundárias?",
-    "categoria": "acoes",
-    "componentes": [
-      "botao",
-      "grupo-de-botoes",
-      "formulario",
-      "modal",
-      "painel-lateral"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "2.4.3",
       "2.4.7",
@@ -422,86 +111,543 @@
       "2.5.8",
       "1.3.2"
     ],
-    "relacionados": [
-      "hierarquia-de-botoes",
-      "texto-de-botao",
-      "fechar-modal",
-      "foco-de-teclado"
+    "related": [
+      "button-hierarchy",
+      "button-text",
+      "close-modal",
+      "keyboard-focus"
     ],
-    "regra": "Defina uma única ação principal pelo objetivo da tarefa, agrupe as alternativas ao lado dela com menor ênfase e mantenha a mesma posição em telas equivalentes.",
-    "arquivo": "patterns/acoes/posicao-de-acoes.md"
+    "rule": "Defina uma única ação principal pelo objetivo da tarefa, agrupe as alternativas ao lado dela com menor ênfase e mantenha a mesma posição em telas equivalentes.",
+    "file": "patterns/actions/action-placement.md"
   },
   {
-    "id": "confirmar-senha",
-    "titulo": "Quando pedir confirmação de senha?",
-    "categoria": "autenticacao",
-    "componentes": [
-      "campo-de-senha",
-      "mostrar-senha",
-      "reautenticacao",
+    "id": "button-hierarchy",
+    "title": "Como definir a hierarquia entre botão primário e secundário?",
+    "category": "actions",
+    "components": [
+      "button",
+      "button-group"
+    ],
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "1.4.1",
+      "1.4.3",
+      "2.4.7",
+      "2.4.3"
+    ],
+    "related": [
+      "action-placement",
+      "button-text",
+      "disabled-button",
+      "link-vs-button"
+    ],
+    "rule": "Em cada grupo de ações, dê a maior ênfase a uma única ação principal e trate as alternativas com ênfase menor, sempre visíveis e nunca diferenciadas só por cor.",
+    "file": "patterns/actions/button-hierarchy.md"
+  },
+  {
+    "id": "confirm-action",
+    "title": "Quando pedir confirmação antes de uma ação?",
+    "category": "actions",
+    "components": [
+      "confirmation-modal",
+      "toast",
+      "review-step"
+    ],
+    "type": "contextual-decision",
+    "impact": "critical",
+    "status": "caution",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.4",
+      "2.1.1",
+      "2.4.3",
+      "1.4.1"
+    ],
+    "related": [
+      "undo",
+      "confirm-deletion",
+      "destructive-action",
+      "when-to-use-modal"
+    ],
+    "rule": "Só peça confirmação para ação irreversível ou de alto custo; em ações rotineiras e recuperáveis, execute e ofereça \"Desfazer\".",
+    "file": "patterns/actions/confirm-action.md"
+  },
+  {
+    "id": "confirm-deletion",
+    "title": "Quando pedir confirmação antes de excluir?",
+    "category": "actions",
+    "components": [
+      "modal",
+      "button",
+      "snackbar"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.4",
+      "2.4.3",
+      "2.1.2",
+      "1.4.1"
+    ],
+    "related": [
+      "destructive-action",
+      "undo",
+      "confirm-action",
+      "close-modal"
+    ],
+    "rule": "Peça confirmação só quando a exclusão for irreversível, ampla ou difícil de recuperar; nos demais casos, execute e ofereça \"Desfazer\".",
+    "file": "patterns/actions/confirm-deletion.md"
+  },
+  {
+    "id": "destructive-action",
+    "title": "Como tratar ações destrutivas?",
+    "category": "actions",
+    "components": [
+      "button",
+      "modal",
+      "snackbar"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "3.3.4",
+      "2.4.3",
+      "1.4.1",
+      "2.1.2"
+    ],
+    "related": [
+      "confirm-deletion",
+      "undo",
+      "confirm-action",
+      "close-modal",
+      "button-hierarchy"
+    ],
+    "rule": "Ajuste a proteção ao impacto, à frequência e à reversibilidade: prefira Desfazer ou arquivar; reserve confirmação com rótulo específico para ações raras, amplas ou irreversíveis.",
+    "file": "patterns/actions/destructive-action.md"
+  },
+  {
+    "id": "disabled-button",
+    "title": "Esconder ou desabilitar uma ação indisponível?",
+    "category": "actions",
+    "components": [
+      "button",
+      "disabled-button",
+      "tooltip"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "moderate",
+    "wcag": [
+      "4.1.2",
+      "2.1.1",
+      "1.4.1",
+      "1.4.3",
+      "2.4.7"
+    ],
+    "related": [
+      "button-hierarchy",
+      "double-submit",
+      "helpful-error-message",
+      "required-fields"
+    ],
+    "rule": "Esconda a ação irrelevante; mantenha visível e explicada a ação central que está temporariamente bloqueada; nunca desabilite sem dizer por quê.",
+    "file": "patterns/actions/disabled-button.md"
+  },
+  {
+    "id": "double-submit",
+    "title": "Como evitar cliques múltiplos durante o carregamento de uma ação?",
+    "category": "actions",
+    "components": [
+      "button",
+      "form"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "4.1.3",
+      "2.1.1"
+    ],
+    "related": [
+      "disabled-button",
+      "retry",
+      "success-confirmation",
+      "preserve-data-after-error"
+    ],
+    "rule": "Valide primeiro; na primeira submissão válida, mostre o processamento no próprio botão, ignore novas ativações da mesma ação e garanta idempotência no servidor.",
+    "file": "patterns/actions/double-submit.md"
+  },
+  {
+    "id": "floating-action-button",
+    "title": "Quando usar botão flutuante?",
+    "category": "actions",
+    "components": [
+      "floating-action-button",
+      "fab",
+      "button"
+    ],
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
+    "wcag": [
+      "4.1.2",
+      "2.5.8",
+      "2.1.1",
+      "2.4.7",
+      "2.3.3"
+    ],
+    "related": [
+      "icon-only-button",
+      "icon-and-text-button",
+      "button-hierarchy",
+      "touch-target"
+    ],
+    "rule": "Use botão flutuante somente para uma única ação primária, frequente e construtiva, sem cobrir conteúdo nem competir com a navegação.",
+    "file": "patterns/actions/floating-action-button.md"
+  },
+  {
+    "id": "icon-and-text-button",
+    "title": "Botões devem ter ícone e texto?",
+    "category": "actions",
+    "components": [
+      "button",
+      "icon-button",
+      "icon"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "moderate",
+    "wcag": [
+      "2.5.3",
+      "4.1.2",
+      "1.1.1",
+      "2.1.1"
+    ],
+    "related": [
+      "icon-only-button",
+      "button-text",
+      "touch-target",
+      "button-hierarchy"
+    ],
+    "rule": "Use ícone mais texto quando a ação for pouco familiar, importante ou destrutiva; use só ícone apenas em ações muito conhecidas e compactas, sempre com nome acessível.",
+    "file": "patterns/actions/icon-and-text-button.md"
+  },
+  {
+    "id": "icon-only-button",
+    "title": "Quando um botão pode ter só ícone, sem texto?",
+    "category": "actions",
+    "components": [
+      "button",
+      "icon-button",
+      "tooltip"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "strong",
+    "wcag": [
+      "1.1.1",
+      "4.1.2",
+      "2.4.7",
+      "2.5.8",
+      "1.4.11",
+      "2.5.3"
+    ],
+    "related": [
+      "icon-and-text-button",
+      "button-text",
+      "touch-target",
+      "link-vs-button"
+    ],
+    "rule": "Use ícone sozinho apenas para ações universalmente reconhecidas no contexto, sempre com nome acessível; se o ícone precisa de explicação, mantenha o rótulo visível.",
+    "file": "patterns/actions/icon-only-button.md"
+  },
+  {
+    "id": "link-vs-button",
+    "title": "Link ou botão: qual usar?",
+    "category": "actions",
+    "components": [
+      "link",
+      "button"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.2",
+      "2.1.1",
+      "2.4.4",
+      "2.4.7",
+      "1.3.1"
+    ],
+    "related": [
+      "link-text",
+      "button-text",
+      "link-in-new-tab",
+      "icon-only-button"
+    ],
+    "rule": "Se a pessoa é levada a outro lugar, use link (`<a href>`); se algo acontece no ponto em que ela está, use botão (`<button>`). Defina a semântica antes do visual.",
+    "file": "patterns/actions/link-vs-button.md"
+  },
+  {
+    "id": "undo",
+    "title": "Quando oferecer a opção Desfazer?",
+    "category": "actions",
+    "components": [
+      "toast",
+      "snackbar",
+      "undo-button"
+    ],
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.3",
+      "2.1.1",
+      "2.2.1",
+      "3.3.4",
+      "1.4.1"
+    ],
+    "related": [
+      "confirm-action",
+      "confirm-deletion",
+      "destructive-action",
+      "toast-duration",
+      "toast-vs-inline-alert"
+    ],
+    "rule": "Ofereça \"Desfazer\" logo após uma ação reversível iniciada pela pessoa, com texto que diga o que mudou, e só se a reversão restaurar o estado completo.",
+    "file": "patterns/actions/undo.md"
+  },
+  {
+    "id": "ai-error-recovery",
+    "title": "Como oferecer recuperação quando a IA falha?",
+    "category": "ai",
+    "components": [
+      "alert",
+      "button",
+      "error-message"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "3.3.1",
+      "3.3.3",
+      "4.1.3",
+      "1.4.1"
+    ],
+    "related": [
+      "retry",
+      "ai-uncertainty",
+      "confirm-ai-action",
+      "technical-error-code",
+      "helpful-error-message"
+    ],
+    "rule": "Identifique a etapa que falhou, explique a causa em linguagem simples, preserve o pedido e o trabalho, e ofereça ao menos uma ação de recuperação específica no mesmo contexto.",
+    "file": "patterns/ai/ai-error-recovery.md"
+  },
+  {
+    "id": "ai-sources",
+    "title": "Como mostrar fontes e critérios nas respostas de IA?",
+    "category": "ai",
+    "components": [
+      "citation",
+      "sources-panel",
+      "ai-response",
+      "link"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "2.1.1",
+      "2.4.4",
+      "2.4.7",
+      "1.4.1",
+      "4.1.2"
+    ],
+    "related": [
+      "label-ai-content",
+      "ai-uncertainty",
+      "review-ai-output",
+      "confirm-ai-action"
+    ],
+    "rule": "Ligue cada afirmação relevante à fonte que a sustenta, deixe a fonte abrível e, em saídas de alto impacto, mostre também os critérios, dados e limites usados.",
+    "file": "patterns/ai/ai-sources.md"
+  },
+  {
+    "id": "ai-uncertainty",
+    "title": "Como comunicar limites e incerteza de respostas de IA?",
+    "category": "ai",
+    "components": [
+      "notice",
+      "label",
+      "confidence-indicator"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "1.4.1",
+      "4.1.3",
+      "2.2.1",
+      "3.1.5"
+    ],
+    "related": [
+      "label-ai-content",
+      "ai-sources",
+      "review-ai-output",
+      "confirm-ai-action",
+      "ai-error-recovery"
+    ],
+    "rule": "Comunique a incerteza perto do resultado, com linguagem proporcional ao desempenho real e ligada a uma ação concreta (conferir, comparar, ver fontes, pedir revisão); mostre número de confiança só se for válido e compreensível.",
+    "file": "patterns/ai/ai-uncertainty.md"
+  },
+  {
+    "id": "confirm-ai-action",
+    "title": "Quando pedir confirmação antes de uma ação executada pela IA?",
+    "category": "ai",
+    "components": [
+      "modal",
+      "button",
+      "action-summary"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "3.3.4",
+      "2.4.3",
+      "4.1.3",
+      "1.4.1"
+    ],
+    "related": [
+      "confirm-action",
+      "destructive-action",
+      "review-ai-output",
+      "ai-error-recovery",
+      "undo"
+    ],
+    "rule": "A IA prepara a ação sem executá-la; peça confirmação explícita imediatamente antes de qualquer efeito relevante, externo, destrutivo, financeiro ou difícil de reverter, mostrando alvo, escopo e consequência.",
+    "file": "patterns/ai/confirm-ai-action.md"
+  },
+  {
+    "id": "label-ai-content",
+    "title": "Como sinalizar que um conteúdo foi gerado por IA?",
+    "category": "ai",
+    "components": [
+      "tag",
+      "chip",
+      "tooltip"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "1.4.1",
+      "1.1.1",
+      "1.4.13",
+      "2.1.1"
+    ],
+    "related": [
+      "ai-uncertainty",
+      "ai-sources",
+      "review-ai-output",
+      "confirm-ai-action"
+    ],
+    "rule": "Rotule com texto claro, junto ao conteúdo, tudo o que a IA gerou ou transformou de forma material, delimitando o escopo exato e sem sugerir revisão ou exatidão que não existem.",
+    "file": "patterns/ai/label-ai-content.md"
+  },
+  {
+    "id": "review-ai-output",
+    "title": "Como deixar pessoas revisarem e editarem resultados gerados por IA?",
+    "category": "ai",
+    "components": [
+      "text-field",
+      "editor",
+      "ai-suggestion",
+      "button"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "2.1.1",
+      "2.4.7",
+      "4.1.3",
+      "1.4.1",
+      "2.4.3"
+    ],
+    "related": [
+      "confirm-ai-action",
+      "label-ai-content",
+      "ai-uncertainty",
+      "ai-error-recovery"
+    ],
+    "rule": "Apresente todo resultado de IA como proposta que a pessoa pode aceitar, editar, refinar, regenerar ou descartar antes que ele afete uma decisão, comunicação ou fluxo.",
+    "file": "patterns/ai/review-ai-output.md"
+  },
+  {
+    "id": "confirm-password",
+    "title": "Quando pedir confirmação de senha?",
+    "category": "authentication",
+    "components": [
+      "password-field",
+      "show-password",
+      "reauthentication",
       "mfa"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "critico",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "critical",
+    "status": "caution",
+    "evidence": "strong",
     "wcag": [
       "3.3.8",
       "1.3.5",
       "3.3.2"
     ],
-    "relacionados": [
-      "mostrar-senha",
-      "requisitos-de-senha",
-      "recuperar-senha",
-      "preservar-dados-apos-erro"
+    "related": [
+      "show-password",
+      "password-requirements",
+      "password-recovery",
+      "preserve-data-after-error"
     ],
-    "regra": "Não repita o campo de senha por padrão; use um único campo com \"mostrar senha\" na criação e reautentique apenas antes de ações sensíveis.",
-    "arquivo": "patterns/autenticacao/confirmar-senha.md"
+    "rule": "Não repita o campo de senha por padrão; use um único campo com \"mostrar senha\" na criação e reautentique apenas antes de ações sensíveis.",
+    "file": "patterns/authentication/confirm-password.md"
   },
   {
-    "id": "mostrar-senha",
-    "titulo": "Mostrar ou ocultar senha: como deve funcionar?",
-    "categoria": "autenticacao",
-    "componentes": [
-      "campo-de-senha",
-      "botao-de-visibilidade"
+    "id": "password-recovery",
+    "title": "Como criar uma recuperação de senha clara?",
+    "category": "authentication",
+    "components": [
+      "forgot-password-link",
+      "identifier-field",
+      "code-field",
+      "reset-form"
     ],
-    "tipo": "recomendacao",
-    "impacto": "critico",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.8",
-      "4.1.2",
-      "2.1.1",
-      "2.5.8",
-      "1.3.5",
-      "2.4.7"
-    ],
-    "relacionados": [
-      "requisitos-de-senha",
-      "confirmar-senha",
-      "recuperar-senha",
-      "label-vs-placeholder"
-    ],
-    "regra": "Oculte a senha por padrão e ofereça um botão opcional, com nome acessível, que alterna a visibilidade sem apagar o valor, mover o foco ou bloquear colar e gerenciadores de senha.",
-    "arquivo": "patterns/autenticacao/mostrar-senha.md"
-  },
-  {
-    "id": "recuperar-senha",
-    "titulo": "Como criar uma recuperação de senha clara?",
-    "categoria": "autenticacao",
-    "componentes": [
-      "link-esqueci-senha",
-      "campo-de-identificador",
-      "campo-de-codigo",
-      "formulario-de-redefinicao"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "critico",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "critical",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "3.3.2",
       "3.3.1",
@@ -509,29 +655,29 @@
       "3.3.8",
       "2.1.1"
     ],
-    "relacionados": [
-      "requisitos-de-senha",
-      "mostrar-senha",
-      "confirmar-senha",
-      "sessao-expirada",
-      "erros-em-formularios"
+    "related": [
+      "password-requirements",
+      "show-password",
+      "confirm-password",
+      "session-expired",
+      "form-errors"
     ],
-    "regra": "Disponibilize \"Esqueci minha senha\" perto do login, dê resposta neutra que não revele se a conta existe, envie link ou código de uso único com validade e descreva o passo seguinte e as alternativas.",
-    "arquivo": "patterns/autenticacao/recuperar-senha.md"
+    "rule": "Disponibilize \"Esqueci minha senha\" perto do login, dê resposta neutra que não revele se a conta existe, envie link ou código de uso único com validade e descreva o passo seguinte e as alternativas.",
+    "file": "patterns/authentication/password-recovery.md"
   },
   {
-    "id": "requisitos-de-senha",
-    "titulo": "Como informar os requisitos de senha?",
-    "categoria": "autenticacao",
-    "componentes": [
-      "campo-de-senha",
-      "texto-de-ajuda",
-      "formulario"
+    "id": "password-requirements",
+    "title": "Como informar os requisitos de senha?",
+    "category": "authentication",
+    "components": [
+      "password-field",
+      "help-text",
+      "form"
     ],
-    "tipo": "recomendacao",
-    "impacto": "critico",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "critical",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "3.3.8",
       "1.3.5",
@@ -539,29 +685,29 @@
       "4.1.3",
       "3.3.2"
     ],
-    "relacionados": [
-      "mostrar-senha",
-      "confirmar-senha",
-      "recuperar-senha",
-      "momento-da-validacao"
+    "related": [
+      "show-password",
+      "confirm-password",
+      "password-recovery",
+      "validation-timing"
     ],
-    "regra": "Mostre os requisitos junto ao campo antes da digitação, priorize comprimento e bloqueio de senhas comuns em vez de regras de composição arbitrárias, e nunca impeça colar ou gerenciadores de senha.",
-    "arquivo": "patterns/autenticacao/requisitos-de-senha.md"
+    "rule": "Mostre os requisitos junto ao campo antes da digitação, priorize comprimento e bloqueio de senhas comuns em vez de regras de composição arbitrárias, e nunca impeça colar ou gerenciadores de senha.",
+    "file": "patterns/authentication/password-requirements.md"
   },
   {
-    "id": "sessao-expirada",
-    "titulo": "Como comunicar sessão expirada?",
-    "categoria": "autenticacao",
-    "componentes": [
-      "dialogo-modal",
-      "mensagem-de-estado",
-      "temporizador",
-      "botao"
+    "id": "session-expired",
+    "title": "Como comunicar sessão expirada?",
+    "category": "authentication",
+    "components": [
+      "modal-dialog",
+      "status-message",
+      "timer",
+      "button"
     ],
-    "tipo": "recomendacao",
-    "impacto": "critico",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "critical",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.2.1",
       "2.2.6",
@@ -569,172 +715,86 @@
       "2.4.3",
       "2.1.1"
     ],
-    "relacionados": [
-      "preservar-dados-apos-erro",
-      "autosave-vs-salvar",
-      "falha-temporaria",
-      "recuperar-senha",
-      "quando-usar-modal"
+    "related": [
+      "preserve-data-after-error",
+      "autosave-vs-save",
+      "temporary-failure",
+      "password-recovery",
+      "when-to-use-modal"
     ],
-    "regra": "Avise antes do vencimento com o tempo restante e uma ação \"Continuar sessão\"; depois do vencimento, explique o motivo, proteja dados sensíveis e leve à reautenticação com retorno ao contexto seguro.",
-    "arquivo": "patterns/autenticacao/sessao-expirada.md"
+    "rule": "Avise antes do vencimento com o tempo restante e uma ação \"Continuar sessão\"; depois do vencimento, explique o motivo, proteja dados sensíveis e leve à reautenticação com retorno ao contexto seguro.",
+    "file": "patterns/authentication/session-expired.md"
   },
   {
-    "id": "aplicacao-de-filtros",
-    "titulo": "Filtros devem ser aplicados automaticamente?",
-    "categoria": "busca-filtros",
-    "componentes": [
-      "filtro",
-      "painel-de-filtros",
-      "botao-aplicar",
-      "lista-de-resultados"
+    "id": "show-password",
+    "title": "Mostrar ou ocultar senha: como deve funcionar?",
+    "category": "authentication",
+    "components": [
+      "password-field",
+      "visibility-toggle"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "critical",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
-      "3.2.2",
-      "4.1.3",
-      "1.4.1",
+      "3.3.8",
+      "4.1.2",
+      "2.1.1",
+      "2.5.8",
+      "1.3.5",
       "2.4.7"
     ],
-    "relacionados": [
-      "estrutura-de-filtros",
-      "filtros-ativos",
-      "busca-sem-resultados",
-      "filtro-de-periodo"
+    "related": [
+      "password-requirements",
+      "confirm-password",
+      "password-recovery",
+      "label-vs-placeholder"
     ],
-    "regra": "Atualize a lista na hora quando a resposta for rápida e a escolha for simples; exija \"Aplicar\" quando houver várias escolhas combinadas, consulta lenta ou painel que cobre os resultados.",
-    "arquivo": "patterns/busca-filtros/aplicacao-de-filtros.md"
+    "rule": "Oculte a senha por padrão e ofereça um botão opcional, com nome acessível, que alterna a visibilidade sem apagar o valor, mover o foco ou bloquear colar e gerenciadores de senha.",
+    "file": "patterns/authentication/show-password.md"
   },
   {
-    "id": "busca-sem-resultados",
-    "titulo": "O que mostrar quando a busca não retorna resultados?",
-    "categoria": "busca-filtros",
-    "componentes": [
-      "campo-de-busca",
-      "estado-vazio",
-      "filtros",
-      "regiao-de-status"
+    "id": "auto-advancing-carousel",
+    "title": "Por que evitar carrossel com rotação automática?",
+    "category": "content",
+    "components": [
+      "carousel",
+      "pause-control",
+      "position-indicator"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.3",
-      "3.3.1",
-      "2.4.3"
-    ],
-    "relacionados": [
-      "estado-vazio",
-      "filtros-ativos",
-      "tentar-novamente",
-      "estrutura-de-filtros"
-    ],
-    "regra": "Mantenha a consulta digitada, informe com clareza que não há resultados e aponte o caminho mais provável para seguir, sem deslocar o foco.",
-    "arquivo": "patterns/busca-filtros/busca-sem-resultados.md"
-  },
-  {
-    "id": "estrutura-de-filtros",
-    "titulo": "Como estruturar filtros em uma interface?",
-    "categoria": "busca-filtros",
-    "componentes": [
-      "filtro",
-      "checkbox",
-      "radio",
-      "select",
-      "painel-lateral"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "1.3.1",
-      "3.3.2",
-      "4.1.3",
-      "1.4.10"
-    ],
-    "relacionados": [
-      "filtros-ativos",
-      "aplicacao-de-filtros",
-      "busca-sem-resultados",
-      "filtro-de-periodo"
-    ],
-    "regra": "Ofereça só filtros que respondem a decisões reais da tarefa, agrupados por significado, com lógica de combinação previsível, estado ativo visível e saída simples (remover um, limpar todos).",
-    "arquivo": "patterns/busca-filtros/estrutura-de-filtros.md"
-  },
-  {
-    "id": "filtros-ativos",
-    "titulo": "Como mostrar os filtros ativos?",
-    "categoria": "busca-filtros",
-    "componentes": [
-      "filtro",
-      "chip",
-      "lista"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.2",
-      "4.1.3",
-      "1.4.1",
-      "2.1.1"
-    ],
-    "relacionados": [
-      "estrutura-de-filtros",
-      "aplicacao-de-filtros",
-      "busca-sem-resultados",
-      "filtro-de-periodo"
-    ],
-    "regra": "Depois de aplicar filtros, exiba um resumo visível com nome e valor de cada critério, remoção individual e uma ação \"Limpar filtros\", fora de qualquer painel fechado.",
-    "arquivo": "patterns/busca-filtros/filtros-ativos.md"
-  },
-  {
-    "id": "carrossel-automatico",
-    "titulo": "Por que evitar carrossel com rotação automática?",
-    "categoria": "conteudo",
-    "componentes": [
-      "carrossel",
-      "controle-de-pausa",
-      "indicador-de-posicao"
-    ],
-    "tipo": "antipadrao",
-    "impacto": "alto",
-    "status": "evitar",
-    "evidencia": "forte",
+    "type": "anti-pattern",
+    "impact": "high",
+    "status": "avoid",
+    "evidence": "strong",
     "wcag": [
       "2.2.2",
       "2.1.1",
       "2.4.7",
       "1.4.10"
     ],
-    "relacionados": [
-      "carrossel",
-      "navegacao-principal",
-      "foco-de-teclado",
-      "abas"
+    "related": [
+      "carousel",
+      "main-navigation",
+      "keyboard-focus",
+      "tabs"
     ],
-    "regra": "Não faça o carrossel girar sozinho; prefira controle manual ou seção estática e, se a rotação for inevitável, ofereça pausa visível e pare ao foco ou à interação.",
-    "arquivo": "patterns/conteudo/carrossel-automatico.md"
+    "rule": "Não faça o carrossel girar sozinho; prefira controle manual ou seção estática e, se a rotação for inevitável, ofereça pausa visível e pare ao foco ou à interação.",
+    "file": "patterns/content/auto-advancing-carousel.md"
   },
   {
-    "id": "carrossel",
-    "titulo": "Quando usar carrossel?",
-    "categoria": "conteudo",
-    "componentes": [
-      "carrossel",
-      "galeria",
-      "controles-de-navegacao"
+    "id": "carousel",
+    "title": "Quando usar carrossel?",
+    "category": "content",
+    "components": [
+      "carousel",
+      "gallery",
+      "navigation-controls"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.2.2",
       "1.4.10",
@@ -743,30 +803,30 @@
       "2.4.7",
       "4.1.2"
     ],
-    "relacionados": [
-      "carrossel-automatico",
-      "abas",
-      "alvo-de-toque",
-      "estrutura-de-filtros"
+    "related": [
+      "auto-advancing-carousel",
+      "tabs",
+      "touch-target",
+      "filter-structure"
     ],
-    "regra": "Use carrossel apenas para itens relacionados e de exploração opcional, com controle manual e sem esconder conteúdo essencial.",
-    "arquivo": "patterns/conteudo/carrossel.md"
+    "rule": "Use carrossel apenas para itens relacionados e de exploração opcional, com controle manual e sem esconder conteúdo essencial.",
+    "file": "patterns/content/carousel.md"
   },
   {
-    "id": "filtro-de-periodo",
-    "titulo": "Como estruturar filtros de período em dashboards?",
-    "categoria": "dados",
-    "componentes": [
-      "filtro",
-      "seletor-de-periodo",
+    "id": "date-range-filter",
+    "title": "Como estruturar filtros de período em dashboards?",
+    "category": "data",
+    "components": [
+      "filter",
+      "date-range-picker",
       "dashboard",
       "card",
-      "grafico"
+      "chart"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "1.4.1",
       "3.3.1",
@@ -774,57 +834,56 @@
       "4.1.2",
       "4.1.3"
     ],
-    "relacionados": [
-      "aplicacao-de-filtros",
-      "filtros-ativos",
-      "estrutura-de-filtros",
-      "estado-vazio"
+    "related": [
+      "applying-filters",
+      "active-filters",
+      "filter-structure",
+      "empty-state"
     ],
-    "regra": "Exiba sempre, em texto, o intervalo ativo, o que ele controla, a data da última atualização dos dados e quais cards ficam fora do recorte.",
-    "arquivo": "patterns/dados/filtro-de-periodo.md"
+    "rule": "Exiba sempre, em texto, o intervalo ativo, o que ele controla, a data da última atualização dos dados e quais cards ficam fora do recorte.",
+    "file": "patterns/data/date-range-filter.md"
   },
   {
-    "id": "ordenacao-de-tabela",
-    "titulo": "Como ordenar dados em tabelas?",
-    "categoria": "dados",
-    "componentes": [
-      "tabela",
-      "cabecalho-de-coluna",
-      "botao"
+    "id": "responsive-table",
+    "title": "Como tornar tabelas responsivas no mobile?",
+    "category": "data",
+    "components": [
+      "table",
+      "list",
+      "card"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
+      "1.4.10",
       "1.3.1",
-      "4.1.2",
-      "4.1.3",
       "2.1.1",
       "2.4.7"
     ],
-    "relacionados": [
-      "paginacao-de-tabela",
-      "tabela-responsiva",
-      "tabela-vs-cards",
-      "estrutura-de-filtros"
+    "related": [
+      "table-vs-cards",
+      "table-sorting",
+      "table-pagination",
+      "touch-target"
     ],
-    "regra": "Ofereça ordenação apenas em colunas com ordem significativa, mostre sempre a coluna e a direção ativas, ordene pelo valor real e exponha o estado via botão e `aria-sort`.",
-    "arquivo": "patterns/dados/ordenacao-de-tabela.md"
+    "rule": "Escolha a adaptação pela tarefa: SE a pessoa compara colunas, mantenha a grade em contêiner com rolagem horizontal própria; SE consulta registros isolados, empilhe ou use lista, sempre preservando a relação cabeçalho-célula.",
+    "file": "patterns/data/responsive-table.md"
   },
   {
-    "id": "paginacao-de-tabela",
-    "titulo": "Quando usar e como configurar paginação em tabelas e listas?",
-    "categoria": "dados",
-    "componentes": [
-      "paginacao",
-      "tabela",
-      "lista"
+    "id": "table-pagination",
+    "title": "Quando usar e como configurar paginação em tabelas e listas?",
+    "category": "data",
+    "components": [
+      "pagination",
+      "table",
+      "list"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "2.4.3",
       "1.4.1",
@@ -832,56 +891,57 @@
       "4.1.3",
       "2.5.8"
     ],
-    "relacionados": [
-      "paginacao-vs-scroll",
-      "ordenacao-de-tabela",
-      "tabela-responsiva",
-      "filtros-ativos"
+    "related": [
+      "pagination-vs-scroll",
+      "table-sorting",
+      "responsive-table",
+      "active-filters"
     ],
-    "regra": "Pagine coleções grandes de ordem estável, mostrando a página atual, mantendo página, filtros e ordenação recuperáveis e nomeando todos os controles.",
-    "arquivo": "patterns/dados/paginacao-de-tabela.md"
+    "rule": "Pagine coleções grandes de ordem estável, mostrando a página atual, mantendo página, filtros e ordenação recuperáveis e nomeando todos os controles.",
+    "file": "patterns/data/table-pagination.md"
   },
   {
-    "id": "tabela-responsiva",
-    "titulo": "Como tornar tabelas responsivas no mobile?",
-    "categoria": "dados",
-    "componentes": [
-      "tabela",
-      "lista",
-      "card"
+    "id": "table-sorting",
+    "title": "Como ordenar dados em tabelas?",
+    "category": "data",
+    "components": [
+      "table",
+      "column-header",
+      "button"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
-      "1.4.10",
       "1.3.1",
+      "4.1.2",
+      "4.1.3",
       "2.1.1",
       "2.4.7"
     ],
-    "relacionados": [
-      "tabela-vs-cards",
-      "ordenacao-de-tabela",
-      "paginacao-de-tabela",
-      "alvo-de-toque"
+    "related": [
+      "table-pagination",
+      "responsive-table",
+      "table-vs-cards",
+      "filter-structure"
     ],
-    "regra": "Escolha a adaptação pela tarefa: SE a pessoa compara colunas, mantenha a grade em contêiner com rolagem horizontal própria; SE consulta registros isolados, empilhe ou use lista, sempre preservando a relação cabeçalho-célula.",
-    "arquivo": "patterns/dados/tabela-responsiva.md"
+    "rule": "Ofereça ordenação apenas em colunas com ordem significativa, mostre sempre a coluna e a direção ativas, ordene pelo valor real e exponha o estado via botão e `aria-sort`.",
+    "file": "patterns/data/table-sorting.md"
   },
   {
-    "id": "tabela-vs-cards",
-    "titulo": "Quando usar tabela em vez de cards?",
-    "categoria": "dados",
-    "componentes": [
-      "tabela",
+    "id": "table-vs-cards",
+    "title": "Quando usar tabela em vez de cards?",
+    "category": "data",
+    "components": [
+      "table",
       "card",
-      "lista"
+      "list"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "1.3.1",
       "1.3.2",
@@ -889,87 +949,28 @@
       "2.4.6",
       "2.4.7"
     ],
-    "relacionados": [
-      "tabela-responsiva",
-      "ordenacao-de-tabela",
-      "paginacao-de-tabela",
-      "estrutura-de-filtros"
+    "related": [
+      "responsive-table",
+      "table-sorting",
+      "table-pagination",
+      "filter-structure"
     ],
-    "regra": "Use tabela quando a pessoa precisa comparar atributos entre itens; use cards para resumos independentes e conteúdo heterogêneo.",
-    "arquivo": "patterns/dados/tabela-vs-cards.md"
+    "rule": "Use tabela quando a pessoa precisa comparar atributos entre itens; use cards para resumos independentes e conteúdo heterogêneo.",
+    "file": "patterns/data/table-vs-cards.md"
   },
   {
-    "id": "carrinho-editar-itens",
-    "titulo": "Como alterar quantidade e remover itens no carrinho?",
-    "categoria": "ecommerce",
-    "componentes": [
-      "carrinho",
-      "stepper",
-      "campo-numerico",
-      "botao-de-icone"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "2.5.8",
-      "4.1.3",
-      "4.1.2",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "desfazer",
-      "checkout-convidado",
-      "variacoes-de-produto",
-      "confirmar-exclusao",
-      "alvo-de-toque"
-    ],
-    "regra": "Ofereça stepper (mais e menos) com campo numérico quando a faixa for ampla, atualize totais sem botão \"Atualizar\" e torne a remoção explícita e reversível.",
-    "arquivo": "patterns/ecommerce/carrinho-editar-itens.md"
-  },
-  {
-    "id": "checkout-convidado",
-    "titulo": "Quando oferecer checkout como convidado?",
-    "categoria": "ecommerce",
-    "componentes": [
-      "checkout",
-      "selecao-de-conta",
-      "botao",
-      "formulario"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "3.3.2",
-      "2.4.6",
-      "2.4.3",
-      "2.5.3"
-    ],
-    "relacionados": [
-      "carrinho-editar-itens",
-      "endereco-por-cep",
-      "etapas-de-formulario",
-      "recuperar-senha"
-    ],
-    "regra": "Quando a conta não é essencial para concluir a compra, ofereça \"Continuar como convidado\" de forma explícita e destacada no início da seleção de conta, e proponha criar conta só depois da confirmação do pedido.",
-    "arquivo": "patterns/ecommerce/checkout-convidado.md"
-  },
-  {
-    "id": "endereco-por-cep",
-    "titulo": "Como aproveitar o CEP para completar o endereço no checkout?",
-    "categoria": "ecommerce",
-    "componentes": [
-      "campo-cep",
-      "formulario-de-endereco",
+    "id": "address-by-postal-code",
+    "title": "Como aproveitar o CEP para completar o endereço no checkout?",
+    "category": "ecommerce",
+    "components": [
+      "postal-code-field",
+      "address-form",
       "autocomplete"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "1.3.5",
       "2.1.1",
@@ -977,30 +978,89 @@
       "3.3.4",
       "1.4.1"
     ],
-    "relacionados": [
-      "autopreenchimento",
-      "erros-em-formularios",
-      "checkout-convidado",
-      "preservar-dados-apos-erro"
+    "related": [
+      "autofill",
+      "form-errors",
+      "guest-checkout",
+      "preserve-data-after-error"
     ],
-    "regra": "Peça o CEP primeiro, consulte ao completar o valor, preencha só o que a fonte retornou e mantenha tudo revisável, editável e com fallback manual.",
-    "arquivo": "patterns/ecommerce/endereco-por-cep.md"
+    "rule": "Peça o CEP primeiro, consulte ao completar o valor, preencha só o que a fonte retornou e mantenha tudo revisável, editável e com fallback manual.",
+    "file": "patterns/ecommerce/address-by-postal-code.md"
   },
   {
-    "id": "variacoes-de-produto",
-    "titulo": "Como exibir variações de produto: tamanho, cor e disponibilidade?",
-    "categoria": "ecommerce",
-    "componentes": [
-      "seletor",
+    "id": "cart-edit-items",
+    "title": "Como alterar quantidade e remover itens no carrinho?",
+    "category": "ecommerce",
+    "components": [
+      "cart",
+      "stepper",
+      "number-field",
+      "icon-button"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "2.5.8",
+      "4.1.3",
+      "4.1.2",
+      "1.4.1"
+    ],
+    "related": [
+      "undo",
+      "guest-checkout",
+      "product-variants",
+      "confirm-deletion",
+      "touch-target"
+    ],
+    "rule": "Ofereça stepper (mais e menos) com campo numérico quando a faixa for ampla, atualize totais sem botão \"Atualizar\" e torne a remoção explícita e reversível.",
+    "file": "patterns/ecommerce/cart-edit-items.md"
+  },
+  {
+    "id": "guest-checkout",
+    "title": "Quando oferecer checkout como convidado?",
+    "category": "ecommerce",
+    "components": [
+      "checkout",
+      "account-selection",
+      "button",
+      "form"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "3.3.2",
+      "2.4.6",
+      "2.4.3",
+      "2.5.3"
+    ],
+    "related": [
+      "cart-edit-items",
+      "address-by-postal-code",
+      "form-steps",
+      "password-recovery"
+    ],
+    "rule": "Quando a conta não é essencial para concluir a compra, ofereça \"Continuar como convidado\" de forma explícita e destacada no início da seleção de conta, e proponha criar conta só depois da confirmação do pedido.",
+    "file": "patterns/ecommerce/guest-checkout.md"
+  },
+  {
+    "id": "product-variants",
+    "title": "Como exibir variações de produto: tamanho, cor e disponibilidade?",
+    "category": "ecommerce",
+    "components": [
+      "picker",
       "swatch",
       "radio-group",
       "select",
-      "guia-de-medidas"
+      "size-guide"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "1.4.1",
       "2.1.1",
@@ -1008,143 +1068,30 @@
       "1.3.1",
       "2.4.7"
     ],
-    "relacionados": [
+    "related": [
       "dropdown",
-      "carrinho-editar-itens",
-      "botao-desabilitado",
-      "nao-so-cor"
+      "cart-edit-items",
+      "disabled-button",
+      "not-color-alone"
     ],
-    "regra": "Mostre cada dimensão de variação como grupo rotulado, recalcule a disponibilidade da combinação após cada escolha e atualize imagem, preço, estoque e compra.",
-    "arquivo": "patterns/ecommerce/variacoes-de-produto.md"
+    "rule": "Mostre cada dimensão de variação como grupo rotulado, recalcule a disponibilidade da combinação após cada escolha e atualize imagem, preço, estoque e compra.",
+    "file": "patterns/ecommerce/product-variants.md"
   },
   {
-    "id": "carregamento-longo",
-    "titulo": "Como tratar carregamentos que demoram muito?",
-    "categoria": "feedback",
-    "componentes": [
-      "indicador-de-carregamento",
-      "barra-de-progresso",
-      "skeleton"
+    "id": "empty-state",
+    "title": "Como criar bons estados vazios?",
+    "category": "feedback",
+    "components": [
+      "empty-state",
+      "illustration",
+      "button",
+      "list",
+      "table"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "4.1.3",
-      "2.2.2",
-      "2.3.3"
-    ],
-    "relacionados": [
-      "skeleton-vs-spinner",
-      "porcentagem-de-progresso",
-      "skeleton-screen",
-      "clique-duplo-em-envio"
-    ],
-    "regra": "Escolha o indicador pela duração e pelo tipo de espera: nada abaixo de 1 s, indeterminado de 1 a 3 s, progresso real acima de 3 s e, acima de 10 s, preserve a tarefa e ofereça continuar, cancelar ou acompanhar depois.",
-    "arquivo": "patterns/feedback/carregamento-longo.md"
-  },
-  {
-    "id": "codigo-de-erro-tecnico",
-    "titulo": "Erros técnicos devem mostrar códigos ao usuário?",
-    "categoria": "feedback",
-    "componentes": [
-      "alerta",
-      "mensagem-de-erro",
-      "botao-copiar"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
-    "wcag": [
-      "3.3.1",
-      "3.3.3",
-      "4.1.3",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "mensagem-de-erro-util",
-      "recuperar-erro-da-ia",
-      "tentar-novamente",
-      "falha-temporaria"
-    ],
-    "regra": "Explique o impacto e o próximo passo primeiro; mostre um código apenas como referência secundária, rotulada e copiável, quando ele ajudar o suporte a localizar a ocorrência.",
-    "arquivo": "patterns/feedback/codigo-de-erro-tecnico.md"
-  },
-  {
-    "id": "confirmacao-de-sucesso",
-    "titulo": "Como comunicar uma ação concluída com sucesso?",
-    "categoria": "feedback",
-    "componentes": [
-      "toast",
-      "mensagem-inline",
-      "pagina-de-confirmacao",
-      "regiao-de-status"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.3",
-      "1.4.1",
-      "2.2.1",
-      "2.1.1"
-    ],
-    "relacionados": [
-      "toast-alerta-inline",
-      "duracao-de-toast",
-      "desfazer",
-      "falha-temporaria",
-      "carregamento-longo"
-    ],
-    "regra": "Confirme só o resultado real, nomeando a ação e o objeto, perto do contexto, com permanência proporcional ao impacto e sem roubar o foco.",
-    "arquivo": "patterns/feedback/confirmacao-de-sucesso.md"
-  },
-  {
-    "id": "duracao-de-toast",
-    "titulo": "Quanto tempo uma notificação temporária deve permanecer?",
-    "categoria": "feedback",
-    "componentes": [
-      "toast",
-      "snackbar",
-      "notificacao-temporaria"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
-    "wcag": [
-      "2.2.1",
-      "4.1.3",
-      "2.1.1",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "toast-alerta-inline",
-      "confirmacao-de-sucesso",
-      "desfazer",
-      "tentar-novamente"
-    ],
-    "regra": "Notificação com ação, erro importante ou informação única nunca some sozinha; só mensagens curtas de baixo impacto podem desaparecer, começando em 4 a 10 segundos e ajustadas pelo tamanho do texto.",
-    "arquivo": "patterns/feedback/duracao-de-toast.md"
-  },
-  {
-    "id": "estado-vazio",
-    "titulo": "Como criar bons estados vazios?",
-    "categoria": "feedback",
-    "componentes": [
-      "estado-vazio",
-      "ilustracao",
-      "botao",
-      "lista",
-      "tabela"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "1.1.1",
       "1.3.1",
@@ -1152,59 +1099,55 @@
       "2.4.7",
       "1.4.3"
     ],
-    "relacionados": [
-      "busca-sem-resultados",
-      "filtros-ativos",
-      "falha-temporaria",
+    "related": [
+      "no-search-results",
+      "active-filters",
+      "temporary-failure",
       "skeleton-vs-spinner",
-      "tentar-novamente"
+      "retry"
     ],
-    "regra": "Identifique a causa do vazio, explique-a em título curto mais uma frase de contexto e ofereça uma única ação principal coerente com essa causa.",
-    "arquivo": "patterns/feedback/estado-vazio.md"
+    "rule": "Identifique a causa do vazio, explique-a em título curto mais uma frase de contexto e ofereça uma única ação principal coerente com essa causa.",
+    "file": "patterns/feedback/empty-state.md"
   },
   {
-    "id": "falha-temporaria",
-    "titulo": "Como comunicar falhas temporárias do sistema?",
-    "categoria": "feedback",
-    "componentes": [
-      "alerta",
-      "mensagem-inline",
-      "toast",
-      "pagina-de-indisponibilidade",
-      "botao"
+    "id": "long-loading",
+    "title": "Como tratar carregamentos que demoram muito?",
+    "category": "feedback",
+    "components": [
+      "loading-indicator",
+      "progress-bar",
+      "skeleton"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "4.1.3",
-      "1.4.1",
-      "2.2.1",
-      "3.3.1"
+      "2.2.2",
+      "2.3.3"
     ],
-    "relacionados": [
-      "tentar-novamente",
-      "preservar-dados-apos-erro",
-      "codigo-de-erro-tecnico",
-      "toast-alerta-inline",
-      "carregamento-longo"
+    "related": [
+      "skeleton-vs-spinner",
+      "progress-percentage",
+      "skeleton-screen",
+      "double-submit"
     ],
-    "regra": "Informe o que falhou, diga se a operação foi concluída, está em andamento ou não aconteceu, guarde os dados e proponha uma só ação segura.",
-    "arquivo": "patterns/feedback/falha-temporaria.md"
+    "rule": "Escolha o indicador pela duração e pelo tipo de espera: nada abaixo de 1 s, indeterminado de 1 a 3 s, progresso real acima de 3 s e, acima de 10 s, preserve a tarefa e ofereça continuar, cancelar ou acompanhar depois.",
+    "file": "patterns/feedback/long-loading.md"
   },
   {
-    "id": "porcentagem-de-progresso",
-    "titulo": "Quando mostrar porcentagem de progresso?",
-    "categoria": "feedback",
-    "componentes": [
-      "barra-de-progresso",
-      "indicador-de-carregamento"
+    "id": "progress-percentage",
+    "title": "Quando mostrar porcentagem de progresso?",
+    "category": "feedback",
+    "components": [
+      "progress-bar",
+      "loading-indicator"
     ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "4.1.3",
       "4.1.2",
@@ -1212,114 +1155,231 @@
       "1.4.11",
       "2.2.2"
     ],
-    "relacionados": [
+    "related": [
       "skeleton-vs-spinner",
-      "carregamento-longo",
-      "upload-de-arquivos",
-      "tentar-novamente"
+      "long-loading",
+      "file-upload",
+      "retry"
     ],
-    "regra": "Mostre porcentagem apenas quando o total e o avanço forem medidos de verdade; sem medida confiável, use indicador indeterminado com rótulo.",
-    "arquivo": "patterns/feedback/porcentagem-de-progresso.md"
+    "rule": "Mostre porcentagem apenas quando o total e o avanço forem medidos de verdade; sem medida confiável, use indicador indeterminado com rótulo.",
+    "file": "patterns/feedback/progress-percentage.md"
+  },
+  {
+    "id": "retry",
+    "title": "Quando e como oferecer \"Tentar novamente\" após um erro?",
+    "category": "feedback",
+    "components": [
+      "alert",
+      "button",
+      "snackbar"
+    ],
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.3",
+      "1.4.1",
+      "2.1.1"
+    ],
+    "related": [
+      "temporary-failure",
+      "double-submit",
+      "preserve-data-after-error",
+      "helpful-error-message"
+    ],
+    "rule": "Ofereça \"Tentar novamente\" só quando a causa for provavelmente temporária e a repetição for segura; preserve o estado, evite duplicidade e dê uma saída após poucas falhas.",
+    "file": "patterns/feedback/retry.md"
   },
   {
     "id": "skeleton-screen",
-    "titulo": "Skeleton screen melhora a percepção de carregamento?",
-    "categoria": "feedback",
-    "componentes": [
+    "title": "Skeleton screen melhora a percepção de carregamento?",
+    "category": "feedback",
+    "components": [
       "skeleton",
-      "indicador-de-carregamento",
-      "tabela",
+      "loading-indicator",
+      "table",
       "card"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "4.1.3",
       "2.3.3",
       "1.4.1",
       "2.4.3"
     ],
-    "relacionados": [
+    "related": [
       "skeleton-vs-spinner",
-      "carregamento-longo",
-      "porcentagem-de-progresso",
-      "estado-vazio"
+      "long-loading",
+      "progress-percentage",
+      "empty-state"
     ],
-    "regra": "Use skeleton quando a estrutura do conteúdo for previsível e a espera for perceptível; ele melhora a percepção, não o desempenho real.",
-    "arquivo": "patterns/feedback/skeleton-screen.md"
+    "rule": "Use skeleton quando a estrutura do conteúdo for previsível e a espera for perceptível; ele melhora a percepção, não o desempenho real.",
+    "file": "patterns/feedback/skeleton-screen.md"
   },
   {
     "id": "skeleton-vs-spinner",
-    "titulo": "Skeleton ou spinner: quando usar cada um?",
-    "categoria": "feedback",
-    "componentes": [
+    "title": "Skeleton ou spinner: quando usar cada um?",
+    "category": "feedback",
+    "components": [
       "skeleton",
       "spinner",
-      "barra-de-progresso",
+      "progress-bar",
       "loading"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "4.1.3",
       "2.2.2",
       "2.3.3",
       "1.4.1"
     ],
-    "relacionados": [
+    "related": [
       "skeleton-screen",
-      "porcentagem-de-progresso",
-      "carregamento-longo",
-      "clique-duplo-em-envio"
+      "progress-percentage",
+      "long-loading",
+      "double-submit"
     ],
-    "regra": "Skeleton para a carga inicial de conteúdo com formato conhecido; spinner inline para ações curtas; barra de progresso só quando houver medida real.",
-    "arquivo": "patterns/feedback/skeleton-vs-spinner.md"
+    "rule": "Skeleton para a carga inicial de conteúdo com formato conhecido; spinner inline para ações curtas; barra de progresso só quando houver medida real.",
+    "file": "patterns/feedback/skeleton-vs-spinner.md"
   },
   {
-    "id": "tentar-novamente",
-    "titulo": "Quando e como oferecer \"Tentar novamente\" após um erro?",
-    "categoria": "feedback",
-    "componentes": [
-      "alerta",
-      "botao",
-      "snackbar"
+    "id": "success-confirmation",
+    "title": "Como comunicar uma ação concluída com sucesso?",
+    "category": "feedback",
+    "components": [
+      "toast",
+      "inline-message",
+      "confirmation-page",
+      "status-region"
     ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "4.1.3",
       "1.4.1",
+      "2.2.1",
       "2.1.1"
     ],
-    "relacionados": [
-      "falha-temporaria",
-      "clique-duplo-em-envio",
-      "preservar-dados-apos-erro",
-      "mensagem-de-erro-util"
+    "related": [
+      "toast-vs-inline-alert",
+      "toast-duration",
+      "undo",
+      "temporary-failure",
+      "long-loading"
     ],
-    "regra": "Ofereça \"Tentar novamente\" só quando a causa for provavelmente temporária e a repetição for segura; preserve o estado, evite duplicidade e dê uma saída após poucas falhas.",
-    "arquivo": "patterns/feedback/tentar-novamente.md"
+    "rule": "Confirme só o resultado real, nomeando a ação e o objeto, perto do contexto, com permanência proporcional ao impacto e sem roubar o foco.",
+    "file": "patterns/feedback/success-confirmation.md"
   },
   {
-    "id": "toast-alerta-inline",
-    "titulo": "Toast, alerta ou mensagem inline: qual usar?",
-    "categoria": "feedback",
-    "componentes": [
+    "id": "technical-error-code",
+    "title": "Erros técnicos devem mostrar códigos ao usuário?",
+    "category": "feedback",
+    "components": [
+      "alert",
+      "error-message",
+      "copy-button"
+    ],
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
+    "wcag": [
+      "3.3.1",
+      "3.3.3",
+      "4.1.3",
+      "1.4.1"
+    ],
+    "related": [
+      "helpful-error-message",
+      "ai-error-recovery",
+      "retry",
+      "temporary-failure"
+    ],
+    "rule": "Explique o impacto e o próximo passo primeiro; mostre um código apenas como referência secundária, rotulada e copiável, quando ele ajudar o suporte a localizar a ocorrência.",
+    "file": "patterns/feedback/technical-error-code.md"
+  },
+  {
+    "id": "temporary-failure",
+    "title": "Como comunicar falhas temporárias do sistema?",
+    "category": "feedback",
+    "components": [
+      "alert",
+      "inline-message",
       "toast",
-      "alerta",
-      "mensagem-inline",
+      "unavailable-page",
+      "button"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.3",
+      "1.4.1",
+      "2.2.1",
+      "3.3.1"
+    ],
+    "related": [
+      "retry",
+      "preserve-data-after-error",
+      "technical-error-code",
+      "toast-vs-inline-alert",
+      "long-loading"
+    ],
+    "rule": "Informe o que falhou, diga se a operação foi concluída, está em andamento ou não aconteceu, guarde os dados e proponha uma só ação segura.",
+    "file": "patterns/feedback/temporary-failure.md"
+  },
+  {
+    "id": "toast-duration",
+    "title": "Quanto tempo uma notificação temporária deve permanecer?",
+    "category": "feedback",
+    "components": [
+      "toast",
+      "snackbar",
+      "temporary-notification"
+    ],
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
+    "wcag": [
+      "2.2.1",
+      "4.1.3",
+      "2.1.1",
+      "1.4.1"
+    ],
+    "related": [
+      "toast-vs-inline-alert",
+      "success-confirmation",
+      "undo",
+      "retry"
+    ],
+    "rule": "Notificação com ação, erro importante ou informação única nunca some sozinha; só mensagens curtas de baixo impacto podem desaparecer, começando em 4 a 10 segundos e ajustadas pelo tamanho do texto.",
+    "file": "patterns/feedback/toast-duration.md"
+  },
+  {
+    "id": "toast-vs-inline-alert",
+    "title": "Toast, alerta ou mensagem inline: qual usar?",
+    "category": "feedback",
+    "components": [
+      "toast",
+      "alert",
+      "inline-message",
       "banner"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "strong",
     "wcag": [
       "4.1.3",
       "3.3.1",
@@ -1327,29 +1387,29 @@
       "1.4.3",
       "2.1.1"
     ],
-    "relacionados": [
-      "duracao-de-toast",
-      "erros-em-formularios",
-      "confirmacao-de-sucesso",
-      "falha-temporaria"
+    "related": [
+      "toast-duration",
+      "form-errors",
+      "success-confirmation",
+      "temporary-failure"
     ],
-    "regra": "Escolha o padrão pelo escopo da mensagem: toast para confirmação breve, inline para algo ligado a um elemento, alerta persistente para condição da página ou do serviço.",
-    "arquivo": "patterns/feedback/toast-alerta-inline.md"
+    "rule": "Escolha o padrão pelo escopo da mensagem: toast para confirmação breve, inline para algo ligado a um elemento, alerta persistente para condição da página ou do serviço.",
+    "file": "patterns/feedback/toast-vs-inline-alert.md"
   },
   {
-    "id": "autopreenchimento",
-    "titulo": "Quando usar preenchimento automático?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-texto",
+    "id": "autofill",
+    "title": "Quando usar preenchimento automático?",
+    "category": "forms",
+    "components": [
+      "text-field",
       "autocomplete",
       "combobox",
-      "endereco"
+      "address"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "1.3.5",
       "3.3.7",
@@ -1357,87 +1417,356 @@
       "1.4.1",
       "4.1.2"
     ],
-    "relacionados": [
+    "related": [
       "dropdown",
-      "endereco-por-cep",
-      "campos-obrigatorios",
-      "preservar-dados-apos-erro"
+      "address-by-postal-code",
+      "required-fields",
+      "preserve-data-after-error"
     ],
-    "regra": "Use preenchimento automático para reduzir digitação, mas mantenha todos os campos visíveis, editáveis e confirmáveis pela pessoa.",
-    "arquivo": "patterns/formularios/autopreenchimento.md"
+    "rule": "Use preenchimento automático para reduzir digitação, mas mantenha todos os campos visíveis, editáveis e confirmáveis pela pessoa.",
+    "file": "patterns/forms/autofill.md"
   },
   {
-    "id": "autosave-vs-salvar",
-    "titulo": "Autosave ou botão Salvar?",
-    "categoria": "formularios",
-    "componentes": [
-      "formulario",
+    "id": "autosave-vs-save",
+    "title": "Autosave ou botão Salvar?",
+    "category": "forms",
+    "components": [
+      "form",
       "editor",
-      "botao",
-      "indicador-de-estado"
+      "button",
+      "status-indicator"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "4.1.3",
       "3.3.4",
       "2.1.1"
     ],
-    "relacionados": [
-      "desfazer",
-      "preservar-dados-apos-erro",
-      "tentar-novamente",
-      "confirmar-acao"
+    "related": [
+      "undo",
+      "preserve-data-after-error",
+      "retry",
+      "confirm-action"
     ],
-    "regra": "Use autosave só para mudanças independentes, de baixo risco e reversíveis, sempre com estado de salvamento visível; use botão explícito quando houver revisão, transação ou efeito externo.",
-    "arquivo": "patterns/formularios/autosave-vs-salvar.md"
+    "rule": "Use autosave só para mudanças independentes, de baixo risco e reversíveis, sempre com estado de salvamento visível; use botão explícito quando houver revisão, transação ou efeito externo.",
+    "file": "patterns/forms/autosave-vs-save.md"
   },
   {
-    "id": "campos-obrigatorios",
-    "titulo": "Como indicar corretamente campos obrigatórios?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-texto",
+    "id": "dropdown",
+    "title": "Quando usar dropdown e quando evitar?",
+    "category": "forms",
+    "components": [
+      "dropdown",
+      "select",
+      "combobox",
+      "radio",
+      "autocomplete"
+    ],
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "1.3.1",
+      "4.1.2",
+      "2.1.1",
+      "2.4.7",
+      "1.4.10",
+      "3.3.2"
+    ],
+    "related": [
+      "autofill",
+      "label-vs-placeholder",
+      "filter-structure",
+      "field-order"
+    ],
+    "rule": "Use dropdown apenas para escolha única entre valores predefinidos; poucas opções pedem opções visíveis e listas longas pedem busca.",
+    "file": "patterns/forms/dropdown.md"
+  },
+  {
+    "id": "error-placement",
+    "title": "Onde exibir mensagens de erro em formulários?",
+    "category": "forms",
+    "components": [
+      "error-message",
+      "error-summary",
+      "global-alert"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.1",
+      "1.3.1",
+      "1.4.1",
+      "2.4.3"
+    ],
+    "related": [
+      "field-error-position",
+      "form-errors",
+      "toast-vs-inline-alert",
+      "preserve-data-after-error"
+    ],
+    "rule": "Erro de campo fica junto ao campo; vários erros ganham resumo navegável no topo; mensagem global é só para falha que afeta o formulário ou o serviço inteiro.",
+    "file": "patterns/forms/error-placement.md"
+  },
+  {
+    "id": "field-error-position",
+    "title": "A mensagem de erro vai antes ou depois do campo?",
+    "category": "forms",
+    "components": [
+      "form-field",
+      "error-message",
+      "error-summary"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.1",
+      "3.3.3",
+      "1.3.1",
+      "1.4.1",
+      "4.1.3"
+    ],
+    "related": [
+      "error-placement",
+      "form-errors",
+      "validation-timing",
+      "preserve-data-after-error"
+    ],
+    "rule": "Coloque a mensagem na mesma unidade visual do rótulo e do campo, em posição consistente e ligada programaticamente ao controle; após o envio, repita-a em um resumo no topo.",
+    "file": "patterns/forms/field-error-position.md"
+  },
+  {
+    "id": "field-order",
+    "title": "Como definir a sequência dos campos em um formulário?",
+    "category": "forms",
+    "components": [
+      "form",
+      "fieldset",
+      "legend",
+      "conditional-field"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "2.4.3",
+      "1.3.2",
+      "1.3.1",
+      "3.3.2"
+    ],
+    "related": [
+      "form-steps",
+      "split-form",
+      "required-fields",
+      "label-vs-placeholder",
+      "dropdown"
+    ],
+    "rule": "Ordene os campos pela tarefa da pessoa, não pelo banco de dados, e faça ordem visual, ordem do HTML e ordem do Tab seguirem a mesma lógica.",
+    "file": "patterns/forms/field-order.md"
+  },
+  {
+    "id": "file-upload",
+    "title": "Como projetar uma boa experiência de envio de arquivos?",
+    "category": "forms",
+    "components": [
+      "file-input",
+      "drop-zone",
+      "file-list",
+      "progress-bar"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.2",
+      "3.3.1",
+      "2.1.1",
+      "4.1.3",
+      "1.4.1"
+    ],
+    "related": [
+      "form-errors",
+      "retry",
+      "long-loading",
+      "progress-percentage",
+      "preserve-data-after-error"
+    ],
+    "rule": "Mostre formatos e limites antes da seleção, use botão nativo acessível (arrastar e soltar é só alternativa), exiba o estado de cada arquivo e explique como corrigir cada falha.",
+    "file": "patterns/forms/file-upload.md"
+  },
+  {
+    "id": "form-errors",
+    "title": "Como estruturar mensagens de erro em formulários?",
+    "category": "forms",
+    "components": [
+      "form-field",
+      "error-message",
+      "error-summary"
+    ],
+    "type": "accessibility",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.1",
+      "3.3.3",
+      "1.4.1",
+      "1.3.1",
+      "4.1.3"
+    ],
+    "related": [
+      "helpful-error-message",
+      "preserve-data-after-error",
+      "validation-timing",
+      "not-color-alone",
+      "required-fields"
+    ],
+    "rule": "Toda mensagem de erro de campo nomeia o campo pelo rótulo, descreve o problema, diz como corrigir, fica ligada ao controle e não apaga o que a pessoa digitou.",
+    "file": "patterns/forms/form-errors.md"
+  },
+  {
+    "id": "form-steps",
+    "title": "Como estruturar etapas em formulários longos?",
+    "category": "forms",
+    "components": [
+      "step-indicator",
+      "form",
+      "button",
+      "review-summary"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "1.3.1",
+      "2.4.6",
+      "3.3.1",
+      "3.3.4",
+      "2.2.1"
+    ],
+    "related": [
+      "split-form",
+      "preserve-data-after-error",
+      "field-order",
+      "autosave-vs-save",
+      "validation-timing"
+    ],
+    "rule": "Organize cada etapa por objetivo, mostre posição e progresso separados da navegação e preserve, permita revisar e recupere os dados ao avançar, voltar ou retomar.",
+    "file": "patterns/forms/form-steps.md"
+  },
+  {
+    "id": "label-vs-placeholder",
+    "title": "Label ou placeholder: o que usar em formulários?",
+    "category": "forms",
+    "components": [
+      "text-field",
+      "label",
+      "placeholder",
+      "helper-text"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.2",
+      "1.3.1",
+      "4.1.2",
+      "1.4.3",
+      "2.5.3"
+    ],
+    "related": [
+      "required-fields",
+      "field-order",
+      "form-errors",
+      "helpful-error-message"
+    ],
+    "rule": "Todo campo tem label visível e associado; o placeholder serve apenas como exemplo curto ou formato, nunca como identificação.",
+    "file": "patterns/forms/label-vs-placeholder.md"
+  },
+  {
+    "id": "preserve-data-after-error",
+    "title": "Como preservar os dados preenchidos após um erro no formulário?",
+    "category": "forms",
+    "components": [
+      "form",
+      "field",
+      "error-summary"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "3.3.1",
+      "3.3.3",
+      "1.4.1",
+      "4.1.3"
+    ],
+    "related": [
+      "form-errors",
+      "error-placement",
+      "retry",
+      "session-expired"
+    ],
+    "rule": "Após um erro, reexiba o formulário com todos os valores válidos mantidos e destaque apenas os campos que precisam de correção; descarte somente segredos, como senha e código de segurança do cartão.",
+    "file": "patterns/forms/preserve-data-after-error.md"
+  },
+  {
+    "id": "required-fields",
+    "title": "Como indicar corretamente campos obrigatórios?",
+    "category": "forms",
+    "components": [
+      "text-field",
       "label",
       "fieldset",
       "legend",
-      "formulario"
+      "form"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "3.3.2",
       "1.3.1",
       "1.4.1",
       "4.1.2"
     ],
-    "relacionados": [
+    "related": [
       "label-vs-placeholder",
-      "erros-em-formularios",
-      "ordem-dos-campos",
-      "momento-da-validacao"
+      "form-errors",
+      "field-order",
+      "validation-timing"
     ],
-    "regra": "Marque a obrigatoriedade em texto no rótulo, com uma única convenção por formulário, e exponha o estado também de forma programática.",
-    "arquivo": "patterns/formularios/campos-obrigatorios.md"
+    "rule": "Marque a obrigatoriedade em texto no rótulo, com uma única convenção por formulário, e exponha o estado também de forma programática.",
+    "file": "patterns/forms/required-fields.md"
   },
   {
-    "id": "dividir-formulario",
-    "titulo": "Quando dividir um formulário em várias etapas?",
-    "categoria": "formularios",
-    "componentes": [
-      "formulario",
-      "indicador-de-etapas",
-      "botao-voltar",
-      "botao-continuar"
+    "id": "split-form",
+    "title": "Quando dividir um formulário em várias etapas?",
+    "category": "forms",
+    "components": [
+      "form",
+      "step-indicator",
+      "back-button",
+      "continue-button"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "strong",
     "wcag": [
       "2.4.6",
       "2.4.3",
@@ -1446,151 +1775,28 @@
       "2.2.1",
       "1.3.1"
     ],
-    "relacionados": [
-      "etapas-de-formulario",
-      "ordem-dos-campos",
-      "autosave-vs-salvar",
-      "preservar-dados-apos-erro"
+    "related": [
+      "form-steps",
+      "field-order",
+      "autosave-vs-save",
+      "preserve-data-after-error"
     ],
-    "regra": "Reduza campos antes de dividir telas; só crie etapas quando houver grupos com objetivo claro, e então preserve os dados, mostre o progresso e permita voltar e revisar.",
-    "arquivo": "patterns/formularios/dividir-formulario.md"
+    "rule": "Reduza campos antes de dividir telas; só crie etapas quando houver grupos com objetivo claro, e então preserve os dados, mostre o progresso e permita voltar e revisar.",
+    "file": "patterns/forms/split-form.md"
   },
   {
-    "id": "dropdown",
-    "titulo": "Quando usar dropdown e quando evitar?",
-    "categoria": "formularios",
-    "componentes": [
-      "dropdown",
-      "select",
-      "combobox",
-      "radio",
-      "autocomplete"
+    "id": "validation-timing",
+    "title": "Quando validar campos durante o preenchimento?",
+    "category": "forms",
+    "components": [
+      "text-field",
+      "error-message",
+      "validation"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "1.3.1",
-      "4.1.2",
-      "2.1.1",
-      "2.4.7",
-      "1.4.10",
-      "3.3.2"
-    ],
-    "relacionados": [
-      "autopreenchimento",
-      "label-vs-placeholder",
-      "estrutura-de-filtros",
-      "ordem-dos-campos"
-    ],
-    "regra": "Use dropdown apenas para escolha única entre valores predefinidos; poucas opções pedem opções visíveis e listas longas pedem busca.",
-    "arquivo": "patterns/formularios/dropdown.md"
-  },
-  {
-    "id": "erros-em-formularios",
-    "titulo": "Como estruturar mensagens de erro em formulários?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-formulario",
-      "mensagem-de-erro",
-      "resumo-de-erros"
-    ],
-    "tipo": "acessibilidade",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.1",
-      "3.3.3",
-      "1.4.1",
-      "1.3.1",
-      "4.1.3"
-    ],
-    "relacionados": [
-      "mensagem-de-erro-util",
-      "preservar-dados-apos-erro",
-      "momento-da-validacao",
-      "nao-so-cor",
-      "campos-obrigatorios"
-    ],
-    "regra": "Toda mensagem de erro de campo nomeia o campo pelo rótulo, descreve o problema, diz como corrigir, fica ligada ao controle e não apaga o que a pessoa digitou.",
-    "arquivo": "patterns/formularios/erros-em-formularios.md"
-  },
-  {
-    "id": "etapas-de-formulario",
-    "titulo": "Como estruturar etapas em formulários longos?",
-    "categoria": "formularios",
-    "componentes": [
-      "indicador-de-etapas",
-      "formulario",
-      "botao",
-      "resumo-de-revisao"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "1.3.1",
-      "2.4.6",
-      "3.3.1",
-      "3.3.4",
-      "2.2.1"
-    ],
-    "relacionados": [
-      "dividir-formulario",
-      "preservar-dados-apos-erro",
-      "ordem-dos-campos",
-      "autosave-vs-salvar",
-      "momento-da-validacao"
-    ],
-    "regra": "Organize cada etapa por objetivo, mostre posição e progresso separados da navegação e preserve, permita revisar e recupere os dados ao avançar, voltar ou retomar.",
-    "arquivo": "patterns/formularios/etapas-de-formulario.md"
-  },
-  {
-    "id": "label-vs-placeholder",
-    "titulo": "Label ou placeholder: o que usar em formulários?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-texto",
-      "label",
-      "placeholder",
-      "texto-auxiliar"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.2",
-      "1.3.1",
-      "4.1.2",
-      "1.4.3",
-      "2.5.3"
-    ],
-    "relacionados": [
-      "campos-obrigatorios",
-      "ordem-dos-campos",
-      "erros-em-formularios",
-      "mensagem-de-erro-util"
-    ],
-    "regra": "Todo campo tem label visível e associado; o placeholder serve apenas como exemplo curto ou formato, nunca como identificação.",
-    "arquivo": "patterns/formularios/label-vs-placeholder.md"
-  },
-  {
-    "id": "momento-da-validacao",
-    "titulo": "Quando validar campos durante o preenchimento?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-texto",
-      "mensagem-de-erro",
-      "validacao"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "high",
+    "status": "caution",
+    "evidence": "strong",
     "wcag": [
       "3.2.1",
       "3.3.1",
@@ -1598,378 +1804,57 @@
       "4.1.3",
       "1.4.1"
     ],
-    "relacionados": [
-      "erros-em-formularios",
-      "posicao-do-erro-no-campo",
-      "requisitos-de-senha",
-      "preservar-dados-apos-erro"
+    "related": [
+      "form-errors",
+      "field-error-position",
+      "password-requirements",
+      "preserve-data-after-error"
     ],
-    "regra": "Valide ao avançar ou enviar; antecipe o feedback somente quando o valor estiver completo ou o requisito puder ser mostrado sem interromper a digitação.",
-    "arquivo": "patterns/formularios/momento-da-validacao.md"
+    "rule": "Valide ao avançar ou enviar; antecipe o feedback somente quando o valor estiver completo ou o requisito puder ser mostrado sem interromper a digitação.",
+    "file": "patterns/forms/validation-timing.md"
   },
   {
-    "id": "onde-exibir-erros",
-    "titulo": "Onde exibir mensagens de erro em formulários?",
-    "categoria": "formularios",
-    "componentes": [
-      "mensagem-de-erro",
-      "resumo-de-erros",
-      "alerta-global"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.1",
-      "1.3.1",
-      "1.4.1",
-      "2.4.3"
-    ],
-    "relacionados": [
-      "posicao-do-erro-no-campo",
-      "erros-em-formularios",
-      "toast-alerta-inline",
-      "preservar-dados-apos-erro"
-    ],
-    "regra": "Erro de campo fica junto ao campo; vários erros ganham resumo navegável no topo; mensagem global é só para falha que afeta o formulário ou o serviço inteiro.",
-    "arquivo": "patterns/formularios/onde-exibir-erros.md"
-  },
-  {
-    "id": "ordem-dos-campos",
-    "titulo": "Como definir a sequência dos campos em um formulário?",
-    "categoria": "formularios",
-    "componentes": [
-      "formulario",
-      "fieldset",
-      "legend",
-      "campo-condicional"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "2.4.3",
-      "1.3.2",
-      "1.3.1",
-      "3.3.2"
-    ],
-    "relacionados": [
-      "etapas-de-formulario",
-      "dividir-formulario",
-      "campos-obrigatorios",
-      "label-vs-placeholder",
-      "dropdown"
-    ],
-    "regra": "Ordene os campos pela tarefa da pessoa, não pelo banco de dados, e faça ordem visual, ordem do HTML e ordem do Tab seguirem a mesma lógica.",
-    "arquivo": "patterns/formularios/ordem-dos-campos.md"
-  },
-  {
-    "id": "posicao-do-erro-no-campo",
-    "titulo": "A mensagem de erro vai antes ou depois do campo?",
-    "categoria": "formularios",
-    "componentes": [
-      "campo-de-formulario",
-      "mensagem-de-erro",
-      "resumo-de-erros"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.1",
-      "3.3.3",
-      "1.3.1",
-      "1.4.1",
-      "4.1.3"
-    ],
-    "relacionados": [
-      "onde-exibir-erros",
-      "erros-em-formularios",
-      "momento-da-validacao",
-      "preservar-dados-apos-erro"
-    ],
-    "regra": "Coloque a mensagem na mesma unidade visual do rótulo e do campo, em posição consistente e ligada programaticamente ao controle; após o envio, repita-a em um resumo no topo.",
-    "arquivo": "patterns/formularios/posicao-do-erro-no-campo.md"
-  },
-  {
-    "id": "preservar-dados-apos-erro",
-    "titulo": "Como preservar os dados preenchidos após um erro no formulário?",
-    "categoria": "formularios",
-    "componentes": [
-      "formulario",
-      "campo",
-      "resumo-de-erros"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.1",
-      "3.3.3",
-      "1.4.1",
-      "4.1.3"
-    ],
-    "relacionados": [
-      "erros-em-formularios",
-      "onde-exibir-erros",
-      "tentar-novamente",
-      "sessao-expirada"
-    ],
-    "regra": "Após um erro, reexiba o formulário com todos os valores válidos mantidos e destaque apenas os campos que precisam de correção; descarte somente segredos, como senha e código de segurança do cartão.",
-    "arquivo": "patterns/formularios/preservar-dados-apos-erro.md"
-  },
-  {
-    "id": "upload-de-arquivos",
-    "titulo": "Como projetar uma boa experiência de envio de arquivos?",
-    "categoria": "formularios",
-    "componentes": [
-      "input-de-arquivo",
-      "area-de-arrastar-e-soltar",
-      "lista-de-arquivos",
-      "barra-de-progresso"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "3.3.2",
-      "3.3.1",
-      "2.1.1",
-      "4.1.3",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "erros-em-formularios",
-      "tentar-novamente",
-      "carregamento-longo",
-      "porcentagem-de-progresso",
-      "preservar-dados-apos-erro"
-    ],
-    "regra": "Mostre formatos e limites antes da seleção, use botão nativo acessível (arrastar e soltar é só alternativa), exiba o estado de cada arquivo e explique como corrigir cada falha.",
-    "arquivo": "patterns/formularios/upload-de-arquivos.md"
-  },
-  {
-    "id": "confirmar-acao-da-ia",
-    "titulo": "Quando pedir confirmação antes de uma ação executada pela IA?",
-    "categoria": "ia",
-    "componentes": [
+    "id": "close-modal",
+    "title": "Como fechar um modal corretamente?",
+    "category": "modals",
+    "components": [
       "modal",
-      "botao",
-      "resumo-de-acao"
+      "button"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "3.3.4",
-      "2.4.3",
-      "4.1.3",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "confirmar-acao",
-      "acao-destrutiva",
-      "revisar-resultado-da-ia",
-      "recuperar-erro-da-ia",
-      "desfazer"
-    ],
-    "regra": "A IA prepara a ação sem executá-la; peça confirmação explícita imediatamente antes de qualquer efeito relevante, externo, destrutivo, financeiro ou difícil de reverter, mostrando alvo, escopo e consequência.",
-    "arquivo": "patterns/ia/confirmar-acao-da-ia.md"
-  },
-  {
-    "id": "fontes-da-ia",
-    "titulo": "Como mostrar fontes e critérios nas respostas de IA?",
-    "categoria": "ia",
-    "componentes": [
-      "citacao",
-      "painel-de-fontes",
-      "resposta-de-ia",
-      "link"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "2.1.1",
-      "2.4.4",
-      "2.4.7",
-      "1.4.1",
-      "4.1.2"
-    ],
-    "relacionados": [
-      "rotular-conteudo-ia",
-      "incerteza-da-ia",
-      "revisar-resultado-da-ia",
-      "confirmar-acao-da-ia"
-    ],
-    "regra": "Ligue cada afirmação relevante à fonte que a sustenta, deixe a fonte abrível e, em saídas de alto impacto, mostre também os critérios, dados e limites usados.",
-    "arquivo": "patterns/ia/fontes-da-ia.md"
-  },
-  {
-    "id": "incerteza-da-ia",
-    "titulo": "Como comunicar limites e incerteza de respostas de IA?",
-    "categoria": "ia",
-    "componentes": [
-      "aviso",
-      "rotulo",
-      "indicador-de-confianca"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "1.4.1",
-      "4.1.3",
-      "2.2.1",
-      "3.1.5"
-    ],
-    "relacionados": [
-      "rotular-conteudo-ia",
-      "fontes-da-ia",
-      "revisar-resultado-da-ia",
-      "confirmar-acao-da-ia",
-      "recuperar-erro-da-ia"
-    ],
-    "regra": "Comunique a incerteza perto do resultado, com linguagem proporcional ao desempenho real e ligada a uma ação concreta (conferir, comparar, ver fontes, pedir revisão); mostre número de confiança só se for válido e compreensível.",
-    "arquivo": "patterns/ia/incerteza-da-ia.md"
-  },
-  {
-    "id": "recuperar-erro-da-ia",
-    "titulo": "Como oferecer recuperação quando a IA falha?",
-    "categoria": "ia",
-    "componentes": [
-      "alerta",
-      "botao",
-      "mensagem-de-erro"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "3.3.1",
-      "3.3.3",
-      "4.1.3",
-      "1.4.1"
-    ],
-    "relacionados": [
-      "tentar-novamente",
-      "incerteza-da-ia",
-      "confirmar-acao-da-ia",
-      "codigo-de-erro-tecnico",
-      "mensagem-de-erro-util"
-    ],
-    "regra": "Identifique a etapa que falhou, explique a causa em linguagem simples, preserve o pedido e o trabalho, e ofereça ao menos uma ação de recuperação específica no mesmo contexto.",
-    "arquivo": "patterns/ia/recuperar-erro-da-ia.md"
-  },
-  {
-    "id": "revisar-resultado-da-ia",
-    "titulo": "Como deixar pessoas revisarem e editarem resultados gerados por IA?",
-    "categoria": "ia",
-    "componentes": [
-      "campo-de-texto",
-      "editor",
-      "sugestao-de-ia",
-      "botao"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "2.1.1",
-      "2.4.7",
-      "4.1.3",
-      "1.4.1",
-      "2.4.3"
-    ],
-    "relacionados": [
-      "confirmar-acao-da-ia",
-      "rotular-conteudo-ia",
-      "incerteza-da-ia",
-      "recuperar-erro-da-ia"
-    ],
-    "regra": "Apresente todo resultado de IA como proposta que a pessoa pode aceitar, editar, refinar, regenerar ou descartar antes que ele afete uma decisão, comunicação ou fluxo.",
-    "arquivo": "patterns/ia/revisar-resultado-da-ia.md"
-  },
-  {
-    "id": "rotular-conteudo-ia",
-    "titulo": "Como sinalizar que um conteúdo foi gerado por IA?",
-    "categoria": "ia",
-    "componentes": [
-      "etiqueta",
-      "chip",
-      "tooltip"
-    ],
-    "tipo": "decisao-contextual",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "1.4.1",
-      "1.1.1",
-      "1.4.13",
-      "2.1.1"
-    ],
-    "relacionados": [
-      "incerteza-da-ia",
-      "fontes-da-ia",
-      "revisar-resultado-da-ia",
-      "confirmar-acao-da-ia"
-    ],
-    "regra": "Rotule com texto claro, junto ao conteúdo, tudo o que a IA gerou ou transformou de forma material, delimitando o escopo exato e sem sugerir revisão ou exatidão que não existem.",
-    "arquivo": "patterns/ia/rotular-conteudo-ia.md"
-  },
-  {
-    "id": "fechar-modal",
-    "titulo": "Como fechar um modal corretamente?",
-    "categoria": "modais",
-    "componentes": [
-      "modal",
-      "botao"
-    ],
-    "tipo": "acessibilidade",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "accessibility",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.1.2",
       "2.4.3",
       "2.4.7",
       "4.1.2"
     ],
-    "relacionados": [
-      "quando-usar-modal",
-      "quando-evitar-modal",
-      "confirmar-acao",
-      "foco-de-teclado"
+    "related": [
+      "when-to-use-modal",
+      "when-to-avoid-modal",
+      "confirm-action",
+      "keyboard-focus"
     ],
-    "regra": "Todo modal tem uma saída visível e nomeada, descarta dados somente com confirmação e devolve o foco ao elemento que o abriu.",
-    "arquivo": "patterns/modais/fechar-modal.md"
+    "rule": "Todo modal tem uma saída visível e nomeada, descarta dados somente com confirmação e devolve o foco ao elemento que o abriu.",
+    "file": "patterns/modals/close-modal.md"
   },
   {
-    "id": "quando-evitar-modal",
-    "titulo": "Quando não usar modal?",
-    "categoria": "modais",
-    "componentes": [
+    "id": "when-to-avoid-modal",
+    "title": "Quando não usar modal?",
+    "category": "modals",
+    "components": [
       "modal",
-      "alerta",
+      "alert",
       "toast",
-      "painel-lateral",
-      "pagina"
+      "side-panel",
+      "page"
     ],
-    "tipo": "antipadrao",
-    "impacto": "alto",
-    "status": "evitar",
-    "evidencia": "forte",
+    "type": "anti-pattern",
+    "impact": "high",
+    "status": "avoid",
+    "evidence": "strong",
     "wcag": [
       "2.1.2",
       "2.4.3",
@@ -1977,28 +1862,28 @@
       "1.4.10",
       "4.1.3"
     ],
-    "relacionados": [
-      "quando-usar-modal",
-      "fechar-modal",
-      "toast-alerta-inline",
-      "onde-exibir-erros"
+    "related": [
+      "when-to-use-modal",
+      "close-modal",
+      "toast-vs-inline-alert",
+      "error-placement"
     ],
-    "regra": "Trate o modal como último recurso: use-o só para decisão curta que exige atenção imediata; fluxos longos, mensagens rotineiras e textos extensos ficam na página.",
-    "arquivo": "patterns/modais/quando-evitar-modal.md"
+    "rule": "Trate o modal como último recurso: use-o só para decisão curta que exige atenção imediata; fluxos longos, mensagens rotineiras e textos extensos ficam na página.",
+    "file": "patterns/modals/when-to-avoid-modal.md"
   },
   {
-    "id": "quando-usar-modal",
-    "titulo": "Quando usar modal?",
-    "categoria": "modais",
-    "componentes": [
+    "id": "when-to-use-modal",
+    "title": "Quando usar modal?",
+    "category": "modals",
+    "components": [
       "modal",
-      "dialogo",
-      "botao"
+      "dialog",
+      "button"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.1.1",
       "2.1.2",
@@ -2007,56 +1892,27 @@
       "1.4.10",
       "4.1.2"
     ],
-    "relacionados": [
-      "quando-evitar-modal",
-      "fechar-modal",
-      "foco-de-teclado",
-      "confirmar-acao"
+    "related": [
+      "when-to-avoid-modal",
+      "close-modal",
+      "keyboard-focus",
+      "confirm-action"
     ],
-    "regra": "Use modal só para decisão ou tarefa curta que exige atenção imediata; se uma página, mensagem inline ou painel lateral resolver, não use modal.",
-    "arquivo": "patterns/modais/quando-usar-modal.md"
-  },
-  {
-    "id": "abas",
-    "titulo": "Quando usar abas?",
-    "categoria": "navegacao",
-    "componentes": [
-      "abas",
-      "tablist",
-      "painel"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "forte",
-    "wcag": [
-      "4.1.2",
-      "2.1.1",
-      "1.4.11",
-      "2.4.7",
-      "1.4.10"
-    ],
-    "relacionados": [
-      "breadcrumbs",
-      "carrossel",
-      "navegacao-principal",
-      "estrutura-de-filtros"
-    ],
-    "regra": "Use abas só para poucos conteúdos relacionados, de mesma importância e independentes o bastante para serem vistos um de cada vez.",
-    "arquivo": "patterns/navegacao/abas.md"
+    "rule": "Use modal só para decisão ou tarefa curta que exige atenção imediata; se uma página, mensagem inline ou painel lateral resolver, não use modal.",
+    "file": "patterns/modals/when-to-use-modal.md"
   },
   {
     "id": "breadcrumbs",
-    "titulo": "Quando usar breadcrumbs?",
-    "categoria": "navegacao",
-    "componentes": [
+    "title": "Quando usar breadcrumbs?",
+    "category": "navigation",
+    "components": [
       "breadcrumbs",
-      "navegacao-secundaria"
+      "secondary-navigation"
     ],
-    "tipo": "recomendacao",
-    "impacto": "medio",
-    "status": "recomendado",
-    "evidencia": "moderada",
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "moderate",
     "wcag": [
       "2.4.8",
       "2.4.4",
@@ -2064,57 +1920,57 @@
       "2.4.7",
       "1.3.1"
     ],
-    "relacionados": [
-      "abas",
-      "navegacao-principal",
-      "paginacao-vs-scroll",
-      "filtros-ativos"
+    "related": [
+      "tabs",
+      "main-navigation",
+      "pagination-vs-scroll",
+      "active-filters"
     ],
-    "regra": "Use breadcrumbs só quando existir hierarquia real de páginas, e trate o retorno aos resultados como uma ação separada da trilha.",
-    "arquivo": "patterns/navegacao/breadcrumbs.md"
+    "rule": "Use breadcrumbs só quando existir hierarquia real de páginas, e trate o retorno aos resultados como uma ação separada da trilha.",
+    "file": "patterns/navigation/breadcrumbs.md"
   },
   {
-    "id": "link-em-nova-aba",
-    "titulo": "Links devem abrir em nova aba?",
-    "categoria": "navegacao",
-    "componentes": [
+    "id": "link-in-new-tab",
+    "title": "Links devem abrir em nova aba?",
+    "category": "navigation",
+    "components": [
       "link",
-      "icone-de-link-externo"
+      "external-link-icon"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "forte",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "strong",
     "wcag": [
       "2.4.4",
       "3.2.5",
       "3.2.2",
       "1.4.1"
     ],
-    "relacionados": [
-      "link-vs-botao",
-      "texto-de-link",
-      "navegacao-principal",
+    "related": [
+      "link-vs-button",
+      "link-text",
+      "main-navigation",
       "breadcrumbs"
     ],
-    "regra": "Por padrão, abra links na mesma aba; reserve a nova aba para resguardar uma tarefa em curso e avise sempre no próprio link.",
-    "arquivo": "patterns/navegacao/link-em-nova-aba.md"
+    "rule": "Por padrão, abra links na mesma aba; reserve a nova aba para resguardar uma tarefa em curso e avise sempre no próprio link.",
+    "file": "patterns/navigation/link-in-new-tab.md"
   },
   {
-    "id": "navegacao-principal",
-    "titulo": "Como criar uma navegação principal clara?",
-    "categoria": "navegacao",
-    "componentes": [
-      "cabecalho",
+    "id": "main-navigation",
+    "title": "Como criar uma navegação principal clara?",
+    "category": "navigation",
+    "components": [
+      "header",
       "nav",
       "menu",
       "submenu",
-      "menu-mobile"
+      "mobile-menu"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.4.1",
       "2.4.7",
@@ -2124,29 +1980,29 @@
       "1.4.10",
       "3.2.3"
     ],
-    "relacionados": [
+    "related": [
       "breadcrumbs",
-      "abas",
-      "link-em-nova-aba",
-      "paginacao-vs-scroll"
+      "tabs",
+      "link-in-new-tab",
+      "pagination-vs-scroll"
     ],
-    "regra": "Mostre poucos destinos no primeiro nível, com rótulos na linguagem do público, separados de ações, em posição consistente, com a seção atual indicada e operação sem depender de hover.",
-    "arquivo": "patterns/navegacao/navegacao-principal.md"
+    "rule": "Mostre poucos destinos no primeiro nível, com rótulos na linguagem do público, separados de ações, em posição consistente, com a seção atual indicada e operação sem depender de hover.",
+    "file": "patterns/navigation/main-navigation.md"
   },
   {
-    "id": "paginacao-vs-scroll",
-    "titulo": "Paginação, \"Carregar mais\" ou scroll infinito?",
-    "categoria": "navegacao",
-    "componentes": [
-      "paginacao",
-      "botao-carregar-mais",
-      "scroll-infinito",
-      "lista"
+    "id": "pagination-vs-scroll",
+    "title": "Paginação, \"Carregar mais\" ou scroll infinito?",
+    "category": "navigation",
+    "components": [
+      "pagination",
+      "load-more-button",
+      "infinite-scroll",
+      "list"
     ],
-    "tipo": "decisao-contextual",
-    "impacto": "medio",
-    "status": "usar-com-cautela",
-    "evidencia": "moderada",
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "moderate",
     "wcag": [
       "2.1.1",
       "2.4.3",
@@ -2154,92 +2010,236 @@
       "1.4.10",
       "2.4.8"
     ],
-    "relacionados": [
-      "paginacao-de-tabela",
-      "carregamento-longo",
+    "related": [
+      "table-pagination",
+      "long-loading",
       "skeleton-vs-spinner",
-      "filtros-ativos"
+      "active-filters"
     ],
-    "regra": "Se localizar e retornar pesam mais, adote paginação; se explorar e comparar pesam mais, adote \"Carregar mais\"; deixe o scroll infinito para feeds em que seguir rolando é a própria tarefa.",
-    "arquivo": "patterns/navegacao/paginacao-vs-scroll.md"
+    "rule": "Se localizar e retornar pesam mais, adote paginação; se explorar e comparar pesam mais, adote \"Carregar mais\"; deixe o scroll infinito para feeds em que seguir rolando é a própria tarefa.",
+    "file": "patterns/navigation/pagination-vs-scroll.md"
   },
   {
-    "id": "mensagem-de-erro-util",
-    "titulo": "Como escrever mensagens de erro úteis?",
-    "categoria": "ux-writing",
-    "componentes": [
-      "mensagem-de-erro",
-      "campo-de-texto",
-      "resumo-de-erros"
+    "id": "tabs",
+    "title": "Quando usar abas?",
+    "category": "navigation",
+    "components": [
+      "tabs",
+      "tablist",
+      "panel"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "medium",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.2",
+      "2.1.1",
+      "1.4.11",
+      "2.4.7",
+      "1.4.10"
+    ],
+    "related": [
+      "breadcrumbs",
+      "carousel",
+      "main-navigation",
+      "filter-structure"
+    ],
+    "rule": "Use abas só para poucos conteúdos relacionados, de mesma importância e independentes o bastante para serem vistos um de cada vez.",
+    "file": "patterns/navigation/tabs.md"
+  },
+  {
+    "id": "active-filters",
+    "title": "Como mostrar os filtros ativos?",
+    "category": "search-filters",
+    "components": [
+      "filter",
+      "chip",
+      "list"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.2",
+      "4.1.3",
+      "1.4.1",
+      "2.1.1"
+    ],
+    "related": [
+      "filter-structure",
+      "applying-filters",
+      "no-search-results",
+      "date-range-filter"
+    ],
+    "rule": "Depois de aplicar filtros, exiba um resumo visível com nome e valor de cada critério, remoção individual e uma ação \"Limpar filtros\", fora de qualquer painel fechado.",
+    "file": "patterns/search-filters/active-filters.md"
+  },
+  {
+    "id": "applying-filters",
+    "title": "Filtros devem ser aplicados automaticamente?",
+    "category": "search-filters",
+    "components": [
+      "filter",
+      "filter-panel",
+      "apply-button",
+      "results-list"
+    ],
+    "type": "contextual-decision",
+    "impact": "medium",
+    "status": "caution",
+    "evidence": "strong",
+    "wcag": [
+      "3.2.2",
+      "4.1.3",
+      "1.4.1",
+      "2.4.7"
+    ],
+    "related": [
+      "filter-structure",
+      "active-filters",
+      "no-search-results",
+      "date-range-filter"
+    ],
+    "rule": "Atualize a lista na hora quando a resposta for rápida e a escolha for simples; exija \"Aplicar\" quando houver várias escolhas combinadas, consulta lenta ou painel que cobre os resultados.",
+    "file": "patterns/search-filters/applying-filters.md"
+  },
+  {
+    "id": "filter-structure",
+    "title": "Como estruturar filtros em uma interface?",
+    "category": "search-filters",
+    "components": [
+      "filter",
+      "checkbox",
+      "radio",
+      "select",
+      "side-panel"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "1.3.1",
+      "3.3.2",
+      "4.1.3",
+      "1.4.10"
+    ],
+    "related": [
+      "active-filters",
+      "applying-filters",
+      "no-search-results",
+      "date-range-filter"
+    ],
+    "rule": "Ofereça só filtros que respondem a decisões reais da tarefa, agrupados por significado, com lógica de combinação previsível, estado ativo visível e saída simples (remover um, limpar todos).",
+    "file": "patterns/search-filters/filter-structure.md"
+  },
+  {
+    "id": "no-search-results",
+    "title": "O que mostrar quando a busca não retorna resultados?",
+    "category": "search-filters",
+    "components": [
+      "search-field",
+      "empty-state",
+      "filters",
+      "status-region"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
+    "wcag": [
+      "4.1.3",
+      "3.3.1",
+      "2.4.3"
+    ],
+    "related": [
+      "empty-state",
+      "active-filters",
+      "retry",
+      "filter-structure"
+    ],
+    "rule": "Mantenha a consulta digitada, informe com clareza que não há resultados e aponte o caminho mais provável para seguir, sem deslocar o foco.",
+    "file": "patterns/search-filters/no-search-results.md"
+  },
+  {
+    "id": "button-text",
+    "title": "Como escrever o texto de um botão?",
+    "category": "ux-writing",
+    "components": [
+      "button"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "moderate",
+    "wcag": [
+      "2.5.3",
+      "2.4.6"
+    ],
+    "related": [
+      "link-text",
+      "button-hierarchy",
+      "icon-only-button",
+      "confirm-deletion"
+    ],
+    "rule": "Inicie o rótulo com um verbo e nomeie o resultado da ação; se alguém puder indagar \"enviar o quê?\" ou \"continuar para onde?\", inclua o objeto ou o destino.",
+    "file": "patterns/ux-writing/button-text.md"
+  },
+  {
+    "id": "helpful-error-message",
+    "title": "Como escrever mensagens de erro úteis?",
+    "category": "ux-writing",
+    "components": [
+      "error-message",
+      "text-field",
+      "error-summary"
+    ],
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "3.3.1",
       "3.3.3",
       "1.4.1",
       "4.1.3"
     ],
-    "relacionados": [
-      "erros-em-formularios",
-      "posicao-do-erro-no-campo",
-      "onde-exibir-erros",
-      "preservar-dados-apos-erro",
-      "codigo-de-erro-tecnico"
+    "related": [
+      "form-errors",
+      "field-error-position",
+      "error-placement",
+      "preserve-data-after-error",
+      "technical-error-code"
     ],
-    "regra": "Toda mensagem de erro deve nomear o campo, descrever o problema em texto simples e indicar a correção (formato, limite ou valor esperado), sem culpar a pessoa.",
-    "arquivo": "patterns/ux-writing/mensagem-de-erro-util.md"
+    "rule": "Toda mensagem de erro deve nomear o campo, descrever o problema em texto simples e indicar a correção (formato, limite ou valor esperado), sem culpar a pessoa.",
+    "file": "patterns/ux-writing/helpful-error-message.md"
   },
   {
-    "id": "texto-de-botao",
-    "titulo": "Como escrever o texto de um botão?",
-    "categoria": "ux-writing",
-    "componentes": [
-      "botao"
-    ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "moderada",
-    "wcag": [
-      "2.5.3",
-      "2.4.6"
-    ],
-    "relacionados": [
-      "texto-de-link",
-      "hierarquia-de-botoes",
-      "icone-sem-texto",
-      "confirmar-exclusao"
-    ],
-    "regra": "Inicie o rótulo com um verbo e nomeie o resultado da ação; se alguém puder indagar \"enviar o quê?\" ou \"continuar para onde?\", inclua o objeto ou o destino.",
-    "arquivo": "patterns/ux-writing/texto-de-botao.md"
-  },
-  {
-    "id": "texto-de-link",
-    "titulo": "Por que evitar \"clique aqui\" em links?",
-    "categoria": "ux-writing",
-    "componentes": [
+    "id": "link-text",
+    "title": "Por que evitar \"clique aqui\" em links?",
+    "category": "ux-writing",
+    "components": [
       "link"
     ],
-    "tipo": "recomendacao",
-    "impacto": "alto",
-    "status": "recomendado",
-    "evidencia": "forte",
+    "type": "recommendation",
+    "impact": "high",
+    "status": "recommended",
+    "evidence": "strong",
     "wcag": [
       "2.4.4",
       "2.4.9",
       "2.5.3",
       "1.4.1"
     ],
-    "relacionados": [
-      "link-vs-botao",
-      "link-em-nova-aba",
-      "texto-de-botao",
-      "foco-de-teclado"
+    "related": [
+      "link-vs-button",
+      "link-in-new-tab",
+      "button-text",
+      "keyboard-focus"
     ],
-    "regra": "O texto do link deve informar o destino ou o propósito por si só; nunca use \"clique aqui\", \"aqui\" ou \"leia mais\" como único texto clicável.",
-    "arquivo": "patterns/ux-writing/texto-de-link.md"
+    "rule": "O texto do link deve informar o destino ou o propósito por si só; nunca use \"clique aqui\", \"aqui\" ou \"leia mais\" como único texto clicável.",
+    "file": "patterns/ux-writing/link-text.md"
   }
 ]

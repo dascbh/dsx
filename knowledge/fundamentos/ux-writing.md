@@ -33,37 +33,37 @@ Texto de interface é design: ele decide se a pessoa entende o que vai acontecer
 - Rótulo prevê o resultado: o botão do dialog repete o verbo da pergunta.
 - Evite "OK", "Sim", "Enviar" sozinho, "Clique aqui".
 - Estado de carregamento: gerúndio + reticências ("Salvando…").
-- Ver [texto-de-botao](../../patterns/ux-writing/texto-de-botao.md), [texto-de-link](../../patterns/ux-writing/texto-de-link.md).
+- Ver [button-text](../../patterns/ux-writing/button-text.md), [link-text](../../patterns/ux-writing/link-text.md).
 
 ### Mensagens de erro
 `o que aconteceu + por quê/onde + como resolver`
 - "Não foi possível concluir o pagamento. O cartão foi recusado pelo banco. Use outro cartão ou fale com o emissor."
 - Em campo: frase curta com a correção ("Informe um CPF com 11 dígitos").
 - Nunca culpe ("Você digitou errado"), nunca exponha código técnico sem tradução, nunca use humor.
-- Ver [mensagem-de-erro-util](../../patterns/ux-writing/mensagem-de-erro-util.md), [erros-em-formularios](../../patterns/formularios/erros-em-formularios.md).
+- Ver [helpful-error-message](../../patterns/ux-writing/helpful-error-message.md), [form-errors](../../patterns/forms/form-errors.md).
 
 ### Estados vazios
 `o que aparece aqui + por que está vazio (se não óbvio) + ação`
 - "Nenhum projeto ainda. Projetos reúnem arquivos e pessoas de um mesmo trabalho. [Criar projeto]"
 - Busca: "Nenhum resultado para "contrato 2025". Confira a grafia ou tente um termo mais geral."
-- Ver [estado-vazio](../../patterns/feedback/estado-vazio.md).
+- Ver [empty-state](../../patterns/feedback/empty-state.md).
 
 ### Confirmações (antes de agir)
 Título como pergunta com o verbo e o objeto; corpo com a consequência; botões com o verbo.
 - Título: "Excluir o projeto Lançamento?"
 - Corpo: "Os 14 arquivos e o histórico serão apagados. Não é possível desfazer."
 - Botões: "Excluir projeto" (destrutivo) · "Cancelar".
-- Ver [confirmar-acao](../../patterns/acoes/confirmar-acao.md), [confirmar-exclusao](../../patterns/acoes/confirmar-exclusao.md).
+- Ver [confirm-action](../../patterns/actions/confirm-action.md), [confirm-deletion](../../patterns/actions/confirm-deletion.md).
 
 ### Sucesso
 `o que foi feito + o que vem agora (se houver)`
 - "Convite enviado para ana@exemplo.com. Ela tem 7 dias para aceitar."
 - Celebre na proporção do feito; uma compra simples não pede fogos de artifício.
-- Ver [confirmacao-de-sucesso](../../patterns/feedback/confirmacao-de-sucesso.md).
+- Ver [success-confirmation](../../patterns/feedback/success-confirmation.md).
 
 ### Rótulos e textos de apoio
 - Rótulo nomeia o dado ("Data de nascimento"); texto de apoio dá formato ou motivo ("Usamos para confirmar sua idade").
-- Placeholder não substitui rótulo ([label-vs-placeholder](../../patterns/formularios/label-vs-placeholder.md)).
+- Placeholder não substitui rótulo ([label-vs-placeholder](../../patterns/forms/label-vs-placeholder.md)).
 
 ---
 

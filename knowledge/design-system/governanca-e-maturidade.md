@@ -82,7 +82,7 @@ Regras de pontuação:
 
 `drift = ocorrências de valor cru ÷ linhas de código de UI × 1000`
 
-- Calculado por `node tools/lint-raw-values.mjs <dir> --json` (campo `driftPorMilLinhas`).
+- Calculado por `node tools/lint-raw-values.mjs <dir> --json` (campo `drift_per_1000_lines`).
 - Regras detectadas: hex cru, cor funcional crua (`rgb()`, `hsl()`, `oklch()`…), px fora da escala (≥ 2px), `z-index` de três dígitos ou mais, valor arbitrário de framework utilitário.
 - Linhas com `dsx-ignore` são ignoradas: conte os escapes separadamente e revise-os; escape sem justificativa é drift escondido.
 - Use como **tendência**: compare o mesmo repositório entre versões. Meta saudável: drift caindo a cada ciclo e zero em código novo (o linter sai com código 1 se encontrar ocorrências; use isso no CI para diffs).

@@ -1,6 +1,6 @@
 ---
 name: mapeador-fluxos
-description: "Mapeia como o usuário se move entre telas para atingir um objetivo — o grafo de navegação, seus desvios, pontos de decisão e rotas de entrada e saída — derivado das chamadas de navegação reais do código, nunca suposto. Grava um mapa de referência (`.dsx/mapas/fluxos.{md,json}`) que a fase de Fluxos do `figma-espelhar`, o `figma-trazer` e o `construir-ui` leem em vez de redescobrir a navegação. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
+description: "Mapeia como o usuário se move entre telas para atingir um objetivo — o grafo de navegação, seus desvios, pontos de decisão e rotas de entrada e saída — derivado das chamadas de navegação reais do código, nunca suposto. Grava um mapa de referência (`.dsx/maps/flows.{md,json}`) que a fase de Fluxos do `figma-espelhar`, o `figma-trazer` e o `construir-ui` leem em vez de redescobrir a navegação. Somente leitura no código e nunca chama `use_figma`. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, junto com `mapeador-ui`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 
@@ -17,16 +17,16 @@ Toda execução **regenera e sobrescreve por completo** os dois arquivos.
 
 ## Antes de começar
 
-Se `.dsx/mapas/mapa-ui.json` existir, leia — reaproveite o inventário de
+Se `.dsx/maps/ui-map.json` existir, leia — reaproveite o inventário de
 páginas e modais como a lista de nós do grafo que você vai montar, em vez de
 redescobrir rotas e diálogos do zero. Se não existir, faça você mesmo o grep
 mínimo de rotas/diálogos e siga em frente.
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa, leia primeiro
-`.dsx/mapas/`; se não existir, aceite o legado `.claude/figma-claude/`
-(`ui-map.json` em vez de `mapa-ui.json`) e registre na sua linha de retorno
+`.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/`
+(`ui-map.json` em vez de `ui-map.json`) e registre na sua linha de retorno
 que o legado foi lido e que o mapa será regravado no caminho novo na próxima
-execução. Você sempre **grava** só em `.dsx/mapas/`.
+execução. Você sempre **grava** só em `.dsx/maps/`.
 
 Comece a varredura em `$ARGUMENTS` se tiver sido passado; senão, na raiz do
 projeto.
@@ -58,7 +58,7 @@ sinalizar.
 
 **3. Inclua os passos movidos por modal.**
 
-Onde um modal (vindo do `mapa-ui.json`, ou achado por grep) faz parte do
+Onde um modal (vindo do `ui-map.json`, ou achado por grep) faz parte do
 caminho de um estado a outro — ex.: um `EditDialog` que, ao confirmar,
 navega para outro lugar —, trate-o como nó do fluxo, não como nota de rodapé.
 
@@ -75,20 +75,20 @@ nome com cara de marketing).
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos por inteiro,
+Crie `.dsx/maps/` se não existir e grave os dois arquivos por inteiro,
 substituindo o que havia antes. As chaves do JSON ficam em inglês — são
 contrato de máquina; traduzir quebraria os leitores. Só a prosa (valores
 descritivos, nomes de fluxo) vai em pt-BR.
 
-**`.dsx/mapas/fluxos.json`**:
+**`.dsx/maps/flows.json`**:
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/caminho/absoluto",
   "scope": "projeto inteiro",
-  "entryPoints": ["/", "/login"],
-  "deadEnds": ["/order/:id/confirmation"],
+  "entry_points": ["/", "/login"],
+  "dead_ends": ["/order/:id/confirmation"],
   "flows": [
     {
       "name": "Criar uma nova demanda",
@@ -98,7 +98,7 @@ descritivos, nomes de fluxo) vai em pt-BR.
       ]
     }
   ],
-  "guardedRoutes": [{ "route": "/admin", "condition": "role === 'admin'", "fallback": "/403" }],
+  "guarded_routes": [{ "route": "/admin", "condition": "role === 'admin'", "fallback": "/403" }],
   "uncertain": [
     { "key": "flow:/demands->/demands/new->/demands/:id", "item": "nome do fluxo 'Criar uma nova demanda'", "why": "nenhum rótulo explícito no código para esta sequência; nomeado a partir do texto da rota/botão" }
   ]
@@ -119,7 +119,7 @@ de/para, como acima), nunca a partir da sua própria redação. O
 frases, porque a sua redação pode (e vai) variar um pouco entre execuções do
 mesmo fluxo — a chave não deve variar.
 
-**`.dsx/mapas/fluxos.md`** — narrado: `# Fluxos do usuário`, depois
+**`.dsx/maps/flows.md`** — narrado: `# Fluxos do usuário`, depois
 `gerado:` / `raiz:` / `escopo:`, uma subseção por fluxo nomeado como um
 caminho numerado curto (não um despejo de arestas cruas), mais as seções
 "Pontos de entrada", "Becos sem saída", "Rotas protegidas" e "Incertos".
@@ -128,7 +128,7 @@ Feche com:
 ```markdown
 ## Para os comandos seguintes
 
-Este arquivo e `fluxos.json` são regenerados por `/dsx:mapear` a cada
+Este arquivo e `flows.json` são regenerados por `/dsx:mapear` a cada
 execução, sempre sobrescrevendo o que havia antes. A fase de Fluxos do
 `figma-espelhar`, o `figma-trazer` e o `construir-ui` devem ler isto antes de
 redescobrir a navegação do zero, e rodar o `mapear` de novo primeiro se

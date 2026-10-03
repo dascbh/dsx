@@ -1,6 +1,6 @@
 ---
 name: mapeador-ui
-description: "Varre a fundo a UI e a estrutura de design do front-end de um projeto — páginas e subpáginas, modais e overlays, tokens de design, tipografia, iconografia e o kit de componentes reutilizáveis — e grava um mapa de referência (`.dsx/mapas/mapa-ui.{md,json}`) que `figma-espelhar`, `figma-fundacoes`, `figma-cobertura`, `figma-trazer` e `construir-ui` leem em vez de redescobrir tudo a cada vez. Somente leitura no código e nunca chama `use_figma` — não faz mudança nenhuma no Figma. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, logo depois do `mapeador-projeto`, junto com `mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`, ou sempre que a UI mudou o bastante para as etapas de espelho/fundações/cobertura redescobrirem tudo. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
+description: "Varre a fundo a UI e a estrutura de design do front-end de um projeto — páginas e subpáginas, modais e overlays, tokens de design, tipografia, iconografia e o kit de componentes reutilizáveis — e grava um mapa de referência (`.dsx/maps/ui-map.{md,json}`) que `figma-espelhar`, `figma-fundacoes`, `figma-cobertura`, `figma-trazer` e `construir-ui` leem em vez de redescobrir tudo a cada vez. Somente leitura no código e nunca chama `use_figma` — não faz mudança nenhuma no Figma. Sobrescreve a própria saída a cada execução. Use como parte de `/dsx:mapear`, logo depois do `mapeador-projeto`, junto com `mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada` e `mapeador-dominio`, ou sempre que a UI mudou o bastante para as etapas de espelho/fundações/cobertura redescobrirem tudo. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 
@@ -21,17 +21,17 @@ Nunca mescle com a versão anterior nem a remende.
 
 ## Antes de começar
 
-Se `.dsx/mapas/mapa-projeto.json` existir (do passo 1 do `/dsx:mapear`),
+Se `.dsx/maps/project-map.json` existir (do passo 1 do `/dsx:mapear`),
 leia-o e reaproveite a detecção de stack, o caminho do arquivo de tema e o
 pacote de ícones em vez de re-derivá-los. Se não existir, faça você mesmo a
 checagem mínima de stack (`ls package.json tsconfig.json 2>/dev/null`) e
 siga em frente — não trave esperando o usuário rodar o passo 1 primeiro.
 
 **Compatibilidade com o fluxo anterior:** ao procurar um mapa, leia primeiro
-`.dsx/mapas/`; se não existir, aceite o legado `.claude/figma-claude/`
-(`project-map.json` em vez de `mapa-projeto.json`) e registre na sua linha
+`.dsx/maps/`; se não existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/`
+e registre na sua linha
 de retorno que o legado foi lido e que o mapa será regravado no caminho novo
-na próxima execução. Você sempre **grava** só em `.dsx/mapas/`.
+na próxima execução. Você sempre **grava** só em `.dsx/maps/`.
 
 Enraíze a varredura no escopo recebido (`$ARGUMENTS`), se houver; senão, na
 raiz do projeto.
@@ -65,7 +65,7 @@ link da barra lateral/superior, não só uma aba `<Outlet>` aninhada nem um
 parâmetro de detalhe `:id`) é um **destino distinto**, não uma variante do
 pai — mesmo quando renderiza pelo exatamente mesmo componente via alias de
 rota ou parâmetro de tipo. Cruze com o que o passo 8 encontrar no chrome de
-navegação e marque-a com `"navVisible": true` em `subPages`, com o seu
+navegação e marque-a com `"nav_visible": true` em `sub_pages`, com o seu
 próprio propósito de uma linha. É essa a distinção de que `figma-espelhar` e
 `figma-cobertura` precisam para decidir se uma rota de componente
 compartilhado ganha frame próprio; perdê-la aqui é como três links reais da
@@ -89,7 +89,7 @@ nome de componente solto.
 Esta é uma passada mais leve que a do passo 3 do `/dsx:mapear` (agente
 `extrator-design-system`: sem adaptadores por framework, sem detecção de
 hazards) — boa o bastante para trabalhar até aquele passo rodar, e
-substituída quando `.dsx/mapas/design-system.json` existir. Não pule este
+substituída quando `.dsx/maps/design-system.json` existir. Não pule este
 passo só porque o extrator talvez rode depois; o `mapear` no modo de cinco
 agentes ainda precisa ser útil sozinho.
 
@@ -166,50 +166,50 @@ nativos), a partir do `package.json`.
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos, substituindo por
+Crie `.dsx/maps/` se não existir e grave os dois arquivos, substituindo por
 completo o que houver.
 
-**`.dsx/mapas/mapa-ui.json`** — estruturado, uma chave por seção acima;
+**`.dsx/maps/ui-map.json`** — estruturado, uma chave por seção acima;
 adapte à vontade, descarte uma chave em vez de preenchê-la com um palpite.
 Os nomes de campo ficam em inglês — são contrato de máquina; só os valores
 descritivos (`purpose`, `note`, `kind`) podem vir em português:
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/absolute/path",
   "scope": "whole project",
   "pages": [
     { "path": "/demands", "source": "src/pages/DemandsPage.tsx", "shell": "MainLayout",
-      "subPages": [{ "path": "/demands/:id", "kind": "detail" }] },
+      "sub_pages": [{ "path": "/demands/:id", "kind": "detail" }] },
     { "path": "/resources", "source": "src/pages/admin/AdminResourcesPage.tsx", "shell": "AdminLayout",
       "note": "um único componente serve /resources, /skills, /tools e /guardrails via parâmetro de tipo",
-      "subPages": [
-        { "path": "/skills", "kind": "visão filtrada (type=skill)", "navVisible": true },
-        { "path": "/tools", "kind": "visão filtrada (type=tool)", "navVisible": true },
-        { "path": "/guardrails", "kind": "visão filtrada (type=guardrail)", "navVisible": true }
+      "sub_pages": [
+        { "path": "/skills", "kind": "visão filtrada (type=skill)", "nav_visible": true },
+        { "path": "/tools", "kind": "visão filtrada (type=tool)", "nav_visible": true },
+        { "path": "/guardrails", "kind": "visão filtrada (type=guardrail)", "nav_visible": true }
       ] }
   ],
   "modals": [
-    { "name": "EditDialog", "kind": "dialog", "triggeredFrom": "DemandsPage", "purpose": "editar uma demanda" }
+    { "name": "EditDialog", "kind": "dialog", "triggered_from": "DemandsPage", "purpose": "editar uma demanda" }
   ],
-  "designSystem": {
-    "themeFile": "src/theme.ts",
+  "design_system": {
+    "theme_file": "src/theme.ts",
     "modes": ["light", "dark"],
-    "colorTokens": { "brand/primary-main": { "light": "#0a5", "dark": "#3c8" } },
-    "spacingScale": [4, 8, 12, 16, 24, 32],
-    "radiusScale": [4, 8, 12],
+    "color_tokens": { "brand/primary-main": { "light": "#0a5", "dark": "#3c8" } },
+    "spacing_scale": [4, 8, 12, 16, 24, 32],
+    "radius_scale": [4, 8, 12],
     "elevation": ["0 1px 2px rgba(0,0,0,.1)"]
   },
   "typography": { "families": ["Plus Jakarta Sans"], "sizes": [11, 12.5, 13, 13.5, 15, 21] },
   "iconography": { "package": "@mui/icons-material", "used": ["Edit", "CheckCircle", "ReportProblem"] },
-  "componentKit": [{ "path": "src/components/SectionCard.tsx", "category": "card", "lines": 88 }],
-  "states": { "screensWithEmpty": 4, "screensWithLoading": 6, "screensWithError": 3, "screensMissingStates": ["ReportsPage"] },
-  "layout": { "chrome": ["AppBar", "SideMenu"], "breakpoints": [600, 960, 1280], "formsLibrary": "react-hook-form" }
+  "component_kit": [{ "path": "src/components/SectionCard.tsx", "category": "card", "lines": 88 }],
+  "states": { "screens_with_empty": 4, "screens_with_loading": 6, "screens_with_error": 3, "screens_missing_states": ["ReportsPage"] },
+  "layout": { "chrome": ["AppBar", "SideMenu"], "breakpoints": [600, 960, 1280], "forms_library": "react-hook-form" }
 }
 ```
 
-**`.dsx/mapas/mapa-ui.md`** — os mesmos fatos, narrados para serem lidos
+**`.dsx/maps/ui-map.md`** — os mesmos fatos, narrados para serem lidos
 por alto em menos de dois minutos: `# Mapa da UI`, depois as linhas
 `gerado:` / `raiz:` / `escopo:`, depois uma seção por área acima (Páginas e
 subpáginas — como árvore, não como lista plana; Modais e overlays; Design
@@ -220,7 +220,7 @@ navegação e responsivo), cada uma com uma tabela/lista curta ou uma linha
 ```markdown
 ## Para as etapas seguintes
 
-Este arquivo e `mapa-ui.json` são regenerados pelo `/dsx:mapear` toda vez
+Este arquivo e `ui-map.json` são regenerados pelo `/dsx:mapear` toda vez
 que ele roda, sempre sobrescrevendo o que estava aqui. `figma-espelhar`,
 `figma-fundacoes`, `figma-cobertura`, `figma-trazer` e `construir-ui` devem
 ler isto antes de redescobrir a UI do zero, e rodar o mapear de novo

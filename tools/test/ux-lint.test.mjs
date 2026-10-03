@@ -2,19 +2,20 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseHtml, querySelectorAll, querySelector, closest, textOf } from '../ux-lint/lib/html.mjs';
 import { configFrom } from '../ux-lint/lib/config.mjs';
-import { analisarTela } from '../ux-lint/tela.mjs';
-import { analisarFluxo } from '../ux-lint/fluxo.mjs';
+import { analyzeScreen, summarize } from '../ux-lint/screen.mjs';
+import { normalizeDetectorJson } from '../ux-lint/lib/legacy.mjs';
+import { analyzeFlow } from '../ux-lint/flow.mjs';
 import { parseYaml } from '../lib/yaml-lite.mjs';
 
-const regras = (r) => r.achados.map((a) => a.regra).sort();
-const pagina = (corpo, h1 = '<h1>Contratos</h1>') =>
-  `<!doctype html><html><head><title>t</title><style>.x{}</style></head><body><header>Topo</header><main>${h1}${corpo}</main></body></html>`;
-const prim = (t) => `<button class="MuiButton-root MuiButton-contained">${t}</button>`;
-const sec = (t) => `<button class="MuiButton-root MuiButton-text">${t}</button>`;
-const dlg = (titulo, conteudo, rodape) =>
-  `<div role="presentation"><div class="MuiDialog-paper" role="dialog" aria-labelledby="t1"><h2 id="t1">${titulo}</h2><div>${conteudo}</div><div class="MuiDialogActions-root">${rodape}</div></div></div>`;
+const rules = (r) => r.findings.map((a) => a.rule).sort();
+const page = (body, h1 = '<h1>Contratos</h1>') =>
+  `<!doctype html><html><head><title>t</title><style>.x{}</style></head><body><header>Topo</header><main>${h1}${body}</main></body></html>`;
+const primaryBtn = (t) => `<button class="MuiButton-root MuiButton-contained">${t}</button>`;
+const secondaryBtn = (t) => `<button class="MuiButton-root MuiButton-text">${t}</button>`;
+const dialogHtml = (title, content, footer) =>
+  `<div role="presentation"><div class="MuiDialog-paper" role="dialog" aria-labelledby="t1"><h2 id="t1">${title}</h2><div>${content}</div><div class="MuiDialogActions-root">${footer}</div></div></div>`;
 
-test('html: árvore, void, script/style ignorados, entidades', () => {
+test('html: tree, void elements, ignored script/style, entities', () => {
   const root = parseHtml('<div id="a" class="x y"><img src=1><br/><script>if (a<b) {}</script><p>A &amp; B&nbsp;C</p></div><style>p{}</style>');
   const div = querySelector(root, '#a');
   assert.equal(div.children.length, 4); // img, br, script, p
@@ -22,11 +23,11 @@ test('html: árvore, void, script/style ignorados, entidades', () => {
   assert.equal(querySelectorAll(root, 'p').length, 1);
 });
 
-test('html: seletores do contrato', () => {
+test('html: contract selectors', () => {
   const root = parseHtml(`<main><form><input type="hidden"><input type="text" id="n"><input type="checkbox"><textarea></textarea></form>
     <button class="MuiButton-contained MuiButton-colorError" data-x="1">Excluir</button><span role="button">Ícone</span></main><nav><button>Menu</button></nav>`);
-  const campo = 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select';
-  assert.deepEqual(querySelectorAll(root, campo).map((n) => n.tag), ['input', 'textarea']);
+  const field = 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select';
+  assert.deepEqual(querySelectorAll(root, field).map((n) => n.tag), ['input', 'textarea']);
   assert.equal(querySelectorAll(root, 'button.MuiButton-contained').length, 1);
   assert.equal(querySelectorAll(root, '[data-x=1]').length, 1);
   assert.equal(querySelectorAll(root, '[data-x="1"]').length, 1);
@@ -40,92 +41,92 @@ test('html: seletores do contrato', () => {
   assert.throws(() => querySelectorAll(root, 'a:hover'), /não suportado/);
 });
 
-test('yaml-lite: 3 níveis, listas inline com aspas, "#" e "," protegidos', () => {
+test('yaml-lite: 3 levels, inline lists with quotes, "#" and "," protected', () => {
   const y = parseYaml([
-    'verificacao:',
-    '  seletores:',
-    '    regioes: ["header", "#main", "a, b"]   # comentário',
-    '    campo: "input:not([type=hidden]), textarea"',
-    'acao: { regiao: topo, max: 1 }',
-    "texto: it's ok # comentário",
+    'verification:',
+    '  selectors:',
+    '    regions: ["header", "#main", "a, b"]   # comentário',
+    '    field: "input:not([type=hidden]), textarea"',
+    'action: { region: top, max: 1 }',
+    "text: it's ok # comentário",
   ].join('\n'));
-  assert.deepEqual(y.verificacao.seletores.regioes, ['header', '#main', 'a, b']);
-  assert.equal(y.verificacao.seletores.campo, 'input:not([type=hidden]), textarea');
-  assert.deepEqual(y.acao, { regiao: 'topo', max: 1 });
-  assert.equal(y.texto, "it's ok");
+  assert.deepEqual(y.verification.selectors.regions, ['header', '#main', 'a, b']);
+  assert.equal(y.verification.selectors.field, 'input:not([type=hidden]), textarea');
+  assert.deepEqual(y.action, { region: 'top', max: 1 });
+  assert.equal(y.text, "it's ok");
 });
 
-test('config: padrões do contrato e sobrescrita parcial', () => {
-  const c = configFrom({ acoes: { 'primarias-por-regiao': 2 }, conteudo: { proibidos: ['tenant'] } });
-  assert.equal(c.acoes['primarias-por-regiao'], 2);
-  assert.equal(c.acoes['ordem-dialogo'], 'cancelar-acao');
-  assert.equal(c.verificacao.seletores.dialogo, '[role=dialog]');
-  assert.equal(c.fluxos['max-passos-jornada'], 12);
-  assert.deepEqual(c.conteudo.proibidos, ['tenant']);
+test('config: contract defaults and partial override', () => {
+  const c = configFrom({ actions: { 'primary-per-region': 2 }, content: { forbidden: ['tenant'] } });
+  assert.equal(c.actions['primary-per-region'], 2);
+  assert.equal(c.actions['dialog-order'], 'cancel-action');
+  assert.equal(c.verification.selectors.dialog, '[role=dialog]');
+  assert.equal(c.flows['max-journey-steps'], 12);
+  assert.deepEqual(c.content.forbidden, ['tenant']);
 });
 
-test('T1: duas primárias em main; diálogo aberto ignora a página atrás', () => {
-  assert.deepEqual(regras(analisarTela(pagina(prim('Criar aditivo') + prim('Exportar PDF')))), ['T1']);
-  const comDialogo = pagina(prim('Criar aditivo') + prim('Exportar PDF') + dlg('Novo', '<p>x</p>', sec('Cancelar') + prim('Criar')));
-  assert.deepEqual(regras(analisarTela(comDialogo)), []);
+test('T1: two primaries in main; open dialog ignores the page behind', () => {
+  assert.deepEqual(rules(analyzeScreen(page(primaryBtn('Criar aditivo') + primaryBtn('Exportar PDF')))), ['T1']);
+  const withDialog = page(primaryBtn('Criar aditivo') + primaryBtn('Exportar PDF') + dialogHtml('Novo', '<p>x</p>', secondaryBtn('Cancelar') + primaryBtn('Criar')));
+  assert.deepEqual(rules(analyzeScreen(withDialog)), []);
 });
 
-test('T2: rodapé do diálogo com a ação antes de cancelar', () => {
-  const r = analisarTela(pagina(dlg('Excluir minuta?', '<p>x</p>', prim('Excluir minuta') + sec('Cancelar'))));
-  assert.deepEqual(regras(r), ['T2']);
-  assert.match(r.achados[0].regiao, /diálogo "Excluir minuta\?"/);
+test('T2: dialog footer with the action before cancel', () => {
+  const r = analyzeScreen(page(dialogHtml('Excluir minuta?', '<p>x</p>', primaryBtn('Excluir minuta') + secondaryBtn('Cancelar'))));
+  assert.deepEqual(rules(r), ['T2']);
+  assert.match(r.findings[0].region, /diálogo "Excluir minuta\?"/);
   // Botão de conteúdo antes do Fechar do rodapé não é rodapé: não compara.
-  assert.deepEqual(regras(analisarTela(pagina(dlg('Categorias', prim('Adicionar'), sec('Fechar'))))), []);
+  assert.deepEqual(rules(analyzeScreen(page(dialogHtml('Categorias', primaryBtn('Adicionar'), secondaryBtn('Fechar'))))), []);
   // Ordem inversa declarada no UX.md.
-  const cfg = configFrom({ acoes: { 'ordem-dialogo': 'acao-cancelar' } });
-  assert.deepEqual(regras(analisarTela(pagina(dlg('X', '', sec('Cancelar') + prim('Salvar'))), cfg)), ['T2']);
+  const cfg = configFrom({ actions: { 'dialog-order': 'action-cancel' } });
+  assert.deepEqual(rules(analyzeScreen(page(dialogHtml('X', '', secondaryBtn('Cancelar') + primaryBtn('Salvar'))), cfg)), ['T2']);
 });
 
-test('T3: sem h1 e com dois h1', () => {
-  assert.deepEqual(regras(analisarTela(pagina('<p>x</p>', ''))), ['T3']);
-  assert.deepEqual(regras(analisarTela(pagina('<h1>Outro</h1>'))), ['T3']);
+test('T3: no h1 and two h1', () => {
+  assert.deepEqual(rules(analyzeScreen(page('<p>x</p>', ''))), ['T3']);
+  assert.deepEqual(rules(analyzeScreen(page('<h1>Outro</h1>'))), ['T3']);
 });
 
-test('T4: campo só com placeholder reprova; rótulo ou aria-label passa', () => {
-  const r = analisarTela(pagina('<input type="text" placeholder="Buscar">'));
-  assert.deepEqual(regras(r), ['T4']);
-  assert.match(r.achados[0].mensagem, /placeholder/);
-  assert.deepEqual(regras(analisarTela(pagina('<label for="b">Busca</label><input id="b" placeholder="Buscar">'))), []);
-  assert.deepEqual(regras(analisarTela(pagina('<label>Nome <input></label><input aria-label="CNPJ"><input aria-hidden="true">'))), []);
+test('T4: placeholder-only field fails; label or aria-label passes', () => {
+  const r = analyzeScreen(page('<input type="text" placeholder="Buscar">'));
+  assert.deepEqual(rules(r), ['T4']);
+  assert.match(r.findings[0].message, /placeholder/);
+  assert.deepEqual(rules(analyzeScreen(page('<label for="b">Busca</label><input id="b" placeholder="Buscar">'))), []);
+  assert.deepEqual(rules(analyzeScreen(page('<label>Nome <input></label><input aria-label="CNPJ"><input aria-hidden="true">'))), []);
 });
 
-test('T5: destrutiva com rótulo genérico (sem T7 duplicado)', () => {
-  const r = analisarTela(pagina(dlg('Excluir?', '', sec('Cancelar') + '<button class="MuiButton-contained MuiButton-colorError">Confirmar</button>')));
-  assert.deepEqual(regras(r), ['T5']);
-  const off = configFrom({ acoes: { 'destrutiva-rotulo-especifico': false } });
-  assert.deepEqual(regras(analisarTela(pagina('<button class="MuiButton-colorError">Confirmar</button>'), off)), ['T7']);
+test('T5: destructive with generic label (no duplicate T7)', () => {
+  const r = analyzeScreen(page(dialogHtml('Excluir?', '', secondaryBtn('Cancelar') + '<button class="MuiButton-contained MuiButton-colorError">Confirmar</button>')));
+  assert.deepEqual(rules(r), ['T5']);
+  const off = configFrom({ actions: { 'destructive-specific-label': false } });
+  assert.deepEqual(rules(analyzeScreen(page('<button class="MuiButton-colorError">Confirmar</button>'), off)), ['T7']);
 });
 
-test('T6: termo proibido, palavra inteira e sem caixa', () => {
-  const cfg = configFrom({ conteudo: { proibidos: ['snapshot', 'RLS'] } });
-  const r = analisarTela(pagina('<p>Novo Snapshot criado</p><p>snapshots antigos</p><p>rls</p>'), cfg);
-  assert.deepEqual(r.achados.map((a) => a.mensagem.match(/"([^"]+)"/)[1]).sort(), ['RLS', 'snapshot']);
-  assert.match(r.achados.find((a) => a.mensagem.includes('snapshot')).mensagem, /\(1×\)/);
+test('T6: forbidden term, whole word, case-insensitive', () => {
+  const cfg = configFrom({ content: { forbidden: ['snapshot', 'RLS'] } });
+  const r = analyzeScreen(page('<p>Novo Snapshot criado</p><p>snapshots antigos</p><p>rls</p>'), cfg);
+  assert.deepEqual(r.findings.map((a) => a.message.match(/"([^"]+)"/)[1]).sort(), ['RLS', 'snapshot']);
+  assert.match(r.findings.find((a) => a.message.includes('snapshot')).message, /\(1×\)/);
 });
 
-test('T7: rótulo sem verbo é aviso (severidade 1)', () => {
-  const r = analisarTela(pagina(sec('OK') + sec('Enviar minuta')));
-  assert.deepEqual(regras(r), ['T7']);
-  assert.equal(r.achados[0].severidade, 1);
+test('T7: label without verb is a warning (severity 1)', () => {
+  const r = analyzeScreen(page(secondaryBtn('OK') + secondaryBtn('Enviar minuta')));
+  assert.deepEqual(rules(r), ['T7']);
+  assert.equal(r.findings[0].severity, 1);
 });
 
-test('fluxo: F1–F5 em mapa sintético', () => {
-  const tr = (id, de, para, linha) => ({ id, de, para, gatilho: { tipo: 'botao', rotulo: id }, evidencia: `src/App.tsx:${linha}` });
-  const mapa = {
-    telas: [
-      { id: 'lista', nome: 'Lista', tipo: 'pagina', pai: null },
-      { id: 'detalhe', nome: 'Detalhe', tipo: 'pagina', pai: 'lista' },
-      { id: 'fim', nome: 'Fim', tipo: 'pagina', pai: null },
-      { id: 'solta', nome: 'Solta', tipo: 'pagina', pai: null },
-      { id: 'dlg-a', nome: 'Diálogo A', tipo: 'dialogo', pai: 'detalhe' },
-      { id: 'dlg-b', nome: 'Diálogo B', tipo: 'dialogo', pai: 'dlg-a' },
+test('flow: F1–F5 on a synthetic map', () => {
+  const tr = (id, from, to, line) => ({ id, from, to, trigger: { type: 'button', label: id }, evidence: `src/App.tsx:${line}` });
+  const map = {
+    screens: [
+      { id: 'lista', name: 'Lista', type: 'page', parent: null },
+      { id: 'detalhe', name: 'Detalhe', type: 'page', parent: 'lista' },
+      { id: 'fim', name: 'Fim', type: 'page', parent: null },
+      { id: 'solta', name: 'Solta', type: 'page', parent: null },
+      { id: 'dlg-a', name: 'Diálogo A', type: 'dialog', parent: 'detalhe' },
+      { id: 'dlg-b', name: 'Diálogo B', type: 'dialog', parent: 'dlg-a' },
     ],
-    transicoes: [
+    transitions: [
       tr('t1', 'lista', 'detalhe', 10),
       tr('t2', 'detalhe', 'fim', 20),
       tr('t3', 'detalhe', 'dlg-a', 30),
@@ -135,17 +136,72 @@ test('fluxo: F1–F5 em mapa sintético', () => {
       tr('t7', 'solta', 'lista', 70),
       tr('t8', 'fim', 'fim', 80),
     ],
-    jornadas: [{ id: 'j1', nome: 'Longa', passos: ['t1', 't3', 't4', 't5', 't6', 't2'], trocas_persona: [] }],
+    journeys: [{ id: 'j1', name: 'Longa', steps: ['t1', 't3', 't4', 't5', 't6', 't2'], persona_switches: [] }],
   };
-  const cfg = configFrom({ fluxos: { 'max-passos-jornada': 5 } });
-  const { achados } = analisarFluxo(mapa, cfg);
-  const por = (r) => achados.filter((a) => a.regra === r);
-  assert.deepEqual(por('F1').map((a) => a.tela), ['fim']); // laço para si mesma não é saída
-  assert.match(por('F1')[0].evidencia[0], /src\/App\.tsx:20/);
-  assert.deepEqual(por('F2').map((a) => a.tela), ['solta']);
-  assert.deepEqual(por('F3').map((a) => a.tela), ['j1']);
-  assert.deepEqual(por('F4').map((a) => a.tela), ['dlg-b']);
-  assert.match(por('F4')[0].evidencia[0], /t4 \(src\/App\.tsx:40\)/);
-  assert.deepEqual(por('F5').map((a) => a.tela), ['detalhe']); // dlg-a volta a detalhe; dlg-b volta a dlg-a
-  assert.ok(achados.every((a) => typeof a.severidade === 'number'));
+  const cfg = configFrom({ flows: { 'max-journey-steps': 5 } });
+  const { findings } = analyzeFlow(map, cfg);
+  const byRule = (r) => findings.filter((a) => a.rule === r);
+  assert.deepEqual(byRule('F1').map((a) => a.screen), ['fim']); // laço para si mesma não é saída
+  assert.match(byRule('F1')[0].evidence[0], /src\/App\.tsx:20/);
+  assert.deepEqual(byRule('F2').map((a) => a.screen), ['solta']);
+  assert.deepEqual(byRule('F3').map((a) => a.screen), ['j1']);
+  assert.deepEqual(byRule('F4').map((a) => a.screen), ['dlg-b']);
+  assert.match(byRule('F4')[0].evidence[0], /t4 \(src\/App\.tsx:40\)/);
+  assert.deepEqual(byRule('F5').map((a) => a.screen), ['detalhe']); // dlg-a volta a detalhe; dlg-b volta a dlg-a
+  assert.ok(findings.every((a) => typeof a.severity === 'number'));
+});
+
+test('config: legacy Portuguese front matter gives the same config, with warnings', () => {
+  const current = {
+    navigation: { 'max-depth': 2, back: 'mandatory' },
+    actions: { 'primary-per-region': 2, 'primary-position': 'bottom-right', 'dialog-order': 'action-cancel', 'destructive-specific-label': false },
+    forms: { label: 'always-visible', validation: 'on-submit', required: 'mark-optional' },
+    content: { buttons: 'verb-object', forbidden: ['tenant'], 'proper-nouns': ['Word'] },
+    flows: { 'max-journey-steps': 8, 'max-stacked-dialogs': 2, 'dead-ends': 1 },
+    verification: { selectors: { dialog: '.dlg', 'dialog-footer': '.foot', primary: '.p' } },
+  };
+  const legacy = {
+    navegacao: { 'profundidade-maxima': 2, retorno: 'obrigatorio' },
+    acoes: { 'primarias-por-regiao': 2, 'posicao-primaria': 'rodape-direita', 'ordem-dialogo': 'acao-cancelar', 'destrutiva-rotulo-especifico': false },
+    formularios: { rotulo: 'sempre-visivel', validacao: 'ao-enviar', obrigatorios: 'marcar-opcionais' },
+    conteudo: { botoes: 'verbo-objeto', proibidos: ['tenant'], 'nomes-proprios': ['Word'] },
+    fluxos: { 'max-passos-jornada': 8, 'max-dialogos-empilhados': 2, 'becos-sem-saida': 1 },
+    verificacao: { seletores: { dialogo: '.dlg', 'rodape-dialogo': '.foot', primaria: '.p' } },
+  };
+  const a = configFrom(current), b = configFrom(legacy);
+  assert.deepEqual(b, a);
+  assert.equal(a.legacyWarnings.length, 0);
+  assert.ok(b.legacyWarnings.some((w) => /nome antigo "acoes", renomeie para "actions"/.test(w)));
+  assert.ok(b.legacyWarnings.some((w) => /valor antigo "rodape-direita" em actions.primary-position, renomeie para "bottom-right"/.test(w)));
+});
+
+test('flow: legacy Portuguese map gives the same findings, with warnings', () => {
+  const current = {
+    screens: [{ id: 'a', name: 'A', type: 'page', parent: null }, { id: 'b', name: 'B', type: 'dialog', parent: 'a' }],
+    transitions: [{ id: 't1', from: 'a', to: 'b', trigger: { type: 'button', label: 'Abrir' }, evidence: 'x.tsx:1' }],
+    journeys: [{ id: 'j', name: 'J', steps: ['t1'], persona_switches: [] }],
+  };
+  const legacy = {
+    telas: [{ id: 'a', nome: 'A', tipo: 'pagina', pai: null }, { id: 'b', nome: 'B', tipo: 'dialogo', pai: 'a' }],
+    transicoes: [{ id: 't1', de: 'a', para: 'b', gatilho: { tipo: 'botao', rotulo: 'Abrir' }, evidencia: 'x.tsx:1' }],
+    jornadas: [{ id: 'j', nome: 'J', passos: ['t1'], trocas_persona: [] }],
+  };
+  const a = analyzeFlow(current), b = analyzeFlow(legacy);
+  assert.deepEqual(b.findings, a.findings);
+  assert.equal(a.warnings, undefined);
+  assert.ok(b.warnings.some((w) => /"telas", renomeie para "screens"/.test(w)));
+  assert.ok(b.warnings.some((w) => /tipo de tela antigo "dialogo", renomeie para "dialog"/.test(w)));
+});
+
+test('JSON convention: outputs use snake_case keys; camelCase and Portuguese outputs are normalized on read', () => {
+  const r = analyzeScreen('<main><button class="MuiButton-contained">Salvar</button></main>');
+  assert.ok('dialog_open' in r && !('dialogOpen' in r));
+  const s = summarize([r]);
+  for (const k of ['screens_with_findings', 'by_rule', 'by_severity']) assert.ok(k in s, k);
+  const snakeOrIds = (o) => Object.keys(o).every((k) => !/[A-Z]/.test(k));
+  assert.ok(snakeOrIds(s));
+  const n = normalizeDetectorJson({ summary: { byRule: { X1: 1 }, porSeveridade: { 2: 1 } }, findings: [{ rule: 'X1', probableData: true, originalSeverity: 2 }], screens: [{ dialogOpen: true }] });
+  assert.deepEqual(n.summary, { by_rule: { X1: 1 }, by_severity: { 2: 1 } });
+  assert.deepEqual(n.findings[0], { rule: 'X1', probable_data: true, original_severity: 2 });
+  assert.deepEqual(n.screens[0], { dialog_open: true });
 });

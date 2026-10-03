@@ -1,0 +1,662 @@
+[
+  {
+    "id": "confirmation-dialog",
+    "title": "Diálogo de confirmação",
+    "summary": "Interrupção curta que pede uma decisão explícita antes de uma ação de consequência séria, dizendo o que vai acontecer e com o quê.",
+    "register": [
+      "operational",
+      "consumer"
+    ],
+    "regions": [
+      "dialog-header",
+      "dialog-body",
+      "dialog-footer"
+    ],
+    "primary_action": {
+      "region": "dialog-footer",
+      "position": "bottom-right",
+      "max": 1
+    },
+    "states": [
+      "open",
+      "running",
+      "error",
+      "success"
+    ],
+    "patterns": [
+      "confirm-action",
+      "confirm-deletion",
+      "destructive-action",
+      "undo",
+      "button-text",
+      "close-modal",
+      "keyboard-focus",
+      "button-hierarchy",
+      "double-submit",
+      "confirm-ai-action",
+      "when-to-use-modal"
+    ],
+    "variations": [
+      "simple-confirmation",
+      "type-to-confirm",
+      "undo-instead-of-confirm",
+      "confirmation-with-consequences"
+    ],
+    "rules": [
+      "T1",
+      "T2",
+      "T5",
+      "T6",
+      "T7",
+      "F4"
+    ],
+    "file": "archetypes/confirmation-dialog.md"
+  },
+  {
+    "id": "detail-side-panel",
+    "title": "Painel lateral de detalhe",
+    "summary": "Painel que desliza da borda sobre a tela atual para mostrar ou editar um registro sem perder a lista ou o contexto de onde a pessoa veio.",
+    "register": [
+      "operational"
+    ],
+    "regions": [
+      "panel-header",
+      "panel-body",
+      "panel-footer"
+    ],
+    "primary_action": {
+      "region": "panel-footer",
+      "position": "bottom-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "error",
+      "no-access",
+      "item-removed",
+      "editing",
+      "success"
+    ],
+    "patterns": [
+      "when-to-use-modal",
+      "when-to-avoid-modal",
+      "close-modal",
+      "keyboard-focus",
+      "tabs",
+      "action-placement",
+      "skeleton-vs-spinner",
+      "autosave-vs-save",
+      "link-vs-button",
+      "preserve-data-after-error"
+    ],
+    "variations": [
+      "overlay",
+      "push-content",
+      "read-with-page-link"
+    ],
+    "rules": [
+      "T1",
+      "T2",
+      "T3",
+      "T6",
+      "T7",
+      "F4",
+      "F5"
+    ],
+    "file": "archetypes/detail-side-panel.md"
+  },
+  {
+    "id": "document-viewer",
+    "title": "Documento com visor",
+    "summary": "Tela de leitura de um documento pronto (contrato, parecer, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.",
+    "register": [
+      "operational",
+      "editorial"
+    ],
+    "regions": [
+      "page-header",
+      "viewer-toolbar",
+      "viewer",
+      "info-panel"
+    ],
+    "primary_action": {
+      "region": "page-header",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "processing",
+      "error",
+      "no-access",
+      "unavailable",
+      "success"
+    ],
+    "patterns": [
+      "breadcrumbs",
+      "tabs",
+      "long-loading",
+      "skeleton-screen",
+      "link-in-new-tab",
+      "icon-only-button",
+      "temporary-failure",
+      "retry",
+      "disabled-button"
+    ],
+    "variations": [
+      "viewer-with-right-panel",
+      "fullscreen-viewer",
+      "side-by-side-comparison"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "file": "archetypes/document-viewer.md"
+  },
+  {
+    "id": "editor-with-panel",
+    "title": "Editor com painel",
+    "summary": "Tela de produção de um documento ou objeto complexo, com a área de edição ao centro e um painel lateral de apoio (comentários, variáveis, sugestões, verificação).",
+    "register": [
+      "operational",
+      "editorial"
+    ],
+    "regions": [
+      "page-header",
+      "toolbar",
+      "editing-area",
+      "side-panel",
+      "status-bar"
+    ],
+    "primary_action": {
+      "region": "page-header",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "saving",
+      "saved",
+      "conflict",
+      "error",
+      "no-access",
+      "read-only",
+      "success"
+    ],
+    "patterns": [
+      "autosave-vs-save",
+      "undo",
+      "preserve-data-after-error",
+      "tabs",
+      "review-ai-output",
+      "label-ai-content",
+      "ai-sources",
+      "session-expired",
+      "icon-only-button",
+      "disabled-button",
+      "success-confirmation"
+    ],
+    "variations": [
+      "fixed-right-panel",
+      "collapsible-panel",
+      "tabbed-panel",
+      "focus-without-panel"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T4",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "file": "archetypes/editor-with-panel.md"
+  },
+  {
+    "id": "form-dialog",
+    "title": "Diálogo de formulário",
+    "summary": "Janela modal curta que coleta poucos dados para criar ou alterar algo sem tirar a pessoa da tela em que ela está.",
+    "register": [
+      "operational",
+      "consumer"
+    ],
+    "regions": [
+      "dialog-header",
+      "dialog-body",
+      "dialog-footer"
+    ],
+    "primary_action": {
+      "region": "dialog-footer",
+      "position": "bottom-right",
+      "max": 1
+    },
+    "states": [
+      "open",
+      "field-error",
+      "submitting",
+      "error",
+      "success"
+    ],
+    "patterns": [
+      "when-to-use-modal",
+      "when-to-avoid-modal",
+      "close-modal",
+      "label-vs-placeholder",
+      "required-fields",
+      "validation-timing",
+      "error-placement",
+      "preserve-data-after-error",
+      "double-submit",
+      "action-placement",
+      "keyboard-focus",
+      "field-order"
+    ],
+    "variations": [
+      "short-dialog",
+      "sectioned-dialog",
+      "promote-to-page"
+    ],
+    "rules": [
+      "T1",
+      "T2",
+      "T4",
+      "T6",
+      "T7",
+      "F4"
+    ],
+    "file": "archetypes/form-dialog.md"
+  },
+  {
+    "id": "library",
+    "title": "Biblioteca",
+    "summary": "Acervo de itens reutilizáveis (modelos, cláusulas, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.",
+    "register": [
+      "operational",
+      "editorial"
+    ],
+    "regions": [
+      "page-header",
+      "collection-navigation",
+      "search-bar",
+      "content",
+      "quick-view"
+    ],
+    "primary_action": {
+      "region": "page-header",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "empty",
+      "empty-filtered",
+      "error",
+      "no-access",
+      "success"
+    ],
+    "patterns": [
+      "filter-structure",
+      "no-search-results",
+      "active-filters",
+      "table-vs-cards",
+      "empty-state",
+      "file-upload",
+      "pagination-vs-scroll",
+      "confirm-deletion",
+      "disabled-button"
+    ],
+    "variations": [
+      "card-grid",
+      "dense-list",
+      "collection-tree",
+      "with-quick-view"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "file": "archetypes/library.md"
+  },
+  {
+    "id": "master-detail",
+    "title": "Mestre-detalhe",
+    "summary": "Duas colunas na mesma tela, a lista à esquerda e o registro selecionado à direita, para percorrer itens em sequência sem trocar de página.",
+    "register": [
+      "operational"
+    ],
+    "regions": [
+      "page-header",
+      "master-column",
+      "detail-column"
+    ],
+    "primary_action": {
+      "region": "detail-column",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "empty",
+      "nothing-selected",
+      "empty-filtered",
+      "error",
+      "no-access",
+      "success"
+    ],
+    "patterns": [
+      "pagination-vs-scroll",
+      "empty-state",
+      "no-search-results",
+      "active-filters",
+      "tabs",
+      "skeleton-vs-spinner",
+      "keyboard-focus",
+      "breadcrumbs"
+    ],
+    "variations": [
+      "two-fixed-columns",
+      "collapsible-master",
+      "stacked-detail-on-mobile"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T6",
+      "T7",
+      "F1",
+      "F5"
+    ],
+    "file": "archetypes/master-detail.md"
+  },
+  {
+    "id": "monitoring-dashboard",
+    "title": "Painel de acompanhamento",
+    "summary": "Tela de visão geral que responde como as coisas estão e o que pede atenção agora, com indicadores, tendências e uma lista curta de pendências.",
+    "register": [
+      "operational"
+    ],
+    "regions": [
+      "page-header",
+      "period-bar",
+      "kpi-strip",
+      "charts-area",
+      "pending-list"
+    ],
+    "primary_action": {
+      "region": "page-header",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "empty",
+      "no-data-in-period",
+      "partial",
+      "stale",
+      "error",
+      "no-access"
+    ],
+    "patterns": [
+      "date-range-filter",
+      "skeleton-screen",
+      "empty-state",
+      "temporary-failure",
+      "retry",
+      "not-color-alone",
+      "table-vs-cards",
+      "long-loading"
+    ],
+    "variations": [
+      "kpis-above-list",
+      "pending-first",
+      "dashboard-per-role"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T6",
+      "F1",
+      "F2"
+    ],
+    "file": "archetypes/monitoring-dashboard.md"
+  },
+  {
+    "id": "operational-list",
+    "title": "Lista operacional",
+    "summary": "Tela de trabalho diário que mostra muitos registros do mesmo tipo para a pessoa encontrar, comparar e agir sobre eles.",
+    "register": [
+      "operational"
+    ],
+    "regions": [
+      "page-header",
+      "filter-bar",
+      "bulk-actions-bar",
+      "content",
+      "list-footer"
+    ],
+    "primary_action": {
+      "region": "page-header",
+      "position": "top-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "empty",
+      "empty-filtered",
+      "error",
+      "no-access",
+      "success"
+    ],
+    "patterns": [
+      "filter-structure",
+      "active-filters",
+      "applying-filters",
+      "table-pagination",
+      "table-sorting",
+      "empty-state",
+      "no-search-results",
+      "table-vs-cards",
+      "responsive-table",
+      "skeleton-screen",
+      "destructive-action"
+    ],
+    "variations": [
+      "with-bulk-actions",
+      "cards-on-mobile",
+      "filters-in-side-panel",
+      "grouped-by-status"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "file": "archetypes/operational-list.md"
+  },
+  {
+    "id": "public-decision-page",
+    "title": "Página pública de decisão",
+    "summary": "Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (de acordo, não concordância, aprovação, recusa).",
+    "register": [
+      "consumer"
+    ],
+    "regions": [
+      "public-header",
+      "request-summary",
+      "document-or-detail",
+      "decision-area",
+      "public-footer"
+    ],
+    "primary_action": {
+      "region": "decision-area",
+      "position": "inline",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "invalid-link",
+      "expired-link",
+      "already-answered",
+      "submitting",
+      "error",
+      "success"
+    ],
+    "patterns": [
+      "button-hierarchy",
+      "button-text",
+      "confirm-action",
+      "double-submit",
+      "success-confirmation",
+      "helpful-error-message",
+      "label-vs-placeholder",
+      "form-errors",
+      "touch-target",
+      "link-in-new-tab",
+      "technical-error-code",
+      "required-fields"
+    ],
+    "variations": [
+      "binary-decision",
+      "decision-with-reason",
+      "decision-with-identification",
+      "long-document-with-sticky-decision"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "F1"
+    ],
+    "file": "archetypes/public-decision-page.md"
+  },
+  {
+    "id": "settings",
+    "title": "Configurações",
+    "summary": "Tela de ajustes persistentes de conta, módulo ou organização, agrupados em seções, com salvamento previsível e uma zona separada para ações de risco.",
+    "register": [
+      "operational",
+      "consumer"
+    ],
+    "regions": [
+      "page-header",
+      "section-menu",
+      "section-body",
+      "section-footer",
+      "danger-zone"
+    ],
+    "primary_action": {
+      "region": "section-footer",
+      "position": "bottom-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "unsaved-changes",
+      "saving",
+      "field-error",
+      "error",
+      "no-access",
+      "success"
+    ],
+    "patterns": [
+      "autosave-vs-save",
+      "required-fields",
+      "validation-timing",
+      "form-errors",
+      "destructive-action",
+      "confirm-action",
+      "disabled-button",
+      "success-confirmation",
+      "tabs",
+      "preserve-data-after-error",
+      "label-vs-placeholder"
+    ],
+    "variations": [
+      "save-per-section",
+      "save-on-change",
+      "top-tabs"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "F5"
+    ],
+    "file": "archetypes/settings.md"
+  },
+  {
+    "id": "step-wizard",
+    "title": "Assistente em etapas",
+    "summary": "Fluxo guiado que divide uma tarefa longa ou rara em etapas ordenadas, com uma decisão por vez e revisão antes de concluir.",
+    "register": [
+      "operational",
+      "consumer"
+    ],
+    "regions": [
+      "page-header",
+      "step-trail",
+      "step-body",
+      "navigation-footer"
+    ],
+    "primary_action": {
+      "region": "navigation-footer",
+      "position": "bottom-right",
+      "max": 1
+    },
+    "states": [
+      "loading",
+      "field-error",
+      "error",
+      "submitting",
+      "success",
+      "draft-restored"
+    ],
+    "patterns": [
+      "split-form",
+      "form-steps",
+      "validation-timing",
+      "form-errors",
+      "error-placement",
+      "preserve-data-after-error",
+      "required-fields",
+      "label-vs-placeholder",
+      "double-submit",
+      "success-confirmation",
+      "action-placement",
+      "file-upload"
+    ],
+    "variations": [
+      "horizontal-trail",
+      "vertical-side-trail",
+      "final-review-step",
+      "wizard-in-dialog"
+    ],
+    "rules": [
+      "T1",
+      "T3",
+      "T4",
+      "T6",
+      "T7",
+      "F3",
+      "F5"
+    ],
+    "file": "archetypes/step-wizard.md"
+  }
+]

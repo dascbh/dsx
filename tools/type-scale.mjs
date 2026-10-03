@@ -32,7 +32,7 @@ export function typeScale({ base = 16, ratio = 'major-third', min = -1, max = 6,
   for (let i = min; i <= max; i++) {
     const raw = base * r ** i;
     const px = Math.round(raw / rounding) * rounding;
-    out.push({ step: i, name: NAMES[i] ?? `step-${i}`, px, rem: round(px / 16, 4), lineHeight: lineHeight(px) });
+    out.push({ step: i, name: NAMES[i] ?? `step-${i}`, px, rem: round(px / 16, 4), line_height: lineHeight(px) });
   }
   return { base, ratio: r, steps: out };
 }
@@ -46,7 +46,7 @@ export function fluidScale({ base = 16, maxBase = base, ratio = 1.2, maxRatio = 
     const slope = (b - a) / (maxVw - minVw);
     const intercept = a - slope * minVw;
     const value = `clamp(${round(a / 16, 4)}rem, ${round(intercept / 16, 4)}rem + ${round(slope * 100, 4)}vw, ${round(b / 16, 4)}rem)`;
-    steps.push({ step: i, name: NAMES[i] ?? `step-${i}`, minPx: round(a), maxPx: round(b), value, lineHeight: lineHeight(b) });
+    steps.push({ step: i, name: NAMES[i] ?? `step-${i}`, min_px: round(a), max_px: round(b), value, line_height: lineHeight(b) });
   }
   return { steps };
 }
@@ -61,7 +61,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(':root {');
     for (const s of result.steps) {
       console.log(`  --font-size-${s.name}: ${s.value ?? s.rem + 'rem'};`);
-      console.log(`  --line-height-${s.name}: ${s.lineHeight};`);
+      console.log(`  --line-height-${s.name}: ${s.line_height};`);
     }
     console.log('}');
   } else console.log(JSON.stringify(result, null, 2));

@@ -1,9 +1,9 @@
 ---
 id: rag-e-fontes
-area: ia
-titulo: RAG, fontes e verificação na experiência
-evidencia: contextual
-relacionados: [evals, evidencia-e-fontes, ux-para-agentes]
+area: ai
+title: RAG, fontes e verificação na experiência
+evidence: contextual
+related: [evals, evidencia-e-fontes, ux-para-agentes]
 ---
 
 # RAG, fontes e verificação
@@ -46,7 +46,7 @@ O último passo é onde mora a maior parte do trabalho de experiência.
 ## 2. Responsabilidades de UX
 
 ### 2.1 Promessa e escopo
-"Pergunte qualquer coisa" cria expectativa impossível. "Pergunte sobre as políticas de RH publicadas nesta base" é honesto. Mostre coleções disponíveis, período coberto, data da última atualização e exemplos do que está fora de escopo. Padrão relacionado: [`incerteza-da-ia`](../../patterns/ia/incerteza-da-ia.md).
+"Pergunte qualquer coisa" cria expectativa impossível. "Pergunte sobre as políticas de RH publicadas nesta base" é honesto. Mostre coleções disponíveis, período coberto, data da última atualização e exemplos do que está fora de escopo. Padrão relacionado: [`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md).
 
 ### 2.2 Fontes e citações
 Um experimento randomizado publicado em 2025 encontrou que citações aumentam a confiança declarada, que muitas citações não aumentam mais do que uma, e que só uma pequena fração (cerca de um décimo) das citações exibidas foi de fato aberta pelos participantes. `[evidência: contextual — contexto experimental específico, confiança autorrelatada]`
@@ -59,7 +59,7 @@ Consequência: citação funciona como **sinal visual de credibilidade** mesmo q
 - o que é **inferência** do sistema aparece separado do que está escrito na fonte;
 - **NUNCA** acrescente link decorativo que não sustenta o que está ao lado.
 
-Componente e regras visuais: [`fontes-da-ia`](../../patterns/ia/fontes-da-ia.md).
+Componente e regras visuais: [`ai-sources`](../../patterns/ai/ai-sources.md).
 
 ### 2.3 Estados de falha distintos
 "Não encontrei informação suficiente" costuma ser melhor que uma resposta fluente e mal apoiada. Cada situação abaixo tem tratamento próprio; não as colapse num único "erro".
@@ -74,7 +74,7 @@ Componente e regras visuais: [`fontes-da-ia`](../../patterns/ia/fontes-da-ia.md)
 | Falha técnica na recuperação | Diferenciar de "não existe"; oferecer tentar de novo |
 | Resposta parcial | Indicar o que foi respondido e o que ficou sem base |
 
-Recuperação de erro: [`recuperar-erro-da-ia`](../../patterns/ia/recuperar-erro-da-ia.md).
+Recuperação de erro: [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md).
 
 ### 2.4 Latência
 Recuperar, reordenar e montar contexto adiciona tempo; recuperação agêntica (várias consultas, várias fontes) adiciona mais.
@@ -100,7 +100,7 @@ O filtro de permissão acontece **antes** do conteúdo chegar ao modelo, não de
 - correta, mas confusa;
 - a pergunta foi entendida de outro jeito.
 
-Cada categoria leva a uma correção diferente (base, recuperação, geração ou interface). Permita também contestar a resposta e pedir confirmação a uma área responsável. Revisão de resultado: [`revisar-resultado-da-ia`](../../patterns/ia/revisar-resultado-da-ia.md).
+Cada categoria leva a uma correção diferente (base, recuperação, geração ou interface). Permita também contestar a resposta e pedir confirmação a uma área responsável. Revisão de resultado: [`review-ai-output`](../../patterns/ai/review-ai-output.md).
 
 ## 3. Contrato de resposta
 

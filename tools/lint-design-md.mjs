@@ -46,8 +46,8 @@ export function lintDesignMd(md) {
   if (frontMatter && !fm.owner) warnings.push('Sem "owner": defina quem mantém o arquivo.');
   if (frontMatter && !fm.updated) warnings.push('Sem "updated": registre a data da última revisão.');
 
-  const placeholdersFm = (frontMatter ?? '').split('\n').filter((l) => !/^\s*#/.test(l) && /<[^>]+>/.test(l));
-  if (placeholdersFm.length) errors.push(`Front matter com ${placeholdersFm.length} placeholder(s) não preenchido(s), ex.: "${placeholdersFm[0].trim()}"`);
+  const fmPlaceholders = (frontMatter ?? '').split('\n').filter((l) => !/^\s*#/.test(l) && /<[^>]+>/.test(l));
+  if (fmPlaceholders.length) errors.push(`Front matter com ${fmPlaceholders.length} placeholder(s) não preenchido(s), ex.: "${fmPlaceholders[0].trim()}"`);
 
   for (const [k, v] of Object.entries(colors)) {
     if (typeof v === 'string' && !v.startsWith('{') && !HEX.test(v) && !/<[^>]+>/.test(v)) errors.push(`colors.${k}: valor "${v}" não é hex válido.`);
@@ -64,7 +64,7 @@ export function lintDesignMd(md) {
   };
   walk(fm, '');
   for (const r of refs) if (lookup(r.ref) === undefined) errors.push(`Referência quebrada em ${r.at}: {${r.ref}}`);
-  info.referencias = refs.length;
+  info.references = refs.length;
 
   // Componentes com valor cru em vez de referência
   for (const [name, def] of Object.entries(fm.components ?? {})) {
@@ -86,12 +86,12 @@ export function lintDesignMd(md) {
   const bgs = ['canvas', 'background', 'surface'].filter((b) => colors[b]);
   for (const t of Object.keys(colors).filter((k) => /^text-|^link$/.test(k))) for (const b of bgs) pairs.push([t, b, 4.5]);
   for (const ui of ['border-strong', 'focus', 'primary'].filter((k) => colors[k])) for (const b of bgs.slice(0, 1)) pairs.push([ui, b, 3]);
-  info.paresContraste = [];
+  info.contrast_pairs = [];
   for (const [fg, bg, min] of pairs) {
     const a = resolveColor(colors[fg]), b = resolveColor(colors[bg]);
     if (!a || !b) continue;
     const ratio = +contrast(a, b).toFixed(2);
-    info.paresContraste.push({ fg, bg, ratio, min, ok: ratio >= min });
+    info.contrast_pairs.push({ fg, bg, ratio, min, ok: ratio >= min });
     if (ratio < min) errors.push(`Contraste insuficiente: ${fg} sobre ${bg} = ${ratio}:1 (mínimo ${min}:1).`);
   }
 
@@ -110,7 +110,7 @@ export function lintDesignMd(md) {
   // --- Corpo --------------------------------------------------------------
   const headings = [...body.matchAll(/^##\s+(.+)$/gm)].map((m) => m[1].trim());
   const hasSection = (aliases) => headings.find((h) => aliases.some((a) => norm(h) === norm(a)));
-  info.secoes = headings;
+  info.sections = headings;
   for (const aliases of REQUIRED_SECTIONS) if (!hasSection(aliases)) errors.push(`Seção obrigatória ausente: "## ${aliases[0]}"`);
   for (const aliases of RECOMMENDED_SECTIONS) if (!hasSection(aliases)) warnings.push(`Seção recomendada ausente: "## ${aliases[0]}"`);
 
@@ -151,8 +151,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`DESIGN.md: ${file}`);
     for (const e of result.errors) console.log(`  ERRO   ${e}`);
     for (const w of result.warnings) console.log(`  AVISO  ${w}`);
-    const p = result.info.paresContraste ?? [];
-    console.log(`\n  ${result.info.secoes?.length ?? 0} seções · ${result.info.referencias ?? 0} referências · ${p.filter((x) => x.ok).length}/${p.length} pares de contraste OK`);
+    const p = result.info.contrast_pairs ?? [];
+    console.log(`\n  ${result.info.sections?.length ?? 0} seções · ${result.info.references ?? 0} referências · ${p.filter((x) => x.ok).length}/${p.length} pares de contraste OK`);
     console.log(result.ok ? '  Gates objetivos: APROVADO' : `  Gates objetivos: REPROVADO (${result.errors.length} erro(s))`);
   }
   process.exit(result.ok ? 0 : 1);

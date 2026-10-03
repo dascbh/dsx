@@ -2,14 +2,15 @@
 // Verifica referências internas em todos os .md do DSX:
 //  - links Markdown relativos [texto](caminho.md#ancora) → arquivo existe (relativo ao arquivo)
 //  - caminhos citados em código `knowledge/…`, `patterns/…`, `templates/…`, `tools/…`, `skills/…`,
-//    `agents/…`, `evals/…`, `examples/…`, `tokens/…`, `docs/…` → existem (relativos à raiz do DSX)
+//    `agents/…`, `evals/…`, `examples/…`, `tokens/…`, `docs/…`, `archetypes/…`, `references/…`, `hooks/…` → existem
+//    (relativos à raiz do DSX; exceto em docs/renames-*.md, que lista caminhos antigos de propósito)
 // Uso: node tools/check-links.mjs
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['knowledge', 'patterns', 'arquetipos', 'referencias', 'templates', 'tools', 'skills', 'agents', 'evals', 'examples', 'tokens', 'docs', 'hooks'];
+const ROOTS = ['knowledge', 'patterns', 'archetypes', 'references', 'templates', 'tools', 'skills', 'agents', 'evals', 'examples', 'tokens', 'docs', 'hooks'];
 const SKIP = new Set(['node_modules', '.git', 'build']);
 
 function* mdFiles(dir) {
@@ -31,7 +32,9 @@ export function checkLinks() {
       if (!target || /^[a-z]+:/i.test(target)) continue;
       if (!existsSync(join(dirname(file), target))) broken.push(`${rel}: link → ${m[1]}`);
     }
-    for (const m of text.matchAll(/`((?:\.\.\/)*(?:[a-z-]+\/)*?(?:knowledge|patterns|arquetipos|referencias|templates|tools|skills|agents|evals|examples|tokens|docs|hooks)\/[^`\s*<>{}]+?)`/g)) {
+    // Tabelas de renomeação (docs/renames-*.md) citam de propósito caminhos que não existem mais.
+    if (/^docs\/renames-[^/]+\.md$/.test(rel)) continue;
+    for (const m of text.matchAll(/`((?:\.\.\/)*(?:[a-z-]+\/)*?(?:knowledge|patterns|archetypes|references|templates|tools|skills|agents|evals|examples|tokens|docs|hooks)\/[^`\s*<>{}]+?)`/g)) {
       let p = m[1].replace(/^(\.\.\/)+/, '');
       if (/[*<>]/.test(p) || p.includes('build/')) continue; // globs, placeholders e artefatos gerados
       if (!ROOTS.some((r) => p.startsWith(r + '/'))) continue;

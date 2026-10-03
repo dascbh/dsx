@@ -1,9 +1,9 @@
 ---
 id: evidencia-e-fontes
-area: ia
-titulo: Evidência, sinal e previsão — níveis de confiança para o framework
-evidencia: contextual
-relacionados: [pesquisa-com-ia, rag-e-fontes, divida-de-experiencia]
+area: ai
+title: Evidência, sinal e previsão — níveis de confiança para o framework
+evidence: contextual
+related: [pesquisa-com-ia, rag-e-fontes, divida-de-experiencia]
 ---
 
 # Evidência, sinal e previsão

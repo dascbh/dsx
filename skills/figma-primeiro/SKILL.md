@@ -62,7 +62,7 @@ ponte, em vez de copiar `get_variable_defs` valor a valor:
    arquivos-base do DSX em `tokens/`, copiados para o projeto):
 
    ```bash
-   node <DSX>/tools/figma/figma-para-tokens.mjs --snapshot /tmp/figma-full.json --tokens tokens/
+   node <DSX>/tools/figma/figma-to-tokens.mjs --snapshot /tmp/figma-full.json --tokens tokens/
    ```
 
    Imprime as mudanças por token — valor ou alias, por modo `Claro`/`Escuro` —
@@ -83,7 +83,7 @@ ponte, em vez de copiar `get_variable_defs` valor a valor:
 4. Com a lista revisada, grave as mudanças nos tokens existentes:
 
    ```bash
-   node <DSX>/tools/figma/figma-para-tokens.mjs --snapshot /tmp/figma-full.json --tokens tokens/ --write
+   node <DSX>/tools/figma/figma-to-tokens.mjs --snapshot /tmp/figma-full.json --tokens tokens/ --write
    ```
 
    Com `--write`, a ponte também roda o gate de contraste de
@@ -126,7 +126,7 @@ regras da skill `construir-ui` (só tokens semânticos, todos os estados).
 siga em frente calado — a primeira entrega passa a ser **propor os tokens**:
 levante os valores repetidos, agrupe por papel, monte a proposta em DTCG (skill
 `tokens`) e devolva ao designer para ele ligar as variáveis no arquivo — de
-preferência com `node <DSX>/tools/figma/tokens-para-figma.mjs --tokens tokens/ --script`,
+preferência com `node <DSX>/tools/figma/tokens-to-figma.mjs --tokens tokens/ --script`,
 que gera o script de `use_figma` com as três coleções já no formato que a volta
 espera (skill `figma-fundacoes`).
 
@@ -134,7 +134,7 @@ Sem isso, o código nasce com hex espalhado e o ciclo com o Figma nunca fecha.
 
 ## 3. Esqueleto antes das telas
 
-Confira antes `.dsx/mapas/mapa-projeto.md` — se a skill `mapear` já rodou, ele
+Confira antes `.dsx/maps/project-map.md` — se a skill `mapear` já rodou, ele
 diz o que, se algo, já existe do lado do código antes de você decidir o
 esqueleto do zero (compatibilidade: na falta dele, aceite o legado
 `.claude/figma-claude/project-map.md` e avise que será regravado no caminho
@@ -175,7 +175,7 @@ Para cada tela, antes de fechar:
 
 Registre as respostas junto do código. Elas são metade da especificação e não
 estão no Figma. Rode a skill `mapear` de novo depois de implementar um lote de
-telas — `.dsx/mapas/dominio.md` e `.dsx/mapas/tarefas.md` passam a capturar
+telas — `.dsx/maps/domain.md` e `.dsx/maps/tasks.md` passam a capturar
 essas respostas, já que agora há código real de onde derivá-las, e a próxima
 tela não repergunta o que a anterior já resolveu.
 
@@ -220,5 +220,5 @@ passa a existir. Monte o registro de sincronia e o baseline
 Figma, a vez costuma começar em `design`, e o baseline é tirado **no momento em
 que você implementa** — é ele que define o "antes" da primeira rodada de diff.
 Junto do registro nascem a primeira linha de `design/figma-changelog.jsonl`
-(`direcao: "figma->codigo"`) e o primeiro `design/figma-reference.json` (skill
+(`direction: "figma->code"`) e o primeiro `design/figma-reference.json` (skill
 `figma-convencoes`) — os três juntos, não em rodadas separadas.

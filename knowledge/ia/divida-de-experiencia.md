@@ -1,9 +1,9 @@
 ---
 id: divida-de-experiencia
-area: ia
-titulo: Dívida de experiência com IA, vibe coding e geradores de wireframe
-evidencia: contextual
-relacionados: [evals, pesquisa-com-ia, generative-ui, evidencia-e-fontes]
+area: ai
+title: Dívida de experiência com IA, vibe coding e geradores de wireframe
+evidence: contextual
+related: [evals, pesquisa-com-ia, generative-ui, evidencia-e-fontes]
 ---
 
 # Dívida de experiência com IA

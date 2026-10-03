@@ -2,7 +2,7 @@
 
 > **Quando consultar**
 > - Antes de escrever ou revisar texto de interface produzido por agente (o rascunho de IA traz essas marcas por padrão).
-> - Ao ler o relatório de `tools/ux-lint/texto.mjs` e decidir como reescrever cada achado (regras X1–X11).
+> - Ao ler o relatório de `tools/ux-lint/text.mjs` e decidir como reescrever cada achado (regras X1–X11).
 > - Quando uma tela "parece robótica", "parece feita por IA" ou "tem texto demais" e é preciso dizer exatamente por quê.
 > - Este arquivo não trata de arquitetura de tela nem de fórmulas por elemento: para isso, `ux-writing.md`.
 
@@ -123,7 +123,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 **Por que incomoda.** "Contratos e Aditivos", "Sumário Executivo", "Baixar Word Assinado": maiúscula em cada palavra é convenção do inglês. Em pt-BR, só nomes próprios e siglas levam maiúscula no meio; o resto pesa a leitura e parece tradução.
 
-**Como reconhecer.** Botão, aba ou título em que todas as palavras de conteúdo depois da primeira começam com maiúscula. Siglas ("TO BE", "PDFs") ficam de fora; nomes próprios do domínio vão em `conteudo.nomes-proprios` no UX.md.
+**Como reconhecer.** Botão, aba ou título em que todas as palavras de conteúdo depois da primeira começam com maiúscula. Siglas ("TO BE", "PDFs") ficam de fora; nomes próprios do domínio vão em `content.proper-nouns` no UX.md.
 
 **Como reescrever.** Só a primeira letra maiúscula (mais nomes próprios e siglas).
 
@@ -137,7 +137,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 **Por que incomoda.** Botão com cinco palavras ou mais vira frase e perde a leitura de alvo. Botão sem verbo ("Nova cláusula", "Categorias") obriga a adivinhar se ele cria, abre ou filtra. "OK", "Sim" e "Confirmar" soltos não dizem o que confirmam.
 
-**Como reconhecer.** Botão com mais de 4 palavras; botão que não começa por verbo no infinitivo (quando o UX.md pede `botoes: verbo-objeto`); rótulos da lista sem objeto. Cartões clicáveis, itens de lista, ordenação e chips não são avaliados.
+**Como reconhecer.** Botão com mais de 4 palavras; botão que não começa por verbo no infinitivo (quando o UX.md pede `content.buttons: verb-object`); rótulos da lista sem objeto. Cartões clicáveis, itens de lista, ordenação e chips não são avaliados.
 
 **Como reescrever.** Verbo + objeto, até 4 palavras. Detalhe vai para o texto de apoio ou para o título do diálogo.
 
@@ -165,9 +165,9 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 **Por que incomoda.** "sha256", "hash", "token", "payload", "API", "JSON", "5xx", "OCR" são palavras de quem construiu, não de quem usa. Para a pessoa, viram ruído ou insegurança ("o que é isso? fiz algo errado?").
 
-**Como reconhecer.** Termos de `conteudo.proibidos` do UX.md, mais a lista padrão da ferramenta. "OCR" passa quando vem explicado na mesma frase.
+**Como reconhecer.** Termos de `content.forbidden` do UX.md, mais a lista padrão da ferramenta. "OCR" passa quando vem explicado na mesma frase.
 
-**Como reescrever.** Diga o efeito com a palavra do domínio. Detalhe técnico, se o suporte precisar, vai num campo secundário (`patterns/feedback/codigo-de-erro-tecnico.md`).
+**Como reescrever.** Diga o efeito com a palavra do domínio. Detalhe técnico, se o suporte precisar, vai num campo secundário (`patterns/feedback/technical-error-code.md`).
 
 | Antes | Depois |
 |---|---|
@@ -179,7 +179,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 ## Corrigir na origem
 
-O texto que aparece na tela quase nunca nasce na tela: vem de um arquivo de vocabulário, de um template com dado interpolado ou de uma resposta do servidor. Rode a ferramenta com `--codigo` para ter `arquivo:linha` de cada achado e corrija lá, uma vez, para todas as telas que usam o texto.
+O texto que aparece na tela quase nunca nasce na tela: vem de um arquivo de vocabulário, de um template com dado interpolado ou de uma resposta do servidor. Rode a ferramenta com `--code` para ter `arquivo:linha` de cada achado e corrija lá, uma vez, para todas as telas que usam o texto.
 
 - **SE** o achado aponta um template (`Remover da lista — ${nome}`) → ENTÃO corrija o template; todas as variantes somem juntas.
 - **SE** a peça acusada (o travessão, a maiúscula) veio do dado interpolado (nome de minuta, de pessoa, de categoria) → ENTÃO não é texto da interface; a ferramenta separa esses casos como "provável dado".

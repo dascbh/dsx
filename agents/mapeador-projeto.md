@@ -1,6 +1,6 @@
 ---
 name: mapeador-projeto
-description: "Varre a estrutura física do projeto — diretórios, arquivos, specs, docs, assets, sinais de stack — e grava um mapa de referência (`.dsx/mapas/mapa-projeto.{md,json}`) que as outras skills e agentes do DSX leem em vez de redescobrir o projeto do zero a cada vez. Sobrescreve a própria saída a cada execução, então o mapa nunca deriva do que está de fato em disco. Use como primeiro ato num projeto (via `/dsx:mapear`, passo 1, ou modo `projeto`), ou sempre que o projeto mudou o bastante para as etapas de descoberta das outras skills parecerem desatualizadas. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
+description: "Varre a estrutura física do projeto — diretórios, arquivos, specs, docs, assets, sinais de stack — e grava um mapa de referência (`.dsx/maps/project-map.{md,json}`) que as outras skills e agentes do DSX leem em vez de redescobrir o projeto do zero a cada vez. Sobrescreve a própria saída a cada execução, então o mapa nunca deriva do que está de fato em disco. Use como primeiro ato num projeto (via `/dsx:mapear`, passo 1, ou modo `project`), ou sempre que o projeto mudou o bastante para as etapas de descoberta das outras skills parecerem desatualizadas. Nunca relata os achados diretamente ao usuário — o mapa é para outros comandos lerem, não para colar na conversa."
 model: inherit
 ---
 
@@ -89,7 +89,7 @@ ls .claude/prancheta/produto.md .claude/prancheta/design.md 2>/dev/null
 ```bash
 ls DESIGN.md design/as-is-to-be.md design/figma-sync.md 2>/dev/null
 ls design/figma-baseline/*.json 2>/dev/null | wc -l
-ls .dsx/mapas/ .dsx/figma/ 2>/dev/null
+ls .dsx/maps/ .dsx/figma/ 2>/dev/null
 ```
 
 **7. Assets.**
@@ -100,23 +100,24 @@ find public src/assets static -maxdepth 2 -type d 2>/dev/null
 
 ## O que gravar
 
-Crie `.dsx/mapas/` se não existir e grave os dois arquivos, substituindo por
+Crie `.dsx/maps/` se não existir e grave os dois arquivos, substituindo por
 completo o que houver.
 
 **Compatibilidade com o fluxo anterior:** se existir o legado
+`.dsx/mapas/mapa-projeto.{md,json}` (nome antigo, em português) ou
 `.claude/figma-claude/project-map.{md,json}`, não o leia como ponto de
 partida (esta varredura é sempre do zero) — só registre na sua linha de
-retorno que o mapa agora mora em `.dsx/mapas/` e que o legado pode ser
-removido. Você sempre **grava** só em `.dsx/mapas/`.
+retorno que o mapa agora mora em `.dsx/maps/` e que o legado pode ser
+removido. Você sempre **grava** só em `.dsx/maps/`.
 
-**`.dsx/mapas/mapa-projeto.json`** — estruturado, uma chave por seção acima,
+**`.dsx/maps/project-map.json`** — estruturado, uma chave por seção acima,
 cada contagem sustentada por um comando real desta execução. Formato
 (adapte à vontade; descarte uma chave inteira em vez de preenchê-la com um
 palpite; os nomes de campo ficam em inglês — são contrato de máquina):
 
 ```json
 {
-  "generatedAt": "2026-08-18T00:00:00Z",
+  "generated_at": "2026-08-18T00:00:00Z",
   "root": "/absolute/path",
   "scope": "whole project",
   "stack": { "detected": ["react", "typescript", "vite"], "evidence": { "react": "package.json" } },
@@ -124,15 +125,15 @@ palpite; os nomes de campo ficam em inglês — são contrato de máquina):
   "routes": { "count": 12, "method": "grep src/routes", "items": ["/demands", "/dashboard"] },
   "dialogs": { "count": 9, "items": ["EditDialog", "ConfirmDialog"] },
   "components": { "count": 41, "directories": ["src/components", "src/ui"] },
-  "specsAndTests": { "framework": "vitest", "count": 58, "locations": ["src/**/__tests__"] },
+  "specs_and_tests": { "framework": "vitest", "count": 58, "locations": ["src/**/__tests__"] },
   "docs": [{ "path": "README.md", "kind": "readme" }],
-  "designSystem": { "themeFile": "src/theme.ts", "iconPackage": "@mui/icons-material", "foundationDoc": "DESIGN.md" },
-  "figmaCycle": { "syncRegistry": false, "baselineFiles": 0 },
+  "design_system": { "theme_file": "src/theme.ts", "icon_package": "@mui/icons-material", "foundation_doc": "DESIGN.md" },
+  "figma_cycle": { "sync_registry": false, "baseline_files": 0 },
   "assets": [{ "path": "public", "kind": "static assets", "count": 34 }]
 }
 ```
 
-**`.dsx/mapas/mapa-projeto.md`** — os mesmos fatos, narrados para serem
+**`.dsx/maps/project-map.md`** — os mesmos fatos, narrados para serem
 lidos por alto em menos de um minuto: `# Mapa do projeto`, depois as linhas
 `gerado:` / `raiz:` / `escopo:`, depois uma seção por área acima (Stack,
 Diretórios, Rotas, Diálogos e modais, Componentes, Specs e testes, Docs e
@@ -143,7 +144,7 @@ encontrado" — nunca um título vazio sem nada embaixo. Feche com:
 ```markdown
 ## Para as etapas seguintes
 
-Este arquivo e `mapa-projeto.json` são regenerados pelo `/dsx:mapear` toda
+Este arquivo e `project-map.json` são regenerados pelo `/dsx:mapear` toda
 vez que ele roda, sempre sobrescrevendo o que estava aqui. Leia isto antes
 de redescobrir o projeto do zero, e rode o mapear de novo primeiro se
 parecer desatualizado.

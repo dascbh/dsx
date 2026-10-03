@@ -17,7 +17,7 @@ O espelho (`figma-espelhar`) descreve **o presente** e não se redesenha. A pág
 ## Pré-condições
 
 - Ciclo montado (`figma-iniciar`) e fundação no arquivo (`figma-fundacoes`): propostas são montadas com as **variáveis e componentes do kit**, nunca com valores soltos.
-- Leia `design/figma-sync.md`. **Modo A escreve no arquivo:** só com `vez: codigo`, ou com `vez: design` se o próprio design pediu a exploração — nesse caso, peça para a pessoa passar a vez (`figma-vez`) ou desenhe só depois que ela confirmar; o guarda bloqueia escrita na vez do design e isso é intencional. **Modo B só lê:** roda em qualquer vez.
+- Leia `design/figma-sync.md`. **Modo A escreve no arquivo:** só com `turn: code`, ou com `turn: design` se o próprio design pediu a exploração — nesse caso, peça para a pessoa passar a vez (`figma-vez`) ou desenhe só depois que ela confirmar; o guarda bloqueia escrita na vez do design e isso é intencional. **Modo B só lê:** roda em qualquer vez.
 - Carregue a skill oficial `figma-use` antes de qualquer `use_figma`.
 
 ## Modo A — Explorar alternativas
@@ -27,7 +27,7 @@ O espelho (`figma-espelhar`) descreve **o presente** e não se redesenha. A pág
 3. **Monte no Figma**, uma alternativa por frame, lado a lado, ao lado de uma cópia **referenciada** (não editada) do frame atual. Use o kit e as variáveis do arquivo; texto real (`ux-writing`), volume de dados realista, e inclua pelo menos um estado não ideal (vazio ou erro) por alternativa.
 4. **Nomeie** `Proposta · <tela> · A — <hipótese em 3–5 palavras>` e escreva a hipótese, os padrões usados e o trade-off principal numa nota ao lado de cada frame.
 5. **Verifique renderizado**: screenshot de cada alternativa; contraste dos pares novos com `node tools/contrast.mjs`; alvos ≥ 44px; hierarquia (uma ação primária por região).
-6. **Registre** uma linha em `design/figma-changelog.jsonl` (`direcao: "codigo->figma"`, `resumo: "propostas: <tela>"`) e liste as propostas em `## Open proposals` do `figma-sync.md`.
+6. **Registre** uma linha em `design/figma-changelog.jsonl` (`direction: "code->figma"`, `summary: "propostas: <tela>"`) e liste as propostas em `## Open proposals` do `figma-sync.md`.
 7. **Recomende** uma, com o critério que decide (ex.: "A, se a tarefa dominante é comparar; B, se é acompanhar um item") e o que validar com pessoas reais (skill `pesquisa`) antes de decidir. Propostas são hipóteses, não evidência.
 
 ## Modo B — Criticar o que o design desenhou
@@ -38,7 +38,7 @@ Para cada frame em `09 · Propostas` (ou os que o usuário apontar):
 2. **Compare com o frame atual** correspondente e liste o que muda.
 3. **Passe as lentes do DSX**, nesta ordem, citando a fonte de cada achado:
    - **Tokens:** fills/strokes ligados a variáveis (`@color/...` no snapshot)? Valor cru em proposta = mudança de token disfarçada ou drift.
-   - **Contraste e não-só-cor:** `tools/contrast.mjs` em cada par novo; estado comunicado só por cor reprova (`patterns/acessibilidade/nao-so-cor.md`).
+   - **Contraste e não-só-cor:** `tools/contrast.mjs` em cada par novo; estado comunicado só por cor reprova (`patterns/accessibility/not-color-alone.md`).
    - **Padrões de interação:** cada decisão contra `patterns/index.json` — erro em toast, modal com formulário longo, botão desabilitado sem motivo, carrossel automático…
    - **Heurísticas e hierarquia:** skill `revisar-ux` (walkthrough da tarefa, severidade 0–4).
    - **Texto:** skill `ux-writing` (glossário, verbo + objeto, mensagens de erro).

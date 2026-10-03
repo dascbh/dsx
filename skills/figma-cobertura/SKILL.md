@@ -1,7 +1,7 @@
 ---
 name: figma-cobertura
 description: "Audita a cobertura entre código e Figma (rotas, diálogos, estados × frames) e atualiza a matriz nos dois sentidos. Use quando perguntarem se falta alguma tela no Figma ou para provar cobertura em vez de afirmá-la."
-argument-hint: "[codigo→figma | figma→codigo]"
+argument-hint: "[code→figma | figma→code]"
 ---
 
 # figma-cobertura — cobertura se prova, não se afirma
@@ -20,29 +20,29 @@ Resumo da auditoria (o resto da skill detalha cada fase):
   overlays, estados) e confira contra os frames do arquivo. Para cada item sem
   par, nomeie o destino: **falta**, **coberto por outro frame** (diga qual) ou
   **fora de escopo** (diga o motivo). Só o terceiro encerra o item.
-- Se o projeto nasceu no Figma (sentido `figma→codigo`), leia a matriz
-  invertida — frame → rota, com status `implementado` / `parcial` / `falta` /
+- Se o projeto nasceu no Figma (sentido `figma→code`), leia a matriz
+  invertida — frame → rota, com status `implementado` / `partial` / `falta` /
   `não vira código`.
 - Números só entram no relatório se vierem de contagem, nunca de estimativa.
 
 ## Antes de qualquer coisa
 
 Carregue a skill **`figma-use`** antes de toda chamada a `use_figma`. Leia
-`design/figma-changelog.jsonl` (a última rodada e o ponteiro de `achados`) e o
+`design/figma-changelog.jsonl` (a última rodada e o ponteiro de `findings`) e o
 `design/figma-reference.json` se existirem: um gap que pareceria novo pode já
 estar registrado como fora de escopo numa rodada anterior.
 
 ## Fase A — inventário a partir do código
 
 Nunca da memória, nunca da navegação pelo app. Do código. Se
-`.dsx/mapas/mapa-ui.json` já tem páginas, modais e estados levantados, reuse em
-vez de rederivar; `.dsx/mapas/mapa-projeto.json` cobre rotas e componentes num
+`.dsx/maps/ui-map.json` já tem páginas, modais e estados levantados, reuse em
+vez de rederivar; `.dsx/maps/project-map.json` cobre rotas e componentes num
 grão mais grosso se o mapeamento de UI não rodou. Só faça grep do que nenhum dos
 dois mapas cobre, e rode a skill `mapear` antes se o projeto andou desde que eles
 foram escritos.
 
-**Compatibilidade:** ao procurar um mapa, leia primeiro `.dsx/mapas/`; se não
-existir, aceite o legado `.claude/figma-claude/` (`ui-map.json`,
+**Compatibilidade:** ao procurar um mapa, leia primeiro `.dsx/maps/`; se não
+existir, aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`ui-map.json`,
 `project-map.json`, `task-flows.json`) e avise que ele será regravado no caminho
 novo na próxima execução de `mapear`.
 
@@ -56,7 +56,7 @@ grep -rn "<Dialog \|<EditDialog\|<Modal\|useConfirm(" src/ | sed 's/:.*//' | sor
 # 3. componentes com UI própria (não utilitários)
 find src/components src/ui -name '*.tsx' | xargs wc -l | sort -n
 
-# 4. estados que não são rota: vazio, carregando, erro, variantes de resultado
+# 4. estados que não são rota: empty, carregando, erro, variantes de resultado
 grep -rn "EmptyState\|LoadError\|isLoading\|isError\|severity=" src/pages src/components | wc -l
 ```
 
@@ -66,7 +66,7 @@ grep -rn "EmptyState\|LoadError\|isLoading\|isError\|severity=" src/pages src/co
 |---|---|---|
 | **rota** | entrada no roteador | um frame |
 | **aba** | filho de `<Outlet>` ou `Tabs` dentro de uma rota | um frame por aba |
-| **rota de componente compartilhado** | uma entrada de `subPages` em `mapa-ui.json` marcada `navVisible: true` — um destino distinto do menu de navegação que por acaso renderiza pelo mesmo componente-fonte dos irmãos, via parâmetro de rota | frame próprio, como qualquer outra rota — **nunca** dobrada na contagem do pai |
+| **rota de componente compartilhado** | uma entrada de `sub_pages` em `ui-map.json` marcada `nav_visible: true` — um destino distinto do menu de navegação que por acaso renderiza pelo mesmo componente-fonte dos irmãos, via parâmetro de rota | frame próprio, como qualquer outra rota — **nunca** dobrada na contagem do pai |
 | **diálogo** | `Dialog`/`Modal` | um frame sobre scrim |
 | **painel** | card grande que só existe dentro de uma tela | some ao frame da tela, ou frame próprio se a tela ficar longa demais |
 | **overlay** | menu, dropdown, toast, faixa fixa | frame pequeno próprio |
@@ -77,11 +77,11 @@ pode fazer, merece.
 
 **Matriz montada sobre a *contagem* de páginas/rotas pode dar 100% e ainda
 assim perder destinos reais de navegação.** Se três links da barra lateral
-apontam para um mesmo componente com parâmetro de tipo, `mapa-ui.json` pode
-registrar isso como uma única entrada em `pages` com três `subPages` — uma
+apontam para um mesmo componente com parâmetro de tipo, `ui-map.json` pode
+registrar isso como uma única entrada em `pages` com três `sub_pages` — uma
 matriz que só soma entradas de nível superior vai dizer "1 de 1, coberto" e
 nunca notar que as outras duas nunca foram construídas. Conte cada sub-página
-`navVisible` como uma linha própria do inventário, igual a qualquer rota.
+`nav_visible` como uma linha própria do inventário, igual a qualquer rota.
 
 ### Saída da fase A
 
@@ -147,11 +147,11 @@ produto"**. A mesma matriz, lida ao contrário, com uma coluna a mais:
 | `Painel · sem dados` | estado da rota `/painel` | falta |
 | `Painel · v2 (exploração)` | — | não vira código, exploração |
 
-Status possíveis: `implementado`, `parcial` (com o que falta), `falta`,
+Status possíveis: `implementado`, `partial` (com o que falta), `falta`,
 `não vira código` (exploração, rascunho, referência — com o motivo).
 
-A mesma regra de reuso da fase A vale aqui: se `.dsx/mapas/mapa-ui.json` ou
-`.dsx/mapas/tarefas.json` já tem a rota/tarefa do lado do código, use isso nas
+A mesma regra de reuso da fase A vale aqui: se `.dsx/maps/ui-map.json` ou
+`.dsx/maps/tasks.json` já tem a rota/tarefa do lado do código, use isso nas
 colunas "Vira" e "Status" em vez de reconferir o código à mão.
 
 Essa coluna é o que responde "quanto do design já virou produto" sem ninguém
@@ -180,7 +180,7 @@ alcança"*. Isso é um achado sobre o código, entregue de graça pela auditoria
 
 Achados da auditoria (código órfão, rota de navegação sem frame, frame fora do
 formato de nome) recebem severidade 0–4 pela escala da skill `revisar-ux` e
-vão para `design/figma-achados/<rodada>.md`, um por achado — é dado, não
+vão para `design/figma-findings/<rodada>.md`, um por achado — é dado, não
 narrativa, e não pode ficar só na conversa.
 
 ## Relatório ao usuário
@@ -198,5 +198,5 @@ campo `frames`) são a mesma informação em dois formatos — regenere o JSON a
 partir da matriz que você acabou de fechar, nunca deixe um mais novo que o
 outro. Se a rodada corrigiu um gap de cobertura, isso também é uma linha nova
 em `design/figma-changelog.jsonl` (skill `figma-ciclo`), com
-`framesCriados`/`framesAlterados`/`framesRemovidos` vindos da contagem e
-`achados` apontando para `design/figma-achados/<rodada>.md`.
+`frames_created`/`frames_changed`/`frames_removed` vindos da contagem e
+`findings` apontando para `design/figma-findings/<rodada>.md`.

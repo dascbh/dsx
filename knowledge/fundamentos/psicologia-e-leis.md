@@ -61,7 +61,7 @@ O tempo para alcançar um alvo cresce com a distância e diminui com o tamanho: 
 | Diretriz Android | 48 × 48 dp |
 | Distância entre alvos de toque | ≥ 8 px |
 
-SE o alvo é de toque ENTÃO projete com 44–48 px; trate 24 px como piso legal, não como meta. Ver [alvo-de-toque](../../patterns/acessibilidade/alvo-de-toque.md) e [botao-flutuante](../../patterns/acoes/botao-flutuante.md).
+SE o alvo é de toque ENTÃO projete com 44–48 px; trate 24 px como piso legal, não como meta. Ver [touch-target](../../patterns/accessibility/touch-target.md) e [floating-action-button](../../patterns/actions/floating-action-button.md).
 
 **Limites.** Fitts mede movimento, não compreensão. Não resolve rótulo ambíguo, dúvida entre opções ou recuperação de erro.
 
@@ -73,9 +73,9 @@ O tempo de decisão cresce (de forma logarítmica) com o número de alternativas
 
 **Regras**
 - Formule a decisão principal da tela numa frase antes de distribuir os elementos.
-- Destaque **uma** ação recomendada; mantenha as alternativas acessíveis, com menor peso. Ver [hierarquia-de-botoes](../../patterns/acoes/hierarquia-de-botoes.md).
+- Destaque **uma** ação recomendada; mantenha as alternativas acessíveis, com menor peso. Ver [button-hierarchy](../../patterns/actions/button-hierarchy.md).
 - Agrupe opções em categorias reconhecíveis pelo público (valide com card sorting).
-- Em listas longas, ofereça busca e filtros em vez de rolagem ([estrutura-de-filtros](../../patterns/busca-filtros/estrutura-de-filtros.md)).
+- Em listas longas, ofereça busca e filtros em vez de rolagem ([filter-structure](../../patterns/search-filters/filter-structure.md)).
 - Separe o comum do avançado com rótulo específico ("Configurações avançadas de cobrança", não "Mais opções").
 - Ao reduzir opções por contexto, explique o critério e permita ver tudo.
 
@@ -127,9 +127,9 @@ O problema de interface quase sempre é de signifier: algo clicável que parece 
 - O que é clicável parece clicável; o que não é, não parece.
 - Rótulos descrevem a consequência ("Excluir projeto"), não o genérico ("OK").
 - Projete todos os estados antes de validar.
-- Não dependa só de cor ou movimento; garanta nome acessível e foco visível ([foco-de-teclado](../../patterns/acessibilidade/foco-de-teclado.md)).
+- Não dependa só de cor ou movimento; garanta nome acessível e foco visível ([keyboard-focus](../../patterns/accessibility/keyboard-focus.md)).
 
-Ver [link-vs-botao](../../patterns/acoes/link-vs-botao.md), [botao-desabilitado](../../patterns/acoes/botao-desabilitado.md).
+Ver [link-vs-button](../../patterns/actions/link-vs-button.md), [disabled-button](../../patterns/actions/disabled-button.md).
 
 ---
 

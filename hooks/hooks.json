@@ -1,18 +1,18 @@
 {
-  "description": "Guarda da vez do ciclo Figma↔código: nega escrita no arquivo do Figma enquanto design/figma-sync.md disser `vez: design` (aceita o legado `turn:`) e anuncia o estado do ciclo ao abrir a sessão. Leitura sempre passa; projeto sem registro não é afetado.",
+  "description": "Guarda da vez do ciclo Figma↔código: nega escrita no arquivo do Figma enquanto design/figma-sync.md disser `turn: design` (aceita o legado `vez:` e os valores antigos `codigo`/`aplicando`, com aviso) e anuncia o estado do ciclo ao abrir a sessão. Leitura sempre passa; projeto sem registro não é afetado.",
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "use_figma",
         "hooks": [
-          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/guarda-vez.py\"", "timeout": 5 }
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/turn-guard.py\"", "timeout": 5 }
         ]
       }
     ],
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/guarda-vez.py\"", "timeout": 5 }
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/turn-guard.py\"", "timeout": 5 }
         ]
       }
     ]

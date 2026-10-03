@@ -7,7 +7,7 @@ description: "Desenha e revisa features de IA e agentes: autonomia por risco, co
 
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/` são relativos a ela.
 
-Referências: `knowledge/ia/ux-para-agentes.md`, `generative-ui.md`, `multimodal.md`, `rag-e-fontes.md`, `conteudo-sintetico.md`; padrões `patterns/ia/*`.
+Referências: `knowledge/ia/ux-para-agentes.md`, `generative-ui.md`, `multimodal.md`, `rag-e-fontes.md`, `conteudo-sintetico.md`; padrões `patterns/ai/*`.
 
 **Tese:** a IA barateia o rascunho, não o erro. O trabalho de UX é tornar o comportamento do sistema **compreensível, supervisionável e reversível**.
 
@@ -23,17 +23,17 @@ Liste tudo que a IA/agente pode **fazer** (não só dizer). Para cada ação:
 | Crítico | mover dinheiro, apagar dados, mudar permissões | confirmação reforçada (revisão completa, digitar/2º fator), trilha de auditoria, nunca em lote silencioso |
 
 Regras:
-- Confirmação uniforme para tudo gera fadiga e aprovação automática — **calibre pelo risco**. `patterns/ia/confirmar-acao-da-ia.md`
+- Confirmação uniforme para tudo gera fadiga e aprovação automática — **calibre pelo risco**. `patterns/ai/confirm-ai-action.md`
 - Nunca automação irreversível em fluxo sensível sem caminho de recuperação.
 - Distinga na interface **sugerir** de **agir**.
 
 ## 2. Ciclo de interação que a UI precisa cobrir
 
 1. **Intenção:** mostre o que o sistema entendeu (objetivo, escopo, restrições). Se ambíguo, pergunte com opções concretas ("Encontrei 2 pessoas chamadas Ana. Qual?").
-2. **Plano/progresso:** passo atual, ferramentas e fontes em uso, decisões pendentes. Spinner genérico não basta para tarefas > 10s. `patterns/feedback/carregamento-longo.md`
-3. **Resultado:** rotulado como gerado por IA (`patterns/ia/rotular-conteudo-ia.md`), com fontes/critérios quando afirma fatos (`patterns/ia/fontes-da-ia.md`), e limites comunicados de forma acionável — não porcentagem solta (`patterns/ia/incerteza-da-ia.md`).
-4. **Revisão:** editar, refazer, refinar, aceitar parcialmente, descartar — sem perder a versão anterior (`patterns/ia/revisar-resultado-da-ia.md`).
-5. **Falha:** diga o que falhou, preserve o que foi feito, repita só a etapa falha, ofereça caminho manual ou humano (`patterns/ia/recuperar-erro-da-ia.md`).
+2. **Plano/progresso:** passo atual, ferramentas e fontes em uso, decisões pendentes. Spinner genérico não basta para tarefas > 10s. `patterns/feedback/long-loading.md`
+3. **Resultado:** rotulado como gerado por IA (`patterns/ai/label-ai-content.md`), com fontes/critérios quando afirma fatos (`patterns/ai/ai-sources.md`), e limites comunicados de forma acionável — não porcentagem solta (`patterns/ai/ai-uncertainty.md`).
+4. **Revisão:** editar, refazer, refinar, aceitar parcialmente, descartar — sem perder a versão anterior (`patterns/ai/review-ai-output.md`).
+5. **Falha:** diga o que falhou, preserve o que foi feito, repita só a etapa falha, ofereça caminho manual ou humano (`patterns/ai/ai-error-recovery.md`).
 6. **Rastro:** histórico do que foi feito, com que dados e com qual aprovação.
 
 ## 3. Permissões e dados

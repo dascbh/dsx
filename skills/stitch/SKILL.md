@@ -17,12 +17,14 @@ description: "Usa o Google Stitch sem edição manual: sincroniza o DESIGN.md, g
 .stitch/
 ├── DESIGN.md          # export do DESIGN.md do projeto para o Stitch (gerado — não edite)
 ├── metadata.json      # projectId, título, telas, design system (formato da skill oficial manage-design-system)
-├── conferencia.json   # última saída de `tools/stitch/design-system.mjs conferir --json`
+├── check.json         # última saída de `tools/stitch/design-system.mjs check --json`
 ├── designs/<slug>.html|png
-└── revisoes/<slug>.md # crítica de cada rodada: achados, aceitos, recusados (com motivo)
+└── reviews/<slug>.md  # crítica de cada rodada: achados, aceitos, recusados (com motivo)
 ```
 
-Em `metadata.json`, acrescente ao formato oficial: `"designSystem": { "assetId", "conferido": "<data>", "status": "conforme|divergente" }`.
+Projeto com nomes antigos (`conferencia.json`, `conferencia-bruta.json`, `revisoes/`, `"conferido"`, `"checkedAt"`, `conforme|divergente`): leia-os, avise "nome antigo, renomeie para X" e grave só com os nomes novos.
+
+Em `metadata.json`, acrescente ao formato oficial (as chaves da API do Stitch, como `designSystem` e `assetId`, ficam como na API): `"designSystem": { "assetId", "checked_at": "<data>", "status": "compliant|divergent" }`.
 
 ## Escolha o modo
 
@@ -46,28 +48,28 @@ O ciclo completo é **sincronizar → gerar → criticar → (você decide) → 
 1. `node <DSX>/tools/lint-design-md.mjs DESIGN.md`. Se houver erro, conserte antes (skill `design-md`). O Stitch não vai consertar o seu sistema por você.
 2. Exporte a versão para o Stitch:
    ```bash
-   node <DSX>/tools/stitch/design-system.mjs exportar DESIGN.md -o .stitch/DESIGN.md
+   node <DSX>/tools/stitch/design-system.mjs export DESIGN.md -o .stitch/DESIGN.md
    ```
    Leia os AVISOS: raio quantizado e fontes que o Stitch não tem.
 3. **Pare e confirme com o usuário** (checkpoint da skill oficial): nome, cor da marca, fontes, nível de raio e avisos.
 4. Projeto: `list_projects`. Se não existir um projeto para este produto, use `create_project` e guarde o `projectId` em `.stitch/metadata.json`.
 5. Importe **pelo DESIGN.md**: `upload_design_md` (base64 de `.stitch/DESIGN.md`) e, logo depois, `create_design_system_from_design_md` com o `{id, sourceScreen}` devolvido. Para arquivos grandes, use o script da skill oficial `upload-to-stitch`.
    - **Nunca use `update_design_system` para sincronizar.** Ele só aceita o modelo Material 3 (cor-semente) e apaga as cores nomeadas do DSX. Para mudar o sistema, reimporte o export.
-6. Espere ~10s (o processamento é assíncrono), chame `list_design_systems`, salve a resposta em `.stitch/conferencia-bruta.json` e confira:
+6. Espere ~10s (o processamento é assíncrono), chame `list_design_systems`, salve a resposta em `.stitch/check-raw.json` e confira:
    ```bash
-   node <DSX>/tools/stitch/design-system.mjs conferir DESIGN.md .stitch/conferencia-bruta.json --asset <assetId> --json > .stitch/conferencia.json
+   node <DSX>/tools/stitch/design-system.mjs check DESIGN.md .stitch/check-raw.json --asset <assetId> --json > .stitch/check.json
    ```
    - **DIVERGENTE** → corrija pela causa apontada e reimporte. Não gere telas sobre um sistema divergente.
-   - **CONFORME com avisos** → normal. A marca fica em `primary-container` e `primary` recebe um tom derivado; os papéis Material 3 extras têm destino definido em `mapeamento`.
+   - **CONFORME com avisos** → normal. A marca fica em `primary-container` e `primary` recebe um tom derivado; os papéis Material 3 extras têm destino definido em `mapping`.
    - **Limite conhecido:** mesmo com o design system em `ROUND_EIGHT`, a config Tailwind de cada tela gerada pode declarar outro raio (observado: 4px). Por isso o raio da tela do Stitch **nunca** é referência: no código, valem os tokens `radius.*` do DSX.
 
 ## 2. Gerar uma tela
 
 1. **Contexto antes do prompt.** Se a tela não tem problema declarado, use a skill `discovery` primeiro. Reúna:
    - persona e tarefa principal;
-   - de onde a tela é alcançada e para onde leva (`.dsx/mapas/fluxos.json`, se existir);
-   - entidades e dados (`.dsx/mapas/dominio.json`).
-2. **Padrões que se aplicam:** consulte `patterns/index.json`, por exemplo `tabela-vs-cards`, `filtros-ativos`, `paginacao-de-tabela`, `estado-vazio`, `hierarquia-de-botoes`. Traduza cada regra em **comportamento descrito**, sem o id. Exemplo: "filtros ativos visíveis como chips removíveis, com 'Limpar filtros'".
+   - de onde a tela é alcançada e para onde leva (`.dsx/maps/flows.json`, se existir);
+   - entidades e dados (`.dsx/maps/domain.json`).
+2. **Padrões que se aplicam:** consulte `patterns/index.json`, por exemplo `table-vs-cards`, `active-filters`, `table-pagination`, `empty-state`, `button-hierarchy`. Traduza cada regra em **comportamento descrito**, sem o id. Exemplo: "filtros ativos visíveis como chips removíveis, com 'Limpar filtros'".
 3. **Monte o prompt** no template da skill oficial `stitch-design:generate-design`: propósito e intenção, plataforma e estrutura da página numerada.
    - **Sem cores, fontes, raios ou hex.** O design system do projeto cuida disso; repetir causa conflito. Vale a regra da skill oficial `generate-design`. A `enhance-prompt` injeta o design system no prompt, então **não** siga essa parte dela.
    - **Texto em pt-BR, no glossário do produto,** com botões no formato verbo + objeto (skill `ux-writing`).
@@ -95,7 +97,7 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
 
 1. **Gates objetivos:**
    ```bash
-   node <DSX>/tools/stitch/analisar-html.mjs .stitch/designs/<slug>.html --design-md DESIGN.md
+   node <DSX>/tools/stitch/analyze-html.mjs .stitch/designs/<slug>.html --design-md DESIGN.md
    ```
    A ferramenta mede:
    - papéis de cor do DSX × papéis só do Stitch, com o destino de cada um;
@@ -111,7 +113,7 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
    - `ux-writing`: termos, verbo + objeto, consistência. Contagens repetidas com palavras diferentes ("Exibindo" × "Mostrando") são comuns no Stitch;
    - `acessibilidade`: o que a triagem estática não pega.
 4. **Revisão independente:** para telas importantes, dispare o subagente `revisor-ux` passando **só** o PNG, o HTML e o público. Não passe o prompt nem a sua crítica.
-5. **Registre** em `.stitch/revisoes/<slug>.md` (formato de `templates/relatorio-heuristico.md`).
+5. **Registre** em `.stitch/reviews/<slug>.md` (formato de `templates/relatorio-heuristico.md`).
 6. **Apresente ao usuário:** liste os achados por severidade e peça para ele escolher o que entra. Achados de token (cor, raio, fonte) **não** entram por tela; voltam para o modo 1.
 
 ## 5. Iterar
@@ -120,7 +122,7 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
 2. Prefira 1 rodada com tudo o que foi aceito, ou uma por tema. Não refaça a tela do zero, a menos que o layout inteiro esteja errado.
 3. Baixe a nova versão (ela ganha outro id; a original fica preservada) e **rode o modo 4 de novo**, inclusive a ferramenta de HTML.
    - A edição pode resolver só na aparência. Exemplo observado: uma linha "clicável" que ganhou só `cursor-pointer`, sem teclado. A ferramenta acusa isso.
-4. Registre aceitos e recusados, com motivo, em `.stitch/revisoes/<slug>.md`.
+4. Registre aceitos e recusados, com motivo, em `.stitch/reviews/<slug>.md`.
 
 ## 6. Trazer para o código
 
@@ -129,7 +131,7 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
 1. Use o screenshot e o HTML como **referência de layout e conteúdo**.
 2. **Mapeie cores pelo papel:**
    - papéis do DSX → os mesmos tokens semânticos;
-   - papéis Material 3 → o destino em `mapeamento`, na saída do `conferir` ou do `analisar-html` (ex.: `primary-container` → `color.action.primary`).
+   - papéis Material 3 → o destino em `mapping` (saída do `check`) ou em `map_to` (saída do `analyze-html`) (ex.: `primary-container` → `color.action.primary`).
 3. **Use componentes do projeto.** O Stitch inventa a estrutura; você reusa o kit (`construir-ui`, seção 1).
 4. **Corrija o que a crítica apontou e o Stitch não resolveu:** acesso por teclado, `href="#"` → rotas reais, `aria-sort` e estados vazio, erro e carregando.
 5. **Gates de entrega:**
@@ -147,7 +149,7 @@ Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipó
 ```
 Projeto: <título> (<projectId>) · design system: <assetId> — CONFORME/DIVERGENTE
 Tela: <slug> (<screenId>) · versão N
-Gates (analisar-html): papéis DSX NN% · contraste X/Y · a11y: <falhas>
+Gates (analyze-html): papéis DSX NN% · contraste X/Y · a11y: <falhas>
 Achados (sev ≥ 3): …   Aceitos: …   Recusados (motivo): …
 Próximo passo: iterar | trazer | gerar variantes
 ```

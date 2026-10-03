@@ -1,9 +1,9 @@
 ---
 id: generative-ui
-area: ia
-titulo: Generative UI (interface gerada em tempo de uso)
-evidencia: sinal
-relacionados: [ux-para-agentes, evals, multimodal]
+area: ai
+title: Generative UI (interface gerada em tempo de uso)
+evidence: signal
+related: [ux-para-agentes, evals, multimodal]
 ---
 
 # Generative UI
@@ -60,7 +60,7 @@ Defina explicitamente o que **nunca** é gerado. Por padrão, são invariantes:
 - Identidade visual (tokens, tipografia, marca).
 - Mensagens legais, consentimentos e avisos obrigatórios.
 - Ações de alto risco ou críticas (pagar, excluir, publicar, alterar acesso) e suas confirmações.
-- Rótulo de conteúdo gerado por IA ([`rotular-conteudo-ia`](../../patterns/ia/rotular-conteudo-ia.md)).
+- Rótulo de conteúdo gerado por IA ([`label-ai-content`](../../patterns/ai/label-ai-content.md)).
 - Controles de cancelar, desfazer e sair.
 
 Só **áreas contextuais** se adaptam. Consistência não serve apenas à marca: é ela que permite à pessoa aprender caminhos e formar memória espacial.
@@ -80,7 +80,7 @@ propriedades:
   itens: { tipo: lista, min: 2, max: 8 }
   atributos: { tipo: lista, min: 3 }
   destaque: { tipo: enum, valores: [nenhum, melhor-valor] }
-estados: [carregando, vazio, erro, parcial]
+estados: [loading, empty, error, partial]
 combinacoes_invalidas:
   - "dentro de modal em mobile"
   - "junto de outro componente de comparação na mesma resposta"

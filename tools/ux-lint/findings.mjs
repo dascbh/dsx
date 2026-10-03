@@ -4,7 +4,7 @@
 // decisão do dono separada do resultado da máquina e status calculado entre execuções.
 //
 //   node tools/ux-lint/findings.mjs register --module <m> [--dir .dsx/findings] [--text t.json] [--screen s.json] [--flow f.json] [--root <repo>] [--include-sev0]
-//   node tools/ux-lint/findings.mjs options  --module <m> --from casos.json
+//   node tools/ux-lint/findings.mjs options  --module <m> --from cases.json
 //   node tools/ux-lint/findings.mjs decide   --module <m> <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
 //   node tools/ux-lint/findings.mjs import   --module <m> decisions.json
 //   node tools/ux-lint/findings.mjs status   --module <m> [--json]
@@ -19,9 +19,10 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from '../lib/cli.mjs';
 import { renderTextPage, normalizeElement, sortCases } from './text-page.mjs';
+import { normalizeCases, normalizeDetectorJson } from './lib/legacy.mjs';
 
 /** Verificadores que produzem a entrada de cada família (nomes isolados aqui para renomear sem caçar no código). */
-export const DETECTORS = { text: 'tools/ux-lint/texto.mjs', screen: 'tools/ux-lint/tela.mjs', flow: 'tools/ux-lint/fluxo.mjs' };
+export const DETECTORS = { text: 'tools/ux-lint/text.mjs', screen: 'tools/ux-lint/screen.mjs', flow: 'tools/ux-lint/flow.mjs' };
 export const FAMILIES = ['text', 'screen', 'flow'];
 const PREFIX = { text: 't', screen: 's', flow: 'f' };
 export const STATUSES = ['open', 'decided', 'ignored', 'fixed', 'regression'];
@@ -78,8 +79,8 @@ export function stableId(item) {
 // ---------- normalização das três saídas ----------
 
 const ELEMENT_FROM_TYPE = {
-  'título': 'title', 'botão': 'button', aba: 'tab', 'rótulo': 'label', placeholder: 'placeholder', 'texto de apoio': 'helper',
-  alerta: 'alert', 'nome acessível': 'accessible-name', tooltip: 'tooltip', 'valor vazio': 'cell',
+  title: 'title', button: 'button', tab: 'tab', label: 'label', placeholder: 'placeholder', helper: 'helper',
+  alert: 'alert', 'accessible-name': 'accessible-name', tooltip: 'tooltip', 'empty-value': 'cell',
 };
 const ELEMENT_FROM_SCREEN_RULE = { T1: 'button', T2: 'button', T3: 'title', T4: 'label', T5: 'button', T7: 'button' };
 const screenName = (f) => basename(String(f)).replace(/\.html?$/, '');
@@ -93,51 +94,57 @@ function makeRel(root) {
   };
 }
 
-/** Saída do verificador de texto (`--json`) → itens. Severidade 0 (provável dado) fica fora salvo `includeSev0`. */
-export function fromText(json, { root = null, includeSev0 = false } = {}) {
+/**
+ * Saída do verificador de texto (`--json`) → itens. Severidade 0 (provável dado) fica fora salvo `includeSev0`.
+ * A saída antiga, com chaves em pt-BR, também é lida (lib/legacy.mjs) — vale para as três famílias.
+ */
+export function fromText(input, { root = null, includeSev0 = false } = {}) {
+  const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
-  return (json.achados ?? []).filter((a) => includeSev0 || a.severidade > 0).map((a) => {
-    const variants = a.variantes && a.variantes.length > 1 ? a.variantes : [];
-    const source = (a.origem?.ocorrencias ?? []).map((o) => `${rel(o.arquivo)}:${o.linha}`);
+  return (json.findings ?? []).filter((a) => includeSev0 || a.severity > 0).map((a) => {
+    const variants = a.variants && a.variants.length > 1 ? a.variants : [];
+    const source = (a.source?.occurrences ?? []).map((o) => `${rel(o.file)}:${o.line}`);
     return {
-      family: 'text', rule: a.regra, severity: a.severidade,
-      element: ELEMENT_FROM_TYPE[(a.tipos ?? [])[0]] ?? null,
-      text: variants.length ? templateOf(a.texto, variants) : clean(a.texto),
-      variants, screens: [...new Set((a.telas ?? []).map(screenName))].sort(), source,
-      message: a.mensagem ?? '',
+      family: 'text', rule: a.rule, severity: a.severity,
+      element: ELEMENT_FROM_TYPE[(a.types ?? [])[0]] ?? null,
+      text: variants.length ? templateOf(a.text, variants) : clean(a.text),
+      variants, screens: [...new Set((a.screens ?? []).map(screenName))].sort(), source,
+      message: a.message ?? '',
     };
   });
 }
 
 /** Saída do verificador de tela (`--json`) → itens (um por tela, região e mensagem). */
-export function fromScreen(json, { root = null } = {}) {
+export function fromScreen(input, { root = null } = {}) {
+  const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
   const out = [];
-  for (const t of json.telas ?? []) for (const a of t.achados ?? []) {
-    const ev = String(a.evidencia ?? '').split(/,\s*/).filter(Boolean).map((e) => rel(e.replace(/:(\d+):\d+$/, ':$1')));
+  for (const t of json.screens ?? []) for (const a of t.findings ?? []) {
+    const ev = String(a.evidence ?? '').split(/,\s*/).filter(Boolean).map((e) => rel(e.replace(/:(\d+):\d+$/, ':$1')));
     out.push({
-      family: 'screen', rule: a.regra, severity: a.severidade, element: ELEMENT_FROM_SCREEN_RULE[a.regra] ?? null,
-      text: maskData(a.mensagem), variants: maskData(a.mensagem) !== clean(a.mensagem) ? [clean(a.mensagem)] : [],
-      screens: [screenName(t.arquivo)], region: a.regiao ?? '', source: [...new Set(ev)], message: a.mensagem,
+      family: 'screen', rule: a.rule, severity: a.severity, element: ELEMENT_FROM_SCREEN_RULE[a.rule] ?? null,
+      text: maskData(a.message), variants: maskData(a.message) !== clean(a.message) ? [clean(a.message)] : [],
+      screens: [screenName(t.file)], region: a.region ?? '', source: [...new Set(ev)], message: a.message,
     });
   }
   return out;
 }
 
 /** Saída do verificador de fluxo (`--json`) → itens (âncora: a tela ou jornada do mapa). */
-export function fromFlow(json, { root = null } = {}) {
+export function fromFlow(input, { root = null } = {}) {
+  const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
   const out = [];
-  for (const s of Array.isArray(json) ? json : [json]) for (const a of s.achados ?? []) {
+  for (const s of Array.isArray(json) ? json : [json]) for (const a of s.findings ?? []) {
     const source = [];
-    for (const e of a.evidencia ?? []) {
+    for (const e of a.evidence ?? []) {
       const m = String(e).match(/([\w@./-]+\.(?:tsx?|jsx?|mjs|cjs|py|vue|svelte)(?::\d+)?)/);
       if (m && !source.includes(rel(m[1]))) source.push(rel(m[1]));
     }
     out.push({
-      family: 'flow', rule: a.regra, severity: a.severidade, element: null,
-      text: maskData(a.mensagem), variants: maskData(a.mensagem) !== clean(a.mensagem) ? [clean(a.mensagem)] : [],
-      screens: [a.tela], source, message: a.mensagem,
+      family: 'flow', rule: a.rule, severity: a.severity, element: null,
+      text: maskData(a.message), variants: maskData(a.message) !== clean(a.message) ? [clean(a.message)] : [],
+      screens: [a.screen], source, message: a.message,
     });
   }
   return out;
@@ -147,12 +154,12 @@ export function fromFlow(json, { root = null } = {}) {
 function collapse(items) {
   const by = new Map();
   for (const it of items) {
-    const ja = by.get(it.id);
-    if (!ja) { by.set(it.id, { ...it }); continue; }
-    ja.severity = Math.max(ja.severity, it.severity);
-    ja.screens = [...new Set([...ja.screens, ...it.screens])].sort();
-    ja.source = [...new Set([...ja.source, ...it.source])];
-    ja.variants = [...new Set([...(ja.variants.length ? ja.variants : []), ...(it.variants ?? [])])];
+    const already = by.get(it.id);
+    if (!already) { by.set(it.id, { ...it }); continue; }
+    already.severity = Math.max(already.severity, it.severity);
+    already.screens = [...new Set([...already.screens, ...it.screens])].sort();
+    already.source = [...new Set([...already.source, ...it.source])];
+    already.variants = [...new Set([...(already.variants.length ? already.variants : []), ...(it.variants ?? [])])];
   }
   return [...by.values()];
 }
@@ -171,10 +178,10 @@ export function assignIds(items, registry = []) {
     if (known.has(it.id) || it.family !== 'text') continue;
     const file = (it.source ?? []).find(isCode);
     const keys = textKeys(it);
-    const par = registry.find((r) => r.family === it.family && r.rule === it.rule && r.origin !== 'review'
+    const match = registry.find((r) => r.family === it.family && r.rule === it.rule && r.origin !== 'review'
       && (r.source ?? []).find(isCode) && fileOf((r.source ?? []).find(isCode)) === (file ? fileOf(file) : null)
       && [...textKeys(r)].some((k) => keys.has(k)));
-    if (par) it.id = par.id;
+    if (match) it.id = match.id;
   }
   return collapse(items);
 }
@@ -226,30 +233,30 @@ export const load = (p, module) => ({
  * revisão manual (`origin: "review"`) não são vistos pelos verificadores e nunca ficam ausentes por eles.
  */
 export function merge(reg, run, { now = new Date(), commit = null, decisions = { items: {} } } = {}) {
-  const dia = today(now);
+  const day = today(now);
   const byId = new Map(reg.items.map((i) => [i.id, i]));
-  const vistos = new Set();
+  const seen = new Set();
   for (const it of run.items) {
-    vistos.add(it.id);
-    const ja = byId.get(it.id);
-    const novo = {
+    seen.add(it.id);
+    const already = byId.get(it.id);
+    const fresh = {
       id: it.id, family: it.family, rule: it.rule, severity: it.severity, element: it.element ?? null,
       text: it.text, variants: it.variants ?? [], screens: it.screens ?? [], source: it.source ?? [],
       ...(it.region ? { region: it.region } : {}), message: it.message ?? '', origin: 'detector',
     };
-    if (ja) {
-      Object.assign(ja, novo, { first_seen: ja.first_seen, last_seen: dia, present: true });
+    if (already) {
+      Object.assign(already, fresh, { first_seen: already.first_seen, last_seen: day, present: true });
     } else {
-      const item = { ...novo, first_seen: dia, last_seen: dia, present: true, status: 'open' };
+      const item = { ...fresh, first_seen: day, last_seen: day, present: true, status: 'open' };
       reg.items.push(item);
       byId.set(item.id, item);
     }
   }
   for (const it of reg.items) {
-    if (!run.families.includes(it.family) || vistos.has(it.id) || it.origin === 'review') continue;
-    if (it.present) { it.present = false; it.fixed_at = dia; }
+    if (!run.families.includes(it.family) || seen.has(it.id) || it.origin === 'review') continue;
+    if (it.present) { it.present = false; it.fixed_at = day; }
   }
-  reg.updated = dia;
+  reg.updated = day;
   reg.runs.push({ at: now.toISOString().replace(/\.\d{3}Z$/, 'Z'), sources: run.families, ...(commit ? { commit } : {}) });
   reg.items.sort((a, b) => FAMILIES.indexOf(a.family) - FAMILIES.indexOf(b.family) || b.severity - a.severity || a.rule.localeCompare(b.rule, 'pt', { numeric: true }) || a.id.localeCompare(b.id));
   return restatus(reg, decisions);
@@ -269,12 +276,12 @@ const stripMarks = (k) => k.replace(/\{\}/g, ' ').replace(/[—–-]/g, ' ').rep
  * arquivo (a origem anotada no caso pode ser outra ocorrência do mesmo texto); ou um texto contido no outro
  * (8+ caracteres) com arquivo em comum.
  */
-export function caseMatches(caso, item) {
-  if (item.family !== 'text' || item.rule !== caso.regra || item.origin === 'review') return false;
-  const a = textKeys({ text: caso.texto, variants: caso.variantes });
+export function caseMatches(entry, item) {
+  if (item.family !== 'text' || item.rule !== entry.rule || item.origin === 'review') return false;
+  const a = textKeys({ text: entry.text, variants: entry.variants });
   const b = textKeys(item);
   if ([...a].some((k) => b.has(k))) return true;
-  const cf = new Set((caso.origem ?? []).map(fileOf));
+  const cf = new Set((entry.source ?? []).map(fileOf));
   const itf = (item.source ?? []).map(fileOf);
   if (cf.size && itf.length && !itf.some((f) => cf.has(f))) return false;
   const sa = [...a].map(stripMarks).filter((k) => k.length >= 8);
@@ -283,35 +290,36 @@ export function caseMatches(caso, item) {
 }
 
 /** Importa casos com opções; devolve { matched, manual, links } e altera reg/options. */
-export function importOptions(reg, options, casos, { now = new Date() } = {}) {
-  const dia = today(now);
+export function importOptions(reg, options, input, { now = new Date() } = {}) {
+  const cases = normalizeCases(input).data ?? [];
+  const day = today(now);
   let matched = 0, manual = 0;
   const links = [];
-  for (const caso of casos) {
-    let ids = reg.items.filter((it) => caseMatches(caso, it)).map((it) => it.id);
+  for (const entry of cases) {
+    let ids = reg.items.filter((it) => caseMatches(entry, it)).map((it) => it.id);
     if (ids.length) matched++;
     else {
       const item = {
-        family: 'text', rule: caso.regra ?? 'desc', severity: caso.severidade ?? 1, element: normalizeElement(caso.elemento),
-        text: maskData(caso.texto), variants: (caso.variantes ?? []).filter(Boolean),
-        screens: (caso.telas ?? []).map(screenName), source: caso.origem ?? [], message: caso.problema ?? '',
+        family: 'text', rule: entry.rule ?? 'desc', severity: entry.severity ?? 1, element: normalizeElement(entry.element),
+        text: maskData(entry.text), variants: (entry.variants ?? []).filter(Boolean),
+        screens: (entry.screens ?? []).map(screenName), source: entry.source ?? [], message: entry.problem ?? '',
       };
       item.id = stableId(item);
-      const ja = reg.items.find((i) => i.id === item.id);
-      if (ja) Object.assign(ja, item, { origin: 'review', present: true, last_seen: dia });
-      else reg.items.push({ ...item, origin: 'review', first_seen: dia, last_seen: dia, present: true, status: 'open' });
+      const already = reg.items.find((i) => i.id === item.id);
+      if (already) Object.assign(already, item, { origin: 'review', present: true, last_seen: day });
+      else reg.items.push({ ...item, origin: 'review', first_seen: day, last_seen: day, present: true, status: 'open' });
       ids = [item.id];
       manual++;
     }
     for (const id of ids) {
       options.items[id] = {
-        problem: caso.problema ?? '',
-        options: (caso.opcoes ?? caso.options ?? []).map((o) => ({ text: o.texto ?? o.text, convention: o.convencao ?? o.convention ?? '', note: o.nota ?? o.note ?? '' })),
-        recommended: caso.recomendada ? { index: caso.recomendada.indice, why: caso.recomendada.porque ?? '' } : (caso.recommended ?? null),
-        ...(caso.id ? { case: caso.id } : {}),
+        problem: entry.problem ?? '',
+        options: (entry.options ?? []).map((o) => ({ text: o.text, convention: o.convention ?? '', note: o.note ?? '' })),
+        recommended: entry.recommended ? { index: entry.recommended.index, why: entry.recommended.why ?? '' } : null,
+        ...(entry.id ? { case: entry.id } : {}),
       };
     }
-    links.push({ case: caso.id ?? null, ids });
+    links.push({ case: entry.id ?? null, ids });
   }
   return { matched, manual, links };
 }
@@ -345,28 +353,28 @@ export function importDecisions(reg, decisions, data, { now = new Date() } = {})
 
 // ---------- check ----------
 
-/** Compara uma execução com o registro, sem gravar. Devolve { pass, novos, regressoes, conhecidos }. */
+/** Compara uma execução com o registro, sem gravar. Devolve { pass, added, regressions, known }. */
 export function check(reg, run, { min = 2, decisions = { items: {} } } = {}) {
   const byId = new Map(reg.items.map((i) => [i.id, i]));
-  const novos = [], regressoes = [], conhecidos = [];
+  const added = [], regressions = [], known = [];
   for (const it of run.items) {
-    const ja = byId.get(it.id);
-    if (!ja) { if (it.severity >= min) novos.push(it); continue; }
-    const st = statusOf(ja, decisions);
+    const already = byId.get(it.id);
+    if (!already) { if (it.severity >= min) added.push(it); continue; }
+    const st = statusOf(already, decisions);
     if (st === 'ignored') continue;
-    if (st === 'fixed' || st === 'regression') regressoes.push({ ...it, was: st });
-    else conhecidos.push({ ...it, status: st });
+    if (st === 'fixed' || st === 'regression') regressions.push({ ...it, was: st });
+    else known.push({ ...it, status: st });
   }
-  return { pass: !novos.length && !regressoes.length, novos, regressoes, conhecidos };
+  return { pass: !added.length && !regressions.length, added, regressions, known };
 }
 
 // ---------- status (resumo) ----------
 
 export function summary(reg) {
-  const conta = (f) => reg.items.reduce((o, i) => { const k = f(i); o[k] = (o[k] || 0) + 1; return o; }, {});
+  const countBy = (f) => reg.items.reduce((o, i) => { const k = f(i); o[k] = (o[k] || 0) + 1; return o; }, {});
   return {
     module: reg.module, updated: reg.updated, runs: reg.runs.length, total: reg.items.length,
-    byStatus: conta((i) => i.status), byFamily: conta((i) => i.family), byRule: conta((i) => i.rule), bySeverity: conta((i) => i.severity),
+    by_status: countBy((i) => i.status), by_family: countBy((i) => i.family), by_rule: countBy((i) => i.rule), by_severity: countBy((i) => i.severity),
     regression: reg.items.filter((i) => i.status === 'regression').map(({ id, rule, text, source, screens }) => ({ id, rule, text, source, screens })),
     decided: reg.items.filter((i) => i.status === 'decided').map(({ id, rule, text, source, screens }) => ({ id, rule, text, source, screens })),
   };
@@ -378,30 +386,30 @@ const escH = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '
 
 /** Monta os casos da página: um por caso de opções (vários ids) ou por item sem opções; corrigidos ficam fora. */
 export function pageCases(reg, options, decisions) {
-  const vivos = reg.items.filter((i) => i.status !== 'fixed');
-  const grupos = new Map();
-  for (const it of vivos) {
+  const alive = reg.items.filter((i) => i.status !== 'fixed');
+  const groups = new Map();
+  for (const it of alive) {
     const op = options.items?.[it.id];
     const k = op ? `op:${op.case ?? it.id}` : `id:${it.id}`;
-    if (!grupos.has(k)) grupos.set(k, { items: [], op });
-    grupos.get(k).items.push(it);
+    if (!groups.has(k)) groups.set(k, { items: [], op });
+    groups.get(k).items.push(it);
   }
-  const casos = [];
-  for (const [k, { items, op }] of grupos) {
+  const cases = [];
+  for (const [k, { items, op }] of groups) {
     const it = items[0];
     const ds = items.map((i) => decisions.items?.[i.id]).filter(Boolean);
-    casos.push({
-      id: k.replace(/^(op|id):/, 'caso-'), ids: items.map((i) => i.id), statuses: items.map((i) => i.status),
-      elemento: it.element ?? (it.family === 'text' ? 'accessible-name' : it.family), regra: it.rule,
-      severidade: Math.max(...items.map((i) => i.severity)), texto: it.text,
-      variantes: [...new Set(items.flatMap((i) => i.variants.length ? i.variants : [i.text]))],
-      origem: [...new Set(items.flatMap((i) => i.source))], telas: [...new Set(items.flatMap((i) => i.screens))],
-      problema: op?.problem || it.message, opcoes: (op?.options ?? []).map((o) => ({ texto: o.text, convencao: o.convention, nota: o.note })),
-      recomendada: op?.recommended ? { indice: op.recommended.index, porque: op.recommended.why } : null,
-      decisao: ds.length === items.length && ds.every((d) => JSON.stringify(d.choice) === JSON.stringify(ds[0].choice)) ? ds[0] : null,
+    cases.push({
+      id: k.replace(/^(op|id):/, 'case-'), ids: items.map((i) => i.id), statuses: items.map((i) => i.status),
+      element: it.element ?? (it.family === 'text' ? 'accessible-name' : it.family), rule: it.rule,
+      severity: Math.max(...items.map((i) => i.severity)), text: it.text,
+      variants: [...new Set(items.flatMap((i) => i.variants.length ? i.variants : [i.text]))],
+      source: [...new Set(items.flatMap((i) => i.source))], screens: [...new Set(items.flatMap((i) => i.screens))],
+      problem: op?.problem || it.message, options: (op?.options ?? []).map((o) => ({ text: o.text, convention: o.convention, note: o.note })),
+      recommended: op?.recommended ? { index: op.recommended.index, why: op.recommended.why } : null,
+      decision: ds.length === items.length && ds.every((d) => JSON.stringify(d.choice) === JSON.stringify(ds[0].choice)) ? ds[0] : null,
     });
   }
-  return sortCases(casos);
+  return sortCases(cases);
 }
 
 const PAGE_STYLE = `
@@ -429,7 +437,7 @@ const hoje=new Date().toISOString().slice(0,10);
 function coletar(){const itens={};const erros=[];const por=(document.getElementById('por').value||'').trim()||'dono';
 document.querySelectorAll('fieldset.decisao').forEach(f=>{const r=f.querySelector('input[type=radio]:checked');const m=f.querySelector('input[type=text]');m.removeAttribute('aria-invalid');
 if(!r)return;const motivo=(m.value||'').trim()||null;
-if(r.value==='ignore'&&!motivo){erros.push(f.dataset.caso);m.setAttribute('aria-invalid','true');return;}
+if(r.value==='ignore'&&!motivo){erros.push(f.dataset.case);m.setAttribute('aria-invalid','true');return;}
 const escolha=r.value==='ignore'?'ignore':Number(r.value);
 f.dataset.ids.split(' ').forEach(id=>{itens[id]={choice:escolha,by:por,at:hoje,reason:motivo};});});
 return {itens,erros};}
@@ -440,19 +448,19 @@ try{await navigator.clipboard.writeText(json);aviso.textContent=n+' decisão(õe
 catch(e){saida.focus();saida.select();aviso.textContent=n+' decisão(ões) no campo abaixo, já selecionadas: copie com Ctrl+C ou Cmd+C.';}});`;
 
 export function renderPage(reg, options, decisions, { product = '', color = '#0E71B8' } = {}) {
-  const casos = pageCases(reg, options, decisions);
+  const cases = pageCases(reg, options, decisions);
   const fixed = reg.items.filter((i) => i.status === 'fixed').length;
   const header = (c) => `<span class="meta">${[...new Set(c.statuses)].map((s) => `<span class="st st-${s}">${STATUS_PT[s] ?? s}</span>`).join('')}<code>${c.ids.slice(0, 4).map(escH).join(' ')}${c.ids.length > 4 ? ` +${c.ids.length - 4}` : ''}</code></span>`;
   const footer = (c) => {
-    const d = c.decisao;
-    const marcada = (v) => (d && String(d.choice) === String(v) ? ' checked' : '');
-    const ops = c.opcoes.map((_, i) => `<label><input type="radio" name="d-${escH(c.id)}" value="${i}"${marcada(i)}> ${String.fromCharCode(65 + i)}</label>`).join('');
-    const ja = d ? `<span class="ja">Decidido: ${d.choice === 'ignore' ? 'ignorar' : d.choice === 'free' ? `texto livre "${escH(d.text)}"` : `opção ${String.fromCharCode(65 + d.choice)}`}${d.by ? ` por ${escH(d.by)}` : ''}${d.at ? ` em ${escH(d.at)}` : ''}</span>` : '';
-    return `<fieldset class="decisao" data-ids="${escH(c.ids.join(' '))}" data-caso="${escH(c.id)}"><legend>Sua decisão</legend>${ops}<label><input type="radio" name="d-${escH(c.id)}" value="ignore"${marcada('ignore')}> Ignorar</label><input type="text" aria-label="Motivo" placeholder="Motivo (obrigatório para ignorar)" value="${escH(d?.reason ?? '')}">${ja}</fieldset>`;
+    const d = c.decision;
+    const checked = (v) => (d && String(d.choice) === String(v) ? ' checked' : '');
+    const ops = c.options.map((_, i) => `<label><input type="radio" name="d-${escH(c.id)}" value="${i}"${checked(i)}> ${String.fromCharCode(65 + i)}</label>`).join('');
+    const already = d ? `<span class="ja">Decidido: ${d.choice === 'ignore' ? 'ignorar' : d.choice === 'free' ? `texto livre "${escH(d.text)}"` : `opção ${String.fromCharCode(65 + d.choice)}`}${d.by ? ` por ${escH(d.by)}` : ''}${d.at ? ` em ${escH(d.at)}` : ''}</span>` : '';
+    return `<fieldset class="decisao" data-ids="${escH(c.ids.join(' '))}" data-case="${escH(c.id)}"><legend>Sua decisão</legend>${ops}<label><input type="radio" name="d-${escH(c.id)}" value="ignore"${checked('ignore')}> Ignorar</label><input type="text" aria-label="Motivo" placeholder="Motivo (obrigatório para ignorar)" value="${escH(d?.reason ?? '')}">${already}</fieldset>`;
   };
   const bottom = `<div class="acoes"><label>Quem decide <input id="por" type="text" autocomplete="name"></label><button type="button" id="copiar">Copiar decisões</button><span id="aviso" role="status" aria-live="polite"></span>
   <textarea id="saida" hidden readonly aria-label="Decisões em JSON"></textarea></div>`;
-  return renderTextPage(casos, {
+  return renderTextPage(cases, {
     title: `Achados de UX · ${reg.module}`, product, color, eyebrow: 'Registro de achados de UX',
     lede: `Cada caso mostra o elemento como aparece hoje e as opções. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.`,
     card: { header, footer }, style: PAGE_STYLE, script: PAGE_SCRIPT, bottom,
@@ -463,7 +471,7 @@ export function renderPage(reg, options, decisions, { product = '', color = '#0E
 
 const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|import|status|check|page> --module <m> [opções]
   register --text t.json --screen s.json --flow f.json [--root <repo>] [--include-sev0]
-  options  --from casos.json
+  options  --from cases.json
   decide   <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
   import   decisions.json
   status   [--json]
@@ -481,27 +489,29 @@ function main() {
   const st = load(p, a.module);
   const now = process.env.DSX_NOW ? new Date(process.env.DSX_NOW) : new Date();
   const str = (v) => (typeof v === 'string' ? v : null);
-  const entradas = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), root, includeSev0: !!a['include-sev0'] };
+  const inputs = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), root, includeSev0: !!a['include-sev0'] };
   const loc = (i) => (i.source?.[0] ?? (i.screens ?? []).join(', '));
 
   if (cmd === 'register') {
-    if (!entradas.text && !entradas.screen && !entradas.flow) { console.error('register: informe ao menos --text, --screen ou --flow'); process.exit(2); }
-    const run = collect(entradas, st.findings.items);
+    if (!inputs.text && !inputs.screen && !inputs.flow) { console.error('register: informe ao menos --text, --screen ou --flow'); process.exit(2); }
+    const run = collect(inputs, st.findings.items);
     st.findings.module = a.module;
     merge(st.findings, run, { now, commit: gitCommit(root), decisions: st.decisions });
     writeJson(p.findings, st.findings);
     const s = summary(st.findings);
-    console.log(`${relative(process.cwd(), p.findings) || p.findings} · ${run.items.length} achados nesta execução (${run.families.join(', ')}); registro com ${s.total}: ${Object.entries(s.byStatus).map(([k, v]) => `${STATUS_PT[k]} ${v}`).join(', ')}`);
+    console.log(`${relative(process.cwd(), p.findings) || p.findings} · ${run.items.length} achados nesta execução (${run.families.join(', ')}); registro com ${s.total}: ${Object.entries(s.by_status).map(([k, v]) => `${STATUS_PT[k]} ${v}`).join(', ')}`);
     return;
   }
   if (cmd === 'options') {
-    if (!str(a.from)) { console.error('options: informe --from casos.json'); process.exit(2); }
-    const { casos = [] } = JSON.parse(readFileSync(a.from, 'utf8'));
-    const r = importOptions(st.findings, st.options, casos, { now });
+    if (!str(a.from)) { console.error('options: informe --from cases.json'); process.exit(2); }
+    const { data, warnings } = normalizeCases(JSON.parse(readFileSync(a.from, 'utf8')));
+    for (const w of warnings) console.error(`AVISO ${a.from}: ${w}`);
+    const cases = (Array.isArray(data) ? data : data?.cases) ?? [];
+    const r = importOptions(st.findings, st.options, cases, { now });
     restatus(st.findings, st.decisions);
     writeJson(p.findings, st.findings);
     writeJson(p.options, st.options);
-    console.log(`${casos.length} casos: ${r.matched} casaram com achados do registro (${r.links.filter((l) => l.ids.length && l.ids.length > 1).length} cobrindo mais de um id); ${r.manual} viraram achado de revisão manual.`);
+    console.log(`${cases.length} casos: ${r.matched} casaram com achados do registro (${r.links.filter((l) => l.ids.length && l.ids.length > 1).length} cobrindo mais de um id); ${r.manual} viraram achado de revisão manual.`);
     return;
   }
   if (cmd === 'decide') {
@@ -529,26 +539,26 @@ function main() {
   if (cmd === 'status') {
     const s = summary(st.findings);
     if (a.json) { console.log(JSON.stringify(s, null, 2)); return; }
-    const linha = (o, f = (k) => k) => Object.entries(o).sort().map(([k, v]) => `${f(k)} ${v}`).join(' · ') || 'nenhum';
+    const line = (o, f = (k) => k) => Object.entries(o).sort().map(([k, v]) => `${f(k)} ${v}`).join(' · ') || 'nenhum';
     console.log(`Módulo ${s.module} · ${s.total} achados · ${s.runs} execução(ões) · atualizado ${s.updated ?? '-'}`);
-    console.log(`  status: ${linha(s.byStatus, (k) => STATUS_PT[k] ?? k)}`);
-    console.log(`  família: ${linha(s.byFamily)}`);
-    console.log(`  regra: ${Object.entries(s.byRule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
-    console.log(`  severidade: ${linha(s.bySeverity)}`);
-    for (const [nome, l] of [['Regressões', s.regression], ['Decididos, falta aplicar', s.decided]]) {
-      console.log(`\n${nome} (${l.length})`);
+    console.log(`  status: ${line(s.by_status, (k) => STATUS_PT[k] ?? k)}`);
+    console.log(`  família: ${line(s.by_family)}`);
+    console.log(`  regra: ${Object.entries(s.by_rule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
+    console.log(`  severidade: ${line(s.by_severity)}`);
+    for (const [label, l] of [['Regressões', s.regression], ['Decididos, falta aplicar', s.decided]]) {
+      console.log(`\n${label} (${l.length})`);
       for (const i of l) console.log(`  ${i.id} ${i.rule} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
     }
     return;
   }
   if (cmd === 'check') {
-    if (!entradas.text && !entradas.screen && !entradas.flow) { console.error('check: informe ao menos --text, --screen ou --flow'); process.exit(2); }
-    const run = collect(entradas, st.findings.items);
+    if (!inputs.text && !inputs.screen && !inputs.flow) { console.error('check: informe ao menos --text, --screen ou --flow'); process.exit(2); }
+    const run = collect(inputs, st.findings.items);
     const min = Number(a.min ?? 2);
     const r = check(st.findings, run, { min, decisions: st.decisions });
-    for (const i of r.novos) console.log(`NOVO ${i.id} ${i.rule} sev ${i.severity} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
-    for (const i of r.regressoes) console.log(`REGRESSÃO ${i.id} ${i.rule} (estava ${STATUS_PT[i.was]}) "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
-    console.log(`${r.pass ? 'Passou' : 'Reprovou'}: ${r.novos.length} novo(s) de severidade ≥ ${min}, ${r.regressoes.length} regressão(ões), ${r.conhecidos.length} conhecido(s) em aberto tolerado(s).`);
+    for (const i of r.added) console.log(`NOVO ${i.id} ${i.rule} sev ${i.severity} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
+    for (const i of r.regressions) console.log(`REGRESSÃO ${i.id} ${i.rule} (estava ${STATUS_PT[i.was]}) "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
+    console.log(`${r.pass ? 'Passou' : 'Reprovou'}: ${r.added.length} novo(s) de severidade ≥ ${min}, ${r.regressions.length} regressão(ões), ${r.known.length} conhecido(s) em aberto tolerado(s).`);
     process.exit(r.pass ? 0 : 1);
   }
   if (cmd === 'page') {

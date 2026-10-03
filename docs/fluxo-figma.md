@@ -4,7 +4,7 @@ O DSX trata código e Figma como **dois lados de um ciclo contínuo**. O código
 
 ```
                  ┌──────────────── projeto (fonte de verdade) ────────────────┐
-                 │  código  ·  DESIGN.md  ·  tokens DTCG  ·  .dsx/mapas/       │
+                 │  código  ·  DESIGN.md  ·  tokens DTCG  ·  .dsx/maps/        │
                  └──────┬───────────────────────────────────────────▲─────────┘
        mapear           │ ida                                        │ volta
        confirmar-mapas  ▼                                            │
@@ -18,7 +18,7 @@ O DSX trata código e Figma como **dois lados de um ciclo contínuo**. O código
                  │   refino do design, alternativas         │  figma-diff
                  └──────────────────────────────────────────┘  figma-propostas (B: pré-voo)
 
-   figma-vez (de quem é a autoridade) · figma-ciclo (governança) · guarda-vez (hook) · figma-cobertura
+   figma-vez (de quem é a autoridade) · figma-ciclo (governança) · turn-guard (hook) · figma-cobertura
 ```
 
 ## Do zero, num projeto que já tem código
@@ -40,31 +40,31 @@ Os passos 1–3 servem o DSX inteiro, não só o Figma: `construir-ui` passa a c
 1. **Explorar / refinar no Figma.** Peça alternativas ao agente (`/dsx:figma-propostas`, modo explorar) ou refine você mesmo. O espelho é editado no lugar; alternativas vão para `09 · Propostas`.
 2. **Pré-voo.** `/dsx:figma-propostas` (modo criticar) passa heurísticas, padrões, contraste, texto e kit sobre o que foi desenhado — antes de virar código.
 3. **Diff.** `/dsx:figma-diff`: snapshot atual × baseline versionado, já classificado em `token` / `primitivo` / `composição`.
-4. **Trazer.** `/dsx:figma-trazer`: aplica na camada certa (token → primitivo → composição → texto), com os gates do DSX. Mudança de variável vira diff DTCG por `tools/figma/figma-para-tokens.mjs` e só entra se o build de tokens passar no contraste.
+4. **Trazer.** `/dsx:figma-trazer`: aplica na camada certa (token → primitivo → composição → texto), com os gates do DSX. Mudança de variável vira diff DTCG por `tools/figma/figma-to-tokens.mjs` e só entra se o build de tokens passar no contraste.
 5. **Fechar.** Registro atualizado (aplicadas, recusadas com motivo), telas tocadas reespelhadas, baseline regenerado, uma linha em `design/figma-changelog.jsonl`. A vez volta para o código.
 
 ## Arquivos que o ciclo mantém no seu projeto
 
 | Arquivo | Para quem | O quê |
 |---|---|---|
-| `design/figma-sync.md` | pessoas | `vez:`, rodadas, propostas abertas, aplicadas, **recusadas com motivo**, divergências conhecidas |
+| `design/figma-sync.md` | pessoas | `turn:`, rodadas, propostas abertas, aplicadas, **recusadas com motivo**, divergências conhecidas |
 | `design/figma-changelog.jsonl` | agentes | uma linha estruturada por rodada (append-only) |
-| `design/figma-achados/<rodada>.md` | ambos | achados completos da rodada, severidade 0–4 |
+| `design/figma-findings/<rodada>.md` | ambos | achados completos da rodada, severidade 0–4 |
 | `design/figma-reference.json` | agentes | ids e nomes atuais (coleções, estilos, frames) |
 | `design/figma-baseline/*.json` | diff | o "antes" canônico — o git vira o histórico do arquivo de design |
 | `design/as-is-to-be.md` | ambos | linha de base confirmada pelo `confirmar-mapas` |
-| `.dsx/mapas/*` | agentes | mapas do projeto (estrutura, UI, fluxos, tarefas, jornada, domínio, design system) |
+| `.dsx/maps/*` | agentes | mapas do projeto (estrutura, UI, fluxos, tarefas, jornada, domínio, design system) |
 | `.dsx/figma/ledger.json` | agentes | estado retomável do `figma-levar` |
 
 ## A regra que mantém tudo de pé
 
 **Uma autoridade por vez**, escrita em `design/figma-sync.md`:
 
-| `vez:` | significa | proibido |
+| `turn:` | significa | proibido |
 |---|---|---|
-| `codigo` | o Figma é espelho | refinar no Figma esperando que sobreviva |
-| `design` | refino em andamento no Figma | **reespelhar** — o hook `guarda-vez` nega a escrita |
-| `aplicando` | propostas virando código | mexer nos mesmos arquivos por fora |
+| `code` | o Figma é espelho | refinar no Figma esperando que sobreviva |
+| `design` | refino em andamento no Figma | **reespelhar** — o hook `turn-guard` nega a escrita |
+| `applying` | propostas virando código | mexer nos mesmos arquivos por fora |
 
 ## Requisitos
 
@@ -73,4 +73,4 @@ Os passos 1–3 servem o DSX inteiro, não só o Figma: `construir-ui` passa a c
 
 ## Projetos que já usavam o fluxo anterior
 
-O DSX lê os caminhos antigos (`.claude/figma-claude/…`) e o registro com `turn:` (code/design/applying). Na próxima execução, os mapas são regravados em `.dsx/mapas/` e o registro pode passar a usar `vez:`. Baseline, `figma-sync.md` e o arquivo do Figma continuam válidos sem mudança.
+O DSX lê os caminhos antigos (`.dsx/mapas/` com nomes em português, `.claude/figma-claude/…`), o registro com `vez:` (valores `codigo`/`design`/`aplicando`) e o changelog com chaves em português (`rodada`, `direcao`, `vezApos`…), avisando "nome antigo, renomeie para X". Na próxima execução, os mapas são regravados em `.dsx/maps/`, e o que o DSX escreve no registro e no changelog usa só os nomes novos (`turn: code | design | applying`, `round`, `direction`, `turn_after`…). Baseline, `figma-sync.md` e o arquivo do Figma continuam válidos sem mudança.

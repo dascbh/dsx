@@ -4,67 +4,67 @@ name: Pactum
 description: Plataforma web de gestão de contratos comerciais de uma distribuidora de alimentos (fictícia), desktop, densidade alta, uso diário pelo time comercial e jurídico.
 owner: time-de-produto-pactum
 updated: 2026-10-02
-produto:
+product:
   persona: Analista de contratos que acompanha vencimentos, reajustes e renovações de 1.800 contratos com varejistas e fornecedores
-  registro: operacional
-  plataforma: desktop
-  densidade: alta
-navegacao:
-  modelo: "menu lateral por área + abas na página de detalhe"
-  profundidade-maxima: 3
-  retorno: obrigatorio
-arquetipos:
-  painel-de-acompanhamento: ["/inicio"]
-  lista-operacional: ["/contratos", "/reajustes"]
-  painel-lateral-de-detalhe: ["/contratos (painel do cliente)"]
-  mestre-detalhe: ["/clientes"]
-  documento-com-visor: ["/contratos/:id/documento"]
-  editor-com-painel: ["/minutas/:id"]
-  assistente-em-etapas: ["/contratos/novo"]
-  biblioteca: ["/modelos"]
-  configuracoes: ["/configuracoes"]
-  pagina-publica-de-decisao: ["/aceite/:token"]
-  dialogo-de-formulario: ["Registrar reajuste", "Adicionar responsável"]
-  dialogo-de-confirmacao: ["Encerrar contrato", "Descartar minuta"]
-acoes:
-  primarias-por-regiao: 1
-  posicao-primaria: topo-direita
-  ordem-dialogo: cancelar-acao
-  destrutiva-rotulo-especifico: true
-confirmacao:
-  irreversivel: digitar-nome
-  reversivel: desfazer
+  register: operational
+  platform: desktop
+  density: high
+navigation:
+  model: "menu lateral por área + abas na página de detalhe"
+  max-depth: 3
+  back: mandatory
+archetypes:
+  monitoring-dashboard: ["/inicio"]
+  operational-list: ["/contratos", "/reajustes"]
+  detail-side-panel: ["/contratos (painel do cliente)"]
+  master-detail: ["/clientes"]
+  document-viewer: ["/contratos/:id/documento"]
+  editor-with-panel: ["/minutas/:id"]
+  step-wizard: ["/contratos/novo"]
+  library: ["/modelos"]
+  settings: ["/configuracoes"]
+  public-decision-page: ["/aceite/:token"]
+  form-dialog: ["Registrar reajuste", "Adicionar responsável"]
+  confirmation-dialog: ["Encerrar contrato", "Descartar minuta"]
+actions:
+  primary-per-region: 1
+  primary-position: top-right
+  dialog-order: cancel-action
+  destructive-specific-label: true
+confirmation:
+  irreversible: type-name
+  reversible: undo
 feedback:
-  sucesso: toast
-  erro-de-campo: inline
-  erro-de-sistema: alerta-na-pagina
-  esqueleto-acima-de-ms: 1000
-estados: [carregando, vazio, vazio-por-filtro, erro, sem-acesso, sucesso]
-formularios:
-  rotulo: sempre-visivel
-  validacao: ao-sair-do-campo
-  obrigatorios: marcar-opcionais
-conteudo:
-  glossario: docs/glossario.md
-  botoes: verbo-objeto
-  proibidos: [tenant, payload, job, status_code, null, ERP_ID]
-fluxos:
-  max-passos-jornada: 10
-  max-dialogos-empilhados: 1
-  becos-sem-saida: 0
-verificacao:
-  seletores:
-    regioes: ["header", "nav", "aside", "main", "[role=dialog]"]
-    dialogo: "[role=dialog]"
-    primaria: ".MuiButton-contained"
-    destrutiva: ".MuiButton-containedError, .MuiButton-colorError"
-    botao: "button, [role=button]"
-    campo: "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select"
+  success: toast
+  field-error: inline
+  system-error: page-alert
+  skeleton-after-ms: 1000
+states: [loading, empty, empty-filtered, error, no-access, success]
+forms:
+  label: always-visible
+  validation: on-blur
+  required: mark-optional
+content:
+  glossary: docs/glossario.md
+  buttons: verb-object
+  forbidden: [tenant, payload, job, status_code, null, ERP_ID]
+flows:
+  max-journey-steps: 10
+  max-stacked-dialogs: 1
+  dead-ends: 0
+verification:
+  selectors:
+    regions: ["header", "nav", "aside", "main", "[role=dialog]"]
+    dialog: "[role=dialog]"
+    primary: ".MuiButton-contained"
+    destructive: ".MuiButton-containedError, .MuiButton-colorError"
+    button: "button, [role=button]"
+    field: "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select"
 ---
 
 # Pactum — UX
 
-Produto fictício, usado como exemplo de referência do formato. As decisões abaixo vieram do código (mapas de `.dsx/mapas/`), de 6 entrevistas com analistas e do registro de chamados de suporte do primeiro semestre; o que foi deduzido sem evidência direta está marcado "(inferido)". Em conflito, vale o comportamento mais restritivo (confirmação, retorno visível) até a próxima revisão.
+Produto fictício, usado como exemplo de referência do formato. As decisões abaixo vieram do código (mapas de `.dsx/maps/`), de 6 entrevistas com analistas e do registro de chamados de suporte do primeiro semestre; o que foi deduzido sem evidência direta está marcado "(inferido)". Em conflito, vale o comportamento mais restritivo (confirmação, retorno visível) até a próxima revisão.
 
 ## Visão geral
 
@@ -106,21 +106,21 @@ Filtros da lista vivem na URL: voltar do detalhe devolve a lista com os mesmos f
 
 | Tela | Arquétipo | Variação | Desvio |
 |---|---|---|---|
-| `/inicio` | painel-de-acompanhamento | três blocos de fila com contagem | Sem gráficos: cada bloco é uma lista curta clicável, porque a pergunta é "o que fazer", não "como está" |
-| `/contratos` | lista-operacional | com-acoes-em-lote | — |
-| `/reajustes` | lista-operacional | com-acoes-em-lote | Agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo |
-| painel do cliente em `/contratos` | painel-lateral-de-detalhe | — | — |
-| `/clientes` | mestre-detalhe | lista à esquerda | — |
-| `/contratos/:id/documento` | documento-com-visor | metadados à direita | — |
-| `/minutas/:id` | editor-com-painel | painel de comparação | O painel abre por padrão em "Diferenças em relação ao modelo", não em "Propriedades" |
-| `/contratos/novo` | assistente-em-etapas | 4 etapas | — |
-| `/modelos` | biblioteca | — | — |
-| `/configuracoes` | configuracoes | — | — |
-| `/aceite/:token` | pagina-publica-de-decisao | — | — |
-| "Registrar reajuste", "Adicionar responsável" | dialogo-de-formulario | — | — |
-| "Encerrar contrato", "Descartar minuta" | dialogo-de-confirmacao | digitar o número | — |
+| `/inicio` | monitoring-dashboard | três blocos de fila com contagem | Sem gráficos: cada bloco é uma lista curta clicável, porque a pergunta é "o que fazer", não "como está" |
+| `/contratos` | operational-list | with-bulk-actions | — |
+| `/reajustes` | operational-list | with-bulk-actions | Agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo |
+| painel do cliente em `/contratos` | detail-side-panel | — | — |
+| `/clientes` | master-detail | lista à esquerda | — |
+| `/contratos/:id/documento` | document-viewer | metadados à direita | — |
+| `/minutas/:id` | editor-with-panel | painel de comparação | O painel abre por padrão em "Diferenças em relação ao modelo", não em "Propriedades" |
+| `/contratos/novo` | step-wizard | 4 etapas | — |
+| `/modelos` | library | — | — |
+| `/configuracoes` | settings | — | — |
+| `/aceite/:token` | public-decision-page | — | — |
+| "Registrar reajuste", "Adicionar responsável" | form-dialog | — | — |
+| "Encerrar contrato", "Descartar minuta" | confirmation-dialog | digitar o número | — |
 
-Cada arquétipo da coluna do meio é um cartão `arquetipos/<id>.md` do DSX; os desvios desta tabela valem só para o Pactum.
+Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os desvios desta tabela valem só para o Pactum.
 
 ## Layout e regiões
 

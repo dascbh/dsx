@@ -11,12 +11,12 @@ Referências: `knowledge/design-system/governanca-e-maturidade.md`, `componentes
 
 ## 1. Inventário (medido, não estimado)
 
-Parta de `.dsx/mapas/design-system.json` se existir (skill `mapear`); senão, delegue ao subagente `extrator-design-system`, que grava esse arquivo. Os `hazards[]` dele (hex duplicado, cor fora da paleta, raio/sombra duplicados, cor condicionada ao modo, fonte não carregada, texto em canvas com fonte diferente) entram direto no diagnóstico. Se o projeto tem arquivo no Figma, `figma-cobertura` diz o que falta de cada lado. Colete:
+Parta de `.dsx/maps/design-system.json` se existir (skill `mapear`); senão, delegue ao subagente `extrator-design-system`, que grava esse arquivo. Os `hazards[]` dele (hex duplicado, cor fora da paleta, raio/sombra duplicados, cor condicionada ao modo, fonte não carregada, texto em canvas com fonte diferente) entram direto no diagnóstico. Se o projeto tem arquivo no Figma, `figma-cobertura` diz o que falta de cada lado. Colete:
 
 - **Tokens:** onde estão definidos, quantos por categoria, se há camada semântica, se há tema escuro.
 - **Drift:**
   ```bash
-  node tools/lint-raw-values.mjs src --json > drift.json   # ocorrências e driftPorMilLinhas
+  node tools/lint-raw-values.mjs src --json > drift.json   # occurrences e drift_per_1000_lines
   ```
   Liste as 10 cores cruas mais frequentes e o token que deveria substituí-las.
 - **Componentes:** lista do kit compartilhado; para cada um, nº de usos (grep de import) e nº de implementações paralelas (ex.: 3 botões diferentes).

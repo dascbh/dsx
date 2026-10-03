@@ -15,7 +15,7 @@ Levante e anote:
 - Arquivos de contexto de agente existentes: `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `DESIGN.md`.
 - Glossário implícito: 10–20 termos de domínio mais frequentes nas strings da UI.
 
-Para projetos médios ou grandes, rode antes a skill `mapear` (estrutura, UI, fluxos, tarefas, jornada, domínio e design system real em `.dsx/mapas/`) e, se houver dúvidas marcadas como `uncertain`, `confirmar-mapas`. Os passos abaixo passam a ler os mapas em vez de redescobrir.
+Para projetos médios ou grandes, rode antes a skill `mapear` (estrutura, UI, fluxos, tarefas, jornada, domínio e design system real em `.dsx/maps/`) e, se houver dúvidas marcadas como `uncertain`, `confirmar-mapas`. Os passos abaixo passam a ler os mapas em vez de redescobrir.
 
 ## 2. Perguntar (uma rodada, só o que falta)
 

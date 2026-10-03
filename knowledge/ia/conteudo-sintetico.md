@@ -1,9 +1,9 @@
 ---
 id: conteudo-sintetico
-area: ia
-titulo: Conteúdo sintético — rotulagem, procedência e limites da detecção
-evidencia: contextual
-relacionados: [rag-e-fontes, evidencia-e-fontes, ux-para-agentes]
+area: ai
+title: Conteúdo sintético — rotulagem, procedência e limites da detecção
+evidence: contextual
+related: [rag-e-fontes, evidencia-e-fontes, ux-para-agentes]
 ---
 
 # Conteúdo sintético: rotulagem, procedência e detecção
@@ -14,11 +14,11 @@ relacionados: [rag-e-fontes, evidencia-e-fontes, ux-para-agentes]
 > - Ao projetar ou descrever um recurso que "verifica se uma imagem é de IA".
 > - Ao escrever a conclusão de uma verificação de origem.
 >
-> **Componente de rótulo:** as regras visuais e de posição estão em [`rotular-conteudo-ia`](../../patterns/ia/rotular-conteudo-ia.md). Este documento cobre o raciocínio por trás e a camada de arquivo/procedência.
+> **Componente de rótulo:** as regras visuais e de posição estão em [`label-ai-content`](../../patterns/ai/label-ai-content.md). Este documento cobre o raciocínio por trás e a camada de arquivo/procedência.
 
 ## 1. Rotulagem na interface: princípios
 
-O rótulo informa **origem**; não prova exatidão nem revisão. Ele trabalha junto de fontes ([`fontes-da-ia`](../../patterns/ia/fontes-da-ia.md)), incerteza ([`incerteza-da-ia`](../../patterns/ia/incerteza-da-ia.md)) e revisão ([`revisar-resultado-da-ia`](../../patterns/ia/revisar-resultado-da-ia.md)).
+O rótulo informa **origem**; não prova exatidão nem revisão. Ele trabalha junto de fontes ([`ai-sources`](../../patterns/ai/ai-sources.md)), incerteza ([`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md)) e revisão ([`review-ai-output`](../../patterns/ai/review-ai-output.md)).
 
 Decisões essenciais:
 - **SE** a IA gerou ou transformou **materialmente** o conteúdo **ENTÃO** rotule no ponto em que a pessoa interpreta ou usa esse conteúdo.

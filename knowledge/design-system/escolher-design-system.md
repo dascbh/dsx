@@ -15,10 +15,10 @@ Escolher design system por gosto produz duas falhas recorrentes: estética que n
 
 | Fonte | O que é | Onde |
 |---|---|---|
-| Biblioteca designmd.app | 759 `DESIGN.md` com metadados (categoria, caso de uso, época, estilo, palavras-chave), licença CC BY 4.0 com crédito obrigatório | Índice completo: `referencias/design-md/indice.json`; 40 curados com o arquivo inteiro e nota: `referencias/design-md/curados.json` + `referencias/design-md/designmd-app/` |
+| Biblioteca designmd.app | 759 `DESIGN.md` com metadados (categoria, caso de uso, época, estilo, palavras-chave), licença CC BY 4.0 com crédito obrigatório | Índice completo: `references/design-md/index.json`; 40 curados com o arquivo inteiro e nota: `references/design-md/curated.json` + `references/design-md/designmd-app/` |
 | Especificação oficial do formato | Seções canônicas, tipos de token, sub-tokens de componente, regras do linter oficial; CLI `@google/design.md` (`lint`, `diff`, `export`) | Resumo e divergências em `design-md.md`, seção "Especificação oficial e linter oficial" |
 
-Consulta: `node tools/referencias.mjs buscar --registro operacional --uso "dashboard financeiro" --curados`.
+Consulta: `node tools/references.mjs search --register operational --use "dashboard financeiro" --curated`.
 
 ## Triagem pelo registro do produto
 
@@ -26,26 +26,26 @@ O **registro** é o tipo de uso que o produto tem; ele decide a família de refe
 
 | SE o produto é… | ENTÃO o registro é | Procure | Evite |
 |---|---|---|---|
-| Ferramenta de trabalho diário, tabelas, formulários, dados densos (back-office, jurídico, financeiro, saúde, B2B) | `operacional` | densidade média/alta, tipografia de leitura longa, poucos acentos, componentes completos | gradientes, vidro, neumorfismo, raios grandes, movimento decorativo |
-| App de consumo, transação curta, mobile, catálogo | `consumo` | alvos de toque grandes, hierarquia forte de ação, imagem como conteúdo | densidade alta, jargão visual corporativo |
+| Ferramenta de trabalho diário, tabelas, formulários, dados densos (back-office, jurídico, financeiro, saúde, B2B) | `operational` | densidade média/alta, tipografia de leitura longa, poucos acentos, componentes completos | gradientes, vidro, neumorfismo, raios grandes, movimento decorativo |
+| App de consumo, transação curta, mobile, catálogo | `consumer` | alvos de toque grandes, hierarquia forte de ação, imagem como conteúdo | densidade alta, jargão visual corporativo |
 | Leitura, documentação, conteúdo longo | `editorial` | medida de linha 60–75ch, serifa ou humanista de texto, ritmo vertical | contraste baixo "elegante", texto sobre imagem |
-| Página de marca, campanha, evento | `marca` | personalidade, tipografia display | levar o estilo para dentro do produto logado |
+| Página de marca, campanha, evento | `brand` | personalidade, tipografia display | levar o estilo para dentro do produto logado |
 | Estudo visual, arte, conceito | `experimental` | só como inspiração pontual | adotar como sistema de produto |
 
-O índice já traz `dsx.registro` (triagem automática por palavras do caso de uso e do estilo). Trate como **primeiro filtro**, não como veredito: confira a descrição e o próprio arquivo.
+O índice já traz `dsx.register` (triagem automática por palavras do caso de uso e do estilo). Trate como **primeiro filtro**, não como veredito: confira a descrição e o próprio arquivo.
 
 ## Avaliação objetiva (antes de mostrar a opção para alguém)
 
 Toda referência candidata passa por:
 
-1. `node tools/referencias.mjs avaliar <arquivo.md>` — linter do DSX + contraste texto/fundo de cada componente + completude (componentes, cores, estilos de texto). Nota 0–100.
+1. `node tools/references.mjs evaluate <arquivo.md>` — linter do DSX + contraste texto/fundo de cada componente + completude (componentes, cores, estilos de texto). Nota 0–100 (`score`; defeitos em `contrast_failures`, `errors`, `warnings`).
 2. `npx -y @google/design.md lint <arquivo.md>` — linter oficial (referências quebradas, contraste, tokens órfãos, ordem das seções, chaves desconhecidas).
 
 Regras:
 
 - **SE** algum componente tem contraste de texto abaixo de 4,5:1 **ENTÃO** a opção só pode ser apresentada como "adaptável", com a correção já proposta. Na curadoria inicial, 19 de 59 candidatos tinham o botão primário reprovado (alguns com 1,05:1).
 - **SE** a referência não declara componentes **ENTÃO** ela é paleta + tipografia, não design system: a construção vai precisar de mais trabalho, diga isso.
-- **SE** o registro do produto é `operacional` e a referência é marcada `experimental` **ENTÃO** descarte.
+- **SE** o registro do produto é `operational` e a referência é marcada `experimental` **ENTÃO** descarte.
 - **SE** a referência imita a identidade de uma marca real (nome, cor e tipografia proprietárias) **ENTÃO** use como estudo de estrutura, nunca como identidade do produto.
 
 ## Como apresentar as opções
@@ -65,7 +65,7 @@ Regras:
 4. **Corrija o que a avaliação apontou**: contraste, componentes faltando (botão primário, secundário, destrutivo; campo; cartão; chip de estado), estados (hover, foco, desabilitado, erro).
 5. **Escreva a prosa do projeto**: persona, densidade, o que nunca pode acontecer. A prosa da referência descreve o estilo, não o produto; reescreva.
 6. **Valide**: `node tools/lint-design-md.mjs DESIGN.md` (gates do DSX) e `npx -y @google/design.md lint DESIGN.md` (formato oficial). Exporte tokens com `npx -y @google/design.md export --format dtcg DESIGN.md` quando o projeto usar DTCG.
-7. **Leve ao Stitch** pela skill `stitch` (modo Sincronizar) e confira com `tools/stitch/design-system.mjs conferir`.
+7. **Leve ao Stitch** pela skill `stitch` (modo Sincronizar) e confira com `tools/stitch/design-system.mjs check`.
 
 ## Checklist
 

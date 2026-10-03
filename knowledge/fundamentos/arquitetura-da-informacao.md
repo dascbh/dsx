@@ -36,9 +36,9 @@ Arquitetura da informação (AI) organiza, nomeia e conecta conteúdo e funçõe
 ### Onde algo deve morar
 
 - SE é uma área que a pessoa visita de forma independente e recorrente ENTÃO rota própria na navegação.
-- SE é uma visão alternativa do mesmo objeto, no mesmo nível ENTÃO aba ([abas](../../patterns/navegacao/abas.md)).
+- SE é uma visão alternativa do mesmo objeto, no mesmo nível ENTÃO aba ([abas](../../patterns/navigation/tabs.md)).
 - SE é parte do mesmo objeto e lida junto ENTÃO seção na mesma página.
-- SE é uma tarefa curta e focada que não exige outro contexto ENTÃO modal ([quando-usar-modal](../../patterns/modais/quando-usar-modal.md), [quando-evitar-modal](../../patterns/modais/quando-evitar-modal.md)).
+- SE é uma tarefa curta e focada que não exige outro contexto ENTÃO modal ([when-to-use-modal](../../patterns/modals/when-to-use-modal.md), [when-to-avoid-modal](../../patterns/modals/when-to-avoid-modal.md)).
 - SE já existe uma entidade com o mesmo significado ENTÃO reuse-a e o nome dela; não crie uma paralela.
 
 ---
@@ -46,7 +46,7 @@ Arquitetura da informação (AI) organiza, nomeia e conecta conteúdo e funçõe
 ## 3. Hierarquia e profundidade
 
 - Organize por tarefa do público, nunca pelo organograma.
-- Navegação global com 5–7 itens de primeiro nível; acima disso, agrupe ([navegacao-principal](../../patterns/navegacao/navegacao-principal.md)).
+- Navegação global com 5–7 itens de primeiro nível; acima disso, agrupe ([main-navigation](../../patterns/navigation/main-navigation.md)).
 - Prefira árvore mais larga e rasa a funda: páginas críticas a no máximo 3 níveis (cliques) do ponto de entrada.
 - Categorias mutuamente distintas: SE duas categorias geram dúvida sobre onde algo está ENTÃO funda, renomeie ou crie atalho cruzado.
 - Proibido "Outros", "Diversos", "Geral" como categoria de primeiro nível; são sintomas de agrupamento inacabado.
@@ -71,13 +71,13 @@ Arquitetura da informação (AI) organiza, nomeia e conecta conteúdo e funçõe
 | Global | Acesso às áreas principais de qualquer lugar | Barra superior, menu lateral, barra inferior no mobile (3–5 itens) |
 | Local | Dentro de uma área | Submenu, abas, navegação secundária |
 | Contextual | Ligações entre itens relacionados | Links no conteúdo, "relacionados" |
-| Orientação | Onde estou | Item ativo destacado, título, [breadcrumbs](../../patterns/navegacao/breadcrumbs.md) |
+| Orientação | Onde estou | Item ativo destacado, título, [breadcrumbs](../../patterns/navigation/breadcrumbs.md) |
 
 **Regras**
 - Item ativo sempre indicado (não só por cor).
 - Breadcrumbs quando a hierarquia tem 3+ níveis e a pessoa pode chegar por busca ou link externo.
-- Links abrem na mesma aba, salvo exceções justificadas ([link-em-nova-aba](../../patterns/navegacao/link-em-nova-aba.md)).
-- Paginação, "carregar mais" ou rolagem infinita conforme a tarefa ([paginacao-vs-scroll](../../patterns/navegacao/paginacao-vs-scroll.md)).
+- Links abrem na mesma aba, salvo exceções justificadas ([link-in-new-tab](../../patterns/navigation/link-in-new-tab.md)).
+- Paginação, "carregar mais" ou rolagem infinita conforme a tarefa ([pagination-vs-scroll](../../patterns/navigation/pagination-vs-scroll.md)).
 - Voltar retorna ao estado anterior (posição de rolagem, filtros, busca).
 
 ---
@@ -100,8 +100,8 @@ Findability é a facilidade de **encontrar, reconhecer e recuperar** algo quando
 - Aceite sinônimos, plurais, acentos ausentes e erros de digitação.
 - Sugira enquanto digita; mostre buscas recentes.
 - Ordene por relevância e explique por que o resultado apareceu (trecho destacado).
-- Filtros combináveis, visíveis quando ativos e fáceis de limpar ([filtros-ativos](../../patterns/busca-filtros/filtros-ativos.md), [estrutura-de-filtros](../../patterns/busca-filtros/estrutura-de-filtros.md), [aplicacao-de-filtros](../../patterns/busca-filtros/aplicacao-de-filtros.md)).
-- Zero resultados: mostre o termo, sugira correção, alternativas e caminhos ([busca-sem-resultados](../../patterns/busca-filtros/busca-sem-resultados.md)).
+- Filtros combináveis, visíveis quando ativos e fáceis de limpar ([active-filters](../../patterns/search-filters/active-filters.md), [filter-structure](../../patterns/search-filters/filter-structure.md), [applying-filters](../../patterns/search-filters/applying-filters.md)).
+- Zero resultados: mostre o termo, sugira correção, alternativas e caminhos ([no-search-results](../../patterns/search-filters/no-search-results.md)).
 - Preserve a consulta e os filtros ao voltar dos resultados.
 - Busca não corrige organização confusa, e boa organização não dispensa busca.
 

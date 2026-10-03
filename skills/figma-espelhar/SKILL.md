@@ -21,9 +21,9 @@ termina com uma prova de cobertura.
 
 Leia o registro de sincronia (`design/figma-sync.md`, skill `figma-ciclo`):
 
-- Se `vez: design`, **pare** e diga ao usuário. Há refino em curso; espelhar
-  agora sobrescreve. (O hook `guarda-vez` também bloqueia, mas não deixe o hook
-  ser o primeiro a avisar.) Registro legado com `turn: design` vale igual.
+- Se `turn: design`, **pare** e diga ao usuário. Há refino em curso; espelhar
+  agora sobrescreve. (O hook `turn-guard` também bloqueia, mas não deixe o hook
+  ser o primeiro a avisar.) Registro legado com `vez: design` vale igual.
 - Se não houver registro, o projeto ainda não tem ciclo: ofereça
   `/dsx:figma-iniciar`.
 
@@ -34,7 +34,7 @@ mudou desde a última sincronia.
 git diff --name-only <ultimo-sync>..HEAD -- src/pages src/components src/theme.ts
 ```
 
-(Ajuste os caminhos à estrutura do projeto — `.dsx/mapas/mapa-projeto.md` diz
+(Ajuste os caminhos à estrutura do projeto — `.dsx/maps/project-map.md` diz
 onde ficam páginas, componentes e tema.)
 
 ## Regra zero — é espelho, não redesenho
@@ -83,12 +83,12 @@ fases abaixo assumem essas mecânicas em vez de rederivá-las. Se o usuário tem
 mais de um time/plano, pergunte em qual criar o arquivo antes de criar.
 
 Chamada a partir da skill `figma-levar`? Ela já conferiu a vez e os mapas —
-siga direto para as fases abaixo usando `.dsx/mapas/mapa-ui.json` e
-`.dsx/mapas/dominio.json` como fonte do que é construído, não o inventário
+siga direto para as fases abaixo usando `.dsx/maps/ui-map.json` e
+`.dsx/maps/domain.json` como fonte do que é construído, não o inventário
 por grep desta skill.
 
-**Onde ler os mapas.** Procure primeiro em `.dsx/mapas/`; se não existir,
-aceite o legado `.claude/figma-claude/` (`ui-map.*`, `project-map.*`,
+**Onde ler os mapas.** Procure primeiro em `.dsx/maps/`; se não existir,
+aceite os legados `.dsx/mapas/` (nomes em português: `mapa-projeto`, `mapa-ui`, `fluxos`, `tarefas`, `jornada`, `dominio`, `confirmacoes`; chaves JSON antigas em camelCase, como `generatedAt` ou `subPages`, valem como as novas em snake_case; tudo com o aviso "nome antigo, renomeie para X") e `.claude/figma-claude/` (`ui-map.*`, `project-map.*`,
 `user-flows.*`, `task-flows.*`, `journey-map.*`, `domain-map.*`,
 `design-system.json`) e avise que ele será regravado no caminho novo na
 próxima execução da skill `mapear`. Antes de qualquer `use_figma` de
@@ -101,15 +101,15 @@ ids de coleção, frame de ícones e chrome já estão lá.
 rotas do roteador, diálogos, painéis, overlays, estados. Use a skill
 `figma-cobertura` — ela produz a checklist que vira a matriz no fim. Pular esta
 fase é o que faz o espelho parecer completo e não estar. Se
-`.dsx/mapas/mapa-ui.md` existe, comece por ele — já tem a hierarquia de
-páginas, modais e estados resolvida; caia para `.dsx/mapas/mapa-projeto.md`
+`.dsx/maps/ui-map.md` existe, comece por ele — já tem a hierarquia de
+páginas, modais e estados resolvida; caia para `.dsx/maps/project-map.md`
 para a estrutura geral, e rode de novo a skill `mapear` antes se o projeto
 mudou desde que algum dos dois foi escrito.
 
 **2. Fundações.** Variáveis com modos claro/escuro, escala numérica, estilos de
 texto e os ícones reais do projeto. Use a skill `figma-fundacoes`. A fonte de
 verdade é `DESIGN.md` + tokens do projeto: tokens DTCG (`tokens/*.tokens.json`)
-quando existirem; senão `.dsx/mapas/design-system.json` — se ele ainda não
+quando existirem; senão `.dsx/maps/design-system.json` — se ele ainda não
 existe, rode a skill `mapear` antes (ela extrai tokens com adaptadores por
 framework — MUI, Tailwind, variáveis CSS — em vez de heurística de grep, e
 aponta onde o código diverge do próprio tema declarado).
@@ -119,7 +119,7 @@ se repete em toda tela vira `COMPONENT`, e as telas usam instâncias. Corta o
 custo das fases seguintes pela metade.
 
 **4. Telas.** Uma por rota, montada com a biblioteca de helpers
-`tools/figma/preludio.js` (colada no topo de cada script `use_figma`; preencha
+`tools/figma/prelude.js` (colada no topo de cada script `use_figma`; preencha
 o bloco CONFIGURE com os ids de `design/figma-reference.json`) em vez de nós
 soltos — sai com auto-layout de verdade, não posicionamento absoluto.
 Armadilhas em [references/plugin-api.md](references/plugin-api.md). Antes de
@@ -127,11 +127,11 @@ compor algo que parece repetir um padrão de outra tela, correlacione com o kit
 em vez de recriar — skill `figma-convencoes`, seção 3 (e seção 5 se o kit ainda
 não tiver a peça).
 
-Uma rota cuja entrada em `mapa-ui.json` lista `subPages` com
-`navVisible: true` precisa de **um frame por sub-página**, não um para o pai —
+Uma rota cuja entrada em `ui-map.json` lista `sub_pages` com
+`nav_visible: true` precisa de **um frame por sub-página**, não um para o pai —
 mesmo que compartilhem o componente de origem. Monte cada uma com o
 filtro/estado daquela sub-página de fato aplicado (dados reais daquele filtro,
-de `dominio.json`), não uma cópia do conteúdo do pai. Um componente
+de `domain.json`), não uma cópia do conteúdo do pai. Um componente
 compartilhado servindo três destinos visíveis na navegação são três frames,
 nunca um.
 
@@ -139,15 +139,15 @@ nunca um.
 relevante: vazio, carregando, erro, cada desfecho de um fluxo com mais de um
 fim, menus e toasts. Use uma DSL de blocos (`['field', rótulo, valor]`,
 `['alert', tom, texto]`) — sem ela, trinta diálogos viram trinta scripts
-irrepetíveis. Se `.dsx/mapas/tarefas.md` existe, use as listas de passos dele
+irrepetíveis. Se `.dsx/maps/tasks.md` existe, use as listas de passos dele
 para saber quantos frames uma tarefa de vários passos realmente precisa, em
 vez de rederivar do componente.
 
 **6. Fluxos.** Raias por ator, caixas com título + subtítulo, conectores em
 cotovelo com **uma** ponta de seta. Some o mapa de rotas: é o diagrama mais
-consultado e o mais barato. Se `.dsx/mapas/fluxos.md` existe, parta dos
+consultado e o mais barato. Se `.dsx/maps/flows.md` existe, parta dos
 fluxos nomeados e dos pontos de entrada/saída dele em vez de retraçar chamadas
-de navegação; `.dsx/mapas/jornada.md` dá às raias seus atores
+de navegação; `.dsx/maps/journey.md` dá às raias seus atores
 (personas/papéis) e os estágios que valem mostrar.
 
 **7. Responsivo.** Desenhe mobile **só onde o código tem breakpoint de verdade**.
@@ -162,7 +162,7 @@ checklist da fase 1 contra o que existe no arquivo.
 Realistas e fictícios, do domínio do produto, com **estados de risco visíveis**:
 algo atrasado, algo devolvido, algo aguardando decisão, um campo não informado.
 Uma lista onde tudo está verde não mostra o design system — mostra o caso feliz,
-que é justamente o que o design não precisa provar. Se `.dsx/mapas/dominio.md`
+que é justamente o que o design não precisa provar. Se `.dsx/maps/domain.md`
 existe, tire de lá os campos, enums e regras de negócio em vez de inventar
 alguns que pareçam plausíveis.
 
@@ -186,7 +186,7 @@ Páginas numeradas — a numeração é o índice:
 09 · Propostas        reservada à exploração de design (skill figma-propostas), nunca conteúdo de produto
 ```
 
-Se `.dsx/mapas/jornada.md` encontrou mais de uma persona/papel, use-o para
+Se `.dsx/maps/journey.md` encontrou mais de uma persona/papel, use-o para
 decidir a divisão `02`/`03`/… — não adivinhe pelos caminhos de rota.
 
 O nome do frame carrega a origem no código — sem isso a matriz de cobertura
@@ -230,8 +230,8 @@ estado vazio). Dois registros, sempre os dois:
 1. **No Figma**, um quadro de achado ao lado do frame (borda tracejada, token
    `color/feedback/warning-icon`), com o texto curto do achado — é o que um
    designer vê.
-2. **No repositório**, em `design/figma-achados/<rodada>.md` (ex.:
-   `design/figma-achados/r3.md`) — se o achado só existe na resposta de chat
+2. **No repositório**, em `design/figma-findings/<rodada>.md` (ex.:
+   `design/figma-findings/r3.md`) — se o achado só existe na resposta de chat
    que gerou a rodada, some assim que a conversa for arquivada.
 
 Um bloco por achado, com a escala de severidade 0–4 do DSX (definida na skill
@@ -265,7 +265,7 @@ uma linha no relatório final ao usuário.
 - [ ] Ícones são os do projeto, não aproximações
 - [ ] Nenhuma tabela transborda o container; nenhum texto sai do frame
 - [ ] Matriz de cobertura ligando cada arquivo de UI aos frames
-- [ ] Achados registrados como achado (quadro no Figma + `design/figma-achados/<rodada>.md`, com severidade 0–4), não corrigidos no desenho
+- [ ] Achados registrados como achado (quadro no Figma + `design/figma-findings/<rodada>.md`, com severidade 0–4), não corrigidos no desenho
 - [ ] Cada frame foi visto renderizado
 - [ ] Nenhuma tela substitui por texto descritivo os elementos interativos que
       de fato contém (balões de mensagem, chips, botões, campos de formulário) —
@@ -280,8 +280,8 @@ Sem estes passos, a próxima rodada de diff reapresenta tudo como novidade:
 2. **Atualize o registro** `design/figma-sync.md` (rodada, frames tocados,
    `Divergências conhecidas`, a quem passa a vez).
 3. **Append** de uma linha em `design/figma-changelog.jsonl`
-   (`"direcao": "codigo->figma"`, contagens reais de frames
-   criados/alterados/removidos, `"achados": "design/figma-achados/<rodada>.md"`).
+   (`"direction": "code->figma"`, contagens reais de frames
+   criados/alterados/removidos, `"findings": "design/figma-findings/<rodada>.md"`).
 4. **Regenere** `design/figma-reference.json` se fundação ou estrutura mudou
    (skill `figma-convencoes`).
 

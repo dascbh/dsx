@@ -1,14 +1,14 @@
 ---
 id: skeleton-screen
-titulo: Skeleton screen melhora a percepção de carregamento?
-categoria: feedback
-componentes: [skeleton, indicador-de-carregamento, tabela, card]
-tipo: decisao-contextual
-impacto: medio
-status: usar-com-cautela
-evidencia: moderada
+title: Skeleton screen melhora a percepção de carregamento?
+category: feedback
+components: [skeleton, loading-indicator, table, card]
+type: contextual-decision
+impact: medium
+status: caution
+evidence: moderate
 wcag: ["4.1.3", "2.3.3", "1.4.1", "2.4.3"]
-relacionados: [skeleton-vs-spinner, carregamento-longo, porcentagem-de-progresso, estado-vazio]
+related: [skeleton-vs-spinner, long-loading, progress-percentage, empty-state]
 ---
 
 # Skeleton screen melhora a percepção de carregamento?

@@ -12,10 +12,10 @@ Produza o relatório de diff do arquivo do Figma. Mecanismo em
 [../figma-ciclo/references/diff.md](../figma-ciclo/references/diff.md).
 
 Antes de começar, leia `design/figma-sync.md` (o arquivo e o baseline de
-registro) e a última linha de `design/figma-changelog.jsonl` — o `resumo` e a
-`direcao` da última rodada, e o ponteiro para os achados que talvez já expliquem
+registro) e a última linha de `design/figma-changelog.jsonl` — o `summary` e a
+`direction` da última rodada, e o ponteiro para os achados que talvez já expliquem
 algo que pareceria divergência nova. Diff é leitura: roda em qualquer vez,
-inclusive `design` — o hook `guarda-vez` deixa passar o que não escreve no
+inclusive `design` — o hook `turn-guard` deixa passar o que não escreve no
 arquivo.
 
 1. **Fase 1 — hashes.** Cole `tools/figma/snapshot.js` com `MODE = 'hashes'`

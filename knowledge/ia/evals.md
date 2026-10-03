@@ -1,9 +1,9 @@
 ---
 id: evals
-area: ia
-titulo: AI evals para produtos e experiências
-evidencia: contextual
-relacionados: [ux-para-agentes, generative-ui, rag-e-fontes, divida-de-experiencia]
+area: ai
+title: AI evals para produtos e experiências
+evidence: contextual
+related: [ux-para-agentes, generative-ui, rag-e-fontes, divida-de-experiencia]
 ---
 
 # AI evals para produtos
@@ -122,98 +122,98 @@ Juízes têm vieses conhecidos: preferência por posição, por respostas longas
 ## 8. Exemplo: rubrica para "UI gerada por agente"
 
 ```yaml
-rubrica: ui-gerada-por-agente
-versao: 1.0
-escopo: "Saídas de composição de interface por agente (generative UI nível 1-2) e telas geradas a partir do DESIGN.md"
-entradas_do_avaliador: [pedido_do_usuario, spec_declarativa, render_light, render_dark, arvore_de_acessibilidade, catalogo, design_md]
+rubric: generated-ui-by-agent
+version: 1.0
+scope: "Saídas de composição de interface por agente (generative UI nível 1-2) e telas geradas a partir do DESIGN.md"
+evaluator-inputs: [user-request, declarative-spec, render-light, render-dark, accessibility-tree, catalog, design-md]
 
 gates:   # binários; qualquer falha reprova a saída inteira
-  - id: G1-catalogo
-    criterio: "Usa apenas componentes do catálogo e nenhuma combinação marcada como inválida"
-    avaliador: codigo   # validação de schema
+  - id: G1-catalog
+    criterion: "Usa apenas componentes do catálogo e nenhuma combinação marcada como inválida"
+    evaluator: code   # validação de schema
   - id: G2-tokens
-    criterio: "Nenhum valor visual cru (cor, espaçamento, raio, fonte) fora dos tokens"
-    avaliador: codigo   # lint de valores crus
-  - id: G3-contraste
-    criterio: "Pares texto/fundo >= 4.5:1 (texto normal) e >= 3:1 (texto grande e componentes), em light e dark"
-    avaliador: codigo
-  - id: G4-invariantes
-    criterio: "Navegação, avisos legais, rótulo de IA e controles de cancelar/desfazer presentes e inalterados"
-    avaliador: codigo
-  - id: G5-acao-critica
-    criterio: "Toda ação de risco alto ou crítico passa pela confirmação fixa (ação, alvo, consequência)"
-    avaliador: codigo + humano_amostral
-  - id: G6-teclado
-    criterio: "Todos os controles alcançáveis por teclado, com foco visível e nome acessível"
-    avaliador: codigo   # varredura automatizada + árvore de acessibilidade
+    criterion: "Nenhum valor visual cru (cor, espaçamento, raio, fonte) fora dos tokens"
+    evaluator: code   # lint de valores crus
+  - id: G3-contrast
+    criterion: "Pares texto/fundo >= 4.5:1 (texto normal) e >= 3:1 (texto grande e componentes), em light e dark"
+    evaluator: code
+  - id: G4-invariants
+    criterion: "Navegação, avisos legais, rótulo de IA e controles de cancelar/desfazer presentes e inalterados"
+    evaluator: code
+  - id: G5-critical-action
+    criterion: "Toda ação de risco alto ou crítico passa pela confirmação fixa (ação, alvo, consequência)"
+    evaluator: code + sampled_human
+  - id: G6-keyboard
+    criterion: "Todos os controles alcançáveis por teclado, com foco visível e nome acessível"
+    evaluator: code   # varredura automatizada + árvore de acessibilidade
 
-criterios:   # escala 0-3, com evidência obrigatória
-  - id: C1-adequacao-formato
-    pergunta: "O tipo de componente escolhido é o certo para a tarefa pedida?"
-    avaliador: llm_juiz
-    ancoras:
+criteria:   # escala 0-3, com evidência obrigatória
+  - id: C1-format-fit
+    question: "O tipo de componente escolhido é o certo para a tarefa pedida?"
+    evaluator: llm_judge
+    anchors:
       0: "Formato atrapalha (ex.: parágrafo para comparar 5 itens)"
       1: "Formato funciona, mas exige esforço evitável"
       2: "Formato adequado, com pequenos excessos ou faltas"
       3: "Formato é o mais direto para a tarefa"
-    aprovado_exemplo: "Pedido de comparação de 4 planos vira tabela-comparativa com destaque de melhor valor"
-    reprovado_exemplo: "Mesmo pedido vira 4 cards soltos sem atributos alinhados"
-  - id: C2-completude
-    pergunta: "Toda informação necessária para decidir ou agir está presente, sem inventar dados?"
-    avaliador: llm_juiz
-    ancoras:
+    pass-example: "Pedido de comparação de 4 planos vira tabela-comparativa com destaque de melhor valor"
+    fail-example: "Mesmo pedido vira 4 cards soltos sem atributos alinhados"
+  - id: C2-completeness
+    question: "Toda informação necessária para decidir ou agir está presente, sem inventar dados?"
+    evaluator: llm_judge
+    anchors:
       0: "Falta dado essencial ou há dado inventado"
       1: "Falta dado relevante"
       2: "Completo, com detalhe secundário ausente"
       3: "Completo e só com o necessário"
-  - id: C3-hierarquia
-    pergunta: "A ordem visual e de leitura prioriza o que a pessoa precisa primeiro?"
-    avaliador: llm_juiz
-    ancoras:
+  - id: C3-hierarchy
+    question: "A ordem visual e de leitura prioriza o que a pessoa precisa primeiro?"
+    evaluator: llm_judge
+    anchors:
       0: "Ação principal ou informação-chave escondida"
       1: "Prioridade confusa"
       2: "Clara, com um elemento competindo"
       3: "Hierarquia inequívoca"
-  - id: C4-estados
-    pergunta: "Estados de carregando, vazio, erro e parcial estão previstos para os dados envolvidos?"
-    avaliador: codigo + llm_juiz
-    ancoras:
+  - id: C4-states
+    question: "Estados de carregando, vazio, erro e parcial estão previstos para os dados envolvidos?"
+    evaluator: code + llm_judge
+    anchors:
       0: "Nenhum estado alternativo"
       1: "Só carregando"
       2: "Falta um estado relevante"
       3: "Todos os estados pertinentes"
-  - id: C5-microcopia
-    pergunta: "Rótulos e mensagens são claros, consistentes com o glossário e sem ambiguidade?"
-    avaliador: llm_juiz
-    ancoras:
+  - id: C5-microcopy
+    question: "Rótulos e mensagens são claros, consistentes com o glossário e sem ambiguidade?"
+    evaluator: llm_judge
+    anchors:
       0: "Termos contraditórios ou ação ambígua"
       1: "Vários rótulos vagos"
       2: "Um rótulo melhorável"
       3: "Texto claro e consistente"
-  - id: C6-consistencia-entre-variacoes
-    pergunta: "Pedidos equivalentes (5 execuções) geram composições reconhecivelmente iguais?"
-    avaliador: codigo   # similaridade estrutural entre specs
-    ancoras:
+  - id: C6-consistency-across-runs
+    question: "Pedidos equivalentes (5 execuções) geram composições reconhecivelmente iguais?"
+    evaluator: code   # similaridade estrutural entre specs
+    anchors:
       0: "Componentes diferentes a cada execução"
       1: "Mesmo componente, ordem e agrupamento instáveis"
       2: "Variação só em detalhe"
       3: "Estrutura estável"
-  - id: C7-tarefa
-    pergunta: "Uma pessoa representativa conclui a tarefa com essa saída?"
-    avaliador: humano   # amostra de sessões
-    ancoras:
+  - id: C7-task
+    question: "Uma pessoa representativa conclui a tarefa com essa saída?"
+    evaluator: human   # amostra de sessões
+    anchors:
       0: "Não conclui"
       1: "Conclui com ajuda"
       2: "Conclui com hesitação"
       3: "Conclui direto"
 
-regras_de_decisao:
-  saida_aprovada: "todos os gates passam E nenhum critério com nota 0 E media(C1..C6) >= 2.0"
-  execucoes_por_caso: 5
-  consistencia: "caso aprovado somente se as 5 execuções forem aprovadas"
-  evidencia: "cada nota cita o elemento (id da spec ou trecho) que a justifica"
-  calibracao_juiz: "recalibrar contra rótulos humanos a cada mudança de rubrica, modelo juiz ou catálogo"
-  limiares: "valores acima são de exemplo; o produto define e registra os seus"
+decision-rules:
+  output-passes: "todos os gates passam E nenhum critério com nota 0 E media(C1..C6) >= 2.0"
+  runs-per-case: 5
+  consistency: "caso aprovado somente se as 5 execuções forem aprovadas"
+  evidence: "cada nota cita o elemento (id da spec ou trecho) que a justifica"
+  judge-calibration: "recalibrar contra rótulos humanos a cada mudança de rubrica, modelo juiz ou catálogo"
+  thresholds: "valores acima são de exemplo; o produto define e registra os seus"
 ```
 
 ## 9. Armadilhas

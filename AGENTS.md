@@ -48,30 +48,38 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Faltou alguma tela no Figma? Matriz código × frames | `figma-cobertura` |
 | Convenções de nomes/páginas e reusar vs criar componente; nota no próprio arquivo | `figma-convencoes` |
 
-Subagentes (`agents/`): `revisor-ux` (revisão independente, só leitura), `extrator-design-system` (design system real do código, com adaptadores e hazards), `juiz-de-evals` (LLM-juiz de um critério), `leitor-figma` (snapshot e diff do arquivo, só leitura), `mapeador-projeto`, `mapeador-ui`, `mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada`, `mapeador-dominio` (mapas em `.dsx/mapas/`) e `analisador-specs` (confronta mapas com as specs).
+Subagentes (`agents/`): `revisor-ux` (revisão independente, só leitura), `extrator-design-system` (design system real do código, com adaptadores e hazards), `juiz-de-evals` (LLM-juiz de um critério), `leitor-figma` (snapshot e diff do arquivo, só leitura), `mapeador-projeto`, `mapeador-ui`, `mapeador-fluxos`, `mapeador-tarefas`, `mapeador-jornada`, `mapeador-dominio` (mapas em `.dsx/maps/`) e `analisador-specs` (confronta mapas com as specs).
 
-Hook (`hooks/`): `guarda-vez` nega escrita no Figma enquanto `design/figma-sync.md` disser `vez: design`.
+Hook (`hooks/`): `turn-guard` nega escrita no Figma enquanto `design/figma-sync.md` disser `turn: design` (lê também o legado `vez:`).
 
 ## Mapa do repositório
 
 ```
 skills/       procedimentos executáveis (SKILL.md) — o que fazer, em que ordem, o que entregar
-arquetipos/   12 arquétipos de tela (regiões, ação primária, estados, variações/arranjos) — index.json para busca
+archetypes/   12 arquétipos de tela (regiões, ação primária, estados, variações/arranjos) — index.json para busca
 patterns/     ~80 padrões de interação com regra SE→ENTÃO, a11y e checklist (index.json para busca)
 knowledge/    referência por área: fundamentos/, design-system/, pesquisa/, ia/
 templates/    DESIGN.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, JTBD, OST…
 tokens/       tokens W3C DTCG em 3 camadas + pares de contraste; build/ é gerado
 tools/        verificadores sem dependências (Node ≥ 20); tools/figma/ = snapshot, diff, prelúdio e pontes de tokens; tools/stitch/ = design system e análise de HTML
-hooks/        guarda-vez (ciclo Figma)
+hooks/        turn-guard (ciclo Figma)
 evals/        rubricas e casos para avaliar UI gerada, DESIGN.md e features de IA
 examples/     DESIGN.md e UX.md de referência (aprovados nos linters)
-referencias/  conteúdo de terceiros para consulta: biblioteca de DESIGN.md (designmd.app, CC BY 4.0) — índice, curados e notas
+references/   conteúdo de terceiros para consulta: biblioteca de DESIGN.md (designmd.app, CC BY 4.0) — índice, curados e notas
 docs/         princípios e integrações com agentes
 ```
 
 ## Regras que valem sempre
 
 Leia `docs/principios.md`. Em resumo: acessibilidade e prevenção de perda vencem estética; nada de dark patterns; evidência rotulada (sintético = hipótese); uma fonte de verdade; sistema antes de improviso; todos os estados; reversibilidade proporcional ao risco; verificar com as ferramentas antes de declarar pronto.
+
+## Nomes: código e dados em inglês, documento em português
+
+- **Inglês:** nomes de arquivos e pastas de ferramentas, scripts e dados; subcomandos e flags de CLI; chaves e valores de JSON/YAML (inclusive o front matter de padrões, arquétipos, `knowledge/` e do `UX.md`); ids (padrões, arquétipos, regiões, estados, variações); mapas em `.dsx/maps/` e suas chaves; títulos de testes; identificadores no código.
+- **Português:** nome e conteúdo dos documentos para pessoas — `knowledge/**`, `templates/**`, skills (pasta `skills/<nome>` e texto), agentes (nome e texto), mensagens impressas pelas ferramentas, texto de interface e títulos de seção do corpo dos `.md` (as 13 seções do `UX.md`, as do `DESIGN.md`).
+- **Forma das chaves:** `snake_case` em todo JSON e JSONL (saídas `--json`, mapas, índices, registros, changelog); `kebab-case` em YAML (front matter de `UX.md`, arquétipos, padrões e `knowledge/`, rubricas de eval). Exceção única: nomes que espelham uma API ou formato externo ficam como no original — campos da API do Figma (`fileKey`, `modeId`, `valuesByMode`…) e do Stitch (`designSystem`, `displayName`…), W3C DTCG, front matter do `DESIGN.md` (formato do Google) e `hooks.json` do Claude Code.
+- **Transição (leitura compatível):** o que a ferramenta **lê** de um projeto (`UX.md`, mapas, registro de achados, `design/figma-sync.md`) aceita também o nome antigo em português, com aviso "nome antigo, renomeie para X"; o que ela **escreve** usa só o nome novo. Subcomandos e flags antigos continuam como apelidos com aviso "nome antigo, use X", numa tabela única: `tools/lib/legacy-cli.mjs`.
+- Tabela completa antigo → novo, e o que tem ou não leitura compatível: `docs/renames-2026-10.md`. Nome novo de código ou dado nasce em inglês.
 
 ## Ferramentas
 
@@ -82,37 +90,37 @@ node tools/palette.mjs "#hex" [--format dtcg]  # rampa 50–950 em OKLCH com con
 node tools/type-scale.mjs --ratio major-third  # escala tipográfica (ou --fluid)
 node tools/spacing-scale.mjs --base 4          # escala de espaçamento
 node tools/lint-design-md.mjs DESIGN.md        # gates objetivos do DESIGN.md
-node tools/lint-ux-md.mjs UX.md [--json]       # gates objetivos do UX.md
-node tools/lint-arquetipos.mjs [--index]       # valida o catálogo de arquétipos e regenera arquetipos/index.json
-node tools/ux-lint/tela.mjs <capturas.html|pasta> [--ux UX.md] [--json]          # regras T1–T7 nas capturas de tela
-node tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json [--ux UX.md] [--json]  # regras F1–F5 no mapa de fluxo
-node tools/ux-lint/texto.mjs --telas <capturas> [--codigo <pastas>] [--ux UX.md] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
+node tools/lint-ux-md.mjs UX.md [--archetypes <pasta>] [--json]   # gates objetivos do UX.md (aceita nomes antigos com aviso)
+node tools/lint-archetypes.mjs [--index]       # valida o catálogo de arquétipos e regenera archetypes/index.json
+node tools/ux-lint/screen.mjs <capturas.html|pasta> [--ux UX.md] [--json] [--fail-at 3]          # regras T1–T7 nas capturas de tela
+node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]  # regras F1–F5 no mapa de fluxo
+node tools/ux-lint/text.mjs --screens <capturas> [--code <pastas>] [--ux UX.md] [--ignore <nomes>] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
 node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json --root <repo>  # registro de achados em .dsx/findings/<m>/ (id estável, status)
-node tools/ux-lint/findings.mjs options --module <m> --from casos.json     # liga opções (2–3 por caso) aos ids; caso sem achado vira item de revisão
+node tools/ux-lint/findings.mjs options --module <m> --from cases.json     # liga opções (2–3 por caso) aos ids; caso sem achado vira item de revisão
 node tools/ux-lint/findings.mjs decide --module <m> <id> <índice|ignore|free> [--reason …] [--text …] [--by …]  # grava decisão do dono
 node tools/ux-lint/findings.mjs import --module <m> decisions.json         # decisões copiadas da página
 node tools/ux-lint/findings.mjs status --module <m> [--json]               # por status, família, regra e severidade; regressões e decididos sem aplicar
 node tools/ux-lint/findings.mjs check --module <m> [--min 2] --text … --screen … --flow …  # trava: reprova achado novo ≥ min ou regressão (não grava)
 node tools/ux-lint/findings.mjs page --module <m> <saida.html> [--product …] [--color …]  # página de escolha com formulário "Copiar decisões"
-node tools/ux-lint/text-page.mjs <casos.json> <saida.html> [--produto …] [--cor …]  # página de escolha só a partir de casos.json
+node tools/ux-lint/text-page.mjs <cases.json> <saida.html> [--title …] [--product …] [--color …]  # página de escolha só a partir de cases.json
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
-node tools/referencias.mjs buscar --registro operacional --uso "termos" --curados   # referências de DESIGN.md (também indice, baixar, avaliar, curar)
+node tools/references.mjs search --register operational --use "termos" --curated   # referências de DESIGN.md (também index, fetch, evaluate, curate)
 node tools/lint-raw-values.mjs <pasta>         # valores crus (drift) no código de UI
 node tools/lint-patterns.mjs [--index]         # valida o catálogo e regenera o índice
 node tools/check-links.mjs                     # referências internas quebradas
-node tools/figma/tokens-para-figma.mjs --tokens <pasta> --script   # tokens DTCG → script de variáveis p/ use_figma
-node tools/figma/figma-para-tokens.mjs --snapshot <s.json> --tokens <pasta> [--write]  # variáveis do Figma → diff DTCG + gate de contraste
-node tools/stitch/design-system.mjs exportar DESIGN.md -o .stitch/DESIGN.md   # DESIGN.md ajustado para importar no Stitch
-node tools/stitch/design-system.mjs conferir DESIGN.md <list_design_systems.json>  # o que o Stitch preservou/mudou
-node tools/stitch/analisar-html.mjs <tela.html> --design-md DESIGN.md      # papéis de cor, contraste e a11y da tela gerada
+node tools/figma/tokens-to-figma.mjs --tokens <pasta> [--json | --script]   # tokens DTCG → plano/script de variáveis p/ use_figma
+node tools/figma/figma-to-tokens.mjs --snapshot <s.json> --tokens <pasta> [--write] [--json]  # variáveis do Figma → diff DTCG + gate de contraste
+node tools/stitch/design-system.mjs export DESIGN.md -o .stitch/DESIGN.md   # DESIGN.md ajustado para importar no Stitch
+node tools/stitch/design-system.mjs check DESIGN.md <list_design_systems.json> [--asset <id>] [--json]  # o que o Stitch preservou/mudou
+node tools/stitch/analyze-html.mjs <tela.html> --design-md DESIGN.md [--json]  # papéis de cor, contraste e a11y da tela gerada
 node tools/figma/diff-baseline.cjs <baseline.json> <atual.json>    # diff classificado (token/primitivo/composição)
 npm run check                                  # tudo acima + testes
 ```
 
 ## Mantendo o framework
 
-- Arquétipo novo: copie um cartão de `arquetipos/` → `node tools/lint-arquetipos.mjs --index`.
-- Padrão novo: `templates/padrao.md` → `patterns/<categoria>/<id>.md` → `node tools/lint-patterns.mjs --index`.
+- Arquétipo novo: copie um cartão de `archetypes/` (id, front matter e ids de regiões/estados/variações em inglês; corpo em pt-BR) → `node tools/lint-archetypes.mjs --index`.
+- Padrão novo: `templates/padrao.md` → `patterns/<category>/<id>.md` (id e front matter em inglês, corpo em pt-BR) → `node tools/lint-patterns.mjs --index`.
 - Conhecimento novo: arquivo em `knowledge/<area>/` começando com "Quando consultar", regras imperativas, decisões SE→ENTÃO e checklist; adicione ao `README.md` da área.
 - Skill nova: `skills/<nome>/SKILL.md` com `name` e `description` (a descrição diz **quando** usar); registre na tabela acima.
 - Antes de commitar: `npm run check`.

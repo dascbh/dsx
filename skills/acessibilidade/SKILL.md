@@ -7,7 +7,7 @@ description: "Audita e corrige acessibilidade WCAG 2.2 AA de telas e componentes
 
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/` são relativos a ela.
 
-Referências: `knowledge/design-system/acessibilidade.md` (requisitos por componente), `patterns/acessibilidade/*`, WAI-ARIA Authoring Practices Guide (APG) para padrões de widget.
+Referências: `knowledge/design-system/acessibilidade.md` (requisitos por componente), `patterns/accessibility/*`, WAI-ARIA Authoring Practices Guide (APG) para padrões de widget.
 
 **Regra zero:** use o elemento HTML nativo antes de ARIA. `<button>` em vez de `<div role="button">`, `<a href>` para navegação, `<dialog>`/biblioteca testada para modal. ARIA errada é pior que nenhuma.
 
@@ -41,15 +41,15 @@ Rode na ordem — cada camada pega coisas que a anterior não pega.
 ### 4. Visual
 - [ ] Texto ≥ 4.5:1; texto grande (≥ 24px ou ≥ 18.66px negrito) ≥ 3:1 (1.4.3).
 - [ ] Bordas de campo, ícones informativos, estados de foco/seleção ≥ 3:1 contra o adjacente (1.4.11).
-- [ ] Informação nunca só por cor (1.4.1) — `patterns/acessibilidade/nao-so-cor.md`.
+- [ ] Informação nunca só por cor (1.4.1) — `patterns/accessibility/not-color-alone.md`.
 - [ ] Zoom 200% sem perda; largura 320px sem rolagem horizontal (1.4.4, 1.4.10).
 - [ ] Espaçamento de texto aumentado não quebra layout (1.4.12).
-- [ ] Alvos ≥ 24×24px ou com espaçamento equivalente (2.5.8); padrão do sistema 44×44px — `patterns/acessibilidade/alvo-de-toque.md`.
+- [ ] Alvos ≥ 24×24px ou com espaçamento equivalente (2.5.8); padrão do sistema 44×44px — `patterns/accessibility/touch-target.md`.
 
 ### 5. Movimento, tempo e entrada
 - [ ] `prefers-reduced-motion` respeitado; nada pisca > 3×/s (2.3.1).
-- [ ] Carrossel/animação automática com pausa (2.2.2) — `patterns/conteudo/carrossel-automatico.md`.
-- [ ] Limite de tempo avisado e extensível (2.2.1) — `patterns/autenticacao/sessao-expirada.md`.
+- [ ] Carrossel/animação automática com pausa (2.2.2) — `patterns/content/auto-advancing-carousel.md`.
+- [ ] Limite de tempo avisado e extensível (2.2.1) — `patterns/authentication/session-expired.md`.
 - [ ] Arrastar tem alternativa de clique (2.5.7).
 - [ ] Autenticação não exige teste cognitivo; permite colar senha e gerenciador de senhas (3.3.8).
 - [ ] Não pedir de novo dado já informado no mesmo fluxo (3.3.7).
