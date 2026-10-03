@@ -1,6 +1,6 @@
 {
   "name": "dsx",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "DSX — framework de design system, UI e UX para agentes de IA: skills, padrões, conhecimento, tokens e ferramentas de verificação.",
   "type": "module",
   "private": true,
