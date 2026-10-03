@@ -15,6 +15,7 @@
 | [hierarquia-visual.md](hierarquia-visual.md) | Alavancas de hierarquia, regras numéricas (tipo, espaço, contraste), padrões de varredura, densidade, teste do borrão | Montar layout, definir escala tipográfica/espaçamento, ou quando "tudo parece igual" |
 | [interacao-e-feedback.md](interacao-e-feedback.md) | Especificação de interação, limiares 0,1/1/10 s, feedback, microinterações e durações, estados vazios, onboarding | Especificar comportamento de controles, carregamentos, animações, vazios ou primeiro uso |
 | [ux-writing.md](ux-writing.md) | Princípios, fórmulas (botão, erro, vazio, confirmação, sucesso), tom de voz em 4 dimensões, estilo pt-BR, glossário | Escrever ou revisar qualquer texto visível |
+| [marcas-de-texto-gerado.md](marcas-de-texto-gerado.md) | Marcas que fazem o texto parecer gerado por IA ou burocrático (travessão, título composto, descrição que repete o título, abertura vazia, caixa de título, termo técnico…), com antes/depois e as regras X1–X11 de `tools/ux-lint/texto.mjs` | Revisar texto escrito por agente, ler o relatório do `texto.mjs` ou explicar por que uma tela "parece feita por IA" |
 | [formularios.md](formularios.md) | Estrutura, ordem, rótulos, tipos de campo, teclados móveis e autocomplete, validação, erros, etapas, envio | Criar ou revisar qualquer formulário |
 | [arquitetura-da-informacao.md](arquitetura-da-informacao.md) | Sistemas de AI, onde algo deve morar, navegação, rotulagem, findability e busca, user flow, fidelidade de wireframe/protótipo | Decidir estrutura, navegação e nomes; desenhar fluxo; escolher fidelidade |
 | [dark-patterns.md](dark-patterns.md) | Catálogo (nome, reconhecimento, dano, alternativa) e linhas vermelhas que o agente deve recusar | Qualquer fluxo de compra, assinatura, cancelamento, consentimento ou pedido para "aumentar conversão" |
@@ -28,7 +29,7 @@
 - **Projetar uma feature nova:** arquitetura-da-informacao (fluxo e lugar) → psicologia-e-leis → hierarquia-visual → interacao-e-feedback → ux-writing.
 - **Auditoria formal com relatório:** avaliacao-de-usabilidade + heuristicas-nielsen.
 - **Projetar/rearranjar tela:** ux-md (arquétipo e políticas do `UX.md` do projeto) → hierarquia-visual → interacao-e-feedback → formularios (se houver) → ux-writing; skill `arranjar-tela`.
-- **Texto apenas:** ux-writing.
+- **Texto apenas:** ux-writing → marcas-de-texto-gerado (com o relatório de `tools/ux-lint/texto.mjs`).
 - **Monetização, consentimento, retenção:** dark-patterns primeiro.
 
 ## Convenções destes arquivos

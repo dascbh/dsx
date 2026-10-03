@@ -86,6 +86,7 @@ node tools/lint-ux-md.mjs UX.md [--json]       # gates objetivos do UX.md
 node tools/lint-arquetipos.mjs [--index]       # valida o catálogo de arquétipos e regenera arquetipos/index.json
 node tools/ux-lint/tela.mjs <capturas.html|pasta> [--ux UX.md] [--json]          # regras T1–T7 nas capturas de tela
 node tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json [--ux UX.md] [--json]  # regras F1–F5 no mapa de fluxo
+node tools/ux-lint/texto.mjs --telas <capturas> [--codigo <pastas>] [--ux UX.md] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
 node tools/referencias.mjs buscar --registro operacional --uso "termos" --curados   # referências de DESIGN.md (também indice, baixar, avaliar, curar)
 node tools/lint-raw-values.mjs <pasta>         # valores crus (drift) no código de UI

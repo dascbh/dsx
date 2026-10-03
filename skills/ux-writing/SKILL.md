@@ -7,7 +7,22 @@ description: "Escreve e revisa todo texto da interface em pt-BR: botões, erros,
 
 > **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/` são relativos a ela.
 
-Referências: `knowledge/fundamentos/ux-writing.md`, `patterns/ux-writing/*` (texto de botão, texto de link, mensagem de erro útil).
+Referências: `knowledge/fundamentos/ux-writing.md`, `knowledge/fundamentos/marcas-de-texto-gerado.md` (marcas de texto gerado por IA e burocrático, regras X1–X11), `patterns/ux-writing/*` (texto de botão, texto de link, mensagem de erro útil).
+
+## Levantamento automático (quando há telas para olhar)
+
+Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não julga arquitetura de tela, só o texto.
+
+1. Rode sobre as capturas HTML, apontando o código onde os textos nascem:
+   ```bash
+   node tools/ux-lint/texto.mjs --telas <pasta-de-capturas> --codigo <pastas-do-front> <pastas-de-vocabulário> --ux UX.md [--ignorar <arquivo.html>] [--json]
+   ```
+   Sem capturas, gere-as antes (skill `code-to-stitch` no projeto, ou qualquer HTML renderizado).
+2. Leia o resumo por regra e o ranking "Textos mais problemáticos" (severidade × número de telas). Priorize por severidade e frequência: texto da navegação ou do cabeçalho, que aparece em todas as telas, vem primeiro.
+3. Corrija **na origem** (`arquivo:linha` do relatório), uma vez: o vocabulário ou o template, não a captura. Um achado com "variantes do mesmo template" se resolve numa linha só.
+4. Ignore a seção "Provável dado": ali a marca veio do conteúdo interpolado (nome de minuta, pessoa, categoria), não do texto da interface.
+5. Para reescrever cada achado, use os antes/depois de `knowledge/fundamentos/marcas-de-texto-gerado.md`. As marcas que a ferramenta não acusa (tríades, "não só … mas também", adjetivos genéricos) entram na revisão manual abaixo.
+6. Rode de novo depois de corrigir e recapturar: o número de achados da interface deve cair, sem achado novo.
 
 ## Antes de escrever
 
@@ -43,8 +58,16 @@ Referências: `knowledge/fundamentos/ux-writing.md`, `patterns/ux-writing/*` (te
 ## Revisão de um fluxo
 
 1. Extraia todas as strings do fluxo (código ou tela) para uma tabela: `tela | elemento | texto atual`.
-2. Marque: inconsistência de termo, fórmula violada, tom fora do momento, erro de português, texto que não ajuda a decidir.
+2. Marque: inconsistência de termo, fórmula violada, tom fora do momento, erro de português, texto que não ajuda a decidir, marca de texto gerado (`knowledge/fundamentos/marcas-de-texto-gerado.md`).
 3. Proponha a reescrita na coluna ao lado, com o motivo em ≤ 8 palavras.
 4. Atualize o glossário com qualquer termo decidido.
 
 Saída: a tabela `tela | elemento | atual | proposto | motivo` + glossário atualizado.
+
+
+## Levantamento com opções para o dono escolher
+
+1. `node tools/ux-lint/texto.mjs --telas <capturas> --codigo <pastas do código> --ux UX.md --json > texto.json` — achados X1–X11 com a origem `arquivo:linha`.
+2. Some a revisão por julgamento do que a máquina não pega bem: **descrições desnecessárias** (repetem o óbvio, explicam o que a tela já mostra, tom de manual).
+3. Para cada caso, escreva 2–3 opções prontas para colar, cada uma com a convenção de origem (`knowledge/fundamentos/elementos-comparados.md`: Material, Carbon, Polaris, GOV.UK, Atlassian, Apple HIG, DSX) e uma recomendada com o porquê. Quando a correção é de lugar (nome vai para o nome acessível, explicação sai da dica e vira texto visível), diga isso na opção.
+4. `node tools/ux-lint/pagina-texto.mjs casos.json pagina.html --produto "<produto>" --cor "<primária>"` — página que mostra cada elemento renderizado hoje e em cada opção. O dono escolhe; a correção é feita na origem.
