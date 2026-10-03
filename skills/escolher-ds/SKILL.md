@@ -42,8 +42,10 @@ Liste por opção: nota, contraste reprovado (componente e razão), componentes 
 
 - Três opções no registro e **uma contrastante**. Para cada uma: o que favorece, o que piora, nota/defeitos, esforço de adaptação, e o crédito (designmd.app, CC BY 4.0).
 - **Mostrar no produto:**
-  - Projeto com telas: capture as telas-chave do código (skill de captura do projeto, ex. `code-to-stitch`; nunca gere a tela existente por texto) e, no Stitch, importe cada opção como design system (skill `stitch`, modo Sincronizar, a partir do DESIGN.md da opção) e use `apply_design_system` nas telas capturadas. Uma linha do canvas por opção.
+  - Projeto com telas e captura pelo código (ex. skill `code-to-stitch`): **renderize as telas reais com o tema de cada opção** — um tema por cima do tema do produto, montado do front matter da referência (paleta, fonte, raio e as cores fixas que o tema do produto tiver). Envie ao Stitch uma linha por opção, mesma tela na mesma coluna, mais a linha do atual. Escolha um ou dois fluxos curtos, não o produto inteiro.
+  - **Não use `apply_design_system` em telas capturadas do código**: elas carregam o CSS real com cores fixas, e a ferramenta quase não muda nada (testado em 2026-10-02: só um selo mudou). Ela funciona em telas geradas pelo próprio Stitch.
   - Projeto sem telas: gere a mesma tela-chave com cada design system (skill `stitch`, modo Gerar) e critique cada uma (modo Criticar).
+- **Critique cada opção nas telas, não no arquivo:** o que quebra no uso real (ex.: tema escuro deixa escura a folha de um documento; paleta neutra apaga a distinção por cor entre estados de campo) pesa mais que a nota. Anote também o que **não** mudou com o tema: são cores fixas no código do produto, dívida de design system a registrar.
 - **Pare e peça a escolha ao dono do produto.** Não escolha por ele.
 
 ## 5. Construir o DESIGN.md do projeto

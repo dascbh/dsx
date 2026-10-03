@@ -70,6 +70,8 @@ export function avaliar(md) {
     }
   }
   const reprovados = pares.filter((p) => p.razao < 4.5);
+  const fundo = cores.background ?? cores.surface;
+  const tema = /^#[0-9a-f]{6}$/i.test(fundo ?? '') ? (contrast(fundo, '#000000') < contrast(fundo, '#FFFFFF') ? 'escuro' : 'claro') : null;
   const temComponentes = Object.keys(fm.components ?? {}).length > 0;
   const nCores = Object.keys(cores).length;
   const nTipos = Object.keys(fm.typography ?? {}).length;
@@ -79,7 +81,7 @@ export function avaliar(md) {
   if (nTipos < 3) nota -= 5;
   nota = Math.max(0, Math.min(100, nota));
   return {
-    nota, erros: r.errors, avisos: r.warnings, contrasteComponentes: pares, contrasteReprovado: reprovados,
+    nota, tema, erros: r.errors, avisos: r.warnings, contrasteComponentes: pares, contrasteReprovado: reprovados,
     tokens: { cores: nCores, tipografia: nTipos, componentes: Object.keys(fm.components ?? {}).length },
   };
 }
@@ -175,7 +177,7 @@ function curar() {
     const av = avaliar(readFileSync(join(COPIAS, f), 'utf8'));
     const meta = indice[slug] ?? {};
     return {
-      slug, titulo: meta.titulo, registro: meta.dsx?.registro, tema: meta.dsx?.tema, uso: meta.uso,
+      slug, titulo: meta.titulo, registro: meta.dsx?.registro, tema: av.tema ?? meta.dsx?.tema, uso: meta.uso,
       nota: av.nota, tokens: av.tokens, contrasteReprovado: av.contrasteReprovado.map((p) => `${p.componente} ${p.razao}:1`),
       erros: av.erros.length, avisos: av.avisos.length, arquivo: `designmd-app/${f}`, url: meta.url,
     };

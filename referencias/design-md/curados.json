@@ -24,7 +24,7 @@
    "slug": "carbon-design",
    "titulo": "Carbon Design System",
    "registro": "operacional",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "shell de aplicação com navegação e cartões; 2x grid, IBM Plex typeface; Restrained, enterprise, data-dense",
    "nota": 82,
    "tokens": {
@@ -132,7 +132,7 @@
    "slug": "primer",
    "titulo": "Primer",
    "registro": "operacional",
-   "tema": "escuro",
+   "tema": "claro",
    "uso": "hero, superfície, conteúdo e grade responsiva; Developer-tool clarity, dense but calm; Mona Sans / system fonts, octicon iconography",
    "nota": 82,
    "tokens": {
@@ -186,7 +186,7 @@
    "slug": "dark-mode-oled",
    "titulo": "Dark Mode (OLED)",
    "registro": "consumo",
-   "tema": "escuro",
+   "tema": "claro",
    "uso": "Dashboards financeiros, Apps criativas, Mobile-first, Gaming",
    "nota": 79,
    "tokens": {
@@ -204,7 +204,7 @@
    "slug": "geist",
    "titulo": "Vercel Geist",
    "registro": "operacional",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "grade modular responsiva; High-contrast black/white, precise geometry; Geist Sans/Mono, tight grid",
    "nota": 79,
    "tokens": {
@@ -564,7 +564,7 @@
    "slug": "airbnb-coral-marketplace",
    "titulo": "Airbnb Coral Marketplace",
    "registro": "consumo",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "Marketplaces, Viagens, Plataformas de hospedagem, E-commerce experiencial",
    "nota": 67,
    "tokens": {
@@ -624,7 +624,7 @@
    "slug": "ollama-pure-grayscale",
    "titulo": "Ollama Pure Grayscale",
    "registro": "operacional",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "Ferramentas CLI, Open-source, Plataformas developer minimalistas, Modelos de IA local",
    "nota": 67,
    "tokens": {
@@ -642,7 +642,7 @@
    "slug": "pinterest-warm-discovery",
    "titulo": "Pinterest Warm Discovery",
    "registro": "consumo",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "Marketplaces visuais, Galerias de inspiração, Plataformas de descoberta, E-commerce visual",
    "nota": 67,
    "tokens": {
@@ -662,7 +662,7 @@
    "slug": "revolut-billboard-fintech",
    "titulo": "Revolut Billboard Fintech",
    "registro": "operacional",
-   "tema": "escuro",
+   "tema": "claro",
    "uso": "Banking digital, Fintechs, Plataformas financeiras, Neobanks",
    "nota": 67,
    "tokens": {
@@ -682,7 +682,7 @@
    "slug": "uber-bold-transit",
    "titulo": "Uber Bold Transit",
    "registro": "editorial",
-   "tema": "claro",
+   "tema": "escuro",
    "uso": "Mobilidade urbana, Logística, Delivery, Plataformas de transporte",
    "nota": 67,
    "tokens": {

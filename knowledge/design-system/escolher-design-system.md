@@ -52,7 +52,9 @@ Regras:
 
 - **Três opções dentro do registro + uma contrastante** (outra direção plausível). Mais que isso paralisa; menos esconde o espaço de escolha.
 - Para cada opção: o que ela favorece (tarefa, persona), o que ela piora, nota e defeitos encontrados, esforço de adaptação.
-- **Mostre aplicado ao produto, não a uma tela genérica**: se o projeto já tem telas, capture-as do código e aplique cada opção no Stitch (`apply_design_system`) — a comparação vira "nossa tela com A, B, C". Sem telas, gere a mesma tela-chave com cada opção.
+- **Mostre aplicado ao produto, não a uma tela genérica**: se o projeto já tem telas, renderize as telas reais com o tema de cada opção (tema por cima do tema do produto, montado do front matter) e compare no Stitch, uma linha por opção — a comparação vira "nossa tela com A, B, C". `apply_design_system` não serve para telas capturadas do código (CSS real com cores fixas: quase nada muda). Sem telas, gere a mesma tela-chave com cada opção.
+- **SE** a opção quebra algo no uso real (documento que deveria ficar claro, estado que dependia de cor) **ENTÃO** isso pesa mais que a nota do arquivo.
+- **SE** algo não mudou com o tema **ENTÃO** é cor fixa no código do produto: registre como dívida, independentemente da escolha.
 - Escolha é do dono do produto. Preferência estética sem relação com a tarefa não é argumento para descartar uma opção avaliada.
 
 ## Construção: da referência ao DESIGN.md do projeto
