@@ -1,0 +1,738 @@
+{
+ "criterio": "linter do DSX (erros −15, avisos −3) + contraste texto/fundo dos componentes (< 4,5:1 −15) + completude (componentes, ≥ 4 cores, ≥ 3 estilos de texto)",
+ "atualizado": "2026-10-03",
+ "itens": [
+  {
+   "slug": "ant-design",
+   "titulo": "Ant Design",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "hero, superfície, conteúdo e grade responsiva; Dense, component-rich enterprise UI; Blue primary, subtle shadows, 6px radius default",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/ant-design.md",
+   "url": "https://designmd.app/library/ant-design"
+  },
+  {
+   "slug": "carbon-design",
+   "titulo": "Carbon Design System",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "shell de aplicação com navegação e cartões; 2x grid, IBM Plex typeface; Restrained, enterprise, data-dense",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/carbon-design.md",
+   "url": "https://designmd.app/library/carbon-design"
+  },
+  {
+   "slug": "dashboard-analytics",
+   "titulo": "Analytics Dashboard",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "shell de aplicação com navegação e cartões; Card grids, KPI tiles, charts, tables; Neutral surfaces, one or two accent colors",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/dashboard-analytics.md",
+   "url": "https://designmd.app/library/dashboard-analytics"
+  },
+  {
+   "slug": "e-ink-editorial",
+   "titulo": "E-Ink Editorial",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "composição editorial com grade tipográfica; Near-monochrome charcoal on warm e-paper; Crisp hairlines, labels, and reading-first hierarchy",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/e-ink-editorial.md",
+   "url": "https://designmd.app/library/e-ink-editorial"
+  },
+  {
+   "slug": "hashicorp-infra-dual",
+   "titulo": "HashiCorp Infra Dual",
+   "registro": "operacional",
+   "tema": "escuro",
+   "uso": "Infraestrutura cloud, DevOps, Automação de infraestrutura, Plataformas multi-produto",
+   "nota": 82,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/hashicorp-infra-dual.md",
+   "url": "https://designmd.app/library/hashicorp-infra-dual"
+  },
+  {
+   "slug": "lightning-design",
+   "titulo": "Salesforce Lightning",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "shell de aplicação com navegação e cartões; Enterprise CRM density and consistency; Token-driven theming (SLDS)",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/lightning-design.md",
+   "url": "https://designmd.app/library/lightning-design"
+  },
+  {
+   "slug": "polaris",
+   "titulo": "Shopify Polaris",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "hero, superfície, conteúdo e grade responsiva; Merchant-admin focused, calm and legible; Card-based layouts, clear affordances",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/polaris.md",
+   "url": "https://designmd.app/library/polaris"
+  },
+  {
+   "slug": "primer",
+   "titulo": "Primer",
+   "registro": "operacional",
+   "tema": "escuro",
+   "uso": "hero, superfície, conteúdo e grade responsiva; Developer-tool clarity, dense but calm; Mona Sans / system fonts, octicon iconography",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/primer.md",
+   "url": "https://designmd.app/library/primer"
+  },
+  {
+   "slug": "shadcn-ui",
+   "titulo": "shadcn/ui (New York)",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "shell de aplicação com navegação e cartões; Neutral, refined, subtle borders and rings; Small radius (0.5rem), muted zinc/slate palette",
+   "nota": 82,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/shadcn-ui.md",
+   "url": "https://designmd.app/library/shadcn-ui"
+  },
+  {
+   "slug": "coastal-commerce",
+   "titulo": "Coastal Commerce",
+   "registro": "consumo",
+   "tema": "claro",
+   "uso": "E-commerce de moda praia, Lojas de surf e lifestyle, Produtos artesanais costeiros, Decoração náutica",
+   "nota": 79,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/coastal-commerce.md",
+   "url": "https://designmd.app/library/coastal-commerce"
+  },
+  {
+   "slug": "dark-mode-oled",
+   "titulo": "Dark Mode (OLED)",
+   "registro": "consumo",
+   "tema": "escuro",
+   "uso": "Dashboards financeiros, Apps criativas, Mobile-first, Gaming",
+   "nota": 79,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/dark-mode-oled.md",
+   "url": "https://designmd.app/library/dark-mode-oled"
+  },
+  {
+   "slug": "geist",
+   "titulo": "Vercel Geist",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "grade modular responsiva; High-contrast black/white, precise geometry; Geist Sans/Mono, tight grid",
+   "nota": 79,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/geist.md",
+   "url": "https://designmd.app/library/geist"
+  },
+  {
+   "slug": "govuk-design",
+   "titulo": "GOV.UK Design System",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "hero, superfície, conteúdo e grade responsiva; Radically clear, task-focused, accessible; Transport/GDS typeface, black on white",
+   "nota": 79,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/govuk-design.md",
+   "url": "https://designmd.app/library/govuk-design"
+  },
+  {
+   "slug": "linear-dark",
+   "titulo": "Linear Style",
+   "registro": "operacional",
+   "tema": "escuro",
+   "uso": "shell de aplicação com navegação e cartões; Dark UI with subtle purple/blue gradients; Crisp small type, hairline borders",
+   "nota": 79,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/linear-dark.md",
+   "url": "https://designmd.app/library/linear-dark"
+  },
+  {
+   "slug": "minimalism-swiss-style",
+   "titulo": "Minimalism & Swiss Style",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "SaaS B2B, Apps enterprise, SaaS de design, Ferramentas profissionais",
+   "nota": 79,
+   "tokens": {
+    "cores": 5,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/minimalism-swiss-style.md",
+   "url": "https://designmd.app/library/minimalism-swiss-style"
+  },
+  {
+   "slug": "spectrum",
+   "titulo": "Adobe Spectrum",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "shell de aplicação com navegação e cartões; Creative-tool oriented, neutral canvas-friendly; Adobe Clean typeface",
+   "nota": 79,
+   "tokens": {
+    "cores": 8,
+    "tipografia": 3,
+    "componentes": 4
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/spectrum.md",
+   "url": "https://designmd.app/library/spectrum"
+  },
+  {
+   "slug": "financial-dashboard",
+   "titulo": "Financial Dashboard",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 77,
+   "tokens": {
+    "cores": 3,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/financial-dashboard.md",
+   "url": "https://designmd.app/library/financial-dashboard"
+  },
+  {
+   "slug": "real-time-monitoring",
+   "titulo": "Real-Time Monitoring",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 77,
+   "tokens": {
+    "cores": 3,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/real-time-monitoring.md",
+   "url": "https://designmd.app/library/real-time-monitoring"
+  },
+  {
+   "slug": "vercel-geist-minimal",
+   "titulo": "Vercel Geist Minimal",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Infraestrutura developer, Plataformas de deploy, Ferramentas frontend, CI/CD",
+   "nota": 77,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/vercel-geist-minimal.md",
+   "url": "https://designmd.app/library/vercel-geist-minimal"
+  },
+  {
+   "slug": "bento-dados-estruturados",
+   "titulo": "Bento Dados Estruturados",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 74,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/bento-dados-estruturados.md",
+   "url": "https://designmd.app/library/bento-dados-estruturados"
+  },
+  {
+   "slug": "minimalismo-funcional-b2b",
+   "titulo": "Minimalismo Funcional B2B",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 74,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/minimalismo-funcional-b2b.md",
+   "url": "https://designmd.app/library/minimalismo-funcional-b2b"
+  },
+  {
+   "slug": "saas-enterprise-analytics",
+   "titulo": "SaaS Enterprise Analytics",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 74,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/saas-enterprise-analytics.md",
+   "url": "https://designmd.app/library/saas-enterprise-analytics"
+  },
+  {
+   "slug": "accessible-ethical",
+   "titulo": "Accessible & Ethical",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Governo, Healthcare, Educação, Qualquer site inclusivo",
+   "nota": 72,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 0
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/accessible-ethical.md",
+   "url": "https://designmd.app/library/accessible-ethical"
+  },
+  {
+   "slug": "conversion-optimized",
+   "titulo": "Conversion-Optimized",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "Marketing, Conversão, Lead gen",
+   "nota": 72,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 0
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/conversion-optimized.md",
+   "url": "https://designmd.app/library/conversion-optimized"
+  },
+  {
+   "slug": "executive-dashboard",
+   "titulo": "Executive Dashboard",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 72,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 0
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/executive-dashboard.md",
+   "url": "https://designmd.app/library/executive-dashboard"
+  },
+  {
+   "slug": "ibm-plex-sans-typography",
+   "titulo": "IBM Plex Sans Typography",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Enterprise products, design systems, documentation, and tech brands.",
+   "nota": 72,
+   "tokens": {
+    "cores": 2,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/ibm-plex-sans-typography.md",
+   "url": "https://designmd.app/library/ibm-plex-sans-typography"
+  },
+  {
+   "slug": "inclusive-design",
+   "titulo": "Inclusive Design",
+   "registro": "marca",
+   "tema": "claro",
+   "uso": "Landing pages, SaaS",
+   "nota": 72,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 0
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/inclusive-design.md",
+   "url": "https://designmd.app/library/inclusive-design"
+  },
+  {
+   "slug": "inter-typography",
+   "titulo": "Inter Typography",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "Apps, dashboards, documentation, digital product needing maximum clarity.",
+   "nota": 72,
+   "tokens": {
+    "cores": 2,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/inter-typography.md",
+   "url": "https://designmd.app/library/inter-typography"
+  },
+  {
+   "slug": "merriweather-typography",
+   "titulo": "Merriweather Typography",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "Blogs, news sites, long-form reading, and editorial platforms.",
+   "nota": 72,
+   "tokens": {
+    "cores": 2,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/merriweather-typography.md",
+   "url": "https://designmd.app/library/merriweather-typography"
+  },
+  {
+   "slug": "trust-authority",
+   "titulo": "Trust & Authority",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "Marketing, Conversão, Lead gen",
+   "nota": 72,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 0
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/trust-authority.md",
+   "url": "https://designmd.app/library/trust-authority"
+  },
+  {
+   "slug": "healthtech-plataforma-clinica",
+   "titulo": "HealthTech Plataforma Clínica",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 69,
+   "tokens": {
+    "cores": 1,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/healthtech-plataforma-clinica.md",
+   "url": "https://designmd.app/library/healthtech-plataforma-clinica"
+  },
+  {
+   "slug": "airbnb-coral-marketplace",
+   "titulo": "Airbnb Coral Marketplace",
+   "registro": "consumo",
+   "tema": "claro",
+   "uso": "Marketplaces, Viagens, Plataformas de hospedagem, E-commerce experiencial",
+   "nota": 67,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 1.12:1"
+   ],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/airbnb-coral-marketplace.md",
+   "url": "https://designmd.app/library/airbnb-coral-marketplace"
+  },
+  {
+   "slug": "claymorphism",
+   "titulo": "Claymorphism",
+   "registro": "consumo",
+   "tema": "claro",
+   "uso": "Apps infantis, Creative tools, Educação, Jogos interativos",
+   "nota": 67,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 1.31:1"
+   ],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/claymorphism.md",
+   "url": "https://designmd.app/library/claymorphism"
+  },
+  {
+   "slug": "data-dense-dashboard",
+   "titulo": "Data-Dense Dashboard",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Landing pages, Websites modernas",
+   "nota": 67,
+   "tokens": {
+    "cores": 5,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 1.97:1"
+   ],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/data-dense-dashboard.md",
+   "url": "https://designmd.app/library/data-dense-dashboard"
+  },
+  {
+   "slug": "ollama-pure-grayscale",
+   "titulo": "Ollama Pure Grayscale",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Ferramentas CLI, Open-source, Plataformas developer minimalistas, Modelos de IA local",
+   "nota": 67,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 1,
+   "avisos": 6,
+   "arquivo": "designmd-app/ollama-pure-grayscale.md",
+   "url": "https://designmd.app/library/ollama-pure-grayscale"
+  },
+  {
+   "slug": "pinterest-warm-discovery",
+   "titulo": "Pinterest Warm Discovery",
+   "registro": "consumo",
+   "tema": "claro",
+   "uso": "Marketplaces visuais, Galerias de inspiração, Plataformas de descoberta, E-commerce visual",
+   "nota": 67,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 1.26:1"
+   ],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/pinterest-warm-discovery.md",
+   "url": "https://designmd.app/library/pinterest-warm-discovery"
+  },
+  {
+   "slug": "revolut-billboard-fintech",
+   "titulo": "Revolut Billboard Fintech",
+   "registro": "operacional",
+   "tema": "escuro",
+   "uso": "Banking digital, Fintechs, Plataformas financeiras, Neobanks",
+   "nota": 67,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 2.83:1"
+   ],
+   "erros": 0,
+   "avisos": 6,
+   "arquivo": "designmd-app/revolut-billboard-fintech.md",
+   "url": "https://designmd.app/library/revolut-billboard-fintech"
+  },
+  {
+   "slug": "uber-bold-transit",
+   "titulo": "Uber Bold Transit",
+   "registro": "editorial",
+   "tema": "claro",
+   "uso": "Mobilidade urbana, Logística, Delivery, Plataformas de transporte",
+   "nota": 67,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 1,
+   "avisos": 6,
+   "arquivo": "designmd-app/uber-bold-transit.md",
+   "url": "https://designmd.app/library/uber-bold-transit"
+  },
+  {
+   "slug": "blue-professional",
+   "titulo": "Blue Professional",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "Pitch SaaS B2B, Entregável de consultoria, Review interno, Pitch consultivo, Update para investidores",
+   "nota": 65,
+   "tokens": {
+    "cores": 4,
+    "tipografia": 2,
+    "componentes": 1
+   },
+   "contrasteReprovado": [],
+   "erros": 0,
+   "avisos": 10,
+   "arquivo": "designmd-app/blue-professional.md",
+   "url": "https://designmd.app/library/blue-professional"
+  },
+  {
+   "slug": "analytics-metric-flow",
+   "titulo": "Analytics Metric Flow",
+   "registro": "operacional",
+   "tema": "claro",
+   "uso": "SaaS Analytics, Dashboards de métricas, Plataformas de dados, Ferramentas de integração",
+   "nota": 64,
+   "tokens": {
+    "cores": 6,
+    "tipografia": 3,
+    "componentes": 1
+   },
+   "contrasteReprovado": [
+    "button-primary 1.95:1"
+   ],
+   "erros": 0,
+   "avisos": 7,
+   "arquivo": "designmd-app/analytics-metric-flow.md",
+   "url": "https://designmd.app/library/analytics-metric-flow"
+  }
+ ]
+}

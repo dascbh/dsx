@@ -28,6 +28,8 @@ Em `metadata.json`, acrescente ao formato oficial: `"designSystem": { "assetId",
 
 | Pedido | Modo |
 |---|---|
+| Ainda não há design system / quer comparar estilos antes de sincronizar | skill `escolher-ds` (referências curadas, opções aplicadas às telas) |
+| Levar ao Stitch uma tela que **já existe no código** | **capture do código** (skill de captura do projeto, ex. `code-to-stitch`): nunca `generate_screen_from_text` — texto reinterpreta bordas, ícones e espaçamentos |
 | Primeira vez no projeto, ou o DESIGN.md/tokens mudaram | **1. Sincronizar** |
 | "Gera a tela de X", "como ficaria X" | **2. Gerar** (sincronize antes, se preciso) |
 | "Me mostra opções", "outras versões" | **3. Variantes** |

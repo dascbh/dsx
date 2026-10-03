@@ -98,6 +98,25 @@ Convenções que o linter usa:
 
 Recomendadas (o linter avisa se faltarem): **Accessibility** (meta WCAG, foco, alvo, movimento reduzido, zoom, alternativa textual) e **Agent Instructions** (quando consultar, o que preservar, como validar). O linter aceita títulos em pt-BR equivalentes (Visão geral, Cores, Tipografia, Layout e espaçamento, Elevação, Formas, Componentes, Faça e não faça, Acessibilidade, Instruções para agentes).
 
+## Especificação oficial e linter oficial
+
+O formato tem especificação pública do Google Labs (versão `alpha`, licença Apache-2.0) e uma CLI própria, o pacote `@google/design.md`, usável sem instalar com `npx -y @google/design.md <comando>`:
+
+| Comando | Para que serve |
+|---|---|
+| `lint DESIGN.md` | Relatório JSON com achados por severidade: referência quebrada, falta de cor primária ou de tipografia, contraste abaixo de AA, token declarado e nunca usado, seções fora da ordem canônica, chave desconhecida |
+| `diff A.md B.md` | Mudanças token a token entre duas versões e regressões |
+| `export --format dtcg\|json-tailwind\|css-tailwind DESIGN.md` | Tokens em W3C DTCG, Tailwind v3 (`theme.extend`) ou Tailwind v4 (`@theme`) |
+| `spec [--rules]` | A especificação e as regras do linter, na versão instalada |
+
+Use os dois linters: o do DSX (`tools/lint-design-md.mjs`) cobre os gates de qualidade da rubrica (pares de contraste declarados, prosa vaga, seções recomendadas); o oficial cobre conformidade ao formato. Divergências conhecidas entre o DSX e a especificação oficial:
+
+- **Sub-tokens de componente.** A especificação aceita só `backgroundColor`, `textColor`, `typography`, `rounded`, `padding`, `size`, `height`, `width`. O DSX também usa `borderColor` (o template e `examples/DESIGN.md`), e o linter oficial avisa a cada uso. **SE** o arquivo vai para uma ferramenta que segue estritamente a especificação **ENTÃO** descreva a borda na prosa da seção Components e no papel de cor (`border`, `*-border`), sem o sub-token.
+- **Seções recomendadas.** Accessibility e Agent Instructions são exigência do DSX, não da especificação; o linter oficial não reclama da ausência nem da presença.
+- **Títulos em pt-BR.** O linter do DSX aceita os equivalentes em português; o oficial verifica a ordem pelos nomes canônicos em inglês. Para máxima compatibilidade, use os títulos canônicos.
+
+Referências prontas no formato, para escolher e adaptar: `escolher-design-system.md`.
+
 ## Regras de escrita
 
 1. **Critério observável no lugar de adjetivo.** "Moderno, clean, elegante" não orienta. Escreva "no máximo uma cor de destaque por viewport; hierarquia por tamanho e peso; cards sem sombra no tema claro". O linter avisa sobre adjetivos vagos.
