@@ -33,6 +33,8 @@ node <DSX>/tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json --ux UX.md   
 
 Os achados entram no relatório com a regra e a severidade que a ferramenta deu. O julgamento abaixo cobre o que ela não mede (adequação do arquétipo, clareza, carga cognitiva).
 
+**Registre em `.dsx/findings` e decida pelo registro** (contrato: `knowledge/fundamentos/achados-de-ux.md`): rode os verificadores com `--json` e `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen tela.json --flow fluxo.json [--text texto.json] --root <repo>`. O relatório cita o id de cada achado; o dono decide pela página (`findings.mjs page`) ou no chat (`findings.mjs decide`), e a próxima revisão começa por `findings.mjs status` (regressões e decididos sem aplicar) em vez de recomeçar do zero.
+
 ## 2.1 Inspecione a tela renderizada
 
 Prefira a interface rodando (navegador/screenshot) ao código. Verifique: desktop e 320px de largura, tema claro e escuro, teclado, estados (vazio, carregando, erro). Se só houver código, diga isso no relatório — a confiança é menor.

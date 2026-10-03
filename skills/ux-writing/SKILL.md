@@ -24,6 +24,15 @@ Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não 
 5. Para reescrever cada achado, use os antes/depois de `knowledge/fundamentos/marcas-de-texto-gerado.md`. As marcas que a ferramenta não acusa (tríades, "não só … mas também", adjetivos genéricos) entram na revisão manual abaixo.
 6. Rode de novo depois de corrigir e recapturar: o número de achados da interface deve cair, sem achado novo.
 
+## Registrar em `.dsx/findings` e decidir pelo registro
+
+O resultado não fica na conversa nem em pasta temporária (contrato: `knowledge/fundamentos/achados-de-ux.md`).
+
+1. `node tools/ux-lint/findings.mjs register --module <m> --text texto.json [--screen tela.json] [--flow fluxo.json] --root <repo>` — cada achado ganha id estável e status.
+2. Escreva as opções em `casos.json` (seção abaixo) e ligue-as aos ids: `findings.mjs options --module <m> --from casos.json`. Caso de revisão manual (descrição desnecessária) entra como item `origin: "review"`.
+3. `findings.mjs page --module <m> pagina.html --product "<produto>" --color "<primária>"`: o dono marca A/B/C ou Ignorar (com motivo) e usa "Copiar decisões"; grave com `findings.mjs import --module <m> decisions.json` (ou `decide` para uma decisão dita no chat).
+4. Aplique na origem só o que está `decided` (`findings.mjs status --module <m>` lista com `arquivo:linha`), recapture, registre de novo e confira `fixed`. `findings.mjs check` no pre-commit ou CI impede achado novo e regressão.
+
 ## Antes de escrever
 
 1. Leia o glossário do projeto, se existir (DESIGN.md, `docs/`, ou strings existentes). **Mesmo conceito = mesma palavra em todas as telas.** Se não existir, monte um com os 10–20 termos do domínio a partir das strings atuais e aponte divergências.
@@ -70,4 +79,4 @@ Saída: a tabela `tela | elemento | atual | proposto | motivo` + glossário atua
 1. `node tools/ux-lint/texto.mjs --telas <capturas> --codigo <pastas do código> --ux UX.md --json > texto.json` — achados X1–X11 com a origem `arquivo:linha`.
 2. Some a revisão por julgamento do que a máquina não pega bem: **descrições desnecessárias** (repetem o óbvio, explicam o que a tela já mostra, tom de manual).
 3. Para cada caso, escreva 2–3 opções prontas para colar, cada uma com a convenção de origem (`knowledge/fundamentos/elementos-comparados.md`: Material, Carbon, Polaris, GOV.UK, Atlassian, Apple HIG, DSX) e uma recomendada com o porquê. Quando a correção é de lugar (nome vai para o nome acessível, explicação sai da dica e vira texto visível), diga isso na opção.
-4. `node tools/ux-lint/pagina-texto.mjs casos.json pagina.html --produto "<produto>" --cor "<primária>"` — página que mostra cada elemento renderizado hoje e em cada opção. O dono escolhe; a correção é feita na origem.
+4. Registre e gere a página pelo registro (`findings.mjs options` + `findings.mjs page`, seção anterior): mostra cada elemento renderizado hoje e em cada opção, com id, status e o formulário de decisão. Sem registro, `node tools/ux-lint/text-page.mjs casos.json pagina.html --produto "<produto>" --cor "<primária>"` gera só a página. O dono escolhe; a correção é feita na origem.

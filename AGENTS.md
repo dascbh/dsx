@@ -87,6 +87,14 @@ node tools/lint-arquetipos.mjs [--index]       # valida o catálogo de arquétip
 node tools/ux-lint/tela.mjs <capturas.html|pasta> [--ux UX.md] [--json]          # regras T1–T7 nas capturas de tela
 node tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json [--ux UX.md] [--json]  # regras F1–F5 no mapa de fluxo
 node tools/ux-lint/texto.mjs --telas <capturas> [--codigo <pastas>] [--ux UX.md] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
+node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json --root <repo>  # registro de achados em .dsx/findings/<m>/ (id estável, status)
+node tools/ux-lint/findings.mjs options --module <m> --from casos.json     # liga opções (2–3 por caso) aos ids; caso sem achado vira item de revisão
+node tools/ux-lint/findings.mjs decide --module <m> <id> <índice|ignore|free> [--reason …] [--text …] [--by …]  # grava decisão do dono
+node tools/ux-lint/findings.mjs import --module <m> decisions.json         # decisões copiadas da página
+node tools/ux-lint/findings.mjs status --module <m> [--json]               # por status, família, regra e severidade; regressões e decididos sem aplicar
+node tools/ux-lint/findings.mjs check --module <m> [--min 2] --text … --screen … --flow …  # trava: reprova achado novo ≥ min ou regressão (não grava)
+node tools/ux-lint/findings.mjs page --module <m> <saida.html> [--product …] [--color …]  # página de escolha com formulário "Copiar decisões"
+node tools/ux-lint/text-page.mjs <casos.json> <saida.html> [--produto …] [--cor …]  # página de escolha só a partir de casos.json
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
 node tools/referencias.mjs buscar --registro operacional --uso "termos" --curados   # referências de DESIGN.md (também indice, baixar, avaliar, curar)
 node tools/lint-raw-values.mjs <pasta>         # valores crus (drift) no código de UI

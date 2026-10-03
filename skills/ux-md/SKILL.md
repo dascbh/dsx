@@ -58,7 +58,7 @@ Qualquer ERRO reprova. Avisos de "sem cartão" indicam arquétipo sem referênci
 node <DSX>/tools/ux-lint/tela.mjs <pasta-de-capturas> --ux UX.md
 node <DSX>/tools/ux-lint/fluxo.mjs .dsx/mapas/fluxos-<modulo>.json --ux UX.md
 ```
-Achados de severidade ≥ 3 são correção antes de entregar ou dívida registrada com dono.
+Achados de severidade ≥ 3 são correção antes de entregar ou dívida registrada com dono. Registre em `.dsx/findings` e decida pelo registro: rode com `--json`, `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen tela.json --flow fluxo.json --root <repo>`, e trate as decisões pelo registro (`findings.mjs page`/`decide`, contrato em `knowledge/fundamentos/achados-de-ux.md`). Dívida registrada = item `open` ou `ignored` com motivo; `findings.mjs check` no CI impede que piore.
 
 **Passo 3 — Julgamento (skill `revisar-ux`):** o que a máquina não mede.
 - O arquétipo atribuído casa com a tarefa de cada tela? (Leia o `quando-usar` e o `evitar-quando` do cartão.)
@@ -73,5 +73,5 @@ Achados de severidade ≥ 3 são correção antes de entregar ou dívida registr
 - [ ] Toda tela e diálogo do mapa está no front matter `arquetipos` ou declarado como desvio na seção 5.
 - [ ] Políticas com evidência (Modo A) ou com o padrão que as justifica (Modo B).
 - [ ] Inconsistências encontradas viraram "Não faça" com a tela de origem.
-- [ ] `lint-ux-md.mjs` sem erro; `ux-lint` de tela e fluxo rodados; severidade ≥ 3 tratada.
+- [ ] `lint-ux-md.mjs` sem erro; `ux-lint` de tela e fluxo rodados e registrados em `.dsx/findings/<modulo>/`; severidade ≥ 3 tratada.
 - [ ] Linha no `CLAUDE.md`/`AGENTS.md` do projeto: "antes de criar ou rearranjar tela, leia `UX.md`".

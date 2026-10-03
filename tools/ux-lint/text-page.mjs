@@ -2,20 +2,30 @@
 // Página de escolha para o levantamento de texto de interface (skill ux-writing).
 // Lê os casos com opções (JSON abaixo) e gera um HTML que mostra cada elemento renderizado no estado atual
 // e em cada opção, com a convenção de origem, a recomendação, as telas e a origem no código.
+// `renderTextPage` é reaproveitada por `findings.mjs page` (que acrescenta id, status e o formulário de decisão).
 //
-//   node tools/ux-lint/pagina-texto.mjs <casos.json> <saida.html> [--titulo "Texto das telas"] [--produto "AURIS"] [--cor "#0E71B8"]
+//   node tools/ux-lint/text-page.mjs <casos.json> <saida.html> [--titulo "Texto das telas"] [--produto "AURIS"] [--cor "#0E71B8"]
 //
 // casos.json: {"casos":[{"id","elemento","regra","severidade","texto","variantes":[],"origem":[],"telas":[],
 //   "problema","opcoes":[{"texto","convencao","nota"}],"recomendada":{"indice","porque"}}]}
-// elemento: botao | titulo | rotulo | dica | apoio | alerta | aba | nome-acessivel | celula | menu
+// elemento: button | title | label | tooltip | helper | alert | tab | accessible-name | cell | menu | placeholder
+// (os nomes antigos em pt-BR — botao, titulo, rotulo, dica, apoio, alerta, aba, nome-acessivel, celula — também valem).
 import { readFileSync, writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { parseArgs } from '../lib/cli.mjs';
 
 const ROTULO = {
-  botao: 'Botões', titulo: 'Títulos', rotulo: 'Rótulos de campo', dica: 'Dicas (tooltip)', apoio: 'Descrições e textos de apoio',
-  alerta: 'Alertas e mensagens', placeholder: 'Textos dentro do campo', aba: 'Abas', 'nome-acessivel': 'Nomes acessíveis', celula: 'Células de tabela', menu: 'Itens de menu',
+  button: 'Botões', title: 'Títulos', label: 'Rótulos de campo', tooltip: 'Dicas (tooltip)', helper: 'Descrições e textos de apoio',
+  alert: 'Alertas e mensagens', placeholder: 'Textos dentro do campo', tab: 'Abas', 'accessible-name': 'Nomes acessíveis', cell: 'Células de tabela', menu: 'Itens de menu',
+  screen: 'Tela (estrutura)', flow: 'Fluxo',
 };
-const ORDEM = ['titulo', 'apoio', 'botao', 'rotulo', 'placeholder', 'dica', 'alerta', 'aba', 'menu', 'celula', 'nome-acessivel'];
+const ORDEM = ['title', 'helper', 'button', 'label', 'placeholder', 'tooltip', 'alert', 'tab', 'menu', 'cell', 'accessible-name', 'screen', 'flow'];
+/** Nomes antigos (pt-BR) de elemento → nome atual. */
+export const ELEMENT_ALIAS = {
+  botao: 'button', titulo: 'title', rotulo: 'label', dica: 'tooltip', apoio: 'helper', alerta: 'alert', aba: 'tab',
+  'nome-acessivel': 'accessible-name', celula: 'cell',
+};
+export const normalizeElement = (e) => ELEMENT_ALIAS[e] ?? e ?? 'accessible-name';
 const REGRA = {
   X1: 'travessão', X1b: 'travessão como vazio', X2: 'título composto', X3: 'descrição redundante', X4: 'abertura vazia',
   X5: 'pontuação final', X6: 'botão longo ou sem verbo', X7: 'dica redundante ou longa', X8: 'placeholder repete rótulo',
@@ -31,22 +41,23 @@ function amostra(elemento, texto) {
     return `<span class="instr">${esc(texto)}</span>`;
   }
   const t = esc(texto);
-  switch (elemento) {
-    case 'botao': return `<span class="btn">${t}</span>`;
-    case 'titulo': return `<span class="tit">${t}</span>`;
-    case 'rotulo': return `<span class="campo"><span class="lbl">${t}</span><span class="inp"></span></span>`;
-    case 'dica': return `<span class="dica-wrap"><span class="ico" aria-hidden="true">?</span><span class="dica">${t}</span></span>`;
-    case 'apoio': return `<span class="apoio">${t}</span>`;
-    case 'alerta': return `<span class="alerta">${t}</span>`;
-    case 'aba': return `<span class="aba">${t}</span>`;
+  switch (normalizeElement(elemento)) {
+    case 'button': return `<span class="btn">${t}</span>`;
+    case 'title': return `<span class="tit">${t}</span>`;
+    case 'label': return `<span class="campo"><span class="lbl">${t}</span><span class="inp"></span></span>`;
+    case 'tooltip': return `<span class="dica-wrap"><span class="ico" aria-hidden="true">?</span><span class="dica">${t}</span></span>`;
+    case 'helper': return `<span class="apoio">${t}</span>`;
+    case 'alert': return `<span class="alerta">${t}</span>`;
+    case 'tab': return `<span class="aba">${t}</span>`;
     case 'menu': return `<span class="menu">${t}</span>`;
     case 'placeholder': return `<span class="campo"><span class="inp ph">${t}</span></span>`;
-    case 'celula': return `<span class="cel">${t || '&nbsp;'}</span>`;
+    case 'cell': return `<span class="cel">${t || '&nbsp;'}</span>`;
+    case 'screen': case 'flow': return `<span class="apoio">${t}</span>`;
     default: return `<code class="aria">${t}</code>`;
   }
 }
 
-function cartao(c) {
+function cartao(c, extra = {}) {
   const rec = c.recomendada?.indice;
   const ops = (c.opcoes ?? []).map((o, i) => `
       <div class="op${i === rec ? ' rec' : ''}">
@@ -56,11 +67,12 @@ function cartao(c) {
       </div>`).join('');
   const variantes = (c.variantes ?? []).filter((v) => v && v !== c.texto);
   return `
-  <article class="caso" data-el="${esc(c.elemento)}" data-sev="${c.severidade ?? 0}" id="${esc(c.id)}">
+  <article class="caso" data-el="${esc(normalizeElement(c.elemento))}" data-sev="${c.severidade ?? 0}" id="${esc(c.id)}">
     <header>
       <span class="sev s${c.severidade ?? 0}" title="severidade ${c.severidade ?? 0} de 4">${c.severidade ?? 0}</span>
       <h3>${esc(c.problema)}</h3>
       <span class="regra">${esc(REGRA[c.regra] ?? c.regra)}</span>
+      ${extra.header ? extra.header(c) : ''}
     </header>
     <div class="grade">
       <div class="op atual">
@@ -75,14 +87,24 @@ function cartao(c) {
       <span>${(c.telas ?? []).length} tela(s): ${(c.telas ?? []).slice(0, 6).map((t) => `<span class="chip">${esc(String(t).replace(/^\d\d-|\.html$/g, ''))}</span>`).join('')}${(c.telas ?? []).length > 6 ? ' …' : ''}</span>
       <span class="origem">${(c.origem ?? []).slice(0, 3).map((o) => `<code>${esc(String(o).replace(/^.*?(frontend|backend)\//, '$1/'))}</code>`).join(' ')}</span>
     </footer>
+    ${extra.footer ? extra.footer(c) : ''}
   </article>`;
 }
 
-function pagina(casos, titulo, produto, cor = '#0E71B8') {
-  const porEl = Object.fromEntries(ORDEM.map((e) => [e, casos.filter((c) => c.elemento === e)]));
-  for (const c of casos) if (!ORDEM.includes(c.elemento)) (porEl[c.elemento] ??= []).push(c);
+/**
+ * Gera o HTML da página de escolha.
+ * opts: { title, product, color, eyebrow, lede, top (HTML depois dos números), card: { header(c), footer(c) },
+ *         style (CSS extra), script (JS extra), bottom (HTML no fim da página) }.
+ */
+export function renderTextPage(casos, opts = {}) {
+  const titulo = opts.title ?? 'Texto das telas';
+  const produto = opts.product ?? '';
+  const cor = opts.color ?? '#0E71B8';
+  const el = (c) => normalizeElement(c.elemento);
+  const porEl = Object.fromEntries(ORDEM.map((e) => [e, casos.filter((c) => el(c) === e)]));
+  for (const c of casos) if (!ORDEM.includes(el(c))) (porEl[el(c)] ??= []).push(c);
   const secoes = Object.entries(porEl).filter(([, l]) => l.length).map(([e, l]) => `
-  <section data-sec="${esc(e)}"><h2>${esc(ROTULO[e] ?? e)} <small>${l.length}</small></h2>${l.map(cartao).join('')}</section>`).join('');
+  <section data-sec="${esc(e)}"><h2>${esc(ROTULO[e] ?? e)} <small>${l.length}</small></h2>${l.map((c) => cartao(c, opts.card)).join('')}</section>`).join('');
   const filtros = Object.entries(porEl).filter(([, l]) => l.length)
     .map(([e, l]) => `<button type="button" class="f" data-f="${esc(e)}" aria-pressed="false">${esc(ROTULO[e] ?? e)} <small>${l.length}</small></button>`).join('');
   const nOps = casos.reduce((n, c) => n + (c.opcoes?.length ?? 0), 0);
@@ -133,31 +155,42 @@ section{display:grid;gap:14px}section h2{margin:12px 0 0;font:600 20px var(--ser
 .removido::before{content:"✕ ";}
 @media (max-width:640px){.pg{padding:20px 16px 56px}h1{font-size:24px}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+${opts.style ?? ''}
 </style>
 <div class="pg">
   <div class="topo">
-    <div class="eyebrow">Levantamento de texto de interface · ${esc(produto)}</div>
+    <div class="eyebrow">${esc(opts.eyebrow ?? 'Levantamento de texto de interface')} · ${esc(produto)}</div>
     <h1>${esc(titulo)}</h1>
-    <p class="lede">Cada caso mostra o elemento como aparece hoje e as opções de texto, renderizadas no mesmo estilo. A etiqueta de cada opção diz de que convenção ela vem. A origem no código indica onde corrigir.</p>
+    <p class="lede">${esc(opts.lede ?? 'Cada caso mostra o elemento como aparece hoje e as opções de texto, renderizadas no mesmo estilo. A etiqueta de cada opção diz de que convenção ela vem. A origem no código indica onde corrigir.')}</p>
     <div class="nums"><span><b>${casos.length}</b> casos</span><span><b>${nOps}</b> opções</span><span><b>${casos.filter((c) => (c.severidade ?? 0) >= 2).length}</b> de severidade 2 ou mais</span><span><b>${new Set(casos.flatMap((c) => c.telas ?? [])).size}</b> telas afetadas</span></div>
+    ${opts.top ?? ''}
   </div>
   <div class="filtros" role="group" aria-label="Filtrar por elemento">${filtros}</div>
   ${secoes}
+  ${opts.bottom ?? ''}
 </div>
 <script>
 const fs=[...document.querySelectorAll('.f')];
 fs.forEach(b=>b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';fs.forEach(x=>x.setAttribute('aria-pressed','false'));if(on)b.setAttribute('aria-pressed','true');
 document.querySelectorAll('section[data-sec]').forEach(s=>{s.hidden=on&&s.dataset.sec!==b.dataset.f;});}));
+${opts.script ?? ''}
 </script>`;
 }
 
-const a = parseArgs();
-const [entrada, saida] = a._;
-if (!entrada || !saida) {
-  console.error('Uso: node tools/ux-lint/pagina-texto.mjs <casos.json> <saida.html> [--titulo "…"] [--produto "…"]');
-  process.exit(2);
+/** Ordena por severidade × telas (maior primeiro), como a CLI faz. */
+export const sortCases = (casos) => casos.sort((p, q) => (q.severidade ?? 0) * (q.telas?.length ?? 1) - (p.severidade ?? 0) * (p.telas?.length ?? 1));
+
+function main() {
+  const a = parseArgs();
+  const [entrada, saida] = a._;
+  if (!entrada || !saida) {
+    console.error('Uso: node tools/ux-lint/text-page.mjs <casos.json> <saida.html> [--titulo "…"] [--produto "…"] [--cor "#hex"]');
+    process.exit(2);
+  }
+  const { casos } = JSON.parse(readFileSync(entrada, 'utf8'));
+  sortCases(casos);
+  writeFileSync(saida, renderTextPage(casos, { title: a.titulo ?? 'Texto das telas', product: a.produto ?? '', color: a.cor ?? '#0E71B8' }));
+  console.log(`${saida} · ${casos.length} casos`);
 }
-const { casos } = JSON.parse(readFileSync(entrada, 'utf8'));
-casos.sort((p, q) => (q.severidade ?? 0) * (q.telas?.length ?? 1) - (p.severidade ?? 0) * (p.telas?.length ?? 1));
-writeFileSync(saida, pagina(casos, a.titulo ?? 'Texto das telas', a.produto ?? '', a.cor ?? '#0E71B8'));
-console.log(`${saida} · ${casos.length} casos`);
+
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();
