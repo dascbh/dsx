@@ -1,6 +1,6 @@
 {
   "name": "dsx",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Framework de design system, UI e UX para agentes de IA: skills de construção, revisão, acessibilidade, UX writing, UX de IA, pesquisa e evals; mapeamento do projeto; exploração gerada com Google Stitch; ciclo contínuo código ↔ Figma com diff versionado e guarda de autoridade; catálogo de padrões; tokens DTCG e ferramentas de verificação.",
   "author": { "name": "Headlabs" },
   "keywords": ["design-system", "ux", "ui", "acessibilidade", "design-tokens", "design-md", "agentes", "figma", "design-to-code", "code-to-design", "stitch"]
