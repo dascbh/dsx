@@ -15,7 +15,8 @@ Um verificador só acha. Sem um registro durável, cada execução recomeça do 
 .dsx/findings/<modulo>/
 ├── findings.json   # escrito pela ferramenta a cada registro (não edite à mão)
 ├── options.json    # escrito pela skill: 2–3 opções por achado, com convenção e recomendação
-└── decisions.json  # escrito pelo dono (página ou chat → `findings.mjs decide/import`)
+├── decisions.json  # escrito pelo dono (página ou chat → `findings.mjs decide/import`)
+└── previews/       # gerado por preview.mjs, fora do git (ver "Prévia das opções")
 ```
 
 Os três ficam separados de propósito: registrar de novo reescreve só `findings.json`; opções e decisões sobrevivem.
@@ -49,7 +50,7 @@ Os três ficam separados de propósito: registrar de novo reescreve só `finding
 }
 ```
 `deviations` é a cópia dos desvios declarados no `UX.md` na última execução que o leu (`register --ux`, ou `<root>/UX.md`). Item coberto por um deles leva também `"deviation": { "id", "reason", "decided_by", "until" }` e status `accepted-deviation`.
-Itens das famílias `screen` e `states` levam também `region` (em `states`, o estado + a região: `error · main`). `source` é relativo à raiz do projeto; nas famílias `screen`, `states` e `consistency` aponta a captura (`.html:linha`), nas outras o código.
+Itens da família `layout` levam também `selectors` (caminho do elemento medido na captura, só para localizar a prévia; não entra no id). Itens das famílias `screen` e `states` levam também `region` (em `states`, o estado + a região: `error · main`). `source` é relativo à raiz do projeto; nas famílias `screen`, `states` e `consistency` aponta a captura (`.html:linha`), nas outras o código.
 
 **Id estável** = hash de `family | rule | âncora`, onde a âncora é, nesta ordem: a primeira origem no código sem o número da linha (o arquivo) + o texto normalizado (minúsculas, espaços únicos, dados variáveis trocados por `{}` — números, datas, horas, valores e, quando há `variants`, o trecho que muda entre elas); sem origem no código, a tela + região + texto. Mudar a linha do arquivo não muda o id; mudar o texto ou o arquivo muda. Dois ajustes declarados: na família `flow` a âncora é sempre a tela (ou jornada) do mapa, porque a evidência dela lista transições de entrada que mudam sem o achado mudar; e nas famílias `text` e `consistency` sem origem no código a âncora não leva tela, porque o achado agrupa várias telas (em `consistency`, o texto é a função ou o conceito — "excluir minuta" —, não os rótulos achados). Quando o conjunto de variantes muda e com ele o texto-modelo, o item herda o id registrado de mesma família, regra e arquivo que tenha uma variante em comum.
 
@@ -58,6 +59,7 @@ Itens das famílias `screen` e `states` levam também `region` (em `states`, o e
 { "items": { "t-7f3a9c2e": { "problem": "…", "options": [{ "text": "…", "convention": "Polaris: verbo + objeto", "note": "…" }], "recommended": { "index": 0, "why": "…" }, "case": "c16" } } }
 ```
 `case` (opcional) agrupa ids cobertos pelo mesmo caso: a página mostra um cartão só e a decisão vale para todos.
+`preview` (opcional, em cada opção) diz como mostrar a opção aplicada à tela real; sem ele vale a prévia padrão da família (ver "Prévia das opções").
 
 `cases.json` (entrada de `findings.mjs options --from` e de `text-page.mjs`, escrito pela skill)
 ```json
@@ -65,6 +67,45 @@ Itens das famílias `screen` e `states` levam também `region` (em `states`, o e
   "source": ["src/Dlg.tsx:80"], "screens": ["07-dlg"], "problem": "…",
   "options": [{ "text": "…", "convention": "Polaris: verbo + objeto", "note": "…" }], "recommended": { "index": 0, "why": "…" } }] }
 ```
+
+## Prévia das opções (antes e depois tirados da captura)
+
+A página de decisão mostra cada caso com a **imagem de hoje** e, em cada opção, a **imagem depois**, recortadas da captura real da tela (os pixels da captura feita pelo código, nunca maquete nem tela gerada por texto). Quem gera é `tools/ux-lint/preview.mjs` (ou `audit.mjs --preview`); a página só lê o resultado.
+
+**Como acha o elemento.** Pelo que o achado já guarda: texto e variantes (o texto-modelo vira padrão, `{}` casa com qualquer trecho), rótulos citados na mensagem (T1, T7, L1, L6, L8), o começo do texto (L7), o exemplo citado (T6), o atributo (`aria-label`, `title`, `placeholder`) quando o texto não está em pixels, e o **seletor medido** das regras L: o `register` guarda em `selectors` o caminho do elemento que o `measure.mjs` mediu, sem entrar no id. Tela representativa: a primeira tela do caso onde o elemento aparece (as capturas de estado da mesma tela entram depois); no C2, a tela da variante que destoa.
+
+**Recorte.** O diálogo inteiro quando o elemento está num diálogo; senão o cartão, seção ou grupo ao redor, com até ~720 px de largura (mais só quando o próprio elemento é mais largo), escala 1, sempre com o elemento inteiro dentro. O "depois" usa a mesma janela do "antes" (a união dos recortes de todas as opções), então dá para comparar sem mexer o olho. Antes: elemento contornado em vermelho; depois: o elemento alterado contornado em verde (remoção: linha tracejada onde ele estava). Imagens em WebP (JPEG se o navegador não codificar WebP), qualidade ~70. Achado da tela inteira (estado ausente, título ausente, região ausente) mostra a tela em meia escala.
+
+**Operações** (campo `preview` da opção: um objeto ou uma lista aplicada em ordem):
+
+| `op` | Efeito no DOM da captura | Campos |
+|---|---|---|
+| `text` | troca o texto do elemento (no campo, o placeholder) | `text` |
+| `remove` | esconde o elemento | — |
+| `variant` | copia as classes de um botão da mesma captura com a variante pedida | `variant`: `contained` \| `outlined` \| `text` |
+| `move` | leva o elemento para o fim ou o começo do grupo de ações e/ou alinha o contêiner | `to`: `end` \| `start`; `justify`: `flex-end` \| `flex-start` \| `center` \| `space-between` |
+| `style` | CSS inline, só propriedades de layout e tipografia da lista fechada (`max-width`, `width`, `margin*`, `padding*`, `gap`, `font-size`, `font-weight`, `line-height`, `text-align`, `justify-content`, `align-items`, `flex-*`, `order`, `display`…; nunca cor) | `css`: `{ "max-width": "72ch" }` |
+| `example` | não muda nada: mostra como referência a captura de outra tela ou estado que já faz certo | `screen`: `02-acervo.error` |
+| `none` | sem prévia; a página diz por quê | `reason` |
+
+Qualquer operação aceita `selector` para mirar outro elemento da captura. Exemplo: `{ "text": "Avançar", "preview": [{ "op": "move", "to": "end", "justify": "flex-end" }] }`.
+
+**Prévia padrão** (opção sem `preview`):
+- **Texto** (`text`): a opção com texto pronto vira `text`; `(remover)` vira `remove`; "Manter…" fica sem prévia (igual a hoje); opção que lista textos de vários elementos (`A · B · C`) aplica o trecho com mais palavras em comum com o elemento; instrução com o texto entre aspas depois do nome do elemento (`Título "…"`, `Rodapé "…"`) troca só o texto principal e avisa; outras instruções de estrutura ficam sem prévia. Nome acessível e dica (tooltip) não aparecem em pixels: sem prévia, com o motivo.
+- **Layout L1** → `move` (`to: end`, `justify: flex-end`); **L7** → `style` (`max-width: 72ch`); **C2** → `variant` da maioria; **S1** → `example` com a captura do mesmo estado em outra tela (do mesmo tipo, diálogo ou página, quando houver); **fluxo F1, F2, F5** → mini diagrama SVG antes/depois das transições da tela no mapa (sem navegador): saída nova, jornada declarada, caminho de volta.
+- Operação que não muda nada na captura (`move`/`style` com o elemento já assim) não gera imagem igual: a página diz que nesta captura nada muda.
+
+**Caso sem opções** (famílias de tela, layout, estados, fluxo) mostra, ao lado de "Hoje", a **correção indicada pela regra** com a mesma prévia padrão. Não é opção de decisão: o formulário continua igual.
+
+**Onde fica** (gerado, fora do git: ignore `.dsx/findings/*/previews/`):
+```
+.dsx/findings/<modulo>/previews/
+├── previews.json          # manifesto: caso → before, after[] (opção, op aplicada, descrição) ou failed com o motivo
+└── <hash>.before.webp …   # imagens; screen-<hash>.webp para a tela inteira; .svg para fluxo
+```
+Cache: o hash do caso junta a versão das prévias, as capturas envolvidas, o localizador e as operações; caso com hash igual e arquivos presentes não é refeito, e arquivo que nenhum caso usa é apagado. A página marca como desatualizada a prévia cuja captura mudou depois de gerada.
+
+**Página paginada.** A página sai em várias, cada uma autocontida (imagens embutidas em base64): `<saída>.html` (índice e página 1), `<saída>-2.html`… com no máximo ~10 MB e 60 casos por arquivo (o que vier antes), na ordem dos grupos (um grupo grande atravessa páginas). Navegação no topo e no rodapé. As escolhas ficam no `localStorage` do navegador (chave por módulo e versão do registro; a página funciona sem ele) e "Copiar decisões" de qualquer página copia as de todas; o topo mostra "N decididos de M". `--preview-files` referencia as imagens de `previews/` em vez de embutir (a ferramenta avisa se páginas + imagens passam de 255 arquivos).
 
 ## Entradas: saída `--json` dos verificadores
 
@@ -116,10 +157,11 @@ Assim o produto só melhora: nada novo entra pior, e o que foi corrigido não vo
 1. **Detectar**: rodar `text.mjs`/`screen.mjs`/`flow.mjs` com `--json`.
 2. **Registrar**: `node tools/ux-lint/findings.mjs register --module <m> --text t.json --screen s.json --flow f.json --root <repo> [--ux UX.md]` (o `UX.md` dá os desvios aceitos).
 3. **Propor**: a skill escreve as opções (`findings.mjs options --module <m> --from cases.json`); caso que não casa com nenhum achado entra como item de revisão manual.
-4. **Decidir**: o dono escolhe na página (`findings.mjs page`, que gera o formulário e um JSON de decisões para colar) ou no chat; `findings.mjs import` / `decide` grava em `decisions.json`.
-5. **Aplicar**: corrigir na origem (`arquivo:linha`), uma decisão por vez ou em lote.
-6. **Confirmar**: detectar e registrar de novo — o que sumiu vira `fixed`; o que voltou, `regression`.
-7. **Travar**: `findings.mjs check` no pre-commit ou no CI.
+4. **Prever**: `preview.mjs` (ou `audit.mjs --preview`) recorta antes e depois de cada caso das capturas.
+5. **Decidir**: o dono escolhe na página (`findings.mjs page`, que gera o formulário e um JSON de decisões para colar) ou no chat; `findings.mjs import` / `decide` grava em `decisions.json`.
+6. **Aplicar**: corrigir na origem (`arquivo:linha`), uma decisão por vez ou em lote.
+7. **Confirmar**: detectar e registrar de novo — o que sumiu vira `fixed`; o que voltou, `regression`.
+8. **Travar**: `findings.mjs check` no pre-commit ou no CI.
 
 ## Checklist
 

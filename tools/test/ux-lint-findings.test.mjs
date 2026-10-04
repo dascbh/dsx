@@ -7,7 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   stableId, templateOf, maskData, fromText, fromScreen, fromFlow, assignIds, merge, statusOf, check,
-  importOptions, importDecisions, makeDecision, renderPage, pageCases,
+  importOptions, importDecisions, makeDecision, renderPage, renderPages, pageCases, fromLayout,
 } from '../ux-lint/findings.mjs';
 
 const CLI = fileURLToPath(new URL('../ux-lint/findings.mjs', import.meta.url));
@@ -193,25 +193,75 @@ test('page: id, status, checked decision and form that copies decisions.json', (
   assert.ok(html.includes('Copiar decisões'));
   assert.ok(html.includes('navigator.clipboard.writeText'));
   assert.ok(html.includes('<textarea id="saida"'));
-  assert.ok(!/fetch\(|localStorage|download=/.test(html), 'sem fetch, sem armazenamento obrigatório, sem download');
+  assert.ok(!/fetch\(|download=/.test(html), 'sem fetch, sem download');
+  assert.match(html, /try\{localStorage\.setItem/, 'localStorage só dentro de try/catch');
   assert.equal(pageCases(reg, options, dec).length, 1);
 
-  // O script do formulário gera o JSON no formato de decisions.json.
-  const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
-  const radio = { value: '1' };
-  const reason = { value: '', removeAttribute() {}, setAttribute() {} };
-  const fieldset = { dataset: { ids: id, case: 'c' }, querySelector: (s) => (s.includes('radio') ? radio : reason) };
-  let click, copied;
-  const els = { por: { value: 'Ana' }, aviso: { textContent: '' }, saida: { value: '', hidden: true }, copiar: { addEventListener: (_, f) => { click = f; } } };
-  const document = { getElementById: (k) => els[k], querySelectorAll: (s) => (s === 'fieldset.decisao' ? [fieldset] : []) };
-  const navigator = { clipboard: { writeText: async (t) => { copied = t; } } };
-  new Function('document', 'navigator', script)(document, navigator);
-  return click().then(() => {
+  // O script do formulário gera o JSON no formato de decisions.json, com ou sem localStorage.
+  const runs = [null, throwingStorage()].map((storage) => runPageScript(html, { storage, checked: '1' }).click().then((copied) => {
     const out = JSON.parse(copied);
     assert.equal(out.items[id].choice, 1);
     assert.equal(out.items[id].by, 'Ana');
     assert.match(out.items[id].at, /^\d{4}-\d{2}-\d{2}$/);
+  }));
+  return Promise.all(runs);
+});
+
+/** Armazenamento que falha (navegação privada, site bloqueado): a página tem de funcionar igual. */
+function throwingStorage() { return { getItem() { throw new Error('bloqueado'); }, setItem() { throw new Error('bloqueado'); } }; }
+function memoryStorage(init = {}) { const m = { ...init }; return { getItem: (k) => m[k] ?? null, setItem: (k, v) => { m[k] = v; }, dump: m }; }
+
+/** Roda o script da página num DOM mínimo: um fieldset por caso da página, com a opção `checked` marcada. */
+function runPageScript(html, { storage = null, checked = null, por = 'Ana' } = {}) {
+  const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
+  const meta = html.match(/<script type="application\/json" id="dsx-decisions">([\s\S]*?)<\/script>/)[1];
+  const listeners = [];
+  const sets = [...html.matchAll(/<fieldset class="decisao" data-ids="([^"]*)" data-case="([^"]*)"/g)].map(([, ids, c]) => {
+    let cur = checked;
+    const reason = { value: '', removeAttribute() {}, setAttribute() {}, addEventListener() {} };
+    return {
+      dataset: { ids, case: c }, addEventListener: (_, f) => listeners.push(f),
+      querySelector: (s) => {
+        if (s === 'input[type=text]') return reason;
+        if (s === 'input[type=radio]:checked') return cur === null ? null : { value: cur };
+        const m = s.match(/value="([^"]*)"/);
+        if (m) return { set checked(v) { if (v) cur = m[1]; } };
+        return null;
+      },
+    };
   });
+  let click, copied;
+  const els = { 'dsx-decisions': { textContent: meta }, por: { value: por, addEventListener() {} }, aviso: { textContent: '' }, saida: { value: '', hidden: true }, copiar: { addEventListener: (_, f) => { click = f; } } };
+  const counters = [{ textContent: '' }];
+  const document = { getElementById: (k) => els[k], querySelectorAll: (s) => (s === 'fieldset.decisao' ? sets : s === '.contador' ? counters : []), querySelector: () => null };
+  const navigator = { clipboard: { writeText: async (t) => { copied = t; } } };
+  new Function('document', 'navigator', 'localStorage', script)(document, navigator, storage ?? memoryStorage());
+  for (const f of listeners) f();
+  return { click: () => click().then(() => copied), counter: () => counters[0].textContent, aviso: () => els.aviso.textContent };
+}
+
+test('page: decisions cross pages through localStorage; counter shows decided of total', async () => {
+  const reg = newRegistry();
+  merge(reg, run([textFinding({ text: 'Remover da lista — Ana', file: '/proj/src/A.tsx' }), textFinding({ rule: 'X11', text: 'Hash do documento', file: '/proj/src/B.tsx' })]), { now: day('01') });
+  const [a, b] = reg.items.map((i) => i.id);
+  const options = { items: { [a]: { problem: 'P1', options: [{ text: 'Remover Ana' }], recommended: null }, [b]: { problem: 'P2', options: [{ text: 'Código' }, { text: 'Código do documento' }], recommended: null } } };
+  const pages = renderPages(reg, options, { items: {} }, { maxCases: 1 });
+  assert.equal(pages.length, 2, 'um caso por página');
+  assert.equal(pages[1].file, 'page-2.html');
+  assert.match(pages[0].html, /<nav class="paginas"[\s\S]*page-2\.html/);
+  assert.match(pages[1].html, /rel="prev"/);
+  const storage = memoryStorage();
+  // decide na página 1…
+  const p1 = runPageScript(pages[0].html, { storage, checked: '0' });
+  assert.equal(p1.counter(), '1 decididos de 2');
+  // …e na página 2, cujo "Copiar" leva as duas.
+  const p2 = runPageScript(pages[1].html, { storage, checked: '1' });
+  assert.equal(p2.counter(), '2 decididos de 2');
+  const out = JSON.parse(await p2.click());
+  const caseOfB = pages.findIndex((p) => p.html.includes(`data-ids="${b}"`));
+  assert.equal(Object.keys(out.items).length, 2);
+  assert.equal(out.items[b].choice, caseOfB === 1 ? 1 : 0);
+  assert.ok(out.items[a]);
 });
 
 test('CLI: register, options, decide, status, check and page in a temp directory', () => {

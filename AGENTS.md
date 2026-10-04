@@ -98,7 +98,8 @@ node tools/lint-archetypes.mjs [--index]       # valida o catálogo de arquétip
 node tools/ux-lint/screen.mjs <capturas.html|pasta> [--ux UX.md] [--json] [--fail-at 3]          # regras T1–T7 nas capturas de tela
 node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]  # regras F1–F5 no mapa de fluxo
 node tools/ux-lint/text.mjs --screens <capturas> [--code <pastas>] [--ux UX.md] [--module <m>] [--ignore <nomes>] [--json]  # higiene de texto X1–X11, com arquivo:linha da origem
-node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--register] [--measure] [--page <saida.html>] [--json]  # auditoria única: pré-requisitos (com drift do UX.md), todos os detectores, relatório por dimensão (data/ux-dimensions.json)
+node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--register] [--measure] [--preview] [--page <saida.html>] [--json]  # auditoria única: pré-requisitos (com drift do UX.md), todos os detectores, relatório por dimensão (data/ux-dimensions.json); --preview gera as prévias antes da página paginada
+node tools/ux-lint/preview.mjs --module <m> --root <projeto> [--screens <capturas>] [--min-severity <n>] [--out <dir>] [--width 1440]  # prévias antes/depois de cada opção, recortadas das capturas (Playwright do projeto; fluxo em SVG sem navegador)
 node tools/ux-lint/measure.mjs <capturas> --out <pasta-geometria> [--ux UX.md] [--width 1440]  # geometria das capturas (Playwright do projeto; rodar de uma pasta que o tenha)
 node tools/ux-lint/layout.mjs <pasta-geometria> [--ux UX.md] [--archetypes <pasta>] [--json] [--fail-at 3]  # layout e hierarquia L1–L9
 node tools/ux-lint/states.mjs <capturas> [--ux UX.md] [--archetypes <pasta>] [--json]  # estados S1–S3 (captura <nn>-<tela>.<estado>.html)
@@ -109,7 +110,7 @@ node tools/ux-lint/findings.mjs decide --module <m> <id> <índice|ignore|free> [
 node tools/ux-lint/findings.mjs import --module <m> decisions.json         # decisões copiadas da página
 node tools/ux-lint/findings.mjs status --module <m> [--json]               # por status, família, regra e severidade; regressões e decididos sem aplicar
 node tools/ux-lint/findings.mjs check --module <m> [--min 2] --text … --screen … --flow …  # trava: reprova achado novo ≥ min ou regressão (não grava)
-node tools/ux-lint/findings.mjs page --module <m> <saida.html> [--product …] [--color …]  # página de escolha com formulário "Copiar decisões"
+node tools/ux-lint/findings.mjs page --module <m> <saida.html> [--product …] [--color …] [--preview-files] [--no-preview] [--max-page-mb 10]  # página de escolha paginada (<saida>-2.html…), com prévias e "Copiar decisões" de todas as páginas
 node tools/ux-lint/text-page.mjs <cases.json> <saida.html> [--title …] [--product …] [--color …]  # página de escolha só a partir de cases.json
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
 node tools/references.mjs search --register operational --use "termos" --curated   # referências de DESIGN.md (também index, fetch, evaluate, curate)

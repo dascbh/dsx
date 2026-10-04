@@ -10,21 +10,23 @@
 //   node tools/ux-lint/findings.mjs import   --module <m> decisions.json
 //   node tools/ux-lint/findings.mjs status   --module <m> [--json]
 //   node tools/ux-lint/findings.mjs check    --module <m> [--min 2] [--text …] [--screen …] [--flow …] [--root <repo>] [--ux UX.md]
-//   node tools/ux-lint/findings.mjs page     --module <m> <saida.html> [--product …] [--color …]
+//   node tools/ux-lint/findings.mjs page     --module <m> <saida.html> [--product …] [--color …] [--previews <dir>] [--preview-files]
+//                                            [--no-preview] [--max-page-mb 10]   (páginas: <saida>.html, <saida>-2.html…)
 //
 // Arquivos em <dir>/<módulo>/: findings.json (escrito aqui), options.json (opções da skill), decisions.json (dono).
 // Desvios declarados no UX.md (`deviations:`, lido de --ux ou de <root>/UX.md) marcam o achado coberto como
 // `accepted-deviation`; a cópia vigente fica em findings.json (`deviations`) e o status volta a `open` quando o
 // desvio sai do UX.md ou vence.
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from '../lib/yaml-lite.mjs';
 import { parseDeviations, coveringDeviation } from './lib/deviations.mjs';
-import { join, relative, isAbsolute, basename, resolve } from 'node:path';
+import { join, relative, isAbsolute, basename, resolve, dirname, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from '../lib/cli.mjs';
-import { renderTextPage, normalizeElement, sortCases } from './text-page.mjs';
+import { renderTextPages, normalizeElement, sortCases, PAGE_MAX_BYTES, MAX_OUTPUT_FILES } from './text-page.mjs';
+import { loadPreviews, attachPreviews, previewKeys, embeddedSize, embedded } from './lib/preview-page.mjs';
 import { normalizeCases, normalizeDetectorJson } from './lib/legacy.mjs';
 
 /** Verificadores que produzem a entrada de cada família (nomes isolados aqui para renomear sem caçar no código). */
@@ -218,6 +220,8 @@ export function fromLayout(input) {
       family: 'layout', rule: a.rule, severity: a.severity, element: ELEMENT_FROM_LAYOUT_RULE[a.rule] ?? null,
       text: clean(a.anchor ?? a.message), variants: [], screens: [screenName(t.screen ?? t.file)], region: a.region ?? '',
       source: [basename(String(t.file ?? `${t.screen}.html`))], message: a.message,
+      // Seletor do elemento na captura (caminho do measure.mjs): localiza a prévia; não entra no id.
+      ...(Array.isArray(a.elements) && a.elements.length ? { selectors: a.elements.slice(0, 8) } : {}),
     });
   }
   return out;
@@ -330,8 +334,10 @@ export function merge(reg, run, { now = new Date(), commit = null, decisions = {
       id: it.id, family: it.family, rule: it.rule, severity: it.severity, element: it.element ?? null,
       text: it.text, variants: it.variants ?? [], screens: it.screens ?? [], source: it.source ?? [],
       ...(it.region ? { region: it.region } : {}), message: it.message ?? '', origin: 'detector',
+      ...(it.selectors?.length ? { selectors: it.selectors } : {}),
     };
     if (already) {
+      if (!fresh.selectors) delete already.selectors;
       Object.assign(already, fresh, { first_seen: already.first_seen, last_seen: day, present: true });
     } else {
       const item = { ...fresh, first_seen: day, last_seen: day, present: true, status: 'open' };
@@ -490,6 +496,7 @@ export function pageCases(reg, options, decisions) {
     cases.push({
       id: k.replace(/^(op|id):/, 'case-'), ids: items.map((i) => i.id), statuses: items.map((i) => i.status),
       element: it.element ?? (it.family === 'text' ? 'accessible-name' : it.family), rule: it.rule,
+      family: it.family, region: it.region ?? '', message: it.message ?? '', selectors: it.selectors ?? [],
       severity: Math.max(...items.map((i) => i.severity)), text: it.text,
       variants: [...new Set(items.flatMap((i) => i.variants.length ? i.variants : [i.text]))],
       source: [...new Set(items.flatMap((i) => i.source))], screens: [...new Set(items.flatMap((i) => i.screens))],
@@ -523,23 +530,44 @@ const PAGE_STYLE = `
 #saida{width:100%;min-height:140px;font:12px var(--mono);border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);padding:8px}
 #aviso{font-size:13px}`;
 
+// Decisões atravessam as páginas: cada escolha vai para o localStorage (chave por módulo + versão do registro) e
+// "Copiar decisões" junta as de todas as páginas. Sem localStorage, vale só o formulário da página aberta.
 const PAGE_SCRIPT = `
 const hoje=new Date().toISOString().slice(0,10);
-function coletar(){const itens={};const erros=[];const por=(document.getElementById('por').value||'').trim()||'dono';
-document.querySelectorAll('fieldset.decisao').forEach(f=>{const r=f.querySelector('input[type=radio]:checked');const m=f.querySelector('input[type=text]');m.removeAttribute('aria-invalid');
-if(!r)return;const motivo=(m.value||'').trim()||null;
-if(r.value==='ignore'&&!motivo){erros.push(f.dataset.case);m.setAttribute('aria-invalid','true');return;}
-const escolha=r.value==='ignore'?'ignore':Number(r.value);
-f.dataset.ids.split(' ').forEach(id=>{itens[id]={choice:escolha,by:por,at:hoje,reason:motivo};});});
-return {itens,erros};}
-document.getElementById('copiar').addEventListener('click',async()=>{const {itens,erros}=coletar();const aviso=document.getElementById('aviso');const saida=document.getElementById('saida');
-if(erros.length){aviso.textContent='Para ignorar, escreva o motivo ('+erros.length+' caso(s) sem motivo, marcados em vermelho).';return;}
+const META=JSON.parse(document.getElementById('dsx-decisions').textContent);
+let mem={by:'',cases:{}};
+function ler(){try{const v=localStorage.getItem(META.key);if(v){const o=JSON.parse(v);if(o&&o.cases)mem=o;}}catch(e){}}
+function gravar(){try{localStorage.setItem(META.key,JSON.stringify(mem));}catch(e){}}
+ler();
+const por=document.getElementById('por');if(mem.by)por.value=mem.by;
+por.addEventListener('input',()=>{mem.by=por.value.trim();gravar();});
+const sets=[...document.querySelectorAll('fieldset.decisao')];
+sets.forEach(f=>{const d=mem.cases[f.dataset.case];const m=f.querySelector('input[type=text]');
+if(d){const r=f.querySelector('input[type=radio][value="'+d.choice+'"]');if(r)r.checked=true;m.value=d.reason||'';}
+const upd=()=>{const r=f.querySelector('input[type=radio]:checked');if(!r)return;mem.cases[f.dataset.case]={choice:r.value,reason:(m.value||'').trim()||null,ids:f.dataset.ids.split(' ')};gravar();contar();};
+f.addEventListener('change',upd);m.addEventListener('input',upd);});
+function atual(c){return mem.cases[c.case]||(c.prior!==null?{choice:String(c.prior),reason:c.reason,ids:c.ids}:null);}
+function contar(){const n=META.cases.filter(atual).length;document.querySelectorAll('.contador').forEach(e=>{e.textContent=n+' decididos de '+META.cases.length;});}
+contar();
+document.getElementById('copiar').addEventListener('click',async()=>{const aviso=document.getElementById('aviso');const saida=document.getElementById('saida');
+const itens={};const erros=[];const quem=(por.value||'').trim()||mem.by||'dono';
+sets.forEach(f=>f.querySelector('input[type=text]').removeAttribute('aria-invalid'));
+META.cases.forEach(c=>{const d=atual(c);if(!d)return;
+if(d.choice==='ignore'&&!d.reason){erros.push(c.case);const f=document.querySelector('fieldset.decisao[data-case="'+c.case+'"]');if(f)f.querySelector('input[type=text]').setAttribute('aria-invalid','true');return;}
+const escolha=d.choice==='ignore'?'ignore':Number(d.choice);c.ids.forEach(id=>{itens[id]={choice:escolha,by:quem,at:hoje,reason:d.reason||null};});});
+if(erros.length){aviso.textContent='Para ignorar, escreva o motivo ('+erros.length+' caso(s) sem motivo'+(erros.some(e=>!document.querySelector('fieldset.decisao[data-case="'+e+'"]'))?', alguns em outras páginas':'')+'; os desta página estão em vermelho).';return;}
 const n=Object.keys(itens).length;const json=JSON.stringify({items:itens},null,2);saida.value=json;saida.hidden=false;
-try{await navigator.clipboard.writeText(json);aviso.textContent=n+' decisão(ões) copiadas. Cole em decisions.json ou no chat.';}
+try{await navigator.clipboard.writeText(json);aviso.textContent=n+' decisão(ões) de todas as páginas copiadas. Cole em decisions.json ou no chat.';}
 catch(e){saida.focus();saida.select();aviso.textContent=n+' decisão(ões) no campo abaixo, já selecionadas: copie com Ctrl+C ou Cmd+C.';}});`;
 
-export function renderPage(reg, options, decisions, { product = '', color = '#0E71B8' } = {}) {
+/**
+ * Páginas de decisão. Devolve [{ file, html, cases, bytes }] (uma página quando cabe).
+ * opts: { product, color, file, previews: manifesto de lib/preview-page.mjs (null = sem prévia), preview_files:
+ *         caminho relativo da página até a pasta de prévias (referencia em vez de embutir), maxBytes, maxCases }.
+ */
+export function renderPages(reg, options, decisions, { product = '', color = '#0E71B8', file = 'page.html', previews = null, previewFiles = null, maxBytes, maxCases } = {}) {
   const cases = pageCases(reg, options, decisions);
+  if (previews) attachPreviews(cases, previews);
   const fixed = reg.items.filter((i) => i.status === 'fixed').length;
   const acceptedCount = reg.items.filter((i) => i.status === 'accepted-deviation').length;
   const header = (c) => `<span class="meta">${[...new Set(c.statuses)].map((s) => `<span class="st st-${s}">${STATUS_PT[s] ?? s}</span>`).join('')}<code>${c.ids.slice(0, 4).map(escH).join(' ')}${c.ids.length > 4 ? ` +${c.ids.length - 4}` : ''}</code></span>`;
@@ -554,13 +582,59 @@ export function renderPage(reg, options, decisions, { product = '', color = '#0E
     const already = d ? `<span class="ja">Decidido: ${d.choice === 'ignore' ? 'ignorar' : d.choice === 'free' ? `texto livre "${escH(d.text)}"` : `opção ${String.fromCharCode(65 + d.choice)}`}${d.by ? ` por ${escH(d.by)}` : ''}${d.at ? ` em ${escH(d.at)}` : ''}</span>` : '';
     return `<fieldset class="decisao" data-ids="${escH(c.ids.join(' '))}" data-case="${escH(c.id)}"><legend>Sua decisão</legend>${ops}<label><input type="radio" name="d-${escH(c.id)}" value="ignore"${checked('ignore')}> Ignorar</label><input type="text" aria-label="Motivo" placeholder="Motivo (obrigatório para ignorar)" value="${escH(d?.reason ?? '')}">${already}</fieldset>`;
   };
-  const bottom = `<div class="acoes"><label>Quem decide <input id="por" type="text" autocomplete="name"></label><button type="button" id="copiar">Copiar decisões</button><span id="aviso" role="status" aria-live="polite"></span>
-  <textarea id="saida" hidden readonly aria-label="Decisões em JSON"></textarea></div>`;
-  return renderTextPage(cases, {
-    title: `Achados de UX · ${reg.module}`, product, color, eyebrow: 'Registro de achados de UX',
-    lede: `Cada caso mostra o elemento como aparece hoje e as opções. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.${acceptedCount ? ` ${acceptedCount} achado(s) cobertos por desvio declarado no UX.md aparecem com o motivo e não contam como abertos.` : ''}`,
-    card: { header, footer }, style: PAGE_STYLE, script: PAGE_SCRIPT, bottom,
+  const meta = {
+    key: `dsx-findings:${reg.module}:${reg.updated ?? ''}#${reg.runs?.length ?? 0}`,
+    cases: cases.filter((c) => !c.deviation).map((c) => ({ case: c.id, ids: c.ids, prior: c.decision && c.decision.choice !== 'free' ? c.decision.choice : null, reason: c.decision?.reason ?? null })),
+  };
+  const bottom = `<div class="acoes"><label>Quem decide <input id="por" type="text" autocomplete="name"></label><button type="button" id="copiar">Copiar decisões</button><span class="contador" aria-live="polite"></span><span id="aviso" role="status" aria-live="polite"></span>
+  <textarea id="saida" hidden readonly aria-label="Decisões em JSON"></textarea></div>
+  <script type="application/json" id="dsx-decisions">${JSON.stringify(meta).replace(/</g, '\\u003c')}</script>`;
+  const withPreview = cases.some((c) => c.preview);
+  const pv = withPreview
+    ? (previewFiles !== null && previewFiles !== undefined
+      ? { mode: 'files', href: (k) => `${previewFiles ? `${previewFiles.replace(/\/$/, '')}/` : ''}${k}` }
+      : { mode: 'embed', sizeOf: (k) => embeddedSize(previews.dir, k), embedded: (k) => embedded(previews.dir, k) })
+    : null;
+  return renderTextPages(cases, {
+    title: `Achados de UX · ${reg.module}`, product, color, eyebrow: 'Registro de achados de UX', file,
+    lede: `Cada caso mostra o elemento como aparece hoje e as opções${withPreview ? ', com a prévia tirada da captura real da tela (antes e depois, com o elemento contornado; clique para ampliar e use Antes | Depois para comparar no mesmo lugar)' : ''}. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON, com as decisões de todas as páginas, vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.${acceptedCount ? ` ${acceptedCount} achado(s) cobertos por desvio declarado no UX.md aparecem com o motivo e não contam como abertos.` : ''}`,
+    top: '<p class="contador" aria-live="polite"></p>',
+    card: { header, footer }, style: PAGE_STYLE, script: PAGE_SCRIPT, bottom, previews: pv, maxBytes, maxCases,
   });
+}
+
+/** Página única (a primeira, quando há várias). */
+export function renderPage(reg, options, decisions, opts = {}) {
+  return renderPages(reg, options, decisions, opts)[0].html;
+}
+
+/**
+ * Grava as páginas em `out` (a primeira com o nome dado, as demais `<nome>-2.html`…). Prévias: lidas de
+ * `previewsDir` (manifesto do preview.mjs); `previewFiles` referencia as imagens em vez de embutir. Devolve
+ * { pages: [{ file, bytes, cases }], warnings }.
+ */
+export function writePages(reg, options, decisions, out, { product = '', color = '#0E71B8', previewsDir = null, screensDir = null, previewFiles = false, noPreview = false, maxBytes, maxCases } = {}) {
+  const warnings = [];
+  const outDir = dirname(resolve(out));
+  const previews = !noPreview && previewsDir ? loadPreviews(previewsDir, { screensDir }) : null;
+  let rel = null;
+  if (previews && previewFiles) { rel = relative(outDir, previewsDir).split(sep).join('/'); }
+  const pages = renderPages(reg, options, decisions, { product, color, file: basename(out), previews, previewFiles: previews && previewFiles ? rel : null, maxBytes, maxCases });
+  if (previews && previewFiles) {
+    const keys = new Set(pages.flatMap((p) => p.cases.flatMap(previewKeys)));
+    if (pages.length + keys.size > MAX_OUTPUT_FILES) warnings.push(`${pages.length} página(s) + ${keys.size} imagem(ns) passam de ${MAX_OUTPUT_FILES} arquivos; para publicar, prefira as imagens embutidas (sem --preview-files) ou suba --min-severity no preview.mjs`);
+  }
+  if (pages.length > MAX_OUTPUT_FILES) warnings.push(`${pages.length} páginas passam de ${MAX_OUTPUT_FILES} arquivos`);
+  for (const p of pages) if (p.bytes > (maxBytes ?? PAGE_MAX_BYTES) * 1.1) warnings.push(`${p.file} tem ${(p.bytes / 1048576).toFixed(1)} MB (um caso sozinho passa do limite por página)`);
+  mkdirSync(outDir, { recursive: true });
+  // páginas de uma execução anterior com mais páginas ficariam órfãs
+  const stem = basename(out).replace(/\.html?$/, '');
+  for (const f of readdirSync(outDir)) {
+    const m = f.match(new RegExp(`^${stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d+)\\.html$`));
+    if (m && Number(m[1]) > pages.length) rmSync(join(outDir, f));
+  }
+  for (const p of pages) writeFileSync(join(outDir, p.file), p.html);
+  return { pages: pages.map((p) => ({ file: join(outDir, p.file), bytes: p.bytes, cases: p.cases.length })), warnings, previews: !!previews };
 }
 
 // ---------- CLI ----------
@@ -572,7 +646,7 @@ const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|impor
   import   decisions.json
   status   [--json]
   check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>] [--ux UX.md]
-  page     <saida.html> [--product …] [--color …]
+  page     <saida.html> [--product …] [--color …] [--previews <dir>] [--preview-files] [--no-preview] [--max-page-mb 10]
   (--dir padrão: <root ou diretório atual>/.dsx/findings; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
 
 function main() {
@@ -662,8 +736,14 @@ function main() {
   if (cmd === 'page') {
     if (!pos[0]) { console.error(USO); process.exit(2); }
     restatus(st.findings, st.decisions);
-    writeFileSync(pos[0], renderPage(st.findings, st.options, st.decisions, { product: str(a.product) ?? '', color: str(a.color) ?? '#0E71B8' }));
-    console.log(`${pos[0]} · ${pageCases(st.findings, st.options, st.decisions).length} casos`);
+    const r = writePages(st.findings, st.options, st.decisions, pos[0], {
+      product: str(a.product) ?? '', color: str(a.color) ?? '#0E71B8', previewsDir: str(a.previews) ? resolve(a.previews) : join(p.base, 'previews'),
+      screensDir: str(a.screens) ? resolve(a.screens) : root ? join(root, '.stitch', a.module, 'code') : null,
+      previewFiles: !!a['preview-files'], noPreview: !!a['no-preview'], maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1048576 : undefined,
+    });
+    for (const w of r.warnings) console.error(`AVISO: ${w}`);
+    console.log(`${r.pages.length} página(s), ${pageCases(st.findings, st.options, st.decisions).length} casos${r.previews ? ', com prévia' : ''}:`);
+    for (const pg of r.pages) console.log(`  ${pg.file} · ${pg.cases} casos · ${(pg.bytes / 1048576).toFixed(2)} MB`);
     return;
   }
   console.error(USO);

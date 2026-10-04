@@ -7,7 +7,9 @@
 //
 // Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--screens <dir>] [--code <dirs...>]
 //        [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register]
-//        [--page <saida.html>] [--json]
+//        [--preview [--min-severity <n>]] [--page <saida.html> [--preview-files] [--max-page-mb 10]] [--json]
+// --preview roda tools/ux-lint/preview.mjs antes da página (prévias antes/depois tiradas das capturas; Playwright
+// resolvido a partir do diretório atual). A página sai paginada: <saida>.html, <saida>-2.html… (≤ 10 MB cada).
 // Padrões: --screens <root>/.stitch/<m>/code · --geometry <root>/.stitch/<m>/geometry (saída de measure.mjs; com
 //          --measure a auditoria mede antes) · --map <root>/.dsx/maps/flows-<m>.json · --ux <root>/UX.md ·
 //          --code <root>/frontend/src <root>/backend/shared (só os que existem) · --dir <root>/.dsx/findings
@@ -55,7 +57,7 @@ export function loadMatrix(path = MATRIX_PATH) {
 /** Interpreta argv; `--code` aceita várias pastas até a próxima flag. */
 export function parseAuditArgs(argv) {
   const out = { code: [] };
-  const flags = new Set(['register', 'json', 'measure']);
+  const flags = new Set(['register', 'json', 'measure', 'preview', 'preview-files']);
   let current = null;
   for (const a of argv) {
     if (a.startsWith('--')) {
@@ -89,6 +91,8 @@ export function resolveOptions(o) {
     code, codeDefaulted: !o.code?.length,
     dir: abs(o.dir) ?? join(root, '.dsx', 'findings'),
     register: !!o.register, page: o.page ? resolve(o.page) : null, json: !!o.json,
+    preview: !!o.preview, previewFiles: !!o['preview-files'], minSeverity: o['min-severity'] !== undefined ? Number(o['min-severity']) : null,
+    maxPageMb: o['max-page-mb'] !== undefined ? Number(o['max-page-mb']) : null,
   };
 }
 
@@ -316,7 +320,18 @@ export function formatReport(r) {
   }
   const t = r.totals;
   L.push(`\nTotal: ${t.open} abertos (${sevLine(t.by_severity)}) · ${t.added} novos · ${t.fixed} corrigidos · ${t.regressions} regressões${t.accepted ? ` · ${t.accepted} desvios aceitos (não contam)` : ''}${t.unregistered ? ` · ${t.unregistered} fora do registro (família que o findings.mjs ainda não registra)` : ''}`);
-  if (r.page) L.push(`Página de decisão: ${r.page}`);
+  if (r.preview) {
+    const p = r.preview;
+    if (!p.summary) L.push(`Prévias: ${p.detail}`);
+    else {
+      L.push(`Prévias: ${p.summary.cases} caso(s) · ${p.stats.generated} gerado(s), ${p.stats.cached} do cache, ${p.stats.failed} sem prévia · em ${p.out}${p.detail ? ` (${p.detail})` : ''}`);
+      L.push(`  por operação: ${Object.entries(p.summary.by_op).map(([k, v]) => `${k} ${v}`).join(' · ') || 'nenhuma'}`);
+      for (const [k, v] of Object.entries(p.summary.without)) L.push(`  sem prévia (${v}): ${k}`);
+    }
+  }
+  for (const w of r.page_warnings ?? []) L.push(`AVISO: ${w}`);
+  if (r.pages?.length > 1) { L.push(`Página de decisão: ${r.pages.length} páginas`); for (const p of r.pages) L.push(`  ${p.file} · ${p.cases} casos · ${(p.bytes / 1048576).toFixed(2)} MB`); }
+  else if (r.page) L.push(`Página de decisão: ${r.page}${r.pages?.[0] ? ` · ${(r.pages[0].bytes / 1048576).toFixed(2)} MB` : ''}`);
   return L.join('\n');
 }
 
@@ -357,6 +372,29 @@ export function measureGeometry(opt) {
   return { id: 'measure', ok: false, path: null, detail: `medição falhou (saída ${r.status}): ${why}`, fix: r.status === 3 ? 'instale o Playwright no projeto (npm i -D playwright && npx playwright install chromium)' : undefined };
 }
 
+/**
+ * Roda o preview.mjs (processo filho, no diretório atual — de onde o Playwright do projeto é resolvido) sobre o
+ * registro desta execução, gravado num diretório temporário para levar os seletores que o layout acabou de medir.
+ */
+export function runPreviewTool(merged, opt, workDir, previewsDir) {
+  const tool = join(DSX, 'tools', 'ux-lint', 'preview.mjs');
+  if (!existsSync(tool)) return { ok: false, detail: 'preview.mjs não existe nesta versão do DSX' };
+  const tmp = join(workDir, 'registry');
+  const base = join(tmp, opt.module);
+  mkdirSync(base, { recursive: true });
+  writeFileSync(join(base, 'findings.json'), JSON.stringify(merged.after));
+  writeFileSync(join(base, 'options.json'), JSON.stringify(merged.options));
+  writeFileSync(join(base, 'decisions.json'), JSON.stringify(merged.decisions));
+  const args = [tool, '--module', opt.module, '--root', opt.root, '--dir', tmp, '--out', previewsDir, '--screens', opt.screens, '--map', opt.map, '--json',
+    ...(opt.minSeverity !== null && opt.minSeverity !== undefined ? ['--min-severity', String(opt.minSeverity)] : [])];
+  const r = spawnSync(process.execPath, args, { cwd: process.cwd(), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  let json = null;
+  try { json = JSON.parse(r.stdout); } catch { /* sem JSON */ }
+  const why = (r.stderr || '').trim().split('\n').slice(0, 3).join(' ');
+  if (!json) return { ok: false, detail: `preview.mjs falhou (saída ${r.status}): ${why}` };
+  return { ok: r.status === 0, playwright: r.status !== 3, out: json.out, stats: json.stats, summary: json.summary, detail: r.status === 3 ? 'Playwright indisponível: só os diagramas de fluxo saíram; rode de uma pasta do projeto que tenha o Playwright' : null };
+}
+
 /** Executa a auditoria. `registry` permite trocar o registro de detectores (testes). */
 export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatrix(), now = new Date() } = {}) {
   const opt = { ...resolveOptions(raw), now };
@@ -373,24 +411,31 @@ export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatri
       for (const k of [4, 3, 2, 1]) t.by_severity[k] += d.by_severity[k] ?? 0;
       return t;
     }, { open: 0, added: 0, fixed: 0, regressions: 0, unregistered: 0, accepted: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0 } });
-    let page = null;
+    let page = null, pages = null, preview = null, pageWarnings = [];
+    const previewsDir = join(opt.dir, opt.module, 'previews');
+    if (opt.preview) preview = runPreviewTool(merged, opt, workDir, previewsDir);
     if (opt.page) {
       findings.restatus(merged.after, merged.decisions);
-      writeFileSync(opt.page, findings.renderPage(merged.after, merged.options, merged.decisions, { product: raw.product ?? '', color: raw.color ?? '#0E71B8' }));
+      const w = findings.writePages(merged.after, merged.options, merged.decisions, opt.page, {
+        product: raw.product ?? '', color: raw.color ?? '#0E71B8', previewsDir, screensDir: opt.screens, previewFiles: opt.previewFiles,
+        noPreview: !opt.preview && !existsSync(join(previewsDir, 'previews.json')), ...(opt.maxPageMb ? { maxBytes: opt.maxPageMb * 1048576 } : {}),
+      });
       page = opt.page;
+      pages = w.pages;
+      pageWarnings = w.warnings;
     }
     return {
       module: opt.module, root: opt.root, registered: opt.register && merged.registeredFamilies.length > 0,
       findings_file: merged.paths.findings, prerequisites: pre.items, ux_drift: pre.drift ? { findings: pre.drift.findings, summary: pre.drift.summary } : null,
       detectors: detectors.map(({ hits, file, ...d }) => d), unregistered: merged.unregistered,
-      dimensions, totals, page,
+      dimensions, totals, page, pages, page_warnings: pageWarnings, preview,
     };
   } finally {
     rmSync(workDir, { recursive: true, force: true });
   }
 }
 
-const USAGE = 'Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--screens <dir>] [--code <dirs...>] [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register] [--page <saida.html>] [--json]';
+const USAGE = 'Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--screens <dir>] [--code <dirs...>] [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register] [--preview [--min-severity <n>]] [--page <saida.html> [--preview-files] [--max-page-mb 10]] [--json]';
 
 function main() {
   const a = parseAuditArgs(process.argv.slice(2));

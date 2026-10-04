@@ -60,13 +60,23 @@ Registre com `node <DSX>/tools/ux-lint/findings.mjs options --module <m> --from 
 
 Para cada achado aberto que o dono precisa decidir, 2–3 opções no próprio `cases.json`, com a convenção que as sustenta e uma recomendada com o porquê. Texto: siga a skill `ux-writing` (fórmulas, glossário, verbo + objeto). Layout e ações: cite o arquétipo e o padrão (`patterns/<categoria>/<id>.md`). Achado sem decisão real (correção única e óbvia) leva uma opção só.
 
-## 5. Página de decisão
+## 5. Prévias e página de decisão
+
+Gere as prévias antes da página: para cada caso aberto, o "antes" e o "depois" de cada opção recortados da captura real (diálogo inteiro ou região ao redor do elemento, contornado), e o mini diagrama de fluxo. Rode de dentro de uma pasta do projeto que tenha o Playwright (no AURIS, `frontend/`):
 
 ```bash
-node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <projeto> --page <projeto>/.dsx/findings/<m>/page.html
+cd <projeto>/frontend
+node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <projeto> --preview --page <projeto>/.dsx/findings/<m>/page.html
 ```
 
-(ou `findings.mjs page`). O dono escolhe uma opção ou "Ignorar" com motivo e copia o JSON; grave com `findings.mjs import --module <m> decisions.json --root <projeto>` ou `findings.mjs decide` para uma decisão dita no chat. A página é gerada, não versionada.
+(ou `preview.mjs --module <m> --root <projeto>` e depois `findings.mjs page`). A página sai paginada — `page.html` com o índice e `page-2.html`… até ~10 MB cada, imagens embutidas —; as escolhas atravessam as páginas e "Copiar decisões" copia as de todas. Para publicar como artefato, a principal vai como página e as demais pelo `files`. `--preview-files` referencia as imagens de `previews/` em vez de embutir (para abrir localmente, sem publicar).
+
+- **SE** uma opção precisa de prévia diferente da padrão da família (mover em vez de trocar o texto, mostrar outra tela como exemplo, variante do botão) **ENTÃO** declare `preview` na opção do `cases.json` (operações em `knowledge/fundamentos/achados-de-ux.md`, "Prévia das opções").
+- **SE** a prévia diz "elemento não encontrado" ou o recorte mostra o elemento errado **ENTÃO** confira o texto do achado contra a captura (o texto pode estar só no estado vazio ou num atributo) ou declare `selector` na operação.
+- **Dispense as prévias** quando o projeto não tem Playwright e instalar não vale a pena, quando a rodada só tem achados de texto invisível (nomes acessíveis) ou quando o dono decide no chat; a página sai igual, sem as imagens. Sem Playwright, o `preview.mjs` ainda gera os diagramas de fluxo.
+- Ignore no git do projeto: `.dsx/findings/*/previews/` e `.dsx/findings/*/page*.html` (gerados).
+
+O dono escolhe uma opção ou "Ignorar" com motivo e copia o JSON; grave com `findings.mjs import --module <m> decisions.json --root <projeto>` ou `findings.mjs decide` para uma decisão dita no chat. A página é gerada, não versionada.
 
 ## 6. Aplicar na origem
 
@@ -99,6 +109,6 @@ Não declare uma dimensão "boa" só porque não tem achado: diga a cobertura e 
 - [ ] Capturas pelo código, mapa conferido e `UX.md` válido antes de rodar.
 - [ ] `audit.mjs --register` rodado; registro gravado em `.dsx/findings/<m>/`.
 - [ ] Toda dimensão de julgamento ou referência revisada com o knowledge indicado; achados com regra ou id de revisão, severidade e princípio.
-- [ ] Opções escritas (texto pela `ux-writing`) e página de decisão entregue ao dono.
+- [ ] Opções escritas (texto pela `ux-writing`), prévias geradas (ou dispensa justificada) e página de decisão entregue ao dono.
 - [ ] Decisões aplicadas na origem e `UX.md` atualizado quando a regra de produto mudou.
 - [ ] Re-auditoria registrada; relatório final no formato acima.
