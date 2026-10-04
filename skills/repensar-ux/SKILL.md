@@ -56,7 +56,7 @@ Cada variante é **código de teste**, nunca produção: monte as telas com os c
 ## 4. Medir e verificar
 
 ```bash
-cd <projeto>/frontend   # pasta com o Playwright do projeto (miniaturas e geometria)
+cd <projeto>/frontend   # pasta com o Playwright do projeto (recorte das telas e geometria)
 node <DSX>/tools/ux-lint/variations.mjs validate --root <projeto> --module <m> --flow <f>
 node <DSX>/tools/ux-lint/variations.mjs measure  --root <projeto> --module <m> --flow <f>
 node <DSX>/tools/ux-lint/variations.mjs lint     --root <projeto> --module <m> --flow <f>
@@ -92,7 +92,17 @@ Escreva o método em `metrics_method` (texto livre, opcional) quando o cenário 
 node <DSX>/tools/ux-lint/variations.mjs page --root <projeto> --module <m> --flow <f> --out <saida.html> [--shots <pasta>] [--product …] [--findings-page <url da página de achados>]
 ```
 
-A página tem a tarefa, a persona e as métricas de hoje no topo; uma linha por variante (Hoje + A/B/C) com os frames em colunas na ordem dos passos (clique amplia; ←/→ percorre os frames da linha), comportamento como par antes → ação → depois, e o cartão da variante (conceito, mudanças por eixo, hipótese, trade-offs, achados que resolve com o resultado do lint, métricas contra hoje). "Lado a lado por passo" troca para colunas = variantes e linhas = passos. Imagens em WebP embutidas; acima de ~10 MB a página se divide (Hoje em todas). Miniaturas ficam em cache em `--shots` (padrão `<flow>/shots/`, fora do git).
+Quem lê a página é a pessoa de produto ou o advogado, não quem construiu: ela precisa decidir em 2 minutos. **Regra: primeiro a resposta, depois o detalhe; sem ids nem jargão na frente.** Id de achado, nome de regra (X6, L1), id de arquétipo ou de padrão e termo de ferramenta ("sem verificação", "suspect") nunca aparecem fora do que está recolhido; lá dentro, só como âncora ou dica.
+
+O que a página mostra, nesta ordem:
+
+1. **A resposta** (primeira dobra a 1440 px): a pergunta numa frase (`question`, ou "Como <título> com menos trabalho?"), uma frase com quem lidera cada número e um cartão por versão (Hoje | A | B | C) com nome e ideia, a tela principal recortada no conteúdo (`hero`, ou a tela com mais conteúdo), 4 números grandes (telas, cliques até concluir ou até `done_label`, palavras por tela, problemas resolvidos) com a diferença para hoje e o selo "melhor", e uma linha de **o que ganha** (`gain`) e **o que custa** (`cost`). Sem `gain`/`cost`, a página usa a primeira frase da hipótese e o primeiro trade-off, cortados: escreva os dois curtos (uma linha cada) para a página não cortar no meio.
+2. **Uma versão por vez**, em abas (←/→ no teclado; no celular, seletor): passo a passo tipo apresentação ("Passo 2 de 8 · Quem recebe", anterior/próximo, trilha de passos), a tela grande e legível, **recortada no conteúdo** (região `main` do UX.md, sem o menu lateral e o cabeçalho do produto; com diálogo aberto, a parte visível com o diálogo por cima), legenda de 1–2 linhas embaixo. Comportamento = "antes" e "depois" no mesmo tamanho, com a ação escrita entre eles. **Comparar com hoje** põe ao lado a tela de hoje do passo equivalente (`compare_to` no frame, id de um frame de hoje; senão o mesmo nome de passo; senão a posição na ordem). Clique amplia em tela cheia.
+3. **Detalhes recolhidos**, em linguagem simples: o que muda (tela, fluxo, comportamento, texto), por que pode funcionar (hipótese), riscos (trade-offs), problemas que resolve com o texto do problema em português e um selo ("resolvido", "continua" ou "precisa conferir" dizendo o que conferir) e novos pontos de atenção. Arquétipo e padrões viram uma linha discreta com os nomes do catálogo.
+4. **Decisão**: "Qual seguir?" (A/B/C ou nenhuma), comentário, e "Misturar partes" recolhido (por eixo).
+5. "Como os números foram contados" recolhido no fim (método, persona, tarefa, divergências medidas, avisos).
+
+Imagens: recorte do conteúdo a 1x (~1200 px de largura), WebP qualidade 0,75, embutidas; acima de ~10 MB a página se divide (Hoje em todas). As imagens ficam em cache em `--shots` (padrão `<flow>/shots/`, fora do git). Depois de gerar, **confira a página com screenshots** (1440 × 900 na primeira dobra, uma aba no passo 2, "Comparar com hoje" aberto, um comportamento, 390 px) e itere até a primeira dobra responder sozinha "qual é melhor e por quê" e as telas serem legíveis.
 
 O dono escolhe uma variante inteira ou **compõe por eixo** ("fluxo de B, texto de A"), com comentário, e copia a decisão. Grave:
 
@@ -118,7 +128,7 @@ Pela skill `construir-ui`, com a decisão como entrada: o código da variante é
     "frames": [ { "id": "f1", "step": "Escolher modelo", "capture": ".stitch/contratos/code/17-lote-passo-1.html", "kind": "screen", "caption": "…" } ],
     "metrics": { "steps": 4, "clicks_to_done": 9, "dialogs": 0, "primary_actions": 4, "words_on_screen": 180, "decisions": 4 } },
   "variants": [ {
-    "id": "a", "name": "…", "concept": "uma frase com a ideia",
+    "id": "a", "name": "…", "concept": "uma frase com a ideia", "hero": "a1", "gain": "o que ganha, numa linha", "cost": "o que custa, numa linha",
     "changes": { "screen": "…", "flow": "…", "behavior": "…", "text": "…" },
     "archetype": "step-wizard", "patterns": ["form-steps", "undo"], "laws": ["hick"],
     "hypothesis": "o que melhora e para quem", "tradeoffs": ["o que piora / risco"],
@@ -131,7 +141,7 @@ Pela skill `construir-ui`, com a decisão como entrada: o código da variante é
 }
 ```
 
-Chaves em `snake_case`; `kind`: `screen | state | behavior`; `laws`, `journey_ref` e `metrics_method` são opcionais; `state` (opcional no frame) vence o sufixo do nome da captura. Arquivos gerados ao lado: `decision.json` (versionado) e `shots/` (cache, fora do git).
+Chaves em `snake_case`; `kind`: `screen | state | behavior`; `laws`, `journey_ref` e `metrics_method` são opcionais; `state` (opcional no frame) vence o sufixo do nome da captura. Opcionais só da página: `question` e `done_label` (raiz), `hero` (id de frame da linha), `gain` e `cost` (uma linha cada, também em `current`) e `compare_to` (no frame da variante, id de um frame de hoje); o `validate` confere `hero` e `compare_to`. Arquivos gerados ao lado: `decision.json` (versionado) e `shots/` (cache, fora do git).
 
 ## Relatório (padrão)
 
@@ -153,6 +163,6 @@ Fica aberto: o que é sem verificação, hipótese a testar com usuários
 - [ ] Três variantes com ideia central oposta, quatro eixos, âncora no catálogo, hipótese e trade-off.
 - [ ] Construídas com componentes reais pelo harness de captura, dados fictícios, código em pasta de teste.
 - [ ] `validate` sem erro; `measure` sem divergência inexplicada; `lint` sem achado novo ≥ 3 e sem `persists`.
-- [ ] Página entregue; decisão gravada em `decision.json`.
+- [ ] Página entregue e conferida por screenshot (a primeira dobra responde sozinha; telas legíveis; nada de id ou jargão na frente); decisão gravada em `decision.json`.
 - [ ] Escolhida construída pela `construir-ui`, com `UX.md` no mesmo commit e re-auditoria.
 - [ ] O que é hipótese foi dito como hipótese (validar com pesquisa, skill `pesquisa`).

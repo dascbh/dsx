@@ -117,21 +117,21 @@ const unionCrop = (a, b) => (!a ? b : !b ? a : (() => { const x = Math.min(a.x, 
 const roundCrop = (c, vw, vh) => { const x = Math.max(0, Math.floor(c.x)), y = Math.max(0, Math.floor(c.y)); return { x, y, width: Math.min(vw - x, Math.ceil(c.w)), height: Math.min(vh - y, Math.ceil(c.h)) }; };
 
 /** Codificador WebP (JPEG se o navegador não codificar WebP), qualidade ~0,7. Reusado pela página de variações. */
-export async function encoder(browser) {
+export async function encoder(browser, quality = 0.7) {
   const page = await browser.newPage();
   await page.setContent('<body></body>');
-  return async (png) => page.evaluate(async (b64) => {
+  return async (png) => page.evaluate(async ([b64, q]) => {
     const img = new Image();
     img.src = `data:image/png;base64,${b64}`;
     await img.decode();
     const c = document.createElement('canvas');
     c.width = img.naturalWidth; c.height = img.naturalHeight;
     c.getContext('2d').drawImage(img, 0, 0);
-    let url = c.toDataURL('image/webp', 0.7);
+    let url = c.toDataURL('image/webp', q);
     let ext = 'webp';
-    if (!url.startsWith('data:image/webp')) { url = c.toDataURL('image/jpeg', 0.7); ext = 'jpg'; }
+    if (!url.startsWith('data:image/webp')) { url = c.toDataURL('image/jpeg', q); ext = 'jpg'; }
     return { ext, b64: url.slice(url.indexOf(',') + 1), width: c.width, height: c.height };
-  }, png.toString('base64'));
+  }, [png.toString('base64'), quality]);
 }
 
 const clip = (ops) => (ops ?? []).map(({ choices, recipe, ...o }) => o);

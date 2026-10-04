@@ -13,9 +13,9 @@
 //   node tools/ux-lint/variations.mjs import   --root … <decision.json>
 //
 // Manifesto: <root>/.dsx/variations/<module>/<flow>/variations.json (ou --manifest). Capturas e caminhos de `code`
-// são relativos à raiz do projeto. O Playwright (miniaturas e geometria para o layout) é resolvido a partir do
+// são relativos à raiz do projeto. O Playwright (recorte das telas e geometria para o layout) é resolvido a partir do
 // diretório atual, como em preview.mjs: rode de uma pasta do projeto que o tenha (no AURIS, frontend/). Sem ele, a
-// página sai sem miniaturas e o lint não roda as regras de layout (L).
+// página sai sem as telas recortadas e o lint não roda as regras de layout (L).
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, mkdtempSync, rmSync } from 'node:fs';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -42,7 +42,7 @@ export const AXIS_PT = { screen: 'Tela', flow: 'Fluxo', behavior: 'Comportamento
 export const METRICS = ['steps', 'clicks_to_done', 'dialogs', 'primary_actions', 'words_on_screen', 'decisions'];
 /** Métricas que as capturas medem (as outras só o manifesto declara). */
 export const MEASURED = ['dialogs', 'primary_actions', 'words_on_screen'];
-const SHOTS_VERSION = 1;
+const SHOTS_VERSION = 2;
 const sha1 = (...p) => createHash('sha1').update(p.map((x) => (typeof x === 'string' || Buffer.isBuffer(x) ? x : JSON.stringify(x))).join('\u0000')).digest('hex');
 const isFile = (p) => { try { return statSync(p).isFile(); } catch { return false; } };
 const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
@@ -67,7 +67,13 @@ export function loadCatalogs(dsx = DSX) {
   const dims = read('data/ux-dimensions.json') ?? {};
   const patterns = new Set();
   for (const p of Array.isArray(pats) ? pats : pats.patterns ?? []) { patterns.add(p.id); if (p.category) patterns.add(`${p.category}/${p.id}`); }
-  return { archetypes: new Set(arch.map((a) => a.id)), archetype_cards: Object.fromEntries(arch.map((a) => [a.id, a])), patterns, laws: new Set(Object.keys(dims.laws_index ?? {})) };
+  const patList = Array.isArray(pats) ? pats : pats.patterns ?? [];
+  return {
+    archetypes: new Set(arch.map((a) => a.id)), archetype_cards: Object.fromEntries(arch.map((a) => [a.id, a])), patterns,
+    pattern_cards: Object.fromEntries(patList.map((p) => [p.id, { title: p.title, category: p.category }])),
+    laws: new Set(Object.keys(dims.laws_index ?? {})), law_cards: Object.fromEntries(Object.entries(dims.laws_index ?? {}).map(([k, v]) => [k, v.name_pt ?? k])),
+    rules: { ...(dims.rules_index ?? {}), ...(dims.review_rules ?? {}) },
+  };
 }
 
 /** Registro de achados do módulo: Map id → item (vazio quando não há registro). */
@@ -98,6 +104,7 @@ export function validateManifest(m, { root, catalogs = loadCatalogs(), registry 
   if ((m.variants ?? []).length && m.variants.length < 2) warn(`${m.variants.length} variante: o método pede 3, realmente diferentes`);
   const ids = new Set();
   const captureOwner = new Map();
+  const currentIds = new Set((m.current?.frames ?? []).map((f) => f.id));
   for (const row of rowsOf(m)) {
     const tag = row.is_current ? 'current' : `variante "${row.id}"`;
     if (ids.has(row.id)) err(`${tag}: id repetido`);
@@ -127,6 +134,8 @@ export function validateManifest(m, { root, catalogs = loadCatalogs(), registry 
         if (!b.before) warn(`${ft}: comportamento sem "behavior.before"; a página mostra só o depois`);
       }
     }
+    if (row.hero && !fids.has(row.hero)) err(`${tag}: hero "${row.hero}" não é frame desta linha`);
+    for (const f of frames) if (f.compare_to && !row.is_current && !currentIds.has(f.compare_to)) err(`${tag}, frame "${f.id}": compare_to "${f.compare_to}" não é frame de hoje`);
     const metrics = row.metrics ?? {};
     for (const k of METRICS) if (!Number.isFinite(Number(metrics[k])) || metrics[k] === null || metrics[k] === '') err(`${tag}: métrica "${k}" ausente ou não numérica`);
     if (row.is_current) continue;
@@ -396,37 +405,50 @@ export function writeDecision(root, m, decision) {
   return f;
 }
 
-// ---------- miniaturas ----------
+// ---------- imagens ----------
 
 /**
- * Miniatura (primeira dobra em meia escala) e imagem ampliada (página inteira em escala 1, até 2700 px de altura)
- * de cada captura, em WebP, com cache pelo conteúdo da captura. Mesma janela do preview.mjs (1440 × 900).
+ * Recorte do conteúdo de cada captura, em WebP (qualidade 0,75), com cache pelo conteúdo da captura: a região de
+ * conteúdo (`main`, ou a 1ª região do UX.md que não é moldura) sem o cabeçalho e o menu do produto, a 1x, até a
+ * altura do conteúdo (no máximo `maxHeight`). Com diálogo aberto, a parte visível da região, com o diálogo por cima.
+ * Sem região de conteúdo, a página inteira. Devolve Map captura → { content, width, height }.
  */
-export async function shootCaptures(captures, { root, shotsDir, playwright, width = 1440, height = 900, log = () => {} }) {
+export async function shootCaptures(captures, { root, shotsDir, playwright, width = 1440, height = 900, contentSelector = 'main', dialogSelector = '[role=dialog], dialog[open]', maxHeight = 2400, quality = 0.75, log = () => {} }) {
   mkdirSync(shotsDir, { recursive: true });
   const out = new Map();
   const todo = [];
+  const have = readdirSync(shotsDir);
   for (const c of captures) {
-    const name = sha1(SHOTS_VERSION, width, height, readFileSync(join(root, c))).slice(0, 16);
-    const have = readdirSync(shotsDir);
-    const thumb = have.find((f) => f.startsWith(`${name}.thumb.`)), full = have.find((f) => f.startsWith(`${name}.full.`));
-    if (thumb && full) out.set(c, { thumb, full }); else todo.push([c, name]);
+    const name = sha1(SHOTS_VERSION, width, height, contentSelector, dialogSelector, maxHeight, quality, readFileSync(join(root, c))).slice(0, 16);
+    const hit = have.map((f) => new RegExp(`^${name}\\.content\\.(\\d+)x(\\d+)\\.[a-z]+$`).exec(f)).find(Boolean);
+    if (hit) out.set(c, { content: hit[0], width: Number(hit[1]), height: Number(hit[2]) }); else todo.push([c, name]);
   }
   if (todo.length && playwright) {
     const browser = await playwright.module.chromium.launch();
     try {
       const page = await browser.newPage({ viewport: { width, height } });
-      const half = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 0.5 });
-      const encode = await encoder(browser);
-      const save = async (png, file) => { const e = await encode(png); const f = `${file}.${e.ext}`; writeFileSync(join(shotsDir, f), Buffer.from(e.b64, 'base64')); return f; };
+      const encode = await encoder(browser, quality);
       for (const [c, name] of todo) {
-        const url = pathToFileURL(join(root, c)).href;
-        for (const p of [page, half]) { await p.goto(url, { waitUntil: 'load', timeout: 30000 }); await p.evaluate(() => document.fonts && document.fonts.ready).catch(() => {}); }
-        const h = Math.min(2700, await page.evaluate(() => document.documentElement.scrollHeight));
-        const full = await save(await page.screenshot({ fullPage: true, clip: { x: 0, y: 0, width, height: Math.max(height, h) } }), `${name}.full`);
-        const thumb = await save(await half.screenshot(), `${name}.thumb`);
-        out.set(c, { thumb, full });
-        log(`${c} → ${thumb}`);
+        await page.goto(pathToFileURL(join(root, c)).href, { waitUntil: 'load', timeout: 30000 });
+        await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
+        const box = await page.evaluate(({ contentSelector, dialogSelector, maxHeight }) => {
+          const vis = (e) => { const st = getComputedStyle(e); return st.display !== 'none' && st.visibility !== 'hidden' && e.getClientRects().length > 0; };
+          const main = [...document.querySelectorAll(contentSelector)].find(vis);
+          const H = Math.min(maxHeight, document.documentElement.scrollHeight);
+          if (!main) return { x: 0, y: 0, w: innerWidth, h: Math.max(innerHeight, H) };
+          const r = main.getBoundingClientRect();
+          const top = r.top + scrollY;
+          if ([...document.querySelectorAll(dialogSelector)].some(vis)) return { x: r.left, y: top, w: r.width, h: Math.max(200, Math.min(r.height, innerHeight - r.top)) };
+          let bottom = r.top;
+          for (const e of main.querySelectorAll('*')) { const b = e.getBoundingClientRect(); if (b.width && b.height && vis(e)) bottom = Math.max(bottom, b.bottom); }
+          return { x: r.left, y: top, w: r.width, h: Math.max(200, Math.min(maxHeight, Math.min(r.height, bottom - r.top + 24))) };
+        }, { contentSelector, dialogSelector, maxHeight });
+        const clip = { x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.w), height: Math.round(box.h) };
+        const e = await encode(await page.screenshot({ fullPage: true, clip }));
+        const file = `${name}.content.${e.width}x${e.height}.${e.ext}`;
+        writeFileSync(join(shotsDir, file), Buffer.from(e.b64, 'base64'));
+        out.set(c, { content: file, width: e.width, height: e.height });
+        log(`${c} → ${file}`);
       }
     } finally { await browser.close(); }
   }
@@ -530,19 +552,21 @@ async function main() {
   const captures = [...new Set(rowsOf(m).flatMap((r) => (r.frames ?? []).map((f) => f.capture)))];
   let shots = new Map();
   if (!a['no-shots']) {
-    if (!playwright) console.error(`${PLAYWRIGHT_MISSING}\nA página sai sem miniaturas.`);
-    shots = await shootCaptures(captures, { root, shotsDir, playwright, log: a.verbose ? console.log : () => {} });
+    if (!playwright) console.error(`${PLAYWRIGHT_MISSING}\nA página sai sem imagens.`);
+    const regions = cfg.verification.selectors.regions ?? [];
+    const content = regions.includes('main') ? 'main' : regions.find((r) => !/^(header|nav|aside)\b|role=(banner|navigation|complementary)|dialog/.test(r)) ?? 'main';
+    shots = await shootCaptures(captures, { root, shotsDir, playwright, contentSelector: content, dialogSelector: cfg.verification.selectors.dialog || '[role=dialog]', log: a.verbose ? console.log : () => {} });
   }
-  const measured = Object.fromEntries(rowsOf(m).map((r) => { const x = measureRow(r, { root, cfg }); return [r.id, { metrics: x.metrics, divergences: divergences(r.metrics, x.metrics) }]; }));
+  const measured = Object.fromEntries(rowsOf(m).map((r) => { const x = measureRow(r, { root, cfg }); return [r.id, { metrics: x.metrics, divergences: divergences(r.metrics, x.metrics), frames: x.frames }]; }));
   const pages = renderVariationsPages(m, {
-    lint, measured, registry, shots, shotsDir, file: basename(out), product: typeof a.product === 'string' ? a.product : '',
+    lint, measured, registry, shots, shotsDir, catalogs, file: basename(out), product: typeof a.product === 'string' ? a.product : '',
     findings_page: typeof a['findings-page'] === 'string' ? a['findings-page'] : null, warnings: v.warnings,
     maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1024 * 1024 : PAGE_MAX_BYTES, dsx_rel: relative(root, DSX) || '.',
   });
   mkdirSync(dirname(out), { recursive: true });
   for (const p of pages) writeFileSync(join(dirname(out), p.file), p.html);
   console.log(`${pages.map((p) => `${join(dirname(out), p.file)} (${(p.bytes / 1048576).toFixed(1)} MB)`).join('\n')}`);
-  console.log(`${(m.variants ?? []).length} variante(s) · ${shots.size} de ${captures.length} captura(s) com miniatura${lint.layout ? '' : ' · lint sem layout'}`);
+  console.log(`${(m.variants ?? []).length} variante(s) · ${shots.size} de ${captures.length} captura(s) com imagem${lint.layout ? '' : ' · lint sem layout'}`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();
