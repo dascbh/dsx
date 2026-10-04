@@ -317,6 +317,18 @@ export function positionOk(box, pos, ref, { dialog = false, contentBottom = null
 }
 
 /**
+ * Primária de linha, não da região (fora do L1): na mesma linha de um campo do próprio formulário ("Nova
+ * categoria" + Adicionar) ou de um título no mesmo pai (cabeçalho de seção com "Novo signatário"). A posição dela
+ * vale em relação à linha; o L1 mede a primária que conclui a região (rodapé do diálogo, topo da página).
+ */
+export function inlinePrimary(p, els) {
+  const sameRow = (e) => { const top = Math.max(e.box.y, p.box.y), bot = Math.min(bottom(e.box), bottom(p.box)); return bot - top >= Math.min(e.box.height, p.box.height) * 0.5; };
+  const inForm = (e) => e.kind === 'field' && p.parent && (e.form_group === p.parent || String(e.id).startsWith(`${p.parent} >`));
+  const headingMate = (e) => e.kind === 'heading' && e.parent && e.parent === p.parent;
+  return els.some((e) => e !== p && sameRow(e) && (inForm(e) || headingMate(e)));
+}
+
+/**
  * Aplica L1–L9 a uma geometria. `ctx`:
  *   { archetype: { id, regions: [], primary_action: { region, position } } | null,
  *     primary_position (do UX.md), limits (LAYOUT_DEFAULTS sobrescritos) }
@@ -346,9 +358,10 @@ export function analyzeLayout(input, ctx = {}) {
   const primaries = els.filter((e) => e.is_primary && e.is_interactive !== false);
   const expectedRegion = arch?.primary_action?.region ?? null;
   const panels = sideColumns(els, ref, 'right');
+  const regionLevel = primaries.filter((p) => !inlinePrimary(p, els));
   const candidates = !dialog && (!expectedRegion || /header/.test(expectedRegion))
-    ? primaries.filter((p) => !panels.some((pn) => containsBox(pn.box, p.box)))
-    : primaries;
+    ? regionLevel.filter((p) => !panels.some((pn) => containsBox(pn.box, p.box)))
+    : regionLevel;
 
   // L1 — posição da primária.
   const position = arch?.primary_action?.position ?? ctx.primary_position ?? null;

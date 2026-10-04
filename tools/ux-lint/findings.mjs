@@ -500,7 +500,7 @@ export function pageCases(reg, options, decisions) {
       severity: Math.max(...items.map((i) => i.severity)), text: it.text,
       variants: [...new Set(items.flatMap((i) => i.variants.length ? i.variants : [i.text]))],
       source: [...new Set(items.flatMap((i) => i.source))], screens: [...new Set(items.flatMap((i) => i.screens))],
-      problem: op?.problem || it.message, options: (op?.options ?? []).map((o) => ({ text: o.text, convention: o.convention, note: o.note })),
+      problem: op?.problem || it.message, options: (op?.options ?? []).map((o) => ({ text: o.text, convention: o.convention, note: o.note, ...(o.preview !== undefined ? { preview: o.preview } : {}) })),
       recommended: op?.recommended ? { index: op.recommended.index, why: op.recommended.why } : null,
       decision: ds.length === items.length && ds.every((d) => JSON.stringify(d.choice) === JSON.stringify(ds[0].choice)) ? ds[0] : null,
       deviation: items.every((i) => i.status === 'accepted-deviation') ? items[0].deviation ?? null : null,

@@ -17,9 +17,14 @@ import * as findings from './findings.mjs';
 import { resolvePlaywright, PLAYWRIGHT_MISSING } from './measure.mjs';
 import {
   PREVIEW_VERSION, locatorFor, optionOps, implicitPreview, pickExample, screenOrder, describeOps, flowDiagram, sha1,
+  stateRecipe, domOps, needsKit, previewKind, BADGE_ALREADY,
 } from './lib/preview-spec.mjs';
+import { runtime } from './lib/preview-runtime.mjs';
+import { buildKit, KIT_VERSION } from './lib/preview-kit.mjs';
 
 const MANIFEST = 'previews.json';
+// o código que roda na captura entra no hash: mudar o runtime refaz as prévias sem precisar subir a versão
+const RUNTIME_HASH = sha1(runtime.toString()).slice(0, 12);
 const BEFORE_COLOR = '#E5484D';
 const AFTER_COLOR = '#12A150';
 const SKIP_STATUS = new Set(['fixed', 'ignored', 'accepted-deviation']);
@@ -57,6 +62,8 @@ export function planPreviews(cases, { screensDir, map = null, minSeverity = null
     return contentHash.get(name);
   };
   const plans = [];
+  // synthesize-state leva a receita (página e diálogo) já resolvida, com o texto da opção por cima do padrão
+  const enrich = (ops) => ops.map((o) => (o.op === 'synthesize-state' ? { ...o, recipe: stateRecipe(o.state, { title: o.title, text: o.text, action: o.action }) } : o));
   for (const c of cases) {
     if (c.statuses.every((s) => SKIP_STATUS.has(s))) continue;
     if (minSeverity !== null && (c.severity ?? 0) < minSeverity) continue;
@@ -80,193 +87,29 @@ export function planPreviews(cases, { screensDir, map = null, minSeverity = null
     plan.kind = loc.screen_level ? 'screen' : 'element';
     plan.locator = loc;
     plan.screens = screens;
+    plan.before_text = String((c.variants ?? [])[0] ?? c.text ?? '').replace(/\{[^{}]*\}/g, '…');
     plan.options = (c.options ?? []).map((o, i) => {
       const r = optionOps(c, o);
       if (r.ops?.some((op) => op.op === 'example') && plan.kind === 'element') plan.kind = 'screen';
-      return { index: i, text: o.text, ...(r.ops ? { ops: r.ops, derived: r.derived, ...(r.note ? { note: r.note } : {}) } : { none: r.none }) };
+      return { index: i, text: o.text, ...(r.ops ? { ops: enrich(r.ops), derived: r.derived, ...(r.note ? { note: r.note } : {}) } : { none: r.none }) };
     });
     if (!plan.options.length) {
       const imp = implicitPreview(c, { exampleFor });
-      plan.implicit = imp.ops ? { label: imp.label, ops: imp.ops } : { label: null, none: imp.none };
+      plan.implicit = imp.ops ? { label: imp.label, ops: enrich(imp.ops) } : { label: null, none: imp.none };
     }
-    const examples = [...plan.options.flatMap((o) => o.ops ?? []), ...(plan.implicit?.ops ?? [])].filter((o) => o.op === 'example').map((o) => o.screen);
-    plan.hash = sha1(PREVIEW_VERSION, width, screens.map((s) => [s, capHash(s)]), loc, plan.options, plan.implicit, examples.map((e) => [e, capHash(e)]));
+    const allOps = [...plan.options.flatMap((o) => o.ops ?? []), ...(plan.implicit?.ops ?? [])];
+    // tela inteira com operação no DOM (estado ou região montados na tela): recorte da tela ou do diálogo
+    if (plan.kind === 'screen' && allOps.some((o) => o.op !== 'example')) plan.kind = 'synth';
+    const examples = allOps.filter((o) => o.op === 'example').map((o) => o.screen);
+    for (const o of allOps) if (o.op === 'insert' && o.from) plan.extras = [...new Set([...(plan.extras ?? []), `${o.from}|${o.source}`])];
+    const kitKey = needsKit(allOps) ? sha1(KIT_VERSION, files.map((f) => [f, capHash(f.replace(/\.html$/, ''))])) : null;
+    plan.hash = sha1(PREVIEW_VERSION, RUNTIME_HASH, width, screens.map((s) => [s, capHash(s)]), loc, plan.options, plan.implicit, examples.map((e) => [e, capHash(e)]), kitKey);
     plan.capture_hashes = Object.fromEntries(screens.map((s) => [s, capHash(s)]));
     plans.push(plan);
   }
   return plans;
 }
 
-// ---------- código que roda dentro da captura ----------
-/* c8 ignore start */
-function runtime() {
-  const clean = (s) => String(s || '').replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim();
-  const visible = (el) => {
-    const r = el.getBoundingClientRect();
-    if (r.width <= 0 || r.height <= 0) return false;
-    for (let n = el; n && n !== document.body; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return false;
-    }
-    return true;
-  };
-  const KIND = { button: 'button, [role=button], a, [role=tab], [role=menuitem], [role=option]', heading: 'h1, h2, h3, h4, h5, h6, [role=heading]' };
-  const R = (el) => { const b = el.getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; };
-  const union = (rs) => { const x = Math.min(...rs.map((r) => r.x)), y = Math.min(...rs.map((r) => r.y)); return { x, y, w: Math.max(...rs.map((r) => r.x + r.w)) - x, h: Math.max(...rs.map((r) => r.y + r.h)) - y }; };
-  const dialogOf = (el) => el.closest('[role=dialog], .MuiDialog-paper');
-  const st = { targets: [] };
-  function find(loc) {
-    const out = [];
-    st.via = 'text';
-    for (const s of loc.selectors || []) { try { const el = document.querySelector(s); if (el && visible(el) && !out.includes(el)) out.push(el); } catch { /* seletor inválido */ } }
-    if (out.length) return out.slice(0, loc.max || 1);
-    const openDialog = [...document.querySelectorAll('[role=dialog]')].find(visible);
-    const order = (l) => (openDialog ? [...l.filter((e) => openDialog.contains(e)), ...l.filter((e) => !openDialog.contains(e))] : l);
-    if (loc.kind === 'placeholder') {
-      const pats = (loc.patterns || []).map((p) => new RegExp(p, 'i'));
-      return order([...document.querySelectorAll('input[placeholder], textarea[placeholder]')].filter((e) => visible(e) && pats.some((p) => p.test(clean(e.placeholder))))).slice(0, loc.max || 1);
-    }
-    const all = [...document.body.querySelectorAll('*')].filter((e) => !['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(e.tagName) && !e.closest('svg') && !e.hasAttribute('data-dsx-mark'));
-    const pass = (test) => {
-      let hits = all.filter((e) => { const t = clean(e.innerText); return t && test(t) && visible(e); });
-      hits = hits.filter((e) => !hits.some((o) => o !== e && e.contains(o)));
-      if (KIND[loc.kind]) hits = hits.map((e) => e.closest(KIND[loc.kind]) || e);
-      if (loc.require_class) hits = hits.filter((e) => e.classList.contains(loc.require_class));
-      return order([...new Set(hits)]);
-    };
-    const pats = (loc.patterns || []).map((p) => new RegExp(p, 'i'));
-    // T1 e L3 citam vários elementos: um por padrão, na ordem do achado.
-    if ((loc.max || 1) > 1 && pats.length > 1) {
-      const res = [];
-      for (const p of pats) { const h = pass((t) => p.test(t)).find((e) => !res.includes(e)); if (h) res.push(h); }
-      if (res.length) return res.slice(0, loc.max);
-    }
-    let hits = pats.length ? pass((t) => pats.some((p) => p.test(t))) : [];
-    if (!hits.length && (loc.prefixes || []).length) hits = pass((t) => loc.prefixes.some((p) => t.startsWith(p)));
-    if (!hits.length && (loc.contains || []).length) hits = pass((t) => loc.contains.some((p) => t.includes(p)));
-    if (!hits.length && (loc.loose || []).length) { const lp = loc.loose.map((p) => new RegExp(p, 'i')); hits = pass((t) => lp.some((p) => p.test(t))); }
-    // Nome acessível, dica (title) ou placeholder: o texto está num atributo, não em pixels.
-    if (!hits.length && pats.length) {
-      // controles transparentes (checkbox do MUI: input com opacidade 0) contam pelo contorno visível ao redor
-      const shown = (e) => (visible(e) ? e : e.parentElement && visible(e.parentElement) && e.getBoundingClientRect().width > 0 ? e.parentElement : null);
-      const attrHits = all.filter((e) => ['aria-label', 'title', 'placeholder'].some((a) => { const v = e.getAttribute(a); return v && pats.some((p) => p.test(clean(v))); })).map(shown).filter(Boolean);
-      hits = order([...new Set(attrHits.filter((e) => !attrHits.some((o) => o !== e && e.contains(o))))]);
-      if (hits.length) st.via = 'attr';
-    }
-    return hits.slice(0, loc.max || 1);
-  }
-  const CONTAINER = 'section, form, fieldset, article, aside, header, footer, nav, table, ul, ol, [role=toolbar], [role=group], [role=region], [role=tabpanel], [role=list], .MuiCard-root, .MuiPaper-root, .MuiDialogActions-root, .MuiDialogContent-root, .MuiStack-root, .MuiAccordion-root';
-  function contextRect(targets) {
-    const T = union(targets.map(R));
-    const vw = innerWidth, vh = innerHeight;
-    const dlg = dialogOf(targets[0]);
-    let C;
-    if (dlg) C = R(dlg);
-    else {
-      C = null;
-      for (let p = targets[0].parentElement; p && p !== document.body; p = p.parentElement) {
-        if (!targets.every((t) => p.contains(t))) continue;
-        const r = R(p);
-        if (p.matches(CONTAINER) && r.w >= 320 && r.h >= T.h + 24) { C = r; break; }
-      }
-      if (!C) { const m = document.querySelector('main') || document.body; C = R(m); }
-    }
-    const maxW = dlg ? Math.min(Math.max(C.w, T.w + 32), vw) : Math.min(Math.max(720, T.w + 32), vw);
-    const maxH = dlg ? vh : Math.min(Math.max(420, T.h + 48), vh);
-    const fit = (cs, cl, ts, tl, max) => { if (cl <= max) return [cs, cl]; const s = Math.min(Math.max(ts + tl / 2 - max / 2, cs), cs + cl - max); return [s, max]; };
-    let [x, w] = fit(C.x, C.w, T.x, T.w, maxW);
-    let [y, h] = fit(C.y, C.h, T.y, T.h, maxH);
-    const grow = (s, l, min, lim) => (l >= min ? [s, l] : [Math.max(0, Math.min(s - (min - l) / 2, lim - min)), min]);
-    [x, w] = grow(x, w, Math.min(480, vw), vw);
-    [y, h] = grow(y, h, 160, vh);
-    // o elemento inteiro sempre dentro do recorte
-    const x2 = Math.max(x + w, T.x + T.w + 6), y2 = Math.max(y + h, T.y + T.h + 6);
-    x = Math.min(x, T.x - 6); y = Math.min(y, T.y - 6);
-    x = Math.max(0, x - 8); y = Math.max(0, y - 8);
-    return { x, y, w: Math.min(vw, x2 + 8) - x, h: Math.min(vh, y2 + 8) - y };
-  }
-  function textNodes(el) {
-    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest('svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
-    const out = [];
-    for (let n = w.nextNode(); n; n = w.nextNode()) if (n.nodeValue.trim()) out.push(n);
-    return out;
-  }
-  function applyOp(op) {
-    const el = op.selector ? document.querySelector(op.selector) : st.targets[0];
-    if (!el) return { error: 'alvo da operação não encontrado' };
-    if (op.op === 'text') {
-      let text = op.text;
-      if (Array.isArray(op.choices) && op.choices.length) {
-        // lista "A · B · C": aplica o trecho com mais palavras em comum com o texto atual deste elemento
-        const words = (s) => new Set(clean(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z0-9]+/).filter((w) => w.length > 2));
-        const cur = words(el.innerText || el.placeholder || '');
-        let best = 0;
-        for (const c of op.choices) { const n = [...words(c)].filter((w) => cur.has(w)).length; if (n > best) { best = n; text = c; } }
-      }
-      if (el.matches('input, textarea')) { el.placeholder = text; return { el, text }; }
-      if (st.via === 'attr') return { error: 'o texto está só no nome acessível (botão de ícone): a troca não aparece em pixels' };
-      const ns = textNodes(el);
-      if (!ns.length) el.textContent = text;
-      else { ns[0].nodeValue = text; for (const n of ns.slice(1)) n.nodeValue = ''; }
-      return { el, text };
-    }
-    if (op.op === 'remove') { const r = R(el); el.style.setProperty('display', 'none', 'important'); return { removed: r }; }
-    if (op.op === 'variant') {
-      if (!el.classList.contains('MuiButton-root')) return { error: 'o elemento não é um botão do MUI; variant não se aplica' };
-      const size = [...el.classList].find((c) => /^MuiButton-size/.test(c));
-      const donors = [...document.querySelectorAll(`.MuiButton-root.MuiButton-${op.variant}`)].filter((d) => d !== el && visible(d));
-      const donor = donors.find((d) => size && d.classList.contains(size)) || donors[0];
-      if (!donor) return { error: `nenhum botão "${op.variant}" nesta captura para copiar o estilo` };
-      el.className = donor.className;
-      return { el };
-    }
-    if (op.op === 'move') {
-      const g = el.parentElement;
-      if (op.to === 'end') g.appendChild(el);
-      if (op.to === 'start') g.prepend(el);
-      if (op.justify) { if (!/flex/.test(getComputedStyle(g).display)) g.style.display = 'flex'; g.style.justifyContent = op.justify; g.style.alignItems = g.style.alignItems || 'center'; }
-      return { el };
-    }
-    if (op.op === 'style') { for (const [k, v] of Object.entries(op.css)) el.style.setProperty(k, v); return { el }; }
-    return { error: `operação ${op.op} não se aplica ao DOM` };
-  }
-  function mark(rects, color, dashed) {
-    for (const r of rects) {
-      const d = document.createElement('div');
-      d.setAttribute('data-dsx-mark', '');
-      const line = r.h === 0;
-      d.style.cssText = `position:fixed;left:${r.x - 4}px;top:${r.y - (line ? 2 : 4)}px;width:${r.w + 8}px;height:${line ? 0 : r.h + 8}px;border:${line ? '0' : `3px ${dashed ? 'dashed' : 'solid'} ${color}`};${line ? `border-top:3px dashed ${color};` : ''}border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.9);z-index:2147483647;pointer-events:none;box-sizing:border-box`;
-      document.body.appendChild(d);
-    }
-  }
-  const still = document.createElement('style');
-  still.textContent = '*,*::before,*::after{transition:none!important;animation:none!important;caret-color:transparent!important}';
-  document.head.appendChild(still);
-  window.__dsxp = {
-    locate(loc) {
-      st.targets = find(loc);
-      if (!st.targets.length) return { found: 0 };
-      st.targets[0].scrollIntoView({ block: 'center', inline: 'nearest' });
-      return { found: st.targets.length, crop: contextRect(st.targets), rects: st.targets.map(R) };
-    },
-    apply(ops) {
-      let removed = null;
-      const texts = [];
-      const before = st.targets.map(R);
-      for (const op of ops) { const r = applyOp(op); if (r.error) return { error: r.error }; if (r.removed) removed = r.removed; if (r.text) texts.push(r.text); }
-      const live = st.targets.filter((t) => t.isConnected && visible(t));
-      const rects = live.map(R);
-      const crop = live.length ? contextRect(live) : null;
-      const same = (a, b) => Math.abs(a.x - b.x) < 0.5 && Math.abs(a.y - b.y) < 0.5 && Math.abs(a.w - b.w) < 0.5 && Math.abs(a.h - b.h) < 0.5;
-      const geometric = ops.every((o) => o.op === 'move' || o.op === 'style');
-      const unchanged = geometric && rects.length === before.length && rects.every((r, i) => same(r, before[i]));
-      return { rects, removed, crop, texts, unchanged };
-    },
-    mark(rects, after) { mark(rects, after ? '#12A150' : '#E5484D', false); },
-    markRemoved(r) { mark([{ x: r.x, y: r.y, w: r.w, h: 0 }], '#12A150', true); },
-  };
-}
-/* c8 ignore stop */
 
 // ---------- execução ----------
 
@@ -290,58 +133,130 @@ async function encoder(browser) {
   }, png.toString('base64'));
 }
 
+const clip = (ops) => (ops ?? []).map(({ choices, recipe, ...o }) => o);
+const loader = (page, screensDir) => async (screen) => {
+  await page.goto(pathToFileURL(join(screensDir, `${screen}.html`)).href, { waitUntil: 'load', timeout: 30000 });
+  await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
+  await page.addScriptTag({ content: `(${runtime.toString()})()` });
+};
+const unionAll = (crop, rects) => rects.reduce((a, r) => unionCrop(a, r), crop);
+const saver = (plan, outDir, encode) => async (png, name) => {
+  const e = await encode(png);
+  const file = `${plan.hash.slice(0, 12)}.${name}.${e.ext}`;
+  writeFileSync(join(outDir, file), Buffer.from(e.b64, 'base64'));
+  return { file, width: e.width, height: e.height };
+};
+/** Entrada "depois" do manifesto, com a legenda do tipo de prévia. */
+const afterEntry = (v, applied, img, extra = {}) => ({
+  key: v.key, option: v.option, label: v.label ?? null, op: applied, description: describeOps(applied), kind_label: previewKind(applied),
+  ...(v.note ? { note: v.note } : {}), ...extra, ...img,
+});
+
 /** Gera as imagens de um caso de elemento. Devolve a entrada do manifesto. */
 async function elementCase(page, plan, { screensDir, outDir, width, height, encode }) {
-  const load = async (screen) => {
-    await page.goto(pathToFileURL(join(screensDir, `${screen}.html`)).href, { waitUntil: 'load', timeout: 30000 });
-    await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
-    await page.addScriptTag({ content: `(${runtime.toString()})()` });
-  };
+  const load = loader(page, screensDir);
+  const loc = plan.locator;
+  const beforeOpts = { annotate: loc.annotate_before ?? null, text: plan.before_text ?? '', fold: loc.fold ?? null };
   let screen = null, loc0 = null;
   for (const s of plan.screens) {
     await load(s);
-    const r = await page.evaluate((l) => window.__dsxp.locate(l), plan.locator);
+    const r = await page.evaluate((l) => window.__dsxp.locate(l), loc);
     if (r.found) { screen = s; loc0 = r; break; }
   }
+  if (!screen && loc.kind === 'main-title') return { failed: `a captura não tem texto de título para promover a h1 (${plan.screens.slice(0, 3).join(', ')}: só esqueleto ou nenhum texto destacado no topo)` };
   if (!screen) return { failed: plan.screens.length ? `elemento não encontrado nas capturas (${plan.screens.slice(0, 3).join(', ')})` : 'nenhuma captura das telas do caso' };
   const variants = [...plan.options.map((o) => ({ key: `o${o.index}`, option: o.index, ops: o.ops, none: o.none, note: o.note }))];
   if (plan.implicit) variants.push({ key: 'rule', option: null, ops: plan.implicit.ops, none: plan.implicit.none, label: plan.implicit.label });
+  // L6: a janela inteira (a dobra é o assunto), da coluna do conteúdo para a direita
+  const viewportCrop = loc.viewport ? await page.evaluate(() => { const m = document.querySelector('main'); const x = m ? Math.max(0, m.getBoundingClientRect().left) : 0; return { x, y: 0, w: innerWidth - x, h: innerHeight }; }) : null;
+  const pass = async (v) => {
+    await load(screen);
+    await page.evaluate((l) => window.__dsxp.locate(l), loc);
+    return page.evaluate(([ops, o]) => window.__dsxp.apply(ops, o), [v.ops, { fold: loc.fold ?? null }]);
+  };
   // 1ª passada: mede o recorte de cada variante e une, para todas usarem a mesma janela.
-  let crop = loc0.crop;
+  let crop = viewportCrop ?? loc0.crop;
+  {
+    const b = await page.evaluate((o) => window.__dsxp.before(o), beforeOpts);
+    if (!viewportCrop) crop = unionAll(crop, b.overlays);
+  }
   for (const v of variants) {
     if (!v.ops) continue;
-    await load(screen);
-    await page.evaluate((l) => window.__dsxp.locate(l), plan.locator);
-    const r = await page.evaluate((ops) => window.__dsxp.apply(ops), v.ops);
+    const r = await pass(v);
     if (r.error) { v.none = r.error; v.ops = null; continue; }
-    if (r.unchanged) { v.none = `nesta captura a operação não muda nada (${describeOps(v.ops)}); o elemento já está assim`; v.ops = null; continue; }
-    crop = unionCrop(crop, r.crop);
+    if (r.unchanged) { v.ops = [{ op: 'badge', text: BADGE_ALREADY }]; v.already = true; v.note = v.note ?? `nesta captura a operação não muda nada (${describeOps(clip(variants.find((x) => x === v).ops))})`; }
+    if (viewportCrop) continue;
+    crop = unionAll(unionCrop(crop, r.crop), r.overlays ?? []);
     if (r.removed) crop = unionCrop(crop, { ...r.removed, h: Math.max(r.removed.h, 1) });
   }
-  const clip = roundCrop(crop, width, height);
-  const save = async (png, name) => {
-    const e = await encode(png);
-    const file = `${plan.hash.slice(0, 12)}.${name}.${e.ext}`;
-    writeFileSync(join(outDir, file), Buffer.from(e.b64, 'base64'));
-    return { file, width: e.width, height: e.height };
-  };
+  const box = roundCrop(crop, width, height);
+  const save = saver(plan, outDir, encode);
   await load(screen);
-  const l = await page.evaluate((x) => window.__dsxp.locate(x), plan.locator);
+  const l = await page.evaluate((x) => window.__dsxp.locate(x), loc);
   await page.evaluate((rs) => window.__dsxp.mark(rs, false), l.rects);
-  const before = await save(await page.screenshot({ clip }), 'before');
+  await page.evaluate((o) => window.__dsxp.before(o), beforeOpts);
+  const before = await save(await page.screenshot({ clip: box }), 'before');
   const after = [];
   for (const v of variants) {
     if (!v.ops) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: v.none }); continue; }
-    await load(screen);
-    await page.evaluate((x) => window.__dsxp.locate(x), plan.locator);
-    const r = await page.evaluate((ops) => window.__dsxp.apply(ops), v.ops);
+    const r = await pass(v);
+    if (r.error) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: r.error }); continue; }
     if (r.rects.length) await page.evaluate((rs) => window.__dsxp.mark(rs, true), r.rects);
     if (r.removed) await page.evaluate((rm) => window.__dsxp.markRemoved(rm), r.removed);
-    const img = await save(await page.screenshot({ clip }), `after-${v.key}`);
-    const applied = v.ops.map((o, i) => (o.op === 'text' && r.texts?.[i] ? { ...o, text: r.texts[i] } : o)).map(({ choices, ...o }) => o);
-    after.push({ key: v.key, option: v.option, label: v.label ?? null, op: applied, description: describeOps(applied), ...(v.note ? { note: v.note } : {}), ...img });
+    if (r.badged) await page.evaluate(([b, t]) => window.__dsxp.badgeAt(b, t), [box, r.badged]);
+    const img = await save(await page.screenshot({ clip: box }), `after-${v.key}`);
+    const applied = clip(r.applied.map((o, i) => (['text', 'annotate', 'insert'].includes(o.op) && r.texts?.[i] ? { ...o, text: r.texts[i] } : o)));
+    after.push(afterEntry(v, applied, img));
   }
-  return { screen, crop: clip, before, after };
+  return { screen, crop: box, before, after };
+}
+
+/**
+ * Caso de tela inteira com operação no DOM (estado ou região montados na própria tela). Diálogo aberto: recorte
+ * do diálogo em escala 1; página: a janela em meia escala. O bloco montado sai contornado em verde.
+ */
+async function synthCase(page, pageHalf, plan, { screensDir, outDir, width, height, encode }) {
+  const screen = plan.screens[0];
+  if (!screen) return { failed: 'nenhuma captura das telas do caso' };
+  const save = saver(plan, outDir, encode);
+  const probe = loader(page, screensDir);
+  await probe(screen);
+  const s0 = await page.evaluate(() => window.__dsxp.screen());
+  const dialog = !!s0.dialog;
+  const pg = dialog ? page : pageHalf;
+  const load = loader(pg, screensDir);
+  const variants = [...plan.options.map((o) => ({ key: `o${o.index}`, option: o.index, ops: o.ops, none: o.none, note: o.note })), ...(plan.implicit ? [{ key: 'rule', option: null, ops: plan.implicit.ops, none: plan.implicit.none, label: plan.implicit.label }] : [])];
+  let crop = dialog ? s0.dialog : { x: 0, y: 0, w: width, h: height };
+  if (dialog) {
+    for (const v of variants) {
+      if (!v.ops || !domOps(v.ops)) continue;
+      await load(screen);
+      await pg.evaluate(() => window.__dsxp.screen());
+      const r = await pg.evaluate((ops) => window.__dsxp.apply(ops), v.ops);
+      if (r.error) { v.none = r.error; v.ops = null; continue; }
+      const d = await pg.evaluate(() => window.__dsxp.screen());
+      crop = unionCrop(crop, d.dialog);
+    }
+    crop = { x: crop.x - 8, y: crop.y - 8, w: crop.w + 16, h: crop.h + 16 };
+  }
+  const box = roundCrop(crop, width, height);
+  await load(screen);
+  const before = await save(await pg.screenshot({ clip: box }), 'before');
+  const after = [];
+  for (const v of variants) {
+    const ex = (v.ops ?? []).find((o) => o.op === 'example');
+    if (!v.ops) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: v.none ?? 'sem prévia' }); continue; }
+    if (ex) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: 'exemplo de outra tela não se mistura com mudança na tela' }); continue; }
+    await load(screen);
+    await pg.evaluate(() => window.__dsxp.screen());
+    const r = await pg.evaluate((ops) => window.__dsxp.apply(ops), v.ops);
+    if (r.error) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: r.error }); continue; }
+    if (r.rects.length) await pg.evaluate((rs) => window.__dsxp.mark(rs, true), r.rects);
+    if (r.badged) await pg.evaluate(([b, t]) => window.__dsxp.badgeAt(b, t), [box, r.badged]);
+    const img = await save(await pg.screenshot({ clip: box }), `after-${v.key}`);
+    after.push(afterEntry(v, clip(r.applied.map((o, i) => (['text', 'annotate', 'insert'].includes(o.op) && r.texts?.[i] ? { ...o, text: r.texts[i] } : o))), img));
+  }
+  return { screen, crop: box, before, after };
 }
 
 /** Caso de tela inteira (estado, título ausente, região ausente): tela em meia escala; `example` mostra outra captura. */
@@ -366,7 +281,7 @@ async function screenCase(pageHalf, plan, { screensDir, outDir, encode }) {
     const ex = (v.ops ?? []).find((o) => o.op === 'example');
     if (!ex) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: v.none ?? 'tela inteira: só a operação "example" tem prévia' }); continue; }
     if (!existsSync(join(screensDir, `${ex.screen}.html`))) { after.push({ key: v.key, option: v.option, label: v.label ?? null, failed: `captura de exemplo ${ex.screen}.html não existe` }); continue; }
-    after.push({ key: v.key, option: v.option, label: v.label ?? null, op: [ex], description: describeOps([ex]), ...(await shot(ex.screen)) });
+    after.push({ key: v.key, option: v.option, label: v.label ?? null, op: [ex], description: describeOps([ex]), kind_label: previewKind([ex]), ...(await shot(ex.screen)) });
   }
   return { screen, before, after };
 }
@@ -379,7 +294,7 @@ function flowCase(plan, { map, outDir }) {
   writeFileSync(join(outDir, `${name}.before.svg`), d.before);
   const after = [];
   for (const o of plan.options) after.push({ key: `o${o.index}`, option: o.index, failed: o.none });
-  if (plan.implicit?.flow) { writeFileSync(join(outDir, `${name}.after-rule.svg`), d.after); after.push({ key: 'rule', option: null, label: plan.implicit.label, op: [{ op: 'flow' }], description: plan.implicit.label, file: `${name}.after-rule.svg` }); }
+  if (plan.implicit?.flow) { writeFileSync(join(outDir, `${name}.after-rule.svg`), d.after); after.push({ key: 'rule', option: null, label: plan.implicit.label, op: [{ op: 'flow' }], description: plan.implicit.label, kind_label: 'Diagrama do fluxo', file: `${name}.after-rule.svg` }); }
   else if (plan.implicit) after.push({ key: 'rule', option: null, failed: plan.implicit.none });
   return { screen: plan.screen, before: { file: `${name}.before.svg` }, after };
 }
@@ -403,17 +318,26 @@ export async function runPreviews(plans, { screensDir, outDir, map = null, width
     page = await browser.newPage({ viewport: { width, height } });
     pageHalf = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 0.5 });
     encode = await encoder(browser);
+    // doadores do módulo (blocos de estado, alertas, botões, painel…), lidos das próprias capturas
+    const files = existsSync(screensDir) ? readdirSync(screensDir).filter((f) => f.endsWith('.html')) : [];
+    const kitPage = await browser.newPage({ viewport: { width, height } });
+    const kit = await buildKit(kitPage, { screensDir, files, outDir, extras: [...new Set(plans.flatMap((p) => p.extras ?? []))], log });
+    await kitPage.close();
+    const init = `window.__dsxkit = ${JSON.stringify(kit).replace(/</g, '\\u003c')};`;
+    await page.addInitScript(init);
+    await pageHalf.addInitScript(init);
     return true;
   };
   try {
     for (const plan of plans) {
       const prev = old?.cases?.[plan.id];
-      if (prev && prev.hash === plan.hash && !prev.failed && filesOf(prev).every((f) => existsSync(join(outDir, f)))) { stats.cached++; continue; }
+      if (prev && prev.hash === plan.hash && !prev.failed && !(prev.after ?? []).some((a) => a.failed) && filesOf(prev).every((f) => existsSync(join(outDir, f)))) { stats.cached++; continue; }
       let entry;
       try {
         if (plan.kind === 'flow') entry = flowCase(plan, { map, outDir });
         else if (!(await ensure())) entry = { failed: 'Playwright indisponível no projeto: prévia de captura não gerada' };
         else if (plan.kind === 'screen') entry = await screenCase(pageHalf, plan, { screensDir, outDir, encode });
+        else if (plan.kind === 'synth') entry = await synthCase(page, pageHalf, plan, { screensDir, outDir, width, height, encode });
         else entry = await elementCase(page, plan, { screensDir, outDir, width, height, encode });
       } catch (e) {
         entry = { failed: `erro ao gerar: ${String(e.message).split('\n')[0]}` };

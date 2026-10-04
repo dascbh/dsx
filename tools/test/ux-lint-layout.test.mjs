@@ -4,7 +4,7 @@ import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
-  analyzeLayout, normalizeGeometry, clusterValues, boxDistance, isSaturated, parseColor, screenIdOf, positionOk,
+  analyzeLayout, normalizeGeometry, clusterValues, boxDistance, isSaturated, parseColor, screenIdOf, positionOk, inlinePrimary,
 } from '../ux-lint/lib/geometry.mjs';
 import { resolveArchetype, stateOf, analyzeGeometry, archetypeCatalog, limitsFrom } from '../ux-lint/layout.mjs';
 import { configFrom } from '../ux-lint/lib/config.mjs';
@@ -59,6 +59,23 @@ test('L1: primary at top-right passes; at the bottom-left fails (archetype wins 
   assert.match(rules(ux, 'L1')[0].message, /UX\.md/);
   // inline não tem posição a cobrar
   assert.equal(rules(analyzeLayout(geom([main(), primary('X', { x: 244, y: 700 })]), { archetype: arch('public-decision-page', 'inline') }), 'L1').length, 0);
+});
+
+test('L1: a primary on the same row as a field of its form, or beside its section title, is a row action (not flagged)', () => {
+  const dlg = { dialog_open: true };
+  const box = el({ id: 'dlg', tag: 'div', kind: 'region', role: 'dialog', region: 'diálogo "Categorias"', box: { x: 420, y: 100, width: 600, height: 700 } });
+  const form = 'dlg > div > form';
+  const add = primary('Adicionar', { x: 910, y: 160 }, { region: 'diálogo "Categorias"', parent: form, id: `${form} > button` });
+  const field = el({ id: `${form} > div > input`, kind: 'field', tag: 'input', region: 'diálogo "Categorias"', form_group: form, box: { x: 440, y: 160, width: 460, height: 38 } });
+  assert.equal(inlinePrimary(add, [box, add, field]), true);
+  assert.equal(rules(analyzeLayout(geom([box, field, add], dlg), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') }), 'L1').length, 0);
+  // sem o campo na linha, a mesma primária volta a ser medida
+  assert.equal(rules(analyzeLayout(geom([box, add], dlg), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') }), 'L1').length, 1);
+  const sec = 'main > section:nth-of-type(2) > div';
+  const novo = primary('Novo signatário', { x: 1250, y: 440 }, { parent: sec });
+  const title = el({ tag: 'h2', kind: 'heading', heading_level: 2, text: 'Signatários', parent: sec, box: { x: 244, y: 444, width: 200, height: 28 } });
+  assert.equal(inlinePrimary(novo, [title, novo]), true);
+  assert.equal(rules(analyzeLayout(geom([main(), h1(), title, novo]), { archetype: arch('settings', 'bottom-right') }), 'L1').length, 0);
 });
 
 test('L1: in a dialog, bottom-right is relative to the dialog box; side-panel primary does not count for page-header', () => {

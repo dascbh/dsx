@@ -48,7 +48,7 @@ export function attachPreviews(cases, manifest) {
     const after = (e.after ?? []).map((a) => {
       const who = a.option === null || a.option === undefined ? `Correção indicada pela regra (${a.label ?? ''})` : `Opção ${LETTER(a.option)}`;
       return a.file
-        ? { option: a.option ?? null, key: a.file, label: a.label ?? null, note: a.note ?? null, alt: `${who} aplicada: ${a.description ?? ''}${e.kind === 'element' ? '; elemento alterado contornado em verde' : ''}` }
+        ? { option: a.option ?? null, key: a.file, label: a.label ?? null, note: a.note ?? null, type: a.kind_label ?? null, alt: `${who} aplicada: ${a.description ?? ''}${e.kind === 'element' ? '; elemento alterado contornado em verde' : ''}` }
         : { option: a.option ?? null, label: a.label ?? null, failed: a.failed };
     });
     c.preview = { before, after, kind: e.kind };

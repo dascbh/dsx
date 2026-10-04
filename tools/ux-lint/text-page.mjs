@@ -68,7 +68,7 @@ function figure(media, after, before, { label, note } = {}) {
   const toggle = before ? `<div class="pv-alt" role="group" aria-label="Comparar com hoje"><button type="button" data-show="b" aria-pressed="false">Antes</button><button type="button" data-show="a" aria-pressed="true">Depois</button></div>` : '';
   return `<figure class="pv">
           <button type="button" class="pv-zoom" aria-label="Ampliar: ${esc(after.alt)}"><span class="pv-a">${media(after.key, after.alt)}</span>${before ? `<span class="pv-b" hidden>${media(before.key, before.alt)}</span>` : ''}</button>
-          ${toggle}${label ? `<figcaption>${esc(label)}</figcaption>` : ''}${note ? `<p class="nota">${esc(note)}</p>` : ''}
+          ${after.type ? `<p class="pv-tipo">${esc(after.type)}</p>` : ''}${toggle}${label ? `<figcaption>${esc(label)}</figcaption>` : ''}${note ? `<p class="nota">${esc(note)}</p>` : ''}
         </figure>`;
 }
 
@@ -146,6 +146,7 @@ const PREVIEW_STYLE = `
 .pv img,.pv svg{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#fff}
 .pv svg{background:var(--surface)}
 .pv figcaption{font-size:12px;color:var(--muted)}
+.pv-tipo{margin:0;font-size:12px;font-weight:600;color:var(--fg);display:flex;gap:6px;align-items:center}.pv-tipo::before{content:'';width:8px;height:8px;border-radius:2px;background:var(--ok)}
 .pv-alt{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;justify-self:start}
 .pv-alt button{font:600 12px var(--sans);border:0;background:var(--surface);color:var(--fg);padding:5px 12px;min-height:32px;cursor:pointer}
 .pv-alt button[aria-pressed="true"]{background:var(--accent);color:#fff}
