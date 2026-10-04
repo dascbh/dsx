@@ -16,8 +16,9 @@ O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pe
 3. Localize a fonte de tokens (CSS variables, tema do Tailwind, `tokens/*.json`, tema MUI…) e a pasta de componentes compartilhados. Anote os caminhos.
 4. Se existirem mapas do projeto (`.dsx/maps/`, gerados pela skill `mapear`), leia os relevantes antes de desenhar: `flows.json` (de onde a tela é alcançada e para onde leva), `tasks.json` (passos e dependências), `domain.json` (de onde vêm os dados, cardinalidades), `journey.json` (persona e momento). Itens em `uncertain` não são fato — confirme com o usuário ou rode `confirmar-mapas`.
 5. Se o projeto mantém o ciclo com o Figma (`design/figma-sync.md` existe) e a vez é `design`, **não altere as telas que estão em refino** sem combinar — a mudança vai colidir com a próxima volta (skill `figma-vez`). Ao concluir com vez `code`, as telas tocadas entram no próximo reespelho incremental (`figma-espelhar`).
-6. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
-7. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
+6. Se a tela vem de uma variação escolhida (skill `repensar-ux`, `.dsx/variations/<module>/<flow>/decision.json`), construa a variante decidida (ou a composição por eixo) a partir do manifesto e do código de teste dela: o código em `tests/…/variants/` é referência de composição com os mesmos componentes, nunca colado na produção. Atualize o `UX.md` (arquétipo, desvio, fluxo) no mesmo commit e confira na re-auditoria que os ids de `resolves` viraram `fixed`.
+7. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
+8. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
 
 ## 1. Descoberta antes de escrever código
 

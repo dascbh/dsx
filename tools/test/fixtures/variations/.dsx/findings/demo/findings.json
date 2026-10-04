@@ -1,0 +1,14 @@
+{
+  "module": "demo",
+  "updated": "2026-10-04",
+  "runs": [{ "at": "2026-10-04T12:00:00Z", "sources": ["text", "screen", "states", "layout"], "commit": null }],
+  "items": [
+    { "id": "t-0000x1aa", "family": "text", "rule": "X1", "severity": 2, "element": "button", "text": "Avançar — próximo passo", "variants": [], "screens": ["01-passo-1"], "source": ["src/Passo1.tsx:10"], "message": "travessão ou meia-risca no texto", "origin": "detector", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" },
+    { "id": "s-0000t1bb", "family": "screen", "rule": "T1", "severity": 3, "element": "button", "text": "{} ações primárias (máx. {}): \"Avançar\", \"Salvar rascunho\"", "variants": ["2 ações primárias (máx. 1): \"Avançar\", \"Salvar rascunho\""], "screens": ["02-passo-2"], "region": "main", "source": [".stitch/demo/code/02-passo-2.html:1"], "message": "2 ações primárias (máx. 1): \"Avançar\", \"Salvar rascunho\"", "origin": "detector", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" },
+    { "id": "st-000s1cc", "family": "states", "rule": "S1", "severity": 2, "element": null, "text": "estado \"draft-restored\" exigido (arquétipo step-wizard) sem captura {}-passo-{}.draft-restored.html", "variants": [], "screens": ["01-passo-1"], "region": "draft-restored · (tela)", "source": [".stitch/demo/code/01-passo-1.html"], "message": "estado \"draft-restored\" exigido (arquétipo step-wizard) sem captura 01-passo-1.draft-restored.html", "origin": "detector", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" },
+    { "id": "l-000l6dd", "family": "layout", "rule": "L6", "severity": 2, "element": "button", "text": "primária \"Avançar\" abaixo da dobra", "variants": [], "screens": ["02-passo-2"], "region": "main", "source": ["02-passo-2.html"], "message": "primária \"Avançar\" abaixo da dobra", "origin": "detector", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" },
+    { "id": "t-000descee", "family": "text", "rule": "desc", "severity": 1, "element": "helper", "text": "Uma linha por destinatário. O cabeçalho são os campos por destinatário.", "variants": [], "screens": ["02-passo-2"], "source": ["src/Passo2.tsx:22"], "message": "descrição que repete o que a tela já mostra", "origin": "review", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" },
+    { "id": "f-000f3ff", "family": "flow", "rule": "F3", "severity": 2, "element": null, "text": "jornada com {} passos", "variants": [], "screens": ["j-lote"], "source": [], "message": "jornada com 14 passos", "origin": "detector", "first_seen": "2026-10-04", "last_seen": "2026-10-04", "present": true, "fixed_at": null, "status": "open" }
+  ],
+  "deviations": []
+}

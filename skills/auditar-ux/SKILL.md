@@ -58,6 +58,8 @@ Registre com `node <DSX>/tools/ux-lint/findings.mjs options --module <m> --from 
 
 ## 4. Propor opções
 
+**SE** os achados de um fluxo têm a mesma causa (passos demais, decisão no lugar errado, texto explicando o que a estrutura esconde) ou o arquétipo não casa mais com a tarefa **ENTÃO** não remende achado por achado: leve o fluxo à skill `repensar-ux` (3 variações construídas, medidas e comparadas), com os ids desses achados em `resolves`, e deixe aqui só os achados isolados.
+
 Para cada achado aberto que o dono precisa decidir, 2–3 opções no próprio `cases.json`, com a convenção que as sustenta e uma recomendada com o porquê. Texto: siga a skill `ux-writing` (fórmulas, glossário, verbo + objeto). Layout e ações: cite o arquétipo e o padrão (`patterns/<categoria>/<id>.md`). Achado sem decisão real (correção única e óbvia) leva uma opção só.
 
 ## 5. Prévias e página de decisão
@@ -109,6 +111,7 @@ Não declare uma dimensão "boa" só porque não tem achado: diga a cobertura e 
 - [ ] Capturas pelo código, mapa conferido e `UX.md` válido antes de rodar.
 - [ ] `audit.mjs --register` rodado; registro gravado em `.dsx/findings/<m>/`.
 - [ ] Toda dimensão de julgamento ou referência revisada com o knowledge indicado; achados com regra ou id de revisão, severidade e princípio.
+- [ ] Fluxos com achados de mesma causa encaminhados à `repensar-ux` em vez de remendados.
 - [ ] Opções escritas (texto pela `ux-writing`), prévias geradas (ou dispensa justificada) e página de decisão entregue ao dono.
 - [ ] Decisões aplicadas na origem e `UX.md` atualizado quando a regra de produto mudou.
 - [ ] Re-auditoria registrada; relatório final no formato acima.

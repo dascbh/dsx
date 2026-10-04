@@ -116,7 +116,8 @@ export function planPreviews(cases, { screensDir, map = null, minSeverity = null
 const unionCrop = (a, b) => (!a ? b : !b ? a : (() => { const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y }; })());
 const roundCrop = (c, vw, vh) => { const x = Math.max(0, Math.floor(c.x)), y = Math.max(0, Math.floor(c.y)); return { x, y, width: Math.min(vw - x, Math.ceil(c.w)), height: Math.min(vh - y, Math.ceil(c.h)) }; };
 
-async function encoder(browser) {
+/** Codificador WebP (JPEG se o navegador não codificar WebP), qualidade ~0,7. Reusado pela página de variações. */
+export async function encoder(browser) {
   const page = await browser.newPage();
   await page.setContent('<body></body>');
   return async (png) => page.evaluate(async (b64) => {

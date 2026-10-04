@@ -11,6 +11,7 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Criar, atualizar ou avaliar o DESIGN.md | `design-md` |
 | Criar, extrair do código ou avaliar o UX.md (tipos de tela, regiões, ações, navegação, feedback, fluxos); nota de 100, drift UX.md × produto, desvios declarados | `ux-md` |
 | Montar ou rearranjar o layout de uma tela a partir do arquétipo (2–3 arranjos para escolher) | `arranjar-tela` |
+| Repensar tela ou fluxo, variações ("outras versões", "como poderia ser"): 3 variações reais construídas com os componentes do projeto, medidas, comparadas numa página e decididas | `repensar-ux` |
 | Criar/alterar tokens, paleta, escalas, tema escuro, contraste | `tokens` |
 | Escrever ou modificar código de interface (para sem DESIGN.md e sem UX.md) | `construir-ui` |
 | Dúvida entre componentes/comportamentos ("modal ou página?") | `padroes` |
@@ -111,6 +112,9 @@ node tools/ux-lint/findings.mjs import --module <m> decisions.json         # dec
 node tools/ux-lint/findings.mjs status --module <m> [--json]               # por status, família, regra e severidade; regressões e decididos sem aplicar
 node tools/ux-lint/findings.mjs check --module <m> [--min 2] --text … --screen … --flow …  # trava: reprova achado novo ≥ min ou regressão (não grava)
 node tools/ux-lint/findings.mjs page --module <m> <saida.html> [--product …] [--color …] [--preview-files] [--no-preview] [--max-page-mb 10]  # página de escolha paginada (<saida>-2.html…), com prévias e "Copiar decisões" de todas as páginas
+node tools/ux-lint/variations.mjs validate|measure|lint --root <projeto> --module <m> --flow <f> [--ux UX.md] [--no-layout] [--json]  # manifesto de variações (.dsx/variations/<m>/<f>/variations.json): confere, mede as capturas e roda texto/tela/estados/layout nos frames cruzando com `resolves`
+node tools/ux-lint/variations.mjs page --root <projeto> --module <m> --flow <f> --out <saida.html> [--shots <pasta>] [--findings-page <url>]  # página de comparação (Hoje + variantes, lado a lado por passo, decisão por variante ou por eixo); Playwright do projeto para as miniaturas
+node tools/ux-lint/variations.mjs decide --root … --module … --flow … (--variant <id> | --compose screen=b,flow=b,behavior=a,text=a) [--comment …] · import --root … decision.json  # grava decision.json
 node tools/ux-lint/text-page.mjs <cases.json> <saida.html> [--title …] [--product …] [--color …]  # página de escolha só a partir de cases.json
 npx -y @google/design.md lint DESIGN.md        # linter oficial do formato (também diff e export dtcg/tailwind)
 node tools/references.mjs search --register operational --use "termos" --curated   # referências de DESIGN.md (também index, fetch, evaluate, curate)

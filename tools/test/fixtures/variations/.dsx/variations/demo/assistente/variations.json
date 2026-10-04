@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "module": "demo",
+  "flow": "assistente",
+  "title": "Gerar documentos em lote",
+  "persona": "Advogada que gera dezenas de minutas por semana a partir de um modelo",
+  "task": "Escolher o modelo e os destinatários, gerar o lote e baixar o arquivo",
+  "journey_ref": "j-lote",
+  "current": {
+    "id": "current",
+    "name": "Hoje",
+    "frames": [
+      { "id": "c1", "step": "Escolher modelo", "capture": ".stitch/demo/code/01-passo-1.html", "kind": "screen", "caption": "Passo 1 de 3" },
+      { "id": "c2", "step": "Destinatários", "capture": ".stitch/demo/code/02-passo-2.html", "kind": "screen", "caption": "Passo 2 de 3, duas primárias" },
+      { "id": "c3", "step": "Resultado", "capture": ".stitch/demo/code/03-resultado.html", "kind": "screen", "caption": "Lote gerado" }
+    ],
+    "metrics": { "steps": 3, "clicks_to_done": 4, "dialogs": 0, "primary_actions": 2, "words_on_screen": 26, "decisions": 3 }
+  },
+  "variants": [
+    {
+      "id": "a",
+      "name": "Uma tela só",
+      "concept": "Modelo e destinatários na mesma tela; gerar mostra o progresso no lugar",
+      "changes": {
+        "screen": "Formulário de página único com seções em vez de três passos",
+        "flow": "Três passos viram um, com o resultado na mesma tela",
+        "behavior": "Gerar mostra o progresso em linha e recupera rascunho",
+        "text": "Botão diz quantos documentos gera; sem instrução de passo"
+      },
+      "archetype": "step-wizard",
+      "patterns": ["form-steps", "long-loading", "forms/autosave-vs-save"],
+      "laws": ["hick"],
+      "hypothesis": "Quem gera lotes toda semana conclui com menos cliques e sem perder o que preencheu",
+      "tradeoffs": ["Tela mais densa para quem gera pela primeira vez"],
+      "resolves": ["t-0000x1aa", "s-0000t1bb", "st-000s1cc", "l-000l6dd", "t-000descee", "f-000f3ff"],
+      "frames": [
+        { "id": "a1", "step": "Montar o lote", "capture": ".dsx/variations/demo/assistente/a/01-tudo.html", "kind": "screen", "caption": "Modelo e destinatários juntos" },
+        { "id": "a1r", "step": "Montar o lote", "capture": ".dsx/variations/demo/assistente/a/04-tudo.draft-restored.html", "kind": "state", "caption": "Rascunho recuperado" },
+        { "id": "a2", "step": "Gerar", "capture": ".dsx/variations/demo/assistente/a/02-gerando.html", "kind": "state", "caption": "Progresso em linha" },
+        { "id": "a3", "step": "Gerar", "capture": ".dsx/variations/demo/assistente/a/03-pronto.html", "kind": "behavior", "caption": "Pronto para baixar", "behavior": { "action": "clica em Gerar 4 documentos", "before": "a2", "after": "a3" } }
+      ],
+      "metrics": { "steps": 2, "clicks_to_done": 2, "dialogs": 0, "primary_actions": 1, "words_on_screen": 12, "decisions": 2 },
+      "code": ["src/variants/a/*.tsx"]
+    },
+    {
+      "id": "b",
+      "name": "Planilha primeiro",
+      "concept": "Começa pela planilha de destinatários e confere antes de gerar",
+      "changes": {
+        "screen": "Tabela editável no centro",
+        "flow": "Destinatários antes do modelo",
+        "behavior": "Validação na hora em cada linha",
+        "text": ""
+      },
+      "patterns": ["validation-timing"],
+      "hypothesis": "Quem já tem a lista pronta começa pelo que conhece",
+      "tradeoffs": ["Quem não tem planilha fica sem ponto de partida"],
+      "resolves": ["t-0000x1aa", "t-000descee"],
+      "frames": [
+        { "id": "b1", "step": "Destinatários", "capture": ".dsx/variations/demo/assistente/b/01-planilha.html", "kind": "screen", "caption": "Planilha" },
+        { "id": "b2", "step": "Conferir", "capture": ".dsx/variations/demo/assistente/b/02-conferir.html", "kind": "screen", "caption": "Revisão final" }
+      ],
+      "metrics": { "steps": 2, "clicks_to_done": 3, "dialogs": 0, "primary_actions": 1, "words_on_screen": 14, "decisions": 2 }
+    }
+  ]
+}

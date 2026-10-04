@@ -17,6 +17,7 @@
 | [ux-writing.md](ux-writing.md) | Princípios, fórmulas (botão, erro, vazio, confirmação, sucesso), tom de voz em 4 dimensões, estilo pt-BR, glossário | Escrever ou revisar qualquer texto visível |
 | [marcas-de-texto-gerado.md](marcas-de-texto-gerado.md) | Marcas que fazem o texto parecer gerado por IA ou burocrático (travessão, título composto, descrição que repete o título, abertura vazia, caixa de título, termo técnico…), com antes/depois e as regras X1–X11 de `tools/ux-lint/text.mjs` | Revisar texto escrito por agente, ler o relatório do `text.mjs` ou explicar por que uma tela "parece feita por IA" |
 | [achados-de-ux.md](achados-de-ux.md) | Contrato do registro de achados de UX (`.dsx/findings/<module>/`): id estável, `findings.json`/`options.json`/`decisions.json`, status calculado (open, decided, ignored, fixed, regression) e trava contra piora | Depois de rodar `text.mjs`/`screen.mjs`/`flow.mjs`; para saber o que está aberto, decidido, corrigido ou voltou; ao ligar `findings.mjs check` no CI |
+| [variacoes-de-ux.md](variacoes-de-ux.md) | Variações de tela e fluxo: eixos (estrutura, divisão do fluxo, modelo de interação, densidade e texto, momento da validação, confirmação × desfazer, primeiro × segundo plano), como gerar alternativas genuínas, hipótese e trade-off, armadilhas | Repensar uma tela ou um fluxo (skill `repensar-ux`); avaliar se alternativas são diferentes de verdade |
 | [dimensoes-de-ux.md](dimensoes-de-ux.md) | As 14 dimensões da auditoria de UX (texto, ações, layout, hierarquia, AI, navegação, fluxos, formulários, estados, consistência, acessibilidade, heurísticas, leis cognitivas, dark patterns): pergunta, regras, como é verificada, lacunas; lacunas vindas de outras fontes | Ao rodar `tools/ux-lint/audit.mjs` ou a skill `auditar-ux`; para saber o que a máquina mede e o que é julgamento |
 | [formularios.md](formularios.md) | Estrutura, ordem, rótulos, tipos de campo, teclados móveis e autocomplete, validação, erros, etapas, envio | Criar ou revisar qualquer formulário |
 | [arquitetura-da-informacao.md](arquitetura-da-informacao.md) | Sistemas de AI, onde algo deve morar, navegação, rotulagem, findability e busca, user flow, fidelidade de wireframe/protótipo | Decidir estrutura, navegação e nomes; desenhar fluxo; escolher fidelidade |
@@ -31,6 +32,7 @@
 - **Projetar uma feature nova:** arquitetura-da-informacao (fluxo e lugar) → psicologia-e-leis → hierarquia-visual → interacao-e-feedback → ux-writing.
 - **Auditoria formal com relatório:** avaliacao-de-usabilidade + heuristicas-nielsen.
 - **Projetar/rearranjar tela:** ux-md (arquétipo e políticas do `UX.md` do projeto) → hierarquia-visual → interacao-e-feedback → formularios (se houver) → ux-writing; skill `arranjar-tela`.
+- **Repensar tela ou fluxo (variações):** variacoes-de-ux → psicologia-e-leis → arquitetura-da-informacao → interacao-e-feedback → ux-writing; skill `repensar-ux`.
 - **Texto apenas:** ux-writing → marcas-de-texto-gerado (com o relatório de `tools/ux-lint/text.mjs`).
 - **Monetização, consentimento, retenção:** dark-patterns primeiro.
 

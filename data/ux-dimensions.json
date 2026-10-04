@@ -132,7 +132,7 @@
       "id": "flows",
       "name_pt": "Fluxos",
       "question_pt": "As jornadas principais terminam, têm saída em toda tela e cabem no limite de passos declarado?",
-      "knowledge": ["knowledge/fundamentos/arquitetura-da-informacao.md", "knowledge/fundamentos/avaliacao-de-usabilidade.md", "knowledge/fundamentos/ux-md.md"],
+      "knowledge": ["knowledge/fundamentos/arquitetura-da-informacao.md", "knowledge/fundamentos/avaliacao-de-usabilidade.md", "knowledge/fundamentos/ux-md.md", "knowledge/fundamentos/variacoes-de-ux.md"],
       "patterns": ["forms/form-steps", "feedback/success-confirmation"],
       "archetypes": ["states"],
       "rules": ["F0", "F1", "F3"],
