@@ -520,14 +520,14 @@ const PAGE_STYLE = `
 .decisao legend{font-size:12px;font-weight:600;padding:0 4px}
 .decisao label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;min-height:32px}
 .decisao input[type=radio]{accent-color:var(--accent);width:18px;height:18px}
-.decisao input[type=text]{font:13px var(--sans);flex:1;min-width:200px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
+.decisao input[type=text]{font:13px var(--sans);flex:1;min-width:200px;padding:6px 8px;border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--fg)}
 .decisao input[type=text][aria-invalid=true]{border-color:var(--bad)}
 .ja{font-size:12px;color:var(--ok);font-weight:600}
 .acoes{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;z-index:2}
-.acoes button{font:600 14px var(--sans);background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 18px;cursor:pointer;min-height:40px}
+.acoes button{font:600 14px var(--sans);background:var(--accent);color:var(--on-accent);border:0;border-radius:10px;padding:9px 18px;cursor:pointer;min-height:40px}
 .acoes button:focus-visible,.decisao input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.acoes input{font:13px var(--sans);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
-#saida{width:100%;min-height:140px;font:12px var(--mono);border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);padding:8px}
+.acoes input{font:13px var(--sans);padding:6px 8px;border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--fg)}
+#saida{width:100%;min-height:140px;font:12px var(--mono);border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--fg);padding:8px}
 #aviso{font-size:13px}`;
 
 // Decisões atravessam as páginas: cada escolha vai para o localStorage (chave por módulo + versão do registro) e

@@ -7,7 +7,7 @@
 //   node tools/ux-lint/variations.mjs measure  --root … --module … --flow … [--ux UX.md] [--json]
 //   node tools/ux-lint/variations.mjs lint     --root … --module … --flow … [--ux UX.md] [--no-layout] [--json] [--fail-at 3]
 //   node tools/ux-lint/variations.mjs page     --root … --module … --flow … --out <saida.html> [--shots <pasta>] [--no-shots]
-//                                              [--no-layout] [--product …] [--findings-page <url>] [--max-page-mb 10]
+//                                              [--no-layout] [--product …] [--findings-page <url>] [--max-page-mb 10] [--fragment]
 //   node tools/ux-lint/variations.mjs decide   --root … --module … --flow … (--variant <id> | --compose screen=b,flow=b,behavior=a,text=a)
 //                                              [--comment "…"] [--by nome]
 //   node tools/ux-lint/variations.mjs import   --root … <decision.json>
@@ -16,6 +16,8 @@
 // são relativos à raiz do projeto. O Playwright (recorte das telas e geometria para o layout) é resolvido a partir do
 // diretório atual, como em preview.mjs: rode de uma pasta do projeto que o tenha (no AURIS, frontend/). Sem ele, a
 // página sai sem as telas recortadas e o lint não roda as regras de layout (L).
+// A página sai como documento completo (doctype, <html lang="pt-BR">, charset, viewport); --fragment tira o esqueleto
+// da página 1 para publicar como artefato (o host põe o esqueleto).
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, mkdtempSync, rmSync } from 'node:fs';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -136,8 +138,26 @@ export function validateManifest(m, { root, catalogs = loadCatalogs(), registry 
     }
     if (row.hero && !fids.has(row.hero)) err(`${tag}: hero "${row.hero}" não é frame desta linha`);
     for (const f of frames) if (f.compare_to && !row.is_current && !currentIds.has(f.compare_to)) err(`${tag}, frame "${f.id}": compare_to "${f.compare_to}" não é frame de hoje`);
+    for (const f of frames) {
+      const c = f.compare_focus;
+      if (c === undefined) continue;
+      const ok = c && ['x', 'y', 'w', 'h'].every((k) => Number.isFinite(c[k]) && c[k] >= 0 && c[k] <= 1) && c.w > 0 && c.h > 0 && c.x + c.w <= 1.0001 && c.y + c.h <= 1.0001;
+      if (!ok) err(`${tag}, frame "${f.id}": compare_focus precisa de x, y, w, h entre 0 e 1 (frações da imagem), sem passar da borda`);
+    }
     const metrics = row.metrics ?? {};
     for (const k of METRICS) if (!Number.isFinite(Number(metrics[k])) || metrics[k] === null || metrics[k] === '') err(`${tag}: métrica "${k}" ausente ou não numérica`);
+    for (const [k, v] of Object.entries(row.metrics_detail ?? {})) {
+      if (k === 'not_comparable') {
+        for (const [mk, why] of Object.entries(v ?? {})) {
+          if (!METRICS.includes(mk)) err(`${tag}: metrics_detail.not_comparable.${mk} não é métrica (${METRICS.join(', ')})`);
+          else if (!String(why ?? '').trim()) err(`${tag}: metrics_detail.not_comparable.${mk} sem motivo`);
+        }
+        continue;
+      }
+      if (!METRICS.includes(k)) { err(`${tag}: metrics_detail.${k} não é métrica (${METRICS.join(', ')})`); continue; }
+      if (!Array.isArray(v) || v.some((x) => typeof x !== 'string' || !x.trim())) { err(`${tag}: metrics_detail.${k} precisa ser uma lista de textos (o que foi contado, um por item)`); continue; }
+      if (Number(metrics[k]) !== v.length) warn(`${tag}: metrics_detail.${k} lista ${v.length} e a métrica diz ${metrics[k]}`);
+    }
     if (row.is_current) continue;
     for (const k of ['name', 'concept', 'hypothesis']) if (!row[k]) err(`${tag}: falta "${k}"`);
     if (!(row.tradeoffs ?? []).length) err(`${tag}: sem "tradeoffs" (toda variação piora alguma coisa; diga o quê)`);
@@ -455,6 +475,84 @@ export async function shootCaptures(captures, { root, shotsDir, playwright, widt
   return out;
 }
 
+/**
+ * Regiões (px) do que mudou entre duas imagens já recortadas (antes e depois de um comportamento): compara blocos de
+ * 16 × 16 px num canvas do navegador (a média por bloco ignora o ruído da compressão), junta blocos vizinhos em
+ * regiões e devolve as maiores. Cache em `shotsDir` pelo nome das duas imagens. Devolve Map "<antes>|<depois>" →
+ * { boxes: [{ x, y, w, h }], width, height } ou null (nada mudou). Sem Playwright, só o que já está em cache.
+ */
+export async function diffShots(pairs, { shotsDir, playwright, block = 16, threshold = 16, maxBoxes = 8 }) {
+  const out = new Map();
+  const todo = [];
+  for (const [a, b] of pairs) {
+    const key = `${a}|${b}`;
+    if (out.has(key)) continue;
+    const f = join(shotsDir, `diff.${sha1(SHOTS_VERSION, 'blocks', a, b, block, threshold).slice(0, 16)}.json`);
+    if (isFile(f)) { try { out.set(key, JSON.parse(readFileSync(f, 'utf8')).diff ?? null); continue; } catch { /* refaz */ } }
+    if (isFile(join(shotsDir, a)) && isFile(join(shotsDir, b))) todo.push([a, b, key, f]);
+  }
+  if (!todo.length || !playwright) return out;
+  const type = (n) => (n.endsWith('.png') ? 'png' : n.endsWith('.webp') ? 'webp' : 'jpeg');
+  const uri = (n) => `data:image/${type(n)};base64,${readFileSync(join(shotsDir, n)).toString('base64')}`;
+  const browser = await playwright.module.chromium.launch();
+  try {
+    const page = await browser.newPage();
+    for (const [a, b, key, f] of todo) {
+      const diff = await page.evaluate(async ({ ua, ub, bs, th, maxBoxes }) => {
+        const load = (u) => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = u; });
+        const [A, B] = await Promise.all([load(ua), load(ub)]);
+        const W = Math.max(A.width, B.width), H = Math.max(A.height, B.height);
+        const px = (img) => { const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.drawImage(img, 0, 0); return x.getImageData(0, 0, W, H).data; };
+        const pa = px(A), pb = px(B);
+        const cols = Math.ceil(W / bs), rows = Math.ceil(H / bs);
+        const hot = new Uint8Array(cols * rows);
+        for (let by = 0; by < rows; by++) for (let bx = 0; bx < cols; bx++) {
+          let s = 0, c = 0;
+          for (let y = by * bs; y < Math.min(H, (by + 1) * bs); y++) for (let x = bx * bs; x < Math.min(W, (bx + 1) * bs); x++) { const i = (y * W + x) * 4; s += Math.abs(pa[i] - pb[i]) + Math.abs(pa[i + 1] - pb[i + 1]) + Math.abs(pa[i + 2] - pb[i + 2]); c++; }
+          if (s / c > th) hot[by * cols + bx] = 1;
+        }
+        // regiões: blocos quentes a até 2 blocos de distância ficam na mesma região
+        const seen = new Uint8Array(cols * rows), boxes = [];
+        for (let i = 0; i < hot.length; i++) {
+          if (!hot[i] || seen[i]) continue;
+          const q = [i]; seen[i] = 1; let x0 = cols, y0 = rows, x1 = -1, y1 = -1, n = 0;
+          while (q.length) {
+            const k = q.pop(), kx = k % cols, ky = (k - kx) / cols; n++;
+            x0 = Math.min(x0, kx); x1 = Math.max(x1, kx); y0 = Math.min(y0, ky); y1 = Math.max(y1, ky);
+            for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+              const nx = kx + dx, ny = ky + dy;
+              if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+              const j = ny * cols + nx;
+              if (hot[j] && !seen[j]) { seen[j] = 1; q.push(j); }
+            }
+          }
+          if (n >= 2) boxes.push({ x: x0 * bs, y: y0 * bs, w: Math.min(W, (x1 + 1) * bs) - x0 * bs, h: Math.min(H, (y1 + 1) * bs) - y0 * bs, n });
+        }
+        if (!boxes.length) return null;
+        boxes.sort((p, q) => q.n - p.n);
+        return { boxes: boxes.slice(0, maxBoxes).map(({ n, ...r }) => r), width: W, height: H };
+      }, { ua: uri(a), ub: uri(b), bs: block, th: threshold, maxBoxes });
+      writeFileSync(f, JSON.stringify({ diff }));
+      out.set(key, diff);
+    }
+  } finally { await browser.close(); }
+  return out;
+}
+
+/** Pares (imagem antes, imagem depois) dos frames de comportamento, para `diffShots`. */
+export function behaviorPairs(m, shots) {
+  const pairs = [];
+  for (const r of rowsOf(m)) {
+    const byId = new Map((r.frames ?? []).map((f) => [f.id, f]));
+    for (const f of r.frames ?? []) {
+      if (f.kind !== 'behavior') continue;
+      const b = shots.get(byId.get(f.behavior?.before)?.capture), a = shots.get((byId.get(f.behavior?.after) ?? f).capture);
+      if (a?.content && b?.content) pairs.push([b.content, a.content]);
+    }
+  }
+  return pairs;
+}
+
 // ---------- CLI ----------
 
 function context(a) {
@@ -557,9 +655,10 @@ async function main() {
     const content = regions.includes('main') ? 'main' : regions.find((r) => !/^(header|nav|aside)\b|role=(banner|navigation|complementary)|dialog/.test(r)) ?? 'main';
     shots = await shootCaptures(captures, { root, shotsDir, playwright, contentSelector: content, dialogSelector: cfg.verification.selectors.dialog || '[role=dialog]', log: a.verbose ? console.log : () => {} });
   }
+  const diffs = shots.size ? await diffShots(behaviorPairs(m, shots), { shotsDir, playwright }).catch((e) => { console.error(`diferença antes/depois não calculada: ${String(e.message).split('\n')[0]}`); return new Map(); }) : new Map();
   const measured = Object.fromEntries(rowsOf(m).map((r) => { const x = measureRow(r, { root, cfg }); return [r.id, { metrics: x.metrics, divergences: divergences(r.metrics, x.metrics), frames: x.frames }]; }));
   const pages = renderVariationsPages(m, {
-    lint, measured, registry, shots, shotsDir, catalogs, file: basename(out), product: typeof a.product === 'string' ? a.product : '',
+    lint, measured, registry, shots, diffs, shotsDir, catalogs, file: basename(out), product: typeof a.product === 'string' ? a.product : '', fragment: !!a.fragment,
     findings_page: typeof a['findings-page'] === 'string' ? a['findings-page'] : null, warnings: v.warnings,
     maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1024 * 1024 : PAGE_MAX_BYTES, dsx_rel: relative(root, DSX) || '.',
   });
