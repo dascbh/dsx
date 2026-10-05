@@ -19,7 +19,7 @@ argument-hint: "<rota, arquivo da tela ou descrição da tela nova>"
 
 ## 2. Diagnostique a tela atual (só tela existente)
 
-1. Capture a tela pelo código com a skill de captura do projeto (ex.: `code-to-stitch`), nos estados que importam (com dados, vazio, erro).
+1. Capture a tela pelo código com a skill de captura do projeto (`capture-from-code` do DSX, ou o harness do projeto), nos estados que importam (com dados, vazio, erro).
 2. Rode o gate objetivo sobre a captura e guarde a saída:
    ```bash
    node <DSX>/tools/ux-lint/screen.mjs <captura.html> --ux UX.md
@@ -84,7 +84,7 @@ Reverificação: ux-lint antes N achados → depois M; lint-ux-md OK
 - [ ] ux-lint de tela rodado depois; `UX.md` atualizado se mudou o arquétipo ou o desvio.
 
 
-## Lições do piloto (AURIS, editor de minuta, 2026-10-02)
+## Lições do piloto (editor de documento com painel, 2026-10-02)
 
 - **`edit_screens` sobre a captura do código é o melhor caminho para arranjos de tela existente:** o Stitch edita o próprio HTML com operações de DOM e mantém o CSS real do produto — o arranjo sai com a cara do produto, não reinterpretado.
 - **Sempre edite uma cópia:** às vezes a edição altera a tela de origem no lugar. Envie a captura uma vez como "Atual" e uma cópia por arranjo ("Arranjo N · base"); peça no prompt "crie uma NOVA versão".

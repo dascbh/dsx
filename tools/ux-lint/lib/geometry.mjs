@@ -9,9 +9,9 @@
 //
 // {
 //   "format": "dsx-geometry", "version": 1,
-//   "screen": "04-minuta-editor",            // nome da captura sem .html (convenção <nn>-<screen-id>[.<state>])
-//   "file": "04-minuta-editor.html",         // captura de origem (como foi passada ao measure)
-//   "title": "/contratos/minutas/:minutaId", // <title> da captura (a skill de captura põe a rota)
+//   "screen": "04-order-editor",             // nome da captura sem .html (convenção <nn>-<screen-id>[.<state>])
+//   "file": "04-order-editor.html",          // captura de origem (como foi passada ao measure)
+//   "title": "/orders/:orderId/edit",       // <title> da captura (a skill de captura põe a rota)
 //   "viewport": { "width": 1440, "height": 900 },
 //   "page_height": 2140,                     // altura total do documento (scrollHeight)
 //   "body_font_size": 15,                    // corpo de texto (px), lido do <body>
@@ -24,7 +24,7 @@
 //     "text_length": 10,                     // tamanho do texto completo (para comprimento de linha)
 //     "box": { "x": 1290, "y": 72, "width": 120, "height": 36 },  // getBoundingClientRect com rolagem 0
 //     "style": { "font_size": 14, "font_weight": 600, "line_height": 24.5, "color": "rgb(255, 255, 255)",
-//                "background_color": "rgb(14, 113, 184)", "display": "inline-flex", "visibility": "visible" },
+//                "background_color": "rgb(43, 89, 195)", "display": "inline-flex", "visibility": "visible" },
 //     "is_interactive": true, "is_primary": true, "is_destructive": false, "is_inline": false, "disabled": false,
 //     "label_for": null,                     // em rótulos: id (caminho) do campo que o rótulo nomeia
 //     "region": "main",                      // região pelo seletor do UX.md; diálogo = `diálogo "Título"`
@@ -130,7 +130,7 @@ export function isSaturated(color) {
   return s >= 0.45 && l >= 0.2 && l <= 0.7;
 }
 
-/** Id da tela a partir do nome da captura: `04-minuta-editor.empty` → `minuta-editor`. */
+/** Id da tela a partir do nome da captura: `04-order-editor.empty` → `order-editor`. */
 export function screenIdOf(name) {
   return String(name).replace(/^.*[\\/]/, '').replace(/\.geometry\.json$|\.html?$/, '').replace(/^\d+[-_]/, '').replace(/\..*$/, '');
 }

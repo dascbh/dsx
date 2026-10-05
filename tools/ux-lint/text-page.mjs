@@ -4,7 +4,7 @@
 // e em cada opção, com a convenção de origem, a recomendação, as telas e a origem no código.
 // `renderTextPage` é reaproveitada por `findings.mjs page` (que acrescenta id, status e o formulário de decisão).
 //
-//   node tools/ux-lint/text-page.mjs <cases.json> <saida.html> [--title "Texto das telas"] [--product "AURIS"] [--color "#0E71B8"]
+//   node tools/ux-lint/text-page.mjs <cases.json> <saida.html> [--title "Texto das telas"] [--product "Purchasing"] [--color "#2B59C3"]
 //
 // cases.json: {"cases":[{"id","element","rule","severity","text","variants":[],"source":[],"screens":[],
 //   "problem","options":[{"text","convention","note"}],"recommended":{"index","why"}}]}
@@ -136,10 +136,10 @@ function card(c, extra = {}, media = null) {
  * `--line` é borda decorativa (cartão, divisória); `--control-line` é a borda de campo e botão secundário (≥ 3:1 contra
  * o fundo); `--on-accent` é o texto sobre `--accent` (≥ 4,5:1). Pares travados em tools/test/theme-contrast.test.mjs.
  */
-export const THEME_TOKENS = `:root{--bg:#F4F6F9;--surface:#FFFFFF;--fg:#1E2130;--muted:#5B6578;--line:#D5DCE6;--control-line:#7B8798;--accent:#0E71B8;--on-accent:#FFFFFF;--accent-soft:#E8F1FA;--ok:#15803D;--ok-soft:#EAF7EF;--warn:#B45309;--warn-soft:#FFF6E5;--bad:#B91C1C;--bad-soft:#FDEEEE;
+export const THEME_TOKENS = `:root{--bg:#F4F6F9;--surface:#FFFFFF;--fg:#1E2130;--muted:#5B6578;--line:#D5DCE6;--control-line:#7B8798;--accent:#2B59C3;--on-accent:#FFFFFF;--accent-soft:#E8F1FA;--ok:#15803D;--ok-soft:#EAF7EF;--warn:#B45309;--warn-soft:#FFF6E5;--bad:#B91C1C;--bad-soft:#FDEEEE;
 --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;--serif:'Source Serif 4',Georgia,serif;--mono:ui-monospace,'SF Mono',Menlo,monospace}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1724;--surface:#142235;--fg:#E7EDF5;--muted:#9AA7B8;--line:#28405A;--control-line:#6A82A0;--accent:#5AA9E6;--on-accent:#0D1724;--accent-soft:#16324B;--ok:#4ADE80;--ok-soft:#13301F;--warn:#F0B45A;--warn-soft:#3A2A12;--bad:#F87171;--bad-soft:#3A1717;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0D1724;--surface:#142235;--fg:#E7EDF5;--muted:#9AA7B8;--line:#28405A;--control-line:#6A82A0;--accent:#5AA9E6;--on-accent:#0D1724;--accent-soft:#16324B;--ok:#4ADE80;--ok-soft:#13301F;--warn:#F0B45A;--warn-soft:#3A2A12;--bad:#F87171;--bad-soft:#3A1717;color-scheme:dark}`;
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1724;--surface:#142235;--fg:#E7EDF5;--muted:#9AA7B8;--line:#28405A;--control-line:#6A82A0;--accent:#7EA6F2;--on-accent:#0D1724;--accent-soft:#16324B;--ok:#4ADE80;--ok-soft:#13301F;--warn:#F0B45A;--warn-soft:#3A2A12;--bad:#F87171;--bad-soft:#3A1717;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D1724;--surface:#142235;--fg:#E7EDF5;--muted:#9AA7B8;--line:#28405A;--control-line:#6A82A0;--accent:#7EA6F2;--on-accent:#0D1724;--accent-soft:#16324B;--ok:#4ADE80;--ok-soft:#13301F;--warn:#F0B45A;--warn-soft:#3A2A12;--bad:#F87171;--bad-soft:#3A1717;color-scheme:dark}`;
 
 export const PAGE_MAX_BYTES = 10 * 1024 * 1024;
 export const PAGE_MAX_CASES = 60;
@@ -225,7 +225,7 @@ export function paginate(cases, { maxCases = PAGE_MAX_CASES, maxBytes = PAGE_MAX
 export function renderTextPages(cases, opts = {}) {
   const title = opts.title ?? 'Texto das telas';
   const product = opts.product ?? '';
-  const color = opts.color ?? '#0E71B8';
+  const color = opts.color ?? '#2B59C3';
   const file = opts.file ?? 'page.html';
   const pv = opts.previews ?? null;
   const sizeOf = (c, seen) => {
@@ -369,7 +369,7 @@ function main() {
   for (const w of warnings) console.error(`AVISO ${input}: ${w}`);
   const cases = Array.isArray(data) ? data : data.cases ?? [];
   sortCases(cases);
-  writeFileSync(output, renderTextPage(cases, { title: a.title ?? 'Texto das telas', product: a.product ?? '', color: a.color ?? '#0E71B8' }));
+  writeFileSync(output, renderTextPage(cases, { title: a.title ?? 'Texto das telas', product: a.product ?? '', color: a.color ?? '#2B59C3' }));
   console.log(`${output} · ${cases.length} casos`);
 }
 

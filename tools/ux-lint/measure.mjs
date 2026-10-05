@@ -14,16 +14,15 @@ import { pathToFileURL } from 'node:url';
 import { parseCli } from '../lib/legacy-cli.mjs';
 import { loadConfig } from './lib/config.mjs';
 import { GEOMETRY_FORMAT, GEOMETRY_VERSION } from './lib/geometry.mjs';
+import { kitProfile } from './lib/kits.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
 
-/** Regiões de arquétipo reconhecidas por padrão (além de `data-region`); o UX.md pode acrescentar ou trocar. */
-export const DEFAULT_ARCHETYPE_REGION_SELECTORS = {
-  'dialog-header': '.MuiDialogTitle-root',
-  'dialog-body': '.MuiDialogContent-root',
-  'dialog-footer': '.MuiDialogActions-root',
-  'step-trail': '.MuiStepper-root',
-  'list-footer': '.MuiTablePagination-root',
-  toolbar: '[role=toolbar]',
-};
+/**
+ * Regiões de arquétipo reconhecidas por padrão (além de `data-region`): as do perfil de kit `auto`
+ * (lib/kits.mjs). Com `verification.kit` no UX.md valem as do kit escolhido; o UX.md pode acrescentar ou
+ * trocar em `verification.selectors.archetype-regions`.
+ */
+export const DEFAULT_ARCHETYPE_REGION_SELECTORS = kitProfile('auto').regions;
 
 /** Resolve o Playwright do projeto (cwd). Devolve o módulo ou null. */
 export function resolvePlaywright(cwd = process.cwd()) {
@@ -49,8 +48,8 @@ export function listHtml(inputs) {
 function collect(sel) {
   const regionSel = [...sel.regions, sel.dialog].join(', ');
   const INTERACTIVE = `${sel.button}, a[href], input:not([type=hidden]), select, textarea, summary, [role=link], [role=tab], [role=checkbox], [role=radio], [role=switch], [role=menuitem], [role=option], [role=combobox]`;
-  const CONTAINERS = 'aside, section, form, fieldset, table, ul, ol, footer, article, [role=toolbar], [role=tablist], [role=list], [role=grid], [role=group], [role=tabpanel], [role=region], [role=complementary], [role=article], .MuiPaper-root, .MuiCard-root, .MuiDialogTitle-root, .MuiDialogContent-root, .MuiDialogActions-root, .MuiStepper-root, .MuiTablePagination-root';
-  const CARDS = '.MuiCard-root, .MuiPaper-outlined, article, [role=article]';
+  const CONTAINERS = `aside, section, form, fieldset, table, ul, ol, footer, article, [role=toolbar], [role=tablist], [role=list], [role=grid], [role=group], [role=tabpanel], [role=region], [role=complementary], [role=article]${sel.kit_containers ? `, ${sel.kit_containers}` : ''}`;
+  const CARDS = sel.kit_cards || 'article, [role=article]';
   const FORM_GROUP = 'form, fieldset, [role=form], [role=group], [role=dialog], [role=tabpanel], aside, section, [role=region]';
   const unstableId = (id) => !id || /^_r_|^:r|^mui-|\d{3,}/.test(id) || /[^\w-]/.test(id);
   const paths = new WeakMap();
@@ -120,7 +119,7 @@ function collect(sel) {
     const role = el.getAttribute('role');
     const isRegion = el.matches(regionSel);
     const insideInteractive = el.parentElement?.closest(INTERACTIVE);
-    const disabled = !!el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('Mui-disabled');
+    const disabled = !!el.disabled || el.getAttribute('aria-disabled') === 'true' || (!!sel.kit_disabled && el.matches(sel.kit_disabled));
     const isInteractive = !insideInteractive && el.matches(INTERACTIVE) && (cs.pointerEvents !== 'none' || disabled)
       && !el.classList.contains('MuiSelect-nativeInput');
     const isField = el.matches(sel.field) || role === 'combobox';
@@ -204,7 +203,11 @@ function collect(sel) {
 /** Mede uma lista de capturas e grava a geometria. Devolve [{ file, out, elements }]. */
 export async function measure(files, { outDir, cfg, width = 1440, height = 900, playwright }) {
   const sel = { ...cfg.verification.selectors };
-  sel.archetype_regions = { ...DEFAULT_ARCHETYPE_REGION_SELECTORS, ...(sel['archetype-regions'] || {}) };
+  const kit = cfg.kitProfile ?? kitProfile(cfg.verification?.kit);
+  sel.archetype_regions = { ...kit.regions, ...(sel['archetype-regions'] || {}) };
+  sel.kit_containers = kit.containers;
+  sel.kit_cards = kit.cards;
+  sel.kit_disabled = kit.disabled;
   delete sel['archetype-regions'];
   mkdirSync(outDir, { recursive: true });
   const browser = await playwright.module.chromium.launch();
@@ -239,8 +242,16 @@ export const PLAYWRIGHT_MISSING = [
 
 async function main() {
   const args = parseCli('ux-lint/measure.mjs');
+  // Com --module (e --root), entrada e saída vêm dos caminhos do projeto (lib/project-paths.mjs).
+  if (typeof args.module === 'string') {
+    const pp = resolveProjectPaths({ root: typeof args.root === 'string' ? args.root : process.cwd(), module: args.module, config: typeof args.config === 'string' ? args.config : null });
+    for (const w of pp.warnings) console.error(`AVISO ${w}`);
+    if (!args._.length) args._.push(pp.captures);
+    if (typeof args.out !== 'string') args.out = pp.geometry;
+    if (typeof args.ux !== 'string' && statSync(pp.ux, { throwIfNoEntry: false })?.isFile()) args.ux = pp.ux;
+  }
   if (!args._.length || typeof args.out !== 'string') {
-    console.error('Uso: node tools/ux-lint/measure.mjs <pasta|arquivo.html...> --out <pasta-geometria> [--ux UX.md] [--width 1440] [--height 900]');
+    console.error('Uso: node tools/ux-lint/measure.mjs <pasta|arquivo.html...> --out <pasta-geometria> [--ux UX.md] [--width 1440] [--height 900]\n     ou: node tools/ux-lint/measure.mjs --module <m> [--root <projeto>] [--config <file>]');
     process.exit(2);
   }
   const playwright = resolvePlaywright();

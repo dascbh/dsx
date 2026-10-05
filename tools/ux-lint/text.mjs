@@ -8,7 +8,7 @@
 // Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md]
 //                                  [--module <m>] [--ignore <nomes...>] [--json]
 // --module escolhe o glossário do módulo (`content.glossary` por módulo): os termos canônicos com maiúscula no
-// meio ("Termo Aditivo", "Radar Tributário") valem como nomes próprios no X10, junto de `content.proper-nouns`.
+// meio ("Nota Fiscal", "Ordem de Compra") valem como nomes próprios no X10, junto de `content.proper-nouns`.
 // --code procura cada texto apontado nas fontes (.ts/.tsx/.js/.jsx/.mjs/.py/.json) e devolve
 // arquivo:linha, para corrigir onde o texto nasce.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -309,9 +309,9 @@ export function rulesForItem(it, cfg = configFrom({}), extras = {}) {
   if (it.type === 'button' && !it.from_aria_label && !COMPANY_NAME.test(t) && !['list-item', 'sort', 'chip', 'menu-item', 'toggle', 'composite'].includes(it.variant)) {
     const ws = words(t);
     if (ws.length > 4) add('X6', `botão com ${ws.length} palavras (máx. 4)`);
-    else if (LABELS_WITHOUT_VERB.includes(norm(t))) add('X6', `botão "${t}" sem objeto`, `${t} <objeto> (ex.: "Enviar minuta")`);
+    else if (LABELS_WITHOUT_VERB.includes(norm(t))) add('X6', `botão "${t}" sem objeto`, `${t} <objeto> (ex.: "Enviar pedido")`);
     else if (cfg.content.buttons === 'verb-object' && ['contained', 'outlined', 'text'].includes(it.variant) && ws.length && !looksLikeVerb(ws[0])) {
-      add('X6', 'botão não começa por verbo', 'verbo no infinitivo + objeto (ex.: "Criar minuta")');
+      add('X6', 'botão não começa por verbo', 'verbo no infinitivo + objeto (ex.: "Criar pedido")');
     }
   }
 

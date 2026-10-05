@@ -15,7 +15,7 @@ rules: [T1, T3, T6, F1, F2]
 
 # Painel de acompanhamento
 
-A tela de entrada de um módulo ou de uma carteira: quantos contratos vencem neste mês, quantos aguardam resposta de terceiros, como evoluiu o volume, o que está atrasado. Cada número precisa responder "e daí?" — levar a uma lista filtrada onde a pessoa age. Painel que só exibe é decoração.
+A tela de entrada de um módulo ou de uma carteira: quantos pedidos vencem neste mês, quantos aguardam resposta de terceiros, como evoluiu o volume, o que está atrasado. Cada número precisa responder "e daí?" — levar a uma lista filtrada onde a pessoa age. Painel que só exibe é decoração.
 
 ## Quando usar
 
@@ -46,7 +46,7 @@ A tela de entrada de um módulo ou de uma carteira: quantos contratos vencem nes
 
 ## O que vai em cada região
 
-- **page-header** — `h1`, horário da última atualização dos dados e, se existir, uma primária (ex.: "Novo contrato"); exportar como secundária.
+- **page-header** — `h1`, horário da última atualização dos dados e, se existir, uma primária (ex.: "Novo pedido"); exportar como secundária.
 - **period-bar** — período com atalhos (hoje, 7 dias, mês, personalizado) e comparação; o período escolhido aparece por extenso e vale para todos os blocos.
 - **kpi-strip** — de 3 a 6 cartões: rótulo, valor, variação com sinal e texto ("↑ 4 em relação ao mês anterior"), destaque de atenção com ícone além da cor; cada cartão é link para a lista filtrada.
 - **charts-area** — 1 ou 2 gráficos que explicam a tendência; título que afirma a leitura, eixo com unidade, tabela alternativa acessível.

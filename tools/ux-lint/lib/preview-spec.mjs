@@ -240,7 +240,7 @@ export function locatorFor(c) {
     // T3 sem h1: o candidato é o texto mais destacado no topo do conteúdo (o título que já está na tela)
     if (rule === 'T3') return { kind: 'main-title', max: 1 };
     if (rule === 'T6') { const ex = String(msg).match(/ex\.: "([^"]+)/); return ex ? { kind: 'any', contains: [clean(ex[1]).replace(/…$/, '').slice(0, 60)], max: 1 } : { screen_level: true }; }
-    const labels = quoted(msg).filter((l) => !/^(Enviar minuta)$/.test(l) || rule !== 'T7');
+    const labels = quoted(msg).filter((l) => !/^(Enviar pedido)$/.test(l) || rule !== 'T7');
     const own = rule === 'T7' ? labels.slice(0, 1) : labels;
     return own.length ? { kind: 'button', patterns: own.map((t) => toPattern(t)).filter(Boolean), max: rule === 'T1' ? 8 : 4 } : { screen_level: true };
   }
@@ -263,7 +263,7 @@ export const INSTRUCTION_VERB_RE = /^(mover|trocar|usar|remover|substituir|mostr
 const ELEMENT_NOUN = 't[íi]tulo|r[óo]tulo|placeholder|apoio|texto|rodap[ée]|link|selo|dica|bot[ãa]o|aba|legenda';
 const ELEMENT_WORD = new RegExp(`(?:^|[;.]\\s*)(${ELEMENT_NOUN})(?=[\\s"“])[^"“;]*["“]([^"”]+)["”]`, 'i');
 const LABEL_COLON = new RegExp(`^(${ELEMENT_NOUN})\\s*:\\s*(.+)$`, 'i');
-/** Opção cujo texto é a própria frase (com aspas internas, como “Criar aditivo”), não uma instrução. */
+/** Opção cujo texto é a própria frase (com aspas internas, como “Criar pedido”), não uma instrução. */
 const isSentence = (t, element) => !INSTRUCTION_NOUN_RE.test(t) && !(!['button', 'tab', 'menu'].includes(element) && INSTRUCTION_VERB_RE.test(t))
   && !ELEMENT_WORD.test(t) && !/,\s+com\s|\s+ou\s+["“]/.test(t) && !/^["“][^"”]+["”]\s+vis[íi]vel/i.test(t);
 const isInstruction = (t, element) => (/["“].+["”]/.test(t) && !isSentence(t, element)) || INSTRUCTION_NOUN_RE.test(t) || (!['button', 'tab', 'menu'].includes(element) && INSTRUCTION_VERB_RE.test(t));
@@ -550,7 +550,7 @@ export function flowDiagram(map, screenId, rule) {
     if (rule === 'F2') parts.push(after
       ? `<rect class="j new" x="4" y="22" width="${W - 8}" height="${H - 26}" rx="12"/><text class="t new" x="14" y="16">jornada declarada no mapa (a definir)</text>`
       : `<text class="t warn" x="14" y="16">fora de todas as jornadas do mapa</text>`);
-    const style = '<style>.n rect{fill:var(--surface,#fff);stroke:var(--line,#C9D2DE);stroke-width:1.5}.n text,.t{font:12px Inter,system-ui,sans-serif;fill:var(--fg,#1E2130)}.n.me rect{stroke:var(--accent,#0E71B8);stroke-width:2.5}.n.new rect{stroke:var(--ok,#15803D);stroke-dasharray:5 4;stroke-width:2}.e{fill:none;stroke:var(--muted,#5B6578);stroke-width:1.5}.e.new{stroke:var(--ok,#15803D);stroke-dasharray:5 4;stroke-width:2}.t.new{fill:var(--ok,#15803D);font-weight:600}.t.warn{fill:var(--bad,#B91C1C);font-weight:600}.j{fill:none;stroke-width:2;stroke-dasharray:6 5}.j.new{stroke:var(--ok,#15803D)}</style>';
+    const style = '<style>.n rect{fill:var(--surface,#fff);stroke:var(--line,#C9D2DE);stroke-width:1.5}.n text,.t{font:12px Inter,system-ui,sans-serif;fill:var(--fg,#1E2130)}.n.me rect{stroke:var(--accent,#2B59C3);stroke-width:2.5}.n.new rect{stroke:var(--ok,#15803D);stroke-dasharray:5 4;stroke-width:2}.e{fill:none;stroke:var(--muted,#5B6578);stroke-width:1.5}.e.new{stroke:var(--ok,#15803D);stroke-dasharray:5 4;stroke-width:2}.t.new{fill:var(--ok,#15803D);font-weight:600}.t.warn{fill:var(--bad,#B91C1C);font-weight:600}.j{fill:none;stroke-width:2;stroke-dasharray:6 5}.j.new{stroke:var(--ok,#15803D)}</style>';
     const defs = '<defs><marker id="a-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted,#5B6578)"/></marker><marker id="a-new" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--ok,#15803D)"/></marker></defs>';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">${style}${defs}${parts.join('')}</svg>`;
   };

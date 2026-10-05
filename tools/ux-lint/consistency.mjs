@@ -28,6 +28,7 @@ import { loadGlossary, glossarySource } from './lib/glossary.mjs';
 import { loadConfig, configFrom } from './lib/config.mjs';
 import { closest, querySelectorAll, matches, isHidden } from './lib/html.mjs';
 import { takeInventory, visibleText } from './text.mjs';
+import { kitProfile } from './lib/kits.mjs';
 
 export const SEVERITY = { C1: 2, C2: 1, C3: 1 };
 /** Grupos de verbo da mesma ação (minúsculas, sem acento). `novo`/`nova` contam como o mesmo verbo. */
@@ -36,7 +37,7 @@ export const VERB_GROUPS = {
   save: ['salvar', 'gravar', 'save'],
   dismiss: ['cancelar', 'voltar', 'fechar', 'cancel', 'close', 'back'],
   create: ['criar', 'novo', 'nova', 'cadastrar', 'create', 'new'],
-  // adicionar põe algo que já existe num lugar (cláusula da biblioteca na minuta); criar faz um objeto novo
+  // adicionar põe algo que já existe num lugar (item do catálogo no pedido); criar faz um objeto novo
   add: ['adicionar', 'incluir', 'add'],
   edit: ['editar', 'alterar', 'modificar', 'edit'],
   download: ['baixar', 'exportar', 'download', 'descarregar', 'export'],
@@ -68,7 +69,7 @@ export function parseAction(label) {
   if (!w.length) return null;
   const group = VERB_OF.get(w[0]);
   if (!group) return null;
-  // "Adicionar à minuta", "Salvar no modelo": o que vem depois da preposição é o destino, não o objeto.
+  // "Adicionar à proposta", "Salvar no modelo": o que vem depois da preposição é o destino, não o objeto.
   if (w[1] && DESTINATION.has(w[1])) return { verb: canonicalVerb(w[0]), group, object: null, destination: singular(w.slice(2).find((x) => !STOP.has(x)) ?? '') || null };
   const rest = w.slice(1).filter((x) => !STOP.has(x) && !/^\d+$/.test(x));
   return { verb: canonicalVerb(w[0]), group, object: rest.length ? singular(rest[0]) : null };
@@ -79,6 +80,10 @@ export function parseAction(label) {
 /** Inventário de uma captura: [{ kind: button|title|tab, text, variant, screen, evidence, action }]. */
 export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
   const sel = cfg.verification.selectors;
+  // rodapé e título de diálogo do kit (lib/kits.mjs); o rodapé declarado no UX.md vence
+  const kit = cfg.kitProfile ?? kitProfile(cfg.verification?.kit);
+  const footerSel = sel['dialog-footer'] || kit.regions['dialog-footer'];
+  const titleSel = `h1, h2, h3${kit['dialog-title'] ? `, ${kit['dialog-title']}` : ''}`;
   const out = [];
   const items = takeInventory(html, cfg);
   for (const it of items) {
@@ -90,7 +95,7 @@ export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
       let action = parseAction(entry.text);
       if (action && !action.object && action.group !== 'dismiss') {
         const aria = parseAction(it.node.attrs['aria-label'] ?? '');
-        const title = dialog ? parseAction(dialogTitle(dialog)) : null;
+        const title = dialog ? parseAction(dialogTitle(dialog, titleSel)) : null;
         action.object = (aria?.group === action.group && aria.object) || (title?.group === action.group && title.object) || null;
       }
       if (action?.group === 'dismiss') {
@@ -98,7 +103,7 @@ export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
         // grupo de botões dele (rodapé) ter uma ação principal (primária ou destrutiva)
         if (!dialog || it.variant === 'icon' || words(entry.text).length > 1) action = null;
         else {
-          const footer = closest(it.node.parent, '.MuiDialogActions-root') ?? it.node.parent;
+          const footer = (footerSel && closest(it.node.parent, footerSel)) ?? it.node.parent;
           const main = querySelectorAll(footer, sel.button).filter((b) => b !== it.node && !isHidden(b) && (matches(b, sel.primary) || matches(b, sel.destructive)));
           action.object = main.length ? 'cancel' : 'close';
         }
@@ -110,8 +115,8 @@ export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
   return out;
 }
 
-function dialogTitle(dialog) {
-  const t = querySelectorAll(dialog, 'h1, h2, h3, .MuiDialogTitle-root')[0];
+function dialogTitle(dialog, titleSel = 'h1, h2, h3') {
+  const t = querySelectorAll(dialog, titleSel)[0];
   return t ? visibleText(t) : '';
 }
 

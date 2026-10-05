@@ -5,7 +5,7 @@
 //
 // Uso: node tools/ux-lint/preview.mjs --module <m> --root <projeto> [--screens <capturas>] [--map <flows.json>]
 //        [--min-severity <n>] [--out <dir>] [--width 1440] [--dir <findings>] [--json]
-// Padrões: --screens <root>/.stitch/<m>/code · --map <root>/.dsx/maps/flows-<m>.json ·
+// Padrões (lib/project-paths.mjs): --screens <root>/.dsx/captures/<m> (legado .stitch/<m>/code com aviso) · --map <root>/.dsx/maps/flows-<m>.json ·
 //          --out <root>/.dsx/findings/<m>/previews (manifesto previews.json + imagens WebP, ou JPEG se WebP falhar).
 // O Playwright NÃO é dependência do DSX: é resolvido a partir do diretório atual (como measure.mjs). Sem ele, sai
 // com 3 e a página fica sem prévia de captura (os diagramas de fluxo saem mesmo assim).
@@ -21,6 +21,7 @@ import {
 } from './lib/preview-spec.mjs';
 import { runtime } from './lib/preview-runtime.mjs';
 import { buildKit, KIT_VERSION } from './lib/preview-kit.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
 
 const MANIFEST = 'previews.json';
 // o código que roda na captura entra no hash: mudar o runtime refaz as prévias sem precisar subir a versão
@@ -31,13 +32,15 @@ const SKIP_STATUS = new Set(['fixed', 'ignored', 'accepted-deviation']);
 const isFile = (p) => { try { return statSync(p).isFile(); } catch { return false; } };
 
 /** Caminhos padrão. */
-export function previewPaths({ root, module, dir = null, out = null, screens = null, map = null }) {
-  const findingsDir = dir ? resolve(dir) : join(root, '.dsx', 'findings');
+export function previewPaths({ root, module, dir = null, out = null, screens = null, map = null, config = null }) {
+  // flags relativas ao diretório atual; padrões do projeto em lib/project-paths.mjs (docs/project-paths.md)
+  const p = resolveProjectPaths({ root, module, config, flags: { dir: dir && resolve(dir), screens: screens && resolve(screens), map: map && resolve(map) } });
+  for (const w of p.warnings) console.error(`AVISO ${w}`);
   return {
-    findingsDir,
-    out: out ? resolve(out) : join(findingsDir, module, 'previews'),
-    screens: screens ? resolve(screens) : join(root, '.stitch', module, 'code'),
-    map: map ? resolve(map) : join(root, '.dsx', 'maps', `flows-${module}.json`),
+    findingsDir: p.findings,
+    out: out ? resolve(out) : join(p.findings, module, 'previews'),
+    screens: p.captures,
+    map: p.map,
   };
 }
 
@@ -375,8 +378,8 @@ export function summarizeManifest(manifest, ids = null) {
 }
 
 /** Monta os casos da página e roda tudo (usado pela CLI e por audit.mjs --preview). */
-export async function previewModule({ root, module, dir = null, out = null, screens = null, map = null, minSeverity = null, width = 1440, playwright, registry = null, log }) {
-  const p = previewPaths({ root, module, dir, out, screens, map });
+export async function previewModule({ root, module, dir = null, out = null, screens = null, map = null, config = null, minSeverity = null, width = 1440, playwright, registry = null, log }) {
+  const p = previewPaths({ root, module, dir, out, screens, map, config });
   const st = findings.load(findings.paths(p.findingsDir, module), module);
   const reg = registry ?? st.findings;
   findings.restatus(reg, st.decisions);
@@ -390,7 +393,7 @@ export async function previewModule({ root, module, dir = null, out = null, scre
 async function main() {
   const a = parseArgs();
   if (!a.module || a.module === true) {
-    console.error('Uso: node tools/ux-lint/preview.mjs --module <m> --root <projeto> [--screens <capturas>] [--map <flows.json>] [--min-severity <n>] [--out <dir>] [--width 1440] [--json]');
+    console.error('Uso: node tools/ux-lint/preview.mjs --module <m> --root <projeto> [--config <file>] [--screens <capturas>] [--map <flows.json>] [--min-severity <n>] [--out <dir>] [--width 1440] [--json]');
     process.exit(2);
   }
   const root = resolve(typeof a.root === 'string' ? a.root : process.cwd());
@@ -400,7 +403,7 @@ async function main() {
   let r;
   try {
     r = await previewModule({
-      root, module: a.module, dir: str(a.dir), out: str(a.out), screens: str(a.screens), map: str(a.map),
+      root, module: a.module, dir: str(a.dir), out: str(a.out), screens: str(a.screens), map: str(a.map), config: str(a.config),
       minSeverity: a['min-severity'] !== undefined ? Number(a['min-severity']) : null, width: Number(a.width ?? 1440), playwright,
       log: a.verbose ? (m) => console.log(m) : () => {},
     });

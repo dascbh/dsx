@@ -6,7 +6,7 @@ argument-hint: "<módulo> <fluxo ou tela>"
 
 # Repensar UX
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `archetypes/`, `tools/`, `data/` são relativos a ela; caminhos sem prefixo (`UX.md`, `.dsx/`, `.stitch/`, `frontend/`) são do projeto.
+> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `archetypes/`, `tools/`, `data/` são relativos a ela; caminhos sem prefixo (`UX.md`, `.dsx/`, `src/`) são do projeto; as pastas de captura e de código vêm de `docs/project-paths.md`.
 
 Referências: `knowledge/fundamentos/variacoes-de-ux.md` (eixos, como gerar alternativas genuínas, hipótese e trade-off, armadilhas), `knowledge/fundamentos/achados-de-ux.md` (registro), `knowledge/fundamentos/psicologia-e-leis.md`, `archetypes/`, `patterns/index.json`, `data/ux-dimensions.json` (`laws_index`).
 
@@ -45,18 +45,38 @@ Gere as três a partir de **ideias centrais opostas**, não de ajustes de uma me
 - variante sem âncora no catálogo (arquétipo, padrão ou lei);
 - variante que quebra uma restrição do passo 1 (essa é descartada, não comparada).
 
+### Falsifiable hypotheses and lenses (manifest format 2)
+
+Each variant is a bet that can be proven wrong (Forward "Hypotheses" stage, USE-10). In a `"format": 2` manifest every variant declares, in plain words:
+
+| Field | What it says |
+|---|---|
+| `audience` | who the variant is for (persona and situation) |
+| `causal_bet` | what change causes which improvement, and why |
+| `counter_hypothesis` | the strongest reason the bet could be wrong |
+| `falsification_test` | the observation that would prove it wrong (a session, a measure, a threshold) |
+| `expected_metric` | the number that should move, from the manifest metrics or a cycle criterion id |
+| `guardrail` | what must not get worse |
+| `lens` | one of Forward's lenses: `subtract`, `invert`, `analogous`, `constraint-first`, `object-first` — distinct per variant (variants sharing a lens count as one) |
+
+The manifest also records the convergence the designer recommends — `"choice": { "variant": "<id>", "why": "…" }` — and what each discarded variant traded — `"rejected_tradeoffs": { "<id>": "…" }`. The owner still decides on the page. `validate` requires all of this from format 2 and only warns on format 1 manifests. Export the Forward view for the demand: `variations.mjs alternatives --root <project> --module <m> --flow <f> --out specs/<demand-id>/design/alternatives.md` (the `Lens:`, `Hypothesis:`, `Traded:`, `Chose:` lines Forward's divergence gate reads). The page shows the hypothesis under "Como saber se funciona", without ids.
+
+### Internal criticism (mandatory before the page goes to the owner)
+
+Record in the manifest a `critique` block with six entries — `counter_case`, `unsupported_claims`, `failure_recovery`, `accessibility`, `domain_data`, `security_ops` — each `{ "status": "resolved" | "limitation" | "measurement", "note": "…" }`: resolved says what changed in the variants; limitation is said on the page as a risk; measurement becomes a falsification test or a cycle criterion with an unknown baseline. This self-check never replaces the isolated review (agent `revisor-ux`, Forward `fde-review`).
+
 ## 3. Construir com os componentes reais
 
-Cada variante é **código de teste**, nunca produção: monte as telas com os componentes do projeto (os mesmos de `frontend/src/components/` e das páginas) e renderize pelo **harness de captura do projeto**, como as capturas de hoje (no AURIS, `frontend/tests/stitch-capture/`, skill `code-to-stitch`, com `environment.tsx` e `serialize.ts`). Código em `frontend/tests/stitch-capture/variants/<flow>/<variant>/*.tsx` (vai em `code` no manifesto). Dados fictícios sempre, nunca nome de cliente real. Sem servidor, sem geração por texto, sem maquete.
+Cada variante é **código de teste**, nunca produção: monte as telas com os componentes do projeto (os mesmos de `src/components/` e das páginas) e renderize pelo **harness de captura**, como as capturas de hoje (skill `capture-from-code`, com `environment.tsx` e `serialize.ts` de `templates/capture/`). Código em `<pasta de testes>/capture/variants/<flow>/<variant>/*.tsx` (vai em `code` no manifesto). Dados fictícios sempre, nunca nome de cliente real. Sem servidor, sem geração por texto, sem maquete.
 
 - Componente que ainda não existe e a variante precisa: monte com os existentes; se não der, a variante diz isso no trade-off (custo de construir).
 - Capture cada frame em `<root>/.dsx/variations/<m>/<flow>/<variant>/<nn>-<frame>.html`; estados com o sufixo da convenção (`<nn>-<frame>.<estado>.html`, ex.: `04-tudo.draft-restored.html`), que é como o lint reconhece o estado capturado.
-- **Frames de comportamento** são pares antes/depois de uma ação: o frame `behavior` aponta `behavior.before` e `behavior.after` (ids de frames da mesma linha) e a `action` em palavras ("clica em Gerar 4 minutas"). Exemplos: desfazer em vez de confirmar; validação na hora; progresso da geração; salvamento automático.
+- **Frames de comportamento** são pares antes/depois de uma ação: o frame `behavior` aponta `behavior.before` e `behavior.after` (ids de frames da mesma linha) e a `action` em palavras ("clica em Gerar 4 pedidos"). Exemplos: desfazer em vez de confirmar; validação na hora; progresso da geração; salvamento automático.
 
 ## 4. Medir e verificar
 
 ```bash
-cd <projeto>/frontend   # pasta com o Playwright do projeto (recorte das telas e geometria)
+cd <projeto>/<pasta-com-playwright>   # pasta com o Playwright do projeto (recorte das telas e geometria)
 node <DSX>/tools/ux-lint/variations.mjs validate --root <projeto> --module <m> --flow <f>
 node <DSX>/tools/ux-lint/variations.mjs measure  --root <projeto> --module <m> --flow <f>
 node <DSX>/tools/ux-lint/variations.mjs lint     --root <projeto> --module <m> --flow <f>
@@ -87,8 +107,8 @@ node <DSX>/tools/ux-lint/variations.mjs lint     --root <projeto> --module <m> -
 Escreva o método em `metrics_method` (texto livre, opcional, **em linguagem de negócio**: a página mostra a quem decide) quando o cenário pedir uma contagem específica; chaves, seletores e nomes de arquivo vão em `metrics_method_tech`, que só aparece em "Para quem constrói". A medida usa os frames `screen` como caminho feliz: se o manifesto conta outro conjunto, a divergência aparece e deve ser explicada. Todas as métricas são "menos é melhor" na página. Métrica que piora de propósito (mais palavras para explicar uma consequência, por exemplo) vai para o trade-off.
 
 **Regras dos números** (a página aplica; o manifesto não pode contornar):
-- **Conte o que dá para conferir.** Liste o que foi contado em `metrics_detail.<métrica>` (ex.: `clicks_to_done: ["Gerar em lote", "Adicionar contratos", …]`, um item por clique, a partir dos frames e das legendas); a página mostra a lista nos detalhes de cada versão e o `validate` avisa quando o tamanho da lista não bate com o número.
-- **Mesmo resultado final ou não comparável.** O número só compara se a versão chega ao mesmo fim da tarefa (`done_label`, "o .zip com todas completas"). Se o caminho capturado termina diferente (uma minuta fora do .zip, um item a menos), reconte incluindo o que falta para chegar lá; se o fluxo não permite, declare `metrics_detail.not_comparable.<métrica>: "motivo"`. A página marca "não comparável" com o motivo e tira a versão do líder e do selo.
+- **Conte o que dá para conferir.** Liste o que foi contado em `metrics_detail.<métrica>` (ex.: `clicks_to_done: ["Gerar em lote", "Adicionar requisições", …]`, um item por clique, a partir dos frames e das legendas); a página mostra a lista nos detalhes de cada versão e o `validate` avisa quando o tamanho da lista não bate com o número.
+- **Mesmo resultado final ou não comparável.** O número só compara se a versão chega ao mesmo fim da tarefa (`done_label`, "o .zip com todas completas"). Se o caminho capturado termina diferente (um pedido fora do .zip, um item a menos), reconte incluindo o que falta para chegar lá; se o fluxo não permite, declare `metrics_detail.not_comparable.<métrica>: "motivo"`. A página marca "não comparável" com o motivo e tira a versão do líder e do selo.
 - **Número principal só com o confirmado.** Em "problemas resolvidos", o número é o que a verificação confirma; os que precisam de conferência aparecem ao lado ("+ 6 a conferir") e nunca somam. O líder, o selo e a frase do topo usam o mesmo critério do número mostrado.
 - **Medido vence declarado.** Palavras por tela mostram a medida das capturas; a declarada que diverge aparece como aviso no próprio número, não só no rodapé.
 
@@ -130,10 +150,10 @@ Pela skill `construir-ui`, com a decisão como entrada: o código da variante é
 
 ```json
 {
-  "format": 1, "module": "contratos", "flow": "lote", "title": "Gerar minutas em lote",
+  "format": 1, "module": "purchasing", "flow": "batch", "title": "Gerar pedidos em lote",
   "persona": "…", "task": "…", "journey_ref": "j-lote-por-modelo",
   "current": { "id": "current", "name": "Hoje",
-    "frames": [ { "id": "f1", "step": "Escolher modelo", "capture": ".stitch/contratos/code/17-lote-passo-1.html", "kind": "screen", "caption": "…" } ],
+    "frames": [ { "id": "f1", "step": "Escolher modelo", "capture": ".dsx/captures/purchasing/17-batch-step-1.html", "kind": "screen", "caption": "…" } ],
     "metrics": { "steps": 4, "clicks_to_done": 9, "dialogs": 0, "primary_actions": 4, "words_on_screen": 180, "decisions": 4 } },
   "variants": [ {
     "id": "a", "name": "…", "concept": "uma frase com a ideia", "hero": "a1", "gain": "o que ganha, numa linha", "cost": "o que custa, numa linha",
@@ -141,10 +161,10 @@ Pela skill `construir-ui`, com a decisão como entrada: o código da variante é
     "archetype": "step-wizard", "patterns": ["form-steps", "undo"], "laws": ["hick"],
     "hypothesis": "o que melhora e para quem", "tradeoffs": ["o que piora / risco"],
     "resolves": ["l-336e4efa", "t-2f07996f"],
-    "frames": [ { "id": "a2", "step": "Gerar", "capture": ".dsx/variations/contratos/lote/a/03-gerar.html", "kind": "behavior", "caption": "…",
-                  "behavior": { "action": "clica em Gerar 4 minutas", "before": "a1", "after": "a2" } } ],
+    "frames": [ { "id": "a2", "step": "Gerar", "capture": ".dsx/variations/purchasing/batch/a/03-generate.html", "kind": "behavior", "caption": "…",
+                  "behavior": { "action": "clica em Gerar 4 pedidos", "before": "a1", "after": "a2" } } ],
     "metrics": { "steps": 2, "clicks_to_done": 4, "dialogs": 0, "primary_actions": 2, "words_on_screen": 90, "decisions": 3 },
-    "code": ["frontend/tests/stitch-capture/variants/lote/a/*.tsx"]
+    "code": ["web/tests/capture/variants/batch/a/*.tsx"]
   } ]
 }
 ```
@@ -165,6 +185,8 @@ Produção: construir-ui · UX.md <versão> · re-auditoria: resolves → fixed 
 Fica aberto: o que é sem verificação, hipótese a testar com usuários
 ```
 
+Format 2 report lines (English): `Lenses: A <lens> · B <lens> · C <lens>` · `Choice: <id> — why; traded: B …, C …` · `Critique: 6/6 (resolved n · limitation n · measurement n)` · `alternatives.md: <path>`.
+
 ## Checklist
 
 - [ ] Persona, tarefa, métricas de hoje e achados do fluxo levantados com fonte.
@@ -175,3 +197,4 @@ Fica aberto: o que é sem verificação, hipótese a testar com usuários
 - [ ] DSX aplicado na própria página (detectores sem severidade ≥ 2 e revisão do `revisor-ux`) e conferida por screenshot (a primeira dobra responde sozinha; telas legíveis; nada de id ou jargão na frente; decisão sem terminal para o dono); decisão gravada em `decision.json`.
 - [ ] Escolhida construída pela `construir-ui`, com `UX.md` no mesmo commit e re-auditoria.
 - [ ] O que é hipótese foi dito como hipótese (validar com pesquisa, skill `pesquisa`).
+- [ ] Format 2: every variant with audience, causal bet, counter-hypothesis, falsification test, expected metric, guardrail and a distinct Forward lens; `choice` and `rejected_tradeoffs` recorded; `critique` complete; `alternatives.md` exported for the demand.

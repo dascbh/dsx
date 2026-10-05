@@ -1,0 +1,14 @@
+# Forward snapshot copied by tools/forward/sync.mjs — do not edit by hand.
+# Forward is canonical; a change belongs in Forward, then `node tools/forward/sync.mjs --from <forward>`.
+forward_version = "0.55.1"
+forward_commit = "1bbc07c1d392378a89d1876c96e6f42876665527"
+forward_dirty = false
+synced_at = "2026-10-05"
+
+[files]
+"spec/dimensions/quality-attributes.toml" = "1841ce7c4b9ee74ba0b25920e7c7005f3e55f8e4ad312fe45a75f1cd62131f57"
+"spec/references/ui-patterns.toml" = "f39a278db993f5933537c8633a7286851018501b5eba02962d4088985474b404"
+"templates/findings.template.toml" = "650594e05550cbf1038f77ca4d5862c7f803c2eef25d5fe95075ef45436bf55a"
+"spec/invariants.toml" = "5234b8f2b344e433021c10f156465512382e7227856c2f0ec6cbba0acff47834"
+"spec/roles.toml" = "75a0cf67880137a8dc38fed4f70067ec3d9ba696d4bde3f11dd57a100171ddcd"
+"bin/fde/design.py" = "189e174328a01103b0c793a0aabc9ae1d8f9238e4aae0cec77208585e2bb8a2c"

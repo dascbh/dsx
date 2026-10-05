@@ -8,8 +8,8 @@ import { configFrom } from '../ux-lint/lib/config.mjs';
 import { analyzeStates, analyzeStateCapture, requiredStates, discoverCaptures, loadArchetypeStates, summarize } from '../ux-lint/states.mjs';
 import { fromStates, collect } from '../ux-lint/findings.mjs';
 
-const page = (body) => `<!doctype html><html><body><header><button>Sair</button></header><nav><a href="/">Início</a></nav><main><h1>Contratos</h1>${body}</main></body></html>`;
-const dialog = (body, footer) => `<!doctype html><html><body><main><h1>Base</h1></main><div role="dialog"><h2>Excluir minuta?</h2>${body}<div class="MuiDialogActions-root">${footer}</div></div></body></html>`;
+const page = (body) => `<!doctype html><html><body><header><button>Sair</button></header><nav><a href="/">Início</a></nav><main><h1>Pedidos</h1>${body}</main></body></html>`;
+const dialog = (body, footer) => `<!doctype html><html><body><main><h1>Base</h1></main><div role="dialog"><h2>Excluir proposta?</h2>${body}<div class="MuiDialogActions-root">${footer}</div></div></body></html>`;
 const btn = (t, cls = 'MuiButton-root MuiButton-outlined') => `<button class="${cls}">${t}</button>`;
 const errorBox = (msg, action = '') => `<div role="alert"><p>Não foi possível carregar.</p><p>${msg}</p>${action}</div>`;
 const ARCH = { 'operational-list': { states: ['loading', 'empty', 'empty-filtered', 'error', 'no-access', 'success'] },
@@ -58,12 +58,12 @@ test('states: required states per kind (page, child, dialog, panel)', () => {
 
 test('states: S1 flags each missing required state; order file makes a child screen', () => {
   const dir = folder({
-    '02-lista.html': page('<table><tr><td>Contrato A</td></tr></table>'),
+    '02-lista.html': page('<table><tr><td>Pedido A</td></tr></table>'),
     '02-lista.loading.html': page('<div role="status" aria-label="Carregando"></div>'),
-    '02-lista.empty.html': page(`<p>Nenhum contrato ainda.</p>${btn('Carregar contratos')}`),
+    '02-lista.empty.html': page(`<p>Nenhum pedido ainda.</p>${btn('Carregar pedidos')}`),
     '03-editor.html': page('<p>Texto</p>'),
     '04-painel-filho.html': page('<p>Painel</p>'),
-    '05-dlg-excluir.html': dialog('<p>Some.</p>', `${btn('Cancelar', 'MuiButton-text')}${btn('Excluir minuta', 'MuiButton-contained MuiButton-colorError')}`),
+    '05-dlg-excluir.html': dialog('<p>Some.</p>', `${btn('Cancelar', 'MuiButton-text')}${btn('Excluir proposta', 'MuiButton-contained MuiButton-colorError')}`),
     'capture-order.json': JSON.stringify([{ nn: '04', id: 'painel-filho', type: 'panel', parent: 'editor' }]),
   });
   const order = new Map([['painel-filho', { type: 'panel', parent: 'editor' }]]);
@@ -83,11 +83,11 @@ test('states: S1 flags each missing required state; order file makes a child scr
 });
 
 test('states: S2 empty or error state without an exit in its region', () => {
-  const noExit = analyzeStateCapture(page('<div class="MuiTabs-root"><button role="tab">Lista</button></div><p>Nenhuma minuta salva ainda.</p><button disabled>Exportar</button>'), 'empty', cfg, 'x.empty.html');
+  const noExit = analyzeStateCapture(page('<div class="MuiTabs-root"><button role="tab">Lista</button></div><p>Nenhuma proposta salva ainda.</p><button disabled>Exportar</button>'), 'empty', cfg, 'x.empty.html');
   assert.deepEqual(rules(noExit), ['S2:empty']);
   assert.equal(noExit[0].region, 'main');
   assert.match(noExit[0].evidence, /^x\.empty\.html:\d+:\d+$/);
-  const withExit = analyzeStateCapture(page(`<p>Nenhuma minuta salva ainda.</p>${btn('Nova minuta')}`), 'empty', cfg, 'x.empty.html');
+  const withExit = analyzeStateCapture(page(`<p>Nenhuma proposta salva ainda.</p>${btn('Nova proposta')}`), 'empty', cfg, 'x.empty.html');
   assert.deepEqual(withExit, []);
   // a saída no cabeçalho (fora da região do estado) não conta
   const errorNoExit = analyzeStateCapture(page(errorBox('Tente de novo em instantes.')), 'error', cfg, 'x.error.html');
@@ -100,9 +100,9 @@ test('states: S2 empty or error state without an exit in its region', () => {
 test('states: S3 error message without guidance', () => {
   const bare = analyzeStateCapture(page(`<div role="alert"><p>Erro 500</p>${btn('Voltar')}</div>`), 'error', cfg, 'e.html');
   assert.deepEqual(rules(bare), ['S3:error']);
-  const code = analyzeStateCapture(page(`<div role="alert">CONTRATOS_INTERNAL_ERROR</div>${btn('Voltar')}`), 'error', cfg, 'e.html');
+  const code = analyzeStateCapture(page(`<div role="alert">PURCHASING_INTERNAL_ERROR</div>${btn('Voltar')}`), 'error', cfg, 'e.html');
   assert.deepEqual(rules(code), ['S3:error']);
-  const explainedOnly = analyzeStateCapture(page(`<div role="alert">O documento foi removido do acervo.</div>${btn('Voltar')}`), 'error', cfg, 'e.html');
+  const explainedOnly = analyzeStateCapture(page(`<div role="alert">O pedido foi removido do catálogo.</div>${btn('Voltar')}`), 'error', cfg, 'e.html');
   assert.deepEqual(rules(explainedOnly), ['S3:error']);
   const guided = analyzeStateCapture(page(errorBox('Não foi possível falar com o servidor agora. Tente de novo em instantes.', btn('Tentar novamente'))), 'error', cfg, 'e.html');
   assert.deepEqual(guided, []);
@@ -122,7 +122,7 @@ test('states: archetype catalog of the repository has states for every card', ()
 });
 
 test('states: JSON goes into findings.mjs with stable st- ids', () => {
-  const dir = folder({ '02-lista.html': page(''), '02-lista.empty.html': page('<p>Nenhum contrato.</p>') });
+  const dir = folder({ '02-lista.html': page(''), '02-lista.empty.html': page('<p>Nenhum pedido.</p>') });
   const out = execFileSync(process.execPath, [join(import.meta.dirname, '..', 'ux-lint', 'states.mjs'), dir, '--json'], { encoding: 'utf8' });
   const json = JSON.parse(out);
   assert.ok(json.screens[0].findings.length > 0);

@@ -345,7 +345,7 @@ quebraria os leitores. Só a prosa (`detail`, `why`, notas) vai em pt-BR.
   "scope": "projeto inteiro",
   "adapters_used": ["mui", "tailwind-v4"],
   "colors": {
-    "brand/primary-main": { "value": "#0e71b8", "modes": { "light": "#0e71b8", "dark": "#5aa9e6" }, "evidence": "src/theme.ts:34" }
+    "brand/primary-main": { "value": "#2b59c3", "modes": { "light": "#2b59c3", "dark": "#7ea6f2" }, "evidence": "src/theme.ts:34" }
   },
   "typography": {
     "h4": { "font_family": "Plus Jakarta Sans Variable", "font_size": "20px", "font_weight": 600, "evidence": "src/theme.ts:52" }
@@ -359,18 +359,18 @@ quebraria os leitores. Só a prosa (`detail`, `why`, notas) vai em pt-BR.
     "force-graph:GraphPage.tsx": { "static": true, "values": { "ingredient": "#2fbf8f" }, "evidence": "GraphPage.tsx:12" }
   },
   "hazards": [
-    { "kind": "duplicated-hex", "detail": "#0e71b8 casa com brand/primary-main mas está escrito como literal", "count": 2, "evidence": "NormaChat.tsx:22,79" },
+    { "kind": "duplicated-hex", "detail": "#2b59c3 casa com brand/primary-main mas está escrito como literal", "count": 2, "evidence": "OrderChat.tsx:22,79" },
     { "kind": "near-zero-yield-adapter", "detail": "Tailwind instalado e compilando, mas sem bloco @theme e quase nenhuma classe utilitária usada em src/", "evidence": "src/index.css" }
   ],
   "usage": {
-    "colors": [{ "value": "#0e71b8", "count": 14, "tokenized": true, "token": "brand/primary-main" }, { "value": "#0f72b9", "count": 3, "tokenized": false }],
+    "colors": [{ "value": "#2b59c3", "count": 14, "tokenized": true, "token": "brand/primary-main" }, { "value": "#2a58c2", "count": 3, "tokenized": false }],
     "font_sizes": [{ "value": "14px", "count": 41, "tokenized": true }],
     "spacing": [{ "value": "12px", "count": 22, "tokenized": false }],
     "radii": [{ "value": "10px", "count": 9, "tokenized": true, "token": "card" }]
   },
   "drift": { "source": "lint-raw-values", "lines": 18234, "occurrences": 212, "per_thousand_lines": 11.63 },
   "consolidations": [
-    { "values": ["#0e71b8", "#0f72b9"], "suggested_token": "color.action.primary", "why": "diferença de 1 em cada canal; mesmo papel (botão principal)" }
+    { "values": ["#2b59c3", "#2a58c2"], "suggested_token": "color.action.primary", "why": "diferença de 1 em cada canal; mesmo papel (botão principal)" }
   ],
   "components": [
     { "name": "Button", "imports": 87, "parallel": ["Btn", "PrimaryButton"], "states": { "hover": true, "focus-visible": false, "disabled": true, "loading": false, "error": null, "empty": null } }

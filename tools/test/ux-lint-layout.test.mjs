@@ -20,9 +20,9 @@ const el = (o = {}) => ({
 });
 const main = (h = 900) => el({ id: 'main', tag: 'main', kind: 'region', box: { x: 220, y: 64, width: 1220, height: h } });
 const geom = (elements, extra = {}) => ({ screen: '02-tela', file: '02-tela.html', viewport: { width: 1440, height: 900 }, body_font_size: 15, elements, ...extra });
-const h1 = (o = {}) => el({ tag: 'h1', kind: 'heading', heading_level: 1, text: 'Contratos', style: { font_size: 24, font_weight: 600 }, box: { x: 244, y: 90, width: 300, height: 32 }, ...o });
+const h1 = (o = {}) => el({ tag: 'h1', kind: 'heading', heading_level: 1, text: 'Pedidos', style: { font_size: 24, font_weight: 600 }, box: { x: 244, y: 90, width: 300, height: 32 }, ...o });
 const btn = (text, box, o = {}) => el({ tag: 'button', kind: 'interactive', is_interactive: true, text, box: { width: 120, height: 36, ...box }, parent: 'main > div.acoes', ...o });
-const primary = (text, box, o = {}) => btn(text, box, { is_primary: true, style: { background_color: 'rgb(14, 113, 184)', font_size: 14, font_weight: 600 }, ...o });
+const primary = (text, box, o = {}) => btn(text, box, { is_primary: true, style: { background_color: 'rgb(43, 89, 195)', font_size: 14, font_weight: 600 }, ...o });
 const rules = (r, rule) => r.findings.filter((f) => f.rule === rule);
 const arch = (id, position, regions = [], region = 'page-header') => ({ id, regions, primary_action: { region, position } });
 
@@ -32,12 +32,12 @@ test('geometry: utilities (cluster, distance, color, screen id, normalize)', () 
   assert.equal(boxDistance({ x: 0, y: 0, width: 10, height: 10 }, { x: 5, y: 5, width: 10, height: 10 }), 0);
   assert.deepEqual(parseColor('rgba(1, 2, 3, 0.5)'), { r: 1, g: 2, b: 3, a: 0.5 });
   assert.deepEqual(parseColor('#fff'), { r: 255, g: 255, b: 255, a: 1 });
-  assert.equal(isSaturated('rgb(14, 113, 184)'), true); // azul de marca
+  assert.equal(isSaturated('rgb(43, 89, 195)'), true); // azul de marca
   assert.equal(isSaturated('rgb(227, 242, 253)'), false); // azul pastel
   assert.equal(isSaturated('rgb(128, 128, 128)'), false); // cinza
-  assert.equal(isSaturated('rgba(14, 113, 184, 0.1)'), false);
-  assert.equal(screenIdOf('04-minuta-editor.geometry.json'), 'minuta-editor');
-  assert.equal(screenIdOf('02-acervo.empty.html'), 'acervo');
+  assert.equal(isSaturated('rgba(43, 89, 195, 0.1)'), false);
+  assert.equal(screenIdOf('04-pedido-editor.geometry.json'), 'pedido-editor');
+  assert.equal(screenIdOf('02-catalogo.empty.html'), 'catalogo');
   const g = normalizeGeometry({ elements: [{ box: { x: 1 } }] });
   assert.equal(g.elements[0].box.width, 0);
   assert.equal(g.elements[0].is_interactive, false);
@@ -45,7 +45,7 @@ test('geometry: utilities (cluster, distance, color, screen id, normalize)', () 
 });
 
 test('L1: primary at top-right passes; at the bottom-left fails (archetype wins over UX.md)', () => {
-  const ok = analyzeLayout(geom([main(), h1(), primary('Nova cláusula', { x: 1290, y: 90 })]), { archetype: arch('library', 'top-right') });
+  const ok = analyzeLayout(geom([main(), h1(), primary('Novo item', { x: 1290, y: 90 })]), { archetype: arch('library', 'top-right') });
   assert.equal(rules(ok, 'L1').length, 0);
   const bad = analyzeLayout(geom([main(), h1(), primary('Salvar', { x: 244, y: 700 })]), { archetype: arch('library', 'top-right'), primary_position: 'bottom-right' });
   const [f] = rules(bad, 'L1');
@@ -87,7 +87,7 @@ test('L1: in a dialog, bottom-right is relative to the dialog box; side-panel pr
   assert.equal(rules(bad, 'L1').length, 1);
   assert.match(rules(bad, 'L1')[0].message, /altura do diálogo/);
   const panel = el({ kind: 'card', box: { x: 1036, y: 240, width: 380, height: 700 } });
-  const r = analyzeLayout(geom([main(), h1(), panel, primary('Pedir de acordo', { x: 1050, y: 600 })]), { archetype: arch('editor-with-panel', 'top-right') });
+  const r = analyzeLayout(geom([main(), h1(), panel, primary('Pedir aprovação', { x: 1050, y: 600 })]), { archetype: arch('editor-with-panel', 'top-right') });
   assert.equal(rules(r, 'L1').length, 0);
   assert.equal(positionOk({ x: 0, y: 0, width: 10, height: 10 }, 'top-left', { x: 0, y: 0, width: 1000, height: 800 }), true);
 });
@@ -106,7 +106,7 @@ test('L2: more than N heavy elements in the first fold fails; nested and adjacen
   const below = heavy.map((e, i) => (i >= 3 ? { ...e, box: { ...e.box, y: 1200 } } : e));
   assert.equal(rules(analyzeLayout(geom([main(), ...below])), 'L2').length, 0);
   // células de um cabeçalho de tabela (blocos saturados encostados) contam uma vez; texto dentro do bloco também
-  const cells = [0, 1, 2, 3, 4, 5].map((i) => el({ tag: 'th', style: { background_color: 'rgb(14, 113, 184)' }, box: { x: 244 + i * 150, y: 300, width: 150, height: 36 } }));
+  const cells = [0, 1, 2, 3, 4, 5].map((i) => el({ tag: 'th', style: { background_color: 'rgb(43, 89, 195)' }, box: { x: 244 + i * 150, y: 300, width: 150, height: 36 } }));
   const inside = el({ text: 'Documento', style: { font_size: 20, font_weight: 700 }, box: { x: 250, y: 304, width: 100, height: 24 } });
   assert.equal(rules(analyzeLayout(geom([main(), h1(), ...cells, inside])), 'L2').length, 0);
   // limite vem do UX.md (layout.max-emphasis)
@@ -120,9 +120,9 @@ test('L3: h1 not the largest text, or lower level larger than upper, fails; numb
   assert.match(rules(big, 'L3')[0].message, /não é o maior texto/);
   const inv = analyzeLayout(geom([main(), h1(),
     el({ tag: 'h3', kind: 'heading', heading_level: 3, text: 'OBJETO', style: { font_size: 12 } }),
-    el({ tag: 'h4', kind: 'heading', heading_level: 4, text: 'Cláusula', style: { font_size: 14 } })]));
+    el({ tag: 'h4', kind: 'heading', heading_level: 4, text: 'Item', style: { font_size: 14 } })]));
   const [f] = rules(inv, 'L3');
-  assert.match(f.message, /h4 "Cláusula" \(14 px\) maior que h3 "OBJETO" \(12 px\)/);
+  assert.match(f.message, /h4 "Item" \(14 px\) maior que h3 "OBJETO" \(12 px\)/);
   assert.equal(f.anchor, 'h4 maior que h3');
 });
 
@@ -236,25 +236,25 @@ test('L9: missing archetype region fails; declared region, heuristics and condit
 });
 
 test('layout.mjs: archetype by screen id or route, state suffix skips L9, limits from UX.md, real catalog', () => {
-  const map = { 'operational-list': ['acervo', 'minutas'], 'editor-with-panel': ['/contratos/minutas/:id'] };
-  assert.equal(resolveArchetype('02-acervo', '', map), 'operational-list');
-  assert.equal(resolveArchetype('02-acervo.empty.geometry.json', '', map), 'operational-list');
-  assert.equal(resolveArchetype('04-x', '/contratos/minutas/:id', map), 'editor-with-panel');
+  const map = { 'operational-list': ['catalogo', 'propostas'], 'editor-with-panel': ['/pedidos/propostas/:id'] };
+  assert.equal(resolveArchetype('02-catalogo', '', map), 'operational-list');
+  assert.equal(resolveArchetype('02-catalogo.empty.geometry.json', '', map), 'operational-list');
+  assert.equal(resolveArchetype('04-x', '/pedidos/propostas/:id', map), 'editor-with-panel');
   assert.equal(resolveArchetype('99-outra', '/nada', map), null);
-  assert.equal(stateOf('02-acervo.empty'), 'empty');
-  assert.equal(stateOf('02-acervo'), null);
+  assert.equal(stateOf('02-catalogo.empty'), 'empty');
+  assert.equal(stateOf('02-catalogo'), null);
   const cat = archetypeCatalog();
   assert.deepEqual(cat['editor-with-panel'].regions, ['page-header', 'toolbar', 'editing-area', 'side-panel', 'status-bar']);
   assert.equal(cat['form-dialog'].primary_action.position, 'bottom-right');
-  const cfg = configFrom({ archetypes: { 'editor-with-panel': ['minuta-editor'] }, layout: { fold: 700, 'max-emphasis': '2', foo: 1 } });
+  const cfg = configFrom({ archetypes: { 'editor-with-panel': ['pedido-editor'] }, layout: { fold: 700, 'max-emphasis': '2', foo: 1 } });
   assert.equal(limitsFrom(cfg).fold, 700);
   assert.equal(limitsFrom(cfg)['max-emphasis'], 2);
   assert.ok(!('foo' in limitsFrom(cfg)));
-  const g = geom([main(), h1()], { screen: '04-minuta-editor' });
+  const g = geom([main(), h1()], { screen: '04-pedido-editor' });
   const r = analyzeGeometry(g, cfg, cat);
   assert.equal(r.archetype, 'editor-with-panel');
   assert.ok(rules(r, 'L9').length >= 1);
-  assert.equal(rules(analyzeGeometry({ ...g, screen: '04-minuta-editor.loading' }, cfg, cat), 'L9').length, 0);
+  assert.equal(rules(analyzeGeometry({ ...g, screen: '04-pedido-editor.loading' }, cfg, cat), 'L9').length, 0);
 });
 
 test('findings: layout family, stable id without coordinates', () => {
@@ -278,12 +278,12 @@ const pw = resolvePlaywright(process.env.DSX_PLAYWRIGHT_CWD ?? process.cwd());
 test('measure: real geometry from a static HTML (skipped without Playwright)', { skip: pw ? false : 'Playwright não encontrado (defina DSX_PLAYWRIGHT_CWD para uma pasta que o tenha)' }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'dsx-geom-'));
   try {
-    const html = `<!doctype html><html><head><title>/contratos</title><style>body{margin:0;font:15px sans-serif}
-      .MuiButton-contained{background:#0e71b8;color:#fff;border:0;padding:8px 16px}</style></head>
+    const html = `<!doctype html><html><head><title>/pedidos</title><style>body{margin:0;font:15px sans-serif}
+      .MuiButton-contained{background:#2B59C3;color:#fff;border:0;padding:8px 16px}</style></head>
       <body><header style="height:64px">Topo</header><main style="padding:24px">
-      <h1 style="font-size:24px">Contratos</h1>
+      <h1 style="font-size:24px">Pedidos</h1>
       <form><label for="n">Nome</label><input id="n" style="display:block"></form>
-      <button class="MuiButton-contained" style="position:absolute;right:24px;top:80px">Nova cláusula</button>
+      <button class="MuiButton-contained" style="position:absolute;right:24px;top:80px">Novo item</button>
       <button style="width:16px;height:16px;padding:0">x</button><button style="width:16px;height:16px;padding:0">y</button>
       </main></body></html>`;
     writeFileSync(join(dir, '02-tela.html'), html);
@@ -291,10 +291,10 @@ test('measure: real geometry from a static HTML (skipped without Playwright)', {
     const [res] = await measure([join(dir, '02-tela.html')], { outDir: join(dir, 'g'), cfg, playwright: pw });
     const g = JSON.parse(readFileSync(res.out, 'utf8'));
     assert.equal(g.format, 'dsx-geometry');
-    assert.equal(g.title, '/contratos');
+    assert.equal(g.title, '/pedidos');
     assert.equal(g.dialog_open, false);
     const p = g.elements.find((e) => e.is_primary);
-    assert.equal(p.text, 'Nova cláusula');
+    assert.equal(p.text, 'Novo item');
     assert.equal(p.region, 'main');
     assert.ok(p.box.x > 1200);
     const label = g.elements.find((e) => e.kind === 'label');

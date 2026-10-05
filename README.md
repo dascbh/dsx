@@ -8,7 +8,7 @@ A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou c
 
 | Pasta | Conteúdo |
 |---|---|
-| [`skills/`](skills) | 33 skills. **Núcleo:** `iniciar`, `design-md`, `ux-md`, `tokens`, `construir-ui`, `arranjar-tela`, `repensar-ux`, `padroes`, `revisar-ux`, `auditar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
+| [`skills/`](skills) | 34 skills. **Núcleo:** `iniciar`, `design-md`, `ux-md`, `tokens`, `construir-ui`, `arranjar-tela`, `repensar-ux`, `padroes`, `revisar-ux`, `auditar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Captura pelo código:** `capture-from-code`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
 | [`agents/`](agents) | 11 subagentes: `revisor-ux`, `extrator-design-system`, `juiz-de-evals`, `leitor-figma`, `analisador-specs` e os mapeadores de projeto, UI, fluxos, tarefas, jornada e domínio |
 | [`hooks/`](hooks) | `turn-guard`: impede reespelhar o Figma por cima do refino do design |
 | [`patterns/`](patterns) | 77 padrões de interação — formulários, feedback, ações, navegação, dados, modais, autenticação, acessibilidade, UX writing, IA, e-commerce — cada um com regra, árvore de decisão SE→ENTÃO, acessibilidade, microcópia e checklist |
@@ -61,6 +61,8 @@ npm run check                                # verificação completa do framewo
 ```
 
 Antes de construir, `discovery` e `pesquisa` garantem que o problema é o certo; depois, `pesquisa` valida com pessoas reais.
+
+In Forward projects, the DSX plugs into the unified product pipeline without a parallel workflow: UI quality (5 metrics), UX quality (5 dimensions) and design-system adherence as separate verdicts against criteria declared in the cycle plan (`tools/ux-lint/criteria.mjs`, `audit.mjs --criteria`), the UX blueprint per objective (`templates/ux-blueprint.md`, `tools/ux-lint/blueprint.mjs`), falsifiable hypotheses in variation manifests and provenance on generated artifacts. See `knowledge/foundations/product-pipeline-ux.md`.
 
 ## Stitch: gerar e iterar telas sem edição manual
 

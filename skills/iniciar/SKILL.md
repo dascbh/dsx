@@ -70,6 +70,15 @@ O `DESIGN.md` e o `UX.md` são as fontes. Os demais arquivos **apontam** para el
 
 Não carregue contexto visual em tarefas que não são de UI (migrações, infra): por isso as regras de ferramenta usam `globs`.
 
+## 6b. Forward projects
+
+If the project runs Forward (`fde.config.toml` exists), the DSX plugs into its pipeline instead of adding a parallel one (`knowledge/foundations/product-pipeline-ux.md`):
+
+- UI/UX criteria go in the cycle plan's `## Acceptance criteria` (fields `kind`, `metric`, scope, `scenario`, `baseline`, `target`, `counter-metric`, `method`, `sample`, `decision`); check them with `tools/ux-lint/criteria.mjs check`.
+- The UX blueprint of each front demand lives in `specs/<demand-id>/design/` (`templates/ux-blueprint.md`); UX.md stays the product-level contract.
+- Variations export to `specs/<demand-id>/design/alternatives.md`; audit results with `--criteria-out` go under `evals/`; heuristic findings go to `reviews/<demand-id>/findings.toml` citing USE/DOM principle ids.
+- Add to the agent context block: "UI quality, UX quality and design-system adherence are separate verdicts; there is no single UX score; unknown is never pass."
+
 ## 7. Gates
 
 Sugira ao usuário (não instale dependências sem pedir):
@@ -89,5 +98,6 @@ DESIGN.md: criado/avaliado — nota NN/100, gates ✔/✘
 UX.md: criado/avaliado — version X.Y.Z, nota NN/100, gates ✔/✘, drift N achado(s), telas com arquétipo N/M
 Contexto conectado em: AGENTS.md ✔ CLAUDE.md ✔ Cursor — Copilot — (DESIGN.md e UX.md)
 Drift inicial: X/1000 linhas
+Forward: <detected | not used> · criteria format and blueprint path explained (if detected)
 Próximos passos recomendados (máx. 5): …
 ```

@@ -1,7 +1,7 @@
 ---
 id: public-decision-page
 title: Página pública de decisão
-summary: Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (de acordo, não concordância, aprovação, recusa).
+summary: Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (confirmação, recusa, aprovação, pedido de ajuste).
 register: [consumer]
 when-to-use: SE uma pessoa de fora do produto, sem conta, precisa ler algo e responder uma vez ENTÃO use página pública de decisão
 avoid-when: quem responde é usuário do produto (use a tela interna), a decisão exige identidade forte que o link não garante ou a pessoa precisa editar o conteúdo
@@ -15,7 +15,7 @@ rules: [T1, T3, T4, T5, T6, T7, F1]
 
 # Página pública de decisão
 
-A contraparte de um contrato recebe um link e precisa dizer se está de acordo com um aditivo; um fornecedor confirma dados; um cliente aprova uma proposta. Essa pessoa não conhece o produto, não tem conta, muitas vezes abre no celular, entre outras tarefas, e vai usar a tela uma vez. A página tem um trabalho: deixar claro **quem pede, o quê, até quando, e o que acontece com cada resposta** — e registrar a resposta sem ambiguidade.
+Um fornecedor recebe um link e precisa confirmar ou recusar um pedido de compra; um parceiro confirma dados; um cliente aprova uma proposta. Essa pessoa não conhece o produto, não tem conta, muitas vezes abre no celular, entre outras tarefas, e vai usar a tela uma vez. A página tem um trabalho: deixar claro **quem pede, o quê, até quando, e o que acontece com cada resposta** — e registrar a resposta sem ambiguidade.
 
 ## Quando usar
 
@@ -24,7 +24,7 @@ A contraparte de um contrato recebe um link e precisa dizer se está de acordo c
 - **SE** a recusa precisa de motivo para o pedido seguir **ENTÃO** use `decision-with-reason`: motivo de uma lista mais mensagem, obrigatórios só na opção que os exige.
 - **SE** a decisão precisa registrar quem respondeu **ENTÃO** use `decision-with-identification` (nome e, se preciso, um dado conferível) antes do envio.
 - **SE** o conteúdo a ler é longo **ENTÃO** use `long-document-with-sticky-decision`, com a decisão sempre alcançável.
-- **SE** a decisão tem efeito jurídico ou financeiro que exige identidade forte **ENTÃO** o link não basta: use assinatura com verificação de identidade (fora deste arquétipo).
+- **SE** a decisão tem efeito legal ou financeiro que exige identidade forte **ENTÃO** o link não basta: use assinatura com verificação de identidade (fora deste arquétipo).
 - **SENÃO** (quem responde é usuário interno) **ENTÃO** a decisão mora na tela de trabalho dele.
 
 ## Mapa de regiões
@@ -34,16 +34,16 @@ A contraparte de um contrato recebe um link e precisa dizer se está de acordo c
 │ public-header  Marca de quem envia        │
 ├──────────────────────────────────────────┤
 │ request-summary                           │
-│  Pedido de de acordo (h1)                 │
-│  Enviado por Escritório X para Empresa Y  │
+│  Confirmação de pedido (h1)               │
+│  Enviado por Empresa X para Fornecedor Y  │
 │  Responda até 15/10/2026                  │
 ├──────────────────────────────────────────┤
 │ document-or-detail                        │
 │  Texto ou prévia do documento · Baixar PDF│
 ├──────────────────────────────────────────┤
 │ decision-area                             │
-│  ( ) Estou de acordo                      │
-│  ( ) Não concordo  → motivo + mensagem    │
+│  ( ) Confirmo o pedido                    │
+│  ( ) Recuso        → motivo + mensagem    │
 │  O que acontece depois: …                 │
 │              [Enviar resposta]            │
 ├──────────────────────────────────────────┤
@@ -54,15 +54,15 @@ A contraparte de um contrato recebe um link e precisa dizer se está de acordo c
 ## O que vai em cada região
 
 - **public-header** — identidade de quem enviou (marca da organização remetente), sem menu do produto, sem links que levem a áreas com login.
-- **request-summary** — `h1` dizendo o que é pedido em linguagem comum; quem pede, para quem, a que se refere (nome do contrato ou objeto), prazo de resposta por extenso. Nada de jargão interno do produto.
+- **request-summary** — `h1` dizendo o que é pedido em linguagem comum; quem pede, para quem, a que se refere (número do pedido ou objeto), prazo de resposta por extenso. Nada de jargão interno do produto.
 - **document-or-detail** — o conteúdo a avaliar, legível no celular, com opção de baixar; alterações destacadas por mais de um sinal quando for revisão.
-- **decision-area** — as opções com rótulos que dizem a decisão ("Estou de acordo", "Não concordo"), consequência de cada uma em uma frase, campos condicionais com rótulo visível, e um único botão de envio que nomeia a ação.
+- **decision-area** — as opções com rótulos que dizem a decisão ("Confirmo o pedido", "Recuso"), consequência de cada uma em uma frase, campos condicionais com rótulo visível, e um único botão de envio que nomeia a ação.
 - **public-footer** — como tirar dúvidas com quem enviou, aviso de privacidade, e nada mais.
 
 ## Ações
 
 - **Primária:** uma, na `decision-area`, junto ao conteúdo — "Enviar resposta" (ou o verbo da opção escolhida). As opções em si não são botões cheios concorrentes; escolher e enviar são dois atos, para evitar toque acidental.
-- **Confirmação:** antes de gravar, recapitule a escolha ("Você vai registrar: Não concordo — motivo: valor") quando a resposta não pode ser mudada; se pode ser mudada até o prazo, diga isso e dispense a confirmação.
+- **Confirmação:** antes de gravar, recapitule a escolha ("Você vai registrar: Recuso — motivo: prazo") quando a resposta não pode ser mudada; se pode ser mudada até o prazo, diga isso e dispense a confirmação.
 - **Envio:** bloqueia clique duplo, mostra progresso, só confirma depois da gravação.
 - **Saídas:** baixar o documento e contatar o remetente; abrir em nova aba avisa.
 
@@ -95,13 +95,13 @@ Campos de nome (e, se necessário, cargo ou documento) antes do envio.
 
 ### long-document-with-sticky-decision
 Conteúdo longo com a decisão em barra fixa no rodapé (ou "Ir para a resposta").
-**Favorece:** contratos e aditivos extensos; decisão sempre alcançável.
+**Favorece:** pedidos extensos, com muitas linhas; decisão sempre alcançável.
 **Piora:** barra fixa rouba altura no celular; pode estimular decidir sem ler — mostre o progresso de leitura em vez de bloquear.
 
 ## Anti-padrões
 
 - Botões "Aceitar" e "Recusar" cheios lado a lado, gravando ao primeiro toque.
-- Termos internos ("minuta", "fase", "token", "tenant") na tela de quem é de fora.
+- Termos internos ("requisição", "fase", "token", "tenant") na tela de quem é de fora.
 - Link expirado mostrando erro técnico ou a página de login do produto.
 - Reabrir o formulário vazio para quem já respondeu.
 - Exigir criação de conta para responder.

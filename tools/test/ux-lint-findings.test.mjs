@@ -42,7 +42,7 @@ test('stable id: line changes → same id; text or file changes → new id', () 
 test('stable id: variable data and variants become {}', () => {
   assert.equal(maskData('Resposta registrada em 02/10/2026 14:37.'), 'Resposta registrada em {} {}.');
   assert.equal(templateOf('Remover da lista — Ana Souza', ['Remover da lista — Ana Souza', 'Remover da lista — Ricardo Almeida']), 'Remover da lista — {}');
-  assert.equal(templateOf('Cláusula 1 — Foro', ['Cláusula 1 — Foro', 'Cláusula 2 — Reajuste de preços']), 'Cláusula {} — {}');
+  assert.equal(templateOf('Item 1 — Frete', ['Item 1 — Frete', 'Item 2 — Desconto por volume']), 'Item {} — {}');
   const one = fromText(textJson([textFinding({ variants: ['Remover da lista — Ana', 'Remover da lista — Bia'] })]), { root: ROOT })[0];
   const other = fromText(textJson([textFinding({ text: 'Remover da lista — Caio', variants: ['Remover da lista — Caio', 'Remover da lista — Duda'] })]), { root: ROOT })[0];
   assert.equal(one.text, 'Remover da lista — {}');
@@ -51,9 +51,9 @@ test('stable id: variable data and variants become {}', () => {
 
 test('id inherited when the variant set changes the template', () => {
   const reg = newRegistry();
-  merge(reg, run([textFinding({ text: 'Cláusula 1 — Foro', variants: ['Cláusula 1 — Foro', 'Cláusula 2 — Preço'] })]), { now: day('01') });
+  merge(reg, run([textFinding({ text: 'Item 1 — Frete', variants: ['Item 1 — Frete', 'Item 2 — Preço'] })]), { now: day('01') });
   const id = reg.items[0].id;
-  const r2 = run([textFinding({ text: 'Cláusula 2 — Preço', line: 99 })], reg.items);
+  const r2 = run([textFinding({ text: 'Item 2 — Preço', line: 99 })], reg.items);
   assert.equal(r2.items[0].id, id);
 });
 
@@ -139,13 +139,13 @@ test('check: fails new finding ≥ min and regression; tolerates known open', ()
 test('options: grouped case covers several ids; case without finding becomes a review item', () => {
   const reg = newRegistry();
   merge(reg, run([
-    textFinding({ rule: 'X10', sev: 1, text: 'Sumário Executivo', file: '/proj/src/nav.tsx', line: 34 }),
-    textFinding({ rule: 'X10', sev: 1, text: 'DRE Projetada', file: '/proj/src/nav.tsx', line: 40 }),
+    textFinding({ rule: 'X10', sev: 1, text: 'Resumo Executivo', file: '/proj/src/nav.tsx', line: 34 }),
+    textFinding({ rule: 'X10', sev: 1, text: 'Relatório Mensal', file: '/proj/src/nav.tsx', line: 40 }),
   ]), { now: day('01') });
   const options = { items: {} };
   const cases = [
-    { id: 'c02', element: 'menu', rule: 'X10', text: 'Sumário Executivo', variants: ['DRE Projetada', 'Sumário Executivo'], source: ['src/nav.tsx:34'], problem: 'Caixa de título', options: [{ text: 'Sumário executivo', convention: 'DSX', note: '' }, { text: 'Resumo', convention: 'Polaris', note: '' }], recommended: { index: 0, why: 'pt-BR' } },
-    { id: 'c50', element: 'helper', rule: 'desc', severity: 1, text: 'Aqui ficam as minutas.', source: ['src/Lista.tsx:12'], screens: ['14-minutas'], problem: 'Descrição desnecessária', options: [{ text: '(remover)', convention: 'DSX' }], recommended: { index: 0, why: '' } },
+    { id: 'c02', element: 'menu', rule: 'X10', text: 'Resumo Executivo', variants: ['Relatório Mensal', 'Resumo Executivo'], source: ['src/nav.tsx:34'], problem: 'Caixa de título', options: [{ text: 'Sumário executivo', convention: 'DSX', note: '' }, { text: 'Resumo', convention: 'Polaris', note: '' }], recommended: { index: 0, why: 'pt-BR' } },
+    { id: 'c50', element: 'helper', rule: 'desc', severity: 1, text: 'Aqui ficam as propostas.', source: ['src/Lista.tsx:12'], screens: ['14-propostas'], problem: 'Descrição desnecessária', options: [{ text: '(remover)', convention: 'DSX' }], recommended: { index: 0, why: '' } },
   ];
   const r = importOptions(reg, options, cases, { now: day('01') });
   assert.equal(r.matched, 1);

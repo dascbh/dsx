@@ -28,14 +28,14 @@ test('UX.md lint: missing persona fails', () => {
 });
 
 test('UX.md lint: missing and out-of-order sections fail', () => {
-  const withoutFlows = example.replace(/^## Fluxos$/m, '## Jornadas');
+  const withoutFlows = example.replace(/^## Flows$/m, '## Journeys');
   assert.ok(has(lintUxMd(withoutFlows, NO_DIR), 'Seção obrigatória ausente: "## Fluxos"'));
-  const swapped = example.replace('## Visão geral', '## TMP').replace('## Personas e tarefas', '## Visão geral').replace('## TMP', '## Personas e tarefas');
+  const swapped = example.replace('## Overview', '## TMP').replace('## Personas & Tasks', '## Overview').replace('## TMP', '## Personas & Tasks');
   assert.ok(has(lintUxMd(swapped, NO_DIR), 'fora de ordem'));
 });
 
-test('UX.md lint: English section titles are accepted', () => {
-  const en = example.replace('## Visão geral', '## Overview').replace('## Faça e não faça', "## Do's and Don'ts");
+test('UX.md lint: English and pt-BR section titles are both accepted', () => {
+  const en = example.replace('## Overview', '## Visão geral').replace("## Do's and Don'ts", '## Faça e não faça').replace('### Do\n', '### Faça\n').replace("### Don't\n", '### Não faça\n');
   assert.equal(lintUxMd(en, NO_DIR).ok, true);
 });
 
@@ -51,7 +51,7 @@ test('UX.md lint: invalid enum and wrong type fail; unknown key warns', () => {
 });
 
 test('UX.md lint: unknown archetype fails (fixed list and folder)', () => {
-  const md = example.replace('library: ["/modelos"]', 'magic-gallery: ["/modelos"]');
+  const md = example.replace('library: ["/catalog"]', 'magic-gallery: ["/catalog"]');
   assert.ok(has(lintUxMd(md, NO_DIR), 'archetypes.magic-gallery'));
   const dir = mkdtempSync(join(tmpdir(), 'dsx-arq-'));
   for (const id of ARCHETYPES) writeFileSync(join(dir, `${id}.md`), `# ${id}\n`);
@@ -61,12 +61,12 @@ test('UX.md lint: unknown archetype fails (fixed list and folder)', () => {
 
 test('UX.md lint: Do/Do not with fewer than 3 items fails; vague text warns', () => {
   const md = example
-    .replace(/- Use o número do contrato como título[^\n]*\n/, '')
-    .replace(/- Devolva a lista com filtros[^\n]*\n/, '')
-    .replace('Tom direto,', 'Tom intuitivo e direto,');
+    .replace(/- Use the order number as the detail title[^\n]*\n/, '')
+    .replace(/- Restore the list with filters[^\n]*\n/, '')
+    .replace('Direct tone,', 'Intuitive and direct tone,');
   const r = lintUxMd(md, NO_DIR);
   assert.ok(has(r, 'Bloco "Faça" com 2'));
-  assert.ok(r.warnings.some((w) => w.includes('intuitivo')));
+  assert.ok(r.warnings.some((w) => w.includes('Intuitive')));
 });
 
 test('UX.md lint: legacy Portuguese front matter passes with "nome antigo" warnings', () => {

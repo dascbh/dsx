@@ -23,19 +23,19 @@ const NO_DIR = { archetypesDir: join(tmpdir(), 'dsx-no-archetypes-dir') };
 
 const MAP = {
   screens: [
-    { id: 'lista', name: 'Contratos', type: 'page', route: '/contratos', parent: null },
-    { id: 'detalhe', name: 'Contrato', type: 'page', route: '/contratos/:id', parent: 'lista' },
+    { id: 'lista', name: 'Pedidos', type: 'page', route: '/pedidos', parent: null },
+    { id: 'detalhe', name: 'Pedido', type: 'page', route: '/pedidos/:id', parent: 'lista' },
     { id: 'dlg-a', name: 'Excluir A', type: 'dialog', parent: 'lista' },
     { id: 'dlg-b', name: 'Excluir B', type: 'dialog', parent: 'lista' },
     { id: 'orfa', name: 'Tela nova', type: 'page', parent: 'lista' },
   ],
   transitions: [], journeys: [],
 };
-const dialog = (title, actionFirst) => `<!doctype html><html><body><main><h1>Contratos</h1></main>
+const dialog = (title, actionFirst) => `<!doctype html><html><body><main><h1>Pedidos</h1></main>
 <div role="dialog" aria-label="${title}"><h2>${title}</h2><div class="MuiDialogActions-root">${actionFirst
-  ? '<button class="MuiButton-contained MuiButton-containedError">Excluir contrato</button><button class="MuiButton-text">Cancelar</button>'
-  : '<button class="MuiButton-text">Cancelar</button><button class="MuiButton-contained MuiButton-containedError">Excluir contrato</button>'}</div></div></body></html>`;
-const PAGE = '<!doctype html><html><body><main><h1>Contratos</h1><button class="MuiButton-contained">Novo contrato</button></main></body></html>';
+  ? '<button class="MuiButton-contained MuiButton-containedError">Excluir pedido</button><button class="MuiButton-text">Cancelar</button>'
+  : '<button class="MuiButton-text">Cancelar</button><button class="MuiButton-contained MuiButton-containedError">Excluir pedido</button>'}</div></div></body></html>`;
+const PAGE = '<!doctype html><html><body><main><h1>Pedidos</h1><button class="MuiButton-contained">Novo pedido</button></main></body></html>';
 
 function uxMd({ deviations = '', updated = '2026-10-01', version = '1.2.0', states = '[loading, empty, error, no-access, success]', glossary = 'inline', extraArch = '' } = {}) {
   return `---
@@ -48,7 +48,7 @@ product:
   persona: analista
   register: operational
 archetypes:
-  operational-list: ["/contratos"]
+  operational-list: ["/pedidos"]
   document-viewer: [detalhe]
   confirmation-dialog: [dlg-a, dlg-b${extraArch}]
 actions:
@@ -70,7 +70,7 @@ ${deviations}---
 
 | Termo | Nunca chamar de |
 |---|---|
-| Contrato | "acordo" |
+| Pedido | "ordem" |
 `;
 }
 
@@ -111,7 +111,7 @@ test('UX.md lint: version is semver; "alpha" warns; anything else fails', () => 
 });
 
 test('UX.md lint: deviations are validated and matched against the body table', () => {
-  const r = lintUxMd(example.replace('    rules: [L9]\n', '    rules: [L99]\n').replace('    decided-by: "jurídico"\n', ''), NO_DIR);
+  const r = lintUxMd(example.replace('    rules: [L9]\n', '    rules: [L99]\n').replace('    decided-by: "finance"\n', ''), NO_DIR);
   assert.ok(r.errors.some((e) => /regra "L99"/.test(e)));
   assert.ok(r.errors.some((e) => /D3: sem decided-by/.test(e)));
   const onlyBody = lintUxMd(example.replace(/^deviations:[\s\S]*?(?=^---)/m, ''), NO_DIR);
@@ -122,7 +122,7 @@ test('UX.md lint: deviations are validated and matched against the body table', 
 });
 
 test('UX.md lint: content.glossary accepts a per-module map', () => {
-  const md = example.replace('  glossary: inline ', '  glossary: { default: docs/g.md, contratos: inline } ');
+  const md = example.replace('  glossary: inline ', '  glossary: { default: docs/g.md, compras: inline } ');
   assert.equal(lintUxMd(md, NO_DIR).ok, true);
   const bad = lintUxMd(example.replace('  glossary: inline ', '  glossary: 42 '), NO_DIR);
   assert.ok(bad.errors.some((e) => /content\.glossary/.test(e)));
@@ -194,7 +194,7 @@ test('drift: U1–U6 on a synthetic project', () => {
 });
 
 test('drift: a deviation covering the screens silences U1 and the U3 majority; up-to-date file is clean', () => {
-  const dev = 'deviations:\n  - id: D1\n    screens: [orfa]\n    rules: []\n    reason: "em construção"\n    decided-by: dono\n  - id: D2\n    screens: [dlg-a, dlg-b]\n    rules: [T2]\n    reason: "ação antes de cancelar por decisão do jurídico"\n    decided-by: dono\n';
+  const dev = 'deviations:\n  - id: D1\n    screens: [orfa]\n    rules: []\n    reason: "em construção"\n    decided-by: dono\n  - id: D2\n    screens: [dlg-a, dlg-b]\n    rules: [T2]\n    reason: "ação antes de cancelar por decisão do time de compras"\n    decided-by: dono\n';
   const p = project(uxMd({ deviations: dev, states: '[loading, empty, error, success]', updated: '2026-10-03' }));
   try {
     const r = analyzeDrift(readFileSync(p.ux, 'utf8'), { map: p.map, screens: p.screens, now: NOW, lastChange: { date: '2026-10-02', source: 'git', paths: [p.map] } });
@@ -209,13 +209,13 @@ const run = (items) => ({ items: findings.assignIds(items), families: ['screen']
 const T2 = (screen) => ({ family: 'screen', rule: 'T2', severity: 2, element: 'button', text: 'ordem invertida', variants: [], screens: [screen], region: 'diálogo', source: [`${screen}.html:3`], message: 'ordem invertida' });
 
 test('findings: covered item is accepted-deviation, does not count as open nor in check, and reopens when the deviation goes', () => {
-  const devs = parseDeviations([{ id: 'D2', screens: ['dlg-a'], rules: ['T2'], reason: 'decisão do jurídico', 'decided-by': 'dono' }]).deviations;
+  const devs = parseDeviations([{ id: 'D2', screens: ['dlg-a'], rules: ['T2'], reason: 'decisão do time de compras', 'decided-by': 'dono' }]).deviations;
   const reg = { module: 'm', updated: null, runs: [], items: [] };
   findings.merge(reg, run([T2('03-dlg-a'), T2('04-dlg-b')]), { now: NOW, deviations: devs });
   const a = reg.items.find((i) => i.screens[0] === '03-dlg-a');
   const b = reg.items.find((i) => i.screens[0] === '04-dlg-b');
   assert.equal(a.status, 'accepted-deviation');
-  assert.deepEqual(a.deviation, { id: 'D2', reason: 'decisão do jurídico', decided_by: 'dono', until: null });
+  assert.deepEqual(a.deviation, { id: 'D2', reason: 'decisão do time de compras', decided_by: 'dono', until: null });
   assert.equal(b.status, 'open');
   assert.deepEqual(reg.deviations, devs, 'a cópia vigente fica no registro');
   assert.ok(!findings.OPEN_STATUSES.includes('accepted-deviation'));
@@ -232,7 +232,7 @@ test('findings: covered item is accepted-deviation, does not count as open nor i
   // página mostra o motivo
   const html = findings.renderPage(reg, { items: {} }, { items: {} }, {});
   assert.match(html, /Desvio aceito D2/);
-  assert.match(html, /decisão do jurídico/);
+  assert.match(html, /decisão do time de compras/);
   // desvio sai do UX.md → volta a abrir
   findings.merge(reg, run([T2('03-dlg-a'), T2('04-dlg-b')]), { now: NOW, deviations: [] });
   assert.equal(reg.items.find((i) => i.screens[0] === '03-dlg-a').status, 'open');
@@ -263,37 +263,37 @@ test('findings: deviationsFromUx reads the front matter; missing file keeps the 
 test('glossary: per-module map is chosen by --module, falls back to default, single path stays compatible', () => {
   const dir = mkdtempSync(join(tmpdir(), 'dsx-gloss-'));
   try {
-    writeFileSync(join(dir, 'trib.md'), '| Termo | Nunca chamar de |\n|---|---|\n| Redutor | "desconto" |\n');
-    writeFileSync(join(dir, 'ctr.md'), '| Termo | Nunca chamar de |\n|---|---|\n| Minuta | "rascunho" |\n| Termo Aditivo | "adendo" |\n');
+    writeFileSync(join(dir, 'financeiro.md'), '| Termo | Nunca chamar de |\n|---|---|\n| Centro de custo | "departamento" |\n');
+    writeFileSync(join(dir, 'compras.md'), '| Termo | Nunca chamar de |\n|---|---|\n| Proposta | "rascunho" |\n| Nota Fiscal | "cupom" |\n');
     const ux = join(dir, 'UX.md');
-    writeFileSync(ux, '---\nname: x\n---\n\n| Termo | Evitar |\n|---|---|\n| De acordo | "aceite" |\n');
-    const cfg = configFrom({ content: { glossary: { default: 'trib.md', contratos: 'ctr.md', publico: 'inline' } } });
+    writeFileSync(ux, '---\nname: x\n---\n\n| Termo | Evitar |\n|---|---|\n| Aprovação | "aceite" |\n');
+    const cfg = configFrom({ content: { glossary: { default: 'financeiro.md', compras: 'compras.md', publico: 'inline' } } });
     assert.ok(isModuleGlossary(cfg.content.glossary));
-    assert.deepEqual(loadGlossary(cfg, ux, 'contratos').map((g) => g.term), ['Minuta', 'Termo Aditivo']);
-    assert.deepEqual(loadGlossary(cfg, ux, 'publico').map((g) => g.term), ['De acordo']);
-    assert.deepEqual(loadGlossary(cfg, ux, 'outro').map((g) => g.term), ['Redutor']);
-    assert.deepEqual(loadGlossary(cfg, ux).map((g) => g.term), ['Redutor']);
-    assert.equal(glossarySource(cfg.content.glossary, 'contratos').module, 'contratos');
-    assert.deepEqual(loadGlossary(configFrom({ content: { glossary: 'ctr.md' } }), ux, 'contratos').map((g) => g.term), ['Minuta', 'Termo Aditivo']);
+    assert.deepEqual(loadGlossary(cfg, ux, 'compras').map((g) => g.term), ['Proposta', 'Nota Fiscal']);
+    assert.deepEqual(loadGlossary(cfg, ux, 'publico').map((g) => g.term), ['Aprovação']);
+    assert.deepEqual(loadGlossary(cfg, ux, 'outro').map((g) => g.term), ['Centro de custo']);
+    assert.deepEqual(loadGlossary(cfg, ux).map((g) => g.term), ['Centro de custo']);
+    assert.equal(glossarySource(cfg.content.glossary, 'compras').module, 'compras');
+    assert.deepEqual(loadGlossary(configFrom({ content: { glossary: 'compras.md' } }), ux, 'compras').map((g) => g.term), ['Proposta', 'Nota Fiscal']);
     // mapa termo → sinônimos continua sendo glossário único
-    assert.equal(isModuleGlossary({ Minuta: ['rascunho'] }), false);
+    assert.equal(isModuleGlossary({ Proposta: ['rascunho'] }), false);
     // sem default e módulo ausente: nada
-    assert.deepEqual(loadGlossary(configFrom({ content: { glossary: { contratos: 'ctr.md' } } }), ux, 'trib'), []);
+    assert.deepEqual(loadGlossary(configFrom({ content: { glossary: { compras: 'compras.md' } } }), ux, 'financeiro'), []);
     // text.mjs: termo canônico com maiúscula no meio vira nome próprio no X10
-    const nouns = glossaryProperNouns(loadGlossary(cfg, ux, 'contratos'));
-    assert.deepEqual(nouns, ['Termo Aditivo']);
-    const html = '<!doctype html><html><body><main><h1>Gerar Termo Aditivo</h1><h2>Lista De Minutas</h2></main></body></html>';
+    const nouns = glossaryProperNouns(loadGlossary(cfg, ux, 'compras'));
+    assert.deepEqual(nouns, ['Nota Fiscal']);
+    const html = '<!doctype html><html><body><main><h1>Gerar Nota Fiscal</h1><h2>Lista De Propostas</h2></main></body></html>';
     const x10 = (r) => r.findings.filter((f) => f.rule === 'X10').map((f) => f.text);
-    assert.deepEqual(x10(analyzeText(html, configFrom({}), 't.html', { properNouns: nouns })), ['Lista De Minutas']);
-    assert.ok(x10(analyzeText(html, configFrom({}), 't.html')).includes('Gerar Termo Aditivo'));
+    assert.deepEqual(x10(analyzeText(html, configFrom({}), 't.html', { properNouns: nouns })), ['Lista De Propostas']);
+    assert.ok(x10(analyzeText(html, configFrom({}), 't.html')).includes('Gerar Nota Fiscal'));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test('audit: passes --module to text and consistency; drift is a prerequisite warning and goes to the report', () => {
-  const ctx = { screens: 's', code: [], ux: 'U.md', module: 'contratos', map: 'f.json' };
+  const ctx = { screens: 's', code: [], ux: 'U.md', module: 'compras', map: 'f.json' };
   for (const fam of ['text', 'consistency']) {
     const args = DETECTOR_REGISTRY.find((d) => d.family === fam).args(ctx);
-    assert.deepEqual(args.slice(args.indexOf('--module'), args.indexOf('--module') + 2), ['--module', 'contratos']);
+    assert.deepEqual(args.slice(args.indexOf('--module'), args.indexOf('--module') + 2), ['--module', 'compras']);
   }
   const p = project(uxMd());
   try {

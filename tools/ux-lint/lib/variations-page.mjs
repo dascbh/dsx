@@ -34,6 +34,15 @@ export const letterOf = (row, i) => (row.is_current ? 'Hoje' : /^[a-z]$/i.test(r
  * Passos de uma linha: frames consecutivos do mesmo `step` formam um grupo. Frame de comportamento vira par
  * antes → ação → depois; os frames citados como antes/depois no mesmo passo não aparecem de novo sozinhos.
  */
+/** Forward lenses in plain language for the decision page (ids stay in "Para quem constrói"). */
+export const LENS_PT = {
+  subtract: 'Tirar: um passo, campo ou decisão some',
+  invert: 'Inverter: muda quem age ou quando',
+  analogous: 'Emprestar: copia o que funciona em outro lugar',
+  'constraint-first': 'Pior caso primeiro: desenha para o caso difícil',
+  'object-first': 'Pelo objeto: organiza em volta da coisa, não da sequência',
+};
+
 export function groupsOf(row) {
   const frames = row.frames ?? [];
   const byId = new Map(frames.map((f) => [f.id, f]));
@@ -508,10 +517,24 @@ export function renderVariationsPages(m, opts = {}) {
         arch ? `<p>Arquétipo: ${esc(arch)} (${esc(r.archetype)}).</p>` : '',
         pats.length ? `<p>Padrões do catálogo: ${esc(pats.join(' · '))}.</p>` : '',
         laws.length ? `<p>Princípios: ${esc(laws.join(', '))}.</p>` : '',
+        r.lens ? `<p>Lente (Forward, USE-10): ${esc(r.lens)}.</p>` : '',
         ids.length ? `<p>Achados citados: ${esc(ids.join(', '))}.</p>` : '',
         (r.code ?? []).length ? `<p>Código da versão: ${(r.code ?? []).map((c) => `<code>${esc(c)}</code>`).join(' ')}</p>` : '',
       ].filter(Boolean);
       return parts.length ? `<details class="det tec"><summary>Para quem constrói</summary>${parts.join('')}</details>` : '';
+    };
+    // Falsifiable hypothesis (manifest format 2), in plain language; the lens id only appears for builders.
+    const chosenId = typeof m.choice === 'string' ? m.choice : m.choice?.variant ?? null;
+    const betBlock = (r) => {
+      const rows = [
+        ['Para quem', r.audience], ['A aposta', r.causal_bet], ['O que provaria o contrário', r.counter_hypothesis],
+        ['Como testar se está errada', r.falsification_test], ['Número que deve melhorar', r.expected_metric], ['O que não pode piorar', r.guardrail],
+        ['Ângulo da ideia', LENS_PT[r.lens] ?? null],
+      ].filter(([, v]) => String(v ?? '').trim());
+      const rec = chosenId === r.id ? `<p>Recomendada por quem desenhou${m.choice?.why ? `: ${esc(m.choice.why)}` : '.'}</p>` : '';
+      const traded = m.rejected_tradeoffs?.[r.id] ? `<p>Por que não é a recomendada: ${esc(m.rejected_tradeoffs[r.id])}</p>` : '';
+      if (!rows.length && !rec && !traded) return '';
+      return `<details class="det"><summary>Como saber se funciona</summary>${rec}${traded}${rows.length ? `<dl class="muda">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}</details>`;
     };
     const details = (r) => {
       if (r.is_current) {
@@ -532,6 +555,7 @@ export function renderVariationsPages(m, opts = {}) {
       return `<div class="dets">
   <details class="det"><summary>O que muda</summary><dl class="muda">${changes}</dl></details>
   <details class="det"><summary>Por que pode funcionar</summary><p>${esc(r.hypothesis)}</p></details>
+  ${betBlock(r)}
   <details class="det"><summary>Riscos (${(r.tradeoffs ?? []).length})</summary><ul>${(r.tradeoffs ?? []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>
   <details class="det"><summary>Problemas que resolve (${v.resolved} confirmado${v.resolved === 1 ? '' : 's'}${v.to_check ? `, ${v.to_check} a conferir` : ''})</summary>${resolves.length ? `<ul class="probs">${resolves.map((id) => problemItem(id, st.get(id), allFresh)).join('')}</ul>` : '<p>Esta versão não diz quais problemas resolve.</p>'}</details>
   ${fresh.length ? `<details class="det"><summary>Novos pontos de atenção (${fresh.length})</summary><ul class="probs">${fresh.map((f) => { const steps = [...new Set((f.frames ?? []).map((id) => stepOfFrame.get(id)).filter(Boolean))]; return `<li><span class="selo selo-${f.severity >= 3 ? 'bad' : 'check'}">${f.severity >= 3 ? 'grave' : 'atenção'}</span> ${esc(plainFinding(f, { rules, where: steps.length ? `em ${steps.join(', ')}` : '' }))}</li>`; }).join('')}</ul></details>` : ''}

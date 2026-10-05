@@ -7,7 +7,7 @@
 version: 1.0.0
 format: alpha
 name: <Nome do produto>
-description: <Tipo de produto, público e densidade. Ex.: "Plataforma B2B de contratos para o jurídico interno, desktop, densidade alta.">
+description: <Tipo de produto, público e densidade. Ex.: "App web de pedidos de compra para o time de suprimentos, desktop, densidade alta.">
 owner: <time ou pessoa que mantém este arquivo>
 updated: <AAAA-MM-DD>
 # Quem usa e em que registro. persona e register são obrigatórios. Chaves e valores em inglês; o texto livre, em pt-BR.
@@ -53,12 +53,17 @@ flows:
   max-stacked-dialogs: 1
   dead-ends: 0
 # Como o ux-lint reconhece o kit do projeto nas capturas. Ajuste ao seu kit (MUI, shadcn, próprio).
+# Onde as ferramentas acham capturas, mapa e código (docs/project-paths.md). Apague o que for o padrão do DSX.
+paths:
+  captures: .dsx/captures/<module>
+  code: [<pasta do front onde o texto nasce>]
 verification:
+  kit: <auto | generic | mui | shadcn | chakra | antd | bootstrap>   # perfil de seletores do kit de componentes
   selectors:
     regions: ["header", "nav", "aside", "main", "[role=dialog]"]
     dialog: "[role=dialog]"
-    primary: "<seletor do botão primário>"
-    destructive: "<seletor do botão destrutivo>"
+    primary: "<seletor do botão primário; apague para usar o do kit>"
+    destructive: "<seletor do botão destrutivo; apague para usar o do kit>"
     button: "button, [role=button]"
     field: "input:not([type=hidden]), textarea, select"
 # Desvios aceitos: o que difere do cartão do arquétipo ou de uma política, com motivo e dono. Achado de regra listada

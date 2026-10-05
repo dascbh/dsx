@@ -15,11 +15,11 @@ Diferença para `revisar-ux`: aquela revisa uma tela ou um fluxo; esta audita um
 
 A auditoria só vale com três insumos do projeto, nesta ordem de importância:
 
-1. **Capturas das telas pelo código do projeto** (HTML renderizado a partir dos componentes reais, nunca tela gerada por texto). Padrão: `<projeto>/.stitch/<módulo>/code/<nn>-<tela>.html`. Estados (vazio, erro, carregando, sem acesso…) ficam ao lado: `<nn>-<tela>.<estado>.html`. No AURIS a captura é a skill `code-to-stitch` do projeto.
+1. **Capturas das telas pelo código do projeto** (HTML renderizado a partir dos componentes reais, nunca tela gerada por texto). Padrão: `<projeto>/.dsx/captures/<módulo>/<nn>-<tela>.html` (configurável em `paths.captures`, ver `docs/project-paths.md`; a pasta antiga `.stitch/<módulo>/code` ainda é lida, com aviso). Estados (vazio, erro, carregando, sem acesso…) ficam ao lado: `<nn>-<tela>.<estado>.html`. A captura é a skill `capture-from-code` do DSX (ou o harness de captura que o projeto já tenha).
 2. **Mapa de fluxo conferido**: `<projeto>/.dsx/maps/flows-<módulo>.json`, gerado pela skill `mapear` (mapeador de fluxos) com evidência arquivo:linha e confirmado com o dono pela skill `confirmar-mapas`. Mapa não conferido gera F1/F5 falsos.
 3. **`UX.md`** na raiz do projeto, válido em `node <DSX>/tools/lint-ux-md.mjs UX.md` e **em dia com o produto**: a auditoria roda o drift (`tools/ux-lint/ux-md-drift.mjs`) como pré-requisito e avisa "UX.md desatualizado: …" (tela sem arquétipo, arquétipo de tela que sumiu, política que a maioria das telas não segue, estado sem captura, `updated` velho, desvio vencido). Sem `UX.md` valem os padrões do DSX, e as regras que dependem de declaração (posição da ação primária, estados obrigatórios, termos proibidos, desvios aceitos) perdem força; com `UX.md` desatualizado, os achados medem contra uma regra velha. Atualize-o (skill `ux-md`, Modo C) antes de decidir achados que dependem do ponto acusado.
 
-Também: as pastas de código onde o texto nasce (`--code`), para o texto apontar arquivo:linha; e a **geometria medida** das capturas (`<projeto>/.stitch/<módulo>/geometry/*.geometry.json`, gerada por `node <DSX>/tools/ux-lint/measure.mjs <capturas> --out <pasta> --ux UX.md`, que precisa do Playwright no projeto), sem a qual as regras L de layout e hierarquia não rodam. Com `--measure` a auditoria mede antes de rodar.
+Também: as pastas de código onde o texto nasce (`--code`), para o texto apontar arquivo:linha; e a **geometria medida** das capturas (`<projeto>/.dsx/captures/<módulo>/geometry/*.geometry.json`, gerada por `node <DSX>/tools/ux-lint/measure.mjs <capturas> --out <pasta> --ux UX.md`, que precisa do Playwright no projeto), sem a qual as regras L de layout e hierarquia não rodam. Com `--measure` a auditoria mede antes de rodar.
 
 ## 2. Rodar a auditoria e registrar
 
@@ -27,7 +27,7 @@ Também: as pastas de código onde o texto nasce (`--code`), para o texto aponta
 node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <projeto> --register [--measure]
 ```
 
-O comando confere os pré-requisitos (e diz como gerar o que falta), roda os detectores que existirem (texto, tela, fluxo, layout, estados, consistência), grava em `<projeto>/.dsx/findings/<m>/findings.json` e imprime o **relatório por dimensão**. Padrões: `--screens <root>/.stitch/<m>/code`, `--geometry <root>/.stitch/<m>/geometry`, `--map <root>/.dsx/maps/flows-<m>.json`, `--ux <root>/UX.md`, `--code <root>/frontend/src <root>/backend/shared` (só os que existem). Sem `--register`, compara com o registro sem gravar (útil antes de mexer).
+O comando confere os pré-requisitos (e diz como gerar o que falta), roda os detectores que existirem (texto, tela, fluxo, layout, estados, consistência), grava em `<projeto>/.dsx/findings/<m>/findings.json` e imprime o **relatório por dimensão**. Caminhos: flag > `--config <arquivo>`/`.dsx/config.json` > bloco `paths` do `UX.md` > padrão (`docs/project-paths.md`). Padrões: `--screens <root>/.dsx/captures/<m>`, `--geometry <root>/.dsx/captures/<m>/geometry`, `--map <root>/.dsx/maps/flows-<m>.json`, `--ux <root>/UX.md`, `--code` = pastas detectadas pela stack (o `src` de cada pacote do front); pastas de texto fora do front (constantes do back-end, vocabulário) entram por `paths.code`. Sem `--register`, compara com o registro sem gravar (útil antes de mexer).
 
 - **SE** um pré-requisito falta **ENTÃO** gere-o com o comando indicado e rode de novo; não substitua captura ausente por julgamento.
 - **SE** um detector aparece como ausente ou fora do registro **ENTÃO** a dimensão dele vai para o julgamento (passo 3) nesta rodada e o relatório final diz isso.
@@ -64,10 +64,10 @@ Para cada achado aberto que o dono precisa decidir, 2–3 opções no próprio `
 
 ## 5. Prévias e página de decisão
 
-Gere as prévias antes da página: para cada caso aberto, o "antes" e o "depois" de cada opção recortados da captura real (diálogo inteiro ou região ao redor do elemento, contornado), e o mini diagrama de fluxo. Rode de dentro de uma pasta do projeto que tenha o Playwright (no AURIS, `frontend/`):
+Gere as prévias antes da página: para cada caso aberto, o "antes" e o "depois" de cada opção recortados da captura real (diálogo inteiro ou região ao redor do elemento, contornado), e o mini diagrama de fluxo. Rode de dentro de uma pasta do projeto que tenha o Playwright (ex.: a pasta do front, onde está o `package.json` com `@playwright/test`):
 
 ```bash
-cd <projeto>/frontend
+cd <projeto>/<pasta-com-playwright>
 node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <projeto> --preview --page <projeto>/.dsx/findings/<m>/page.html
 ```
 
@@ -88,6 +88,22 @@ Corrija onde o problema nasce: o `source` (arquivo:linha) do achado, o template 
 
 Recapture as telas alteradas e rode de novo o passo 2 com `--register`. O que sumiu vira `fixed`; o que voltou, `regression`. Achado de revisão não some sozinho: reveja a tela e decida de novo. Ligue `findings.mjs check` no pre-commit ou CI do projeto.
 
+## Product pipeline quality (Forward contract)
+
+The audit also reports the Forward product-pipeline contract (`knowledge/foundations/product-pipeline-ux.md`, matrix `data/pipeline-quality.json`): **UI quality** (5 metrics: information density, semantic economy, action topology, visual hierarchy alignment, interaction friction), **UX quality** (5 dimensions: task effectiveness, cognitive economy, journey topology, expectation/feedback alignment, effort and recovery) and **design-system adherence** as a separate verdict. The 14 dimensions above become the diagnostic layer.
+
+```bash
+node <DSX>/tools/ux-lint/criteria.mjs check cycles/C-<n>/plan.md        # declarations: fields, metric ids, dated plan
+node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <project> --criteria cycles/C-<n>/plan.md \
+     [--evidence <recorded.json>] [--criteria-out <project>/evals/ux/C-<n>-criteria.json]
+```
+
+- Criteria come from the `## Acceptance criteria` section of the cycle plan (format in the knowledge file): declared before construction, never written after seeing the result. Inspecting without a plan is valid: every metric reads `unknown — no criterion declared`, and the report says so.
+- Each criterion gets value, evidence revision, verdict (`pass | fail | unknown | not-applicable`) and evidence class (`observed | expert-inferred | human | synthetic`). Unknown is never pass; synthetic evidence never decides; a target relative to an unknown baseline stays unknown until the measurement task runs.
+- No score: never summarize the audit as one number, and never let a passing DS adherence offset a failed UI/UX metric (or the reverse).
+- Judgment findings (step 3) still cite a principle; when they feed a criterion, record them in the evidence file as `expert-inferred`, and in `reviews/<demand-id>/findings.toml` (Forward) with the USE/DOM id.
+- The `--json` output and the results file carry `provenance` (date, owner role, sources with revision, criteria, evidence class, assumptions, gaps).
+
 ## Relatório final (padrão)
 
 ```
@@ -106,6 +122,15 @@ Fica aberto: <lacunas das dimensões e o que precisa de pesquisa com usuários>
 
 Não declare uma dimensão "boa" só porque não tem achado: diga a cobertura e as lacunas dela.
 
+Add to the final report (English block, after the dimensions):
+
+```
+UI quality: density <verdict> · semantics <verdict> · action topology <verdict> · hierarchy <verdict> · friction <verdict>
+UX quality: effectiveness <verdict> · cognitive economy <verdict> · journey topology <verdict> · feedback <verdict> · effort/recovery <verdict>
+DS adherence (separate): <verdict> — tokens/kit · semantics · rendered parity · interaction/a11y · adoption
+Unknown criteria: <ids> and the measurement each one needs
+```
+
 ## Checklist
 
 - [ ] Capturas pelo código, mapa conferido e `UX.md` válido antes de rodar.
@@ -115,3 +140,4 @@ Não declare uma dimensão "boa" só porque não tem achado: diga a cobertura e 
 - [ ] Opções escritas (texto pela `ux-writing`), prévias geradas (ou dispensa justificada) e página de decisão entregue ao dono.
 - [ ] Decisões aplicadas na origem e `UX.md` atualizado quando a regra de produto mudou.
 - [ ] Re-auditoria registrada; relatório final no formato acima.
+- [ ] Quality sections read against the cycle plan criteria (or reported as unknown when there is no plan); no single score; DS adherence reported separately.

@@ -20,6 +20,15 @@ O objetivo não é "uma tela bonita", é **uma tela que parece ter sido feita pe
 7. Se a tela vem do Stitch (`.stitch/designs/<slug>.html|png`), ela é **referência de layout e conteúdo**, não código: siga o modo "Trazer" da skill `stitch` (cores mapeadas por papel, componentes do projeto, correções que a crítica apontou).
 8. Se a tarefa for uma feature nova sem problema definido ("faz uma tela de X"), pergunte **para quem** e **qual tarefa** a tela resolve antes de desenhar. Uma frase basta.
 
+## 0b. Product pipeline contract (Forward)
+
+When the work belongs to a Forward cycle (`cycles/C-<n>/plan.md` exists), the UI realizes a contract written before it (`knowledge/foundations/product-pipeline-ux.md`):
+
+1. **Read the blueprint** of the front demand: `specs/<demand-id>/design/intended-model.md` (actors, jobs, primary actions and consequences, acceptance scenarios) and, when present, `flow.md` and `ia.md`. UI is the realization of this contract, not the source of the job. A blueprint gap (missing state, screen without requirement) goes back to its owner; do not improvise it in code. Check before building: `node <DSX>/tools/ux-lint/blueprint.mjs check --design specs/<demand-id>/design --no-captures`.
+2. **Read the UI/UX criteria** of the plan (`node <DSX>/tools/ux-lint/criteria.mjs list cycles/C-<n>/plan.md`). Build toward the declared targets and counter-metrics; never edit them (the plan is frozen at sign-off).
+3. **Internal criticism before code.** Write six short entries — strongest counter-case, unsupported claims, failure/recovery scenarios, accessibility, domain/data contradictions, security/operational risks — each resolved (what you changed) or turned into an explicit limitation or measurement task. Put it in the demand's notes on `cycles/C-<n>/board.md` (or in the variations manifest's `critique` when the screen comes from `repensar-ux`). It never replaces the isolated review (`revisor-ux`, Forward `fde-review`).
+4. **After UI**, verify the realized journey: recapture, then `blueprint.mjs check --design specs/<demand-id>/design --module <m> [--journey <id>]` (no orphans both ways, DOM-5) and `audit.mjs --module <m> --root . --criteria cycles/C-<n>/plan.md --criteria-out evals/ux/C-<n>-criteria.json`. Report UI quality, UX quality and DS adherence as separate verdicts; `unknown` stays unknown.
+
 ## 1. Descoberta antes de escrever código
 
 Faça este inventário **antes** de criar qualquer arquivo:
@@ -82,7 +91,7 @@ node <DSX>/tools/lint-ux-md.mjs UX.md                           # se você alter
 node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .   # o UX.md ainda descreve as telas (U1–U6)
 ```
 
-Achado de severidade ≥ 3 do ux-lint bloqueia a entrega (ou vira dívida registrada em `.dsx/findings/<modulo>/` com dono). Captura pela skill de captura do projeto (ex.: `code-to-stitch`); sem captura, diga no relatório que o gate de UX não rodou.
+Achado de severidade ≥ 3 do ux-lint bloqueia a entrega (ou vira dívida registrada em `.dsx/findings/<modulo>/` com dono). Captura pela skill de captura do projeto (`capture-from-code` do DSX, ou o harness do projeto); sem captura, diga no relatório que o gate de UX não rodou.
 
 **Mudou comportamento, atualize o `UX.md` no mesmo commit.** Tela nova ou removida, arquétipo, posição de ação, confirmação, feedback, estado ou fluxo diferente do que o `UX.md` diz: atualize a linha da tela (seção 5), a política ou o desvio (bloco `deviations` + tabela D…), o mapa `.dsx/maps/flows-<module>.json` se a navegação mudou, e suba `version` (política ou arquétipo → menor; só texto → patch) e `updated`. O drift (U5) acusa `updated` mais velho que as telas.
 
@@ -94,6 +103,8 @@ Checklist mínimo de acessibilidade (completo em `skills/acessibilidade/SKILL.md
 - [ ] Alvo de toque ≥ 24px (padrão 44px).
 - [ ] Erro comunicado por texto + ícone, não só cor; ligado ao campo por `aria-describedby`.
 - [ ] Mudanças dinâmicas importantes anunciadas (`role="status"` / `role="alert"`).
+
+**Design-system adherence is its own verdict** (Forward `design-system-lifecycle.md`): tokens and kit, semantics, rendered parity, interaction/accessibility and adoption, each pass/fail/unknown with the foundation revision. A clean `lint-raw-values` does not make a screen with poor action topology acceptable, and a good layout does not excuse unexplained drift.
 
 ## 5. Relatório de entrega
 
@@ -108,6 +119,7 @@ Arquétipo: <id> (UX.md <version>) · desvios aplicados: D… ou nenhum
 Estados implementados: carregando ✔ vazio ✔ erro ✔ sucesso ✔ foco ✔ …
 Verificações: lint-raw-values 0 ocorrências · contraste OK · ux-lint sem sev ≥ 3 · drift 0 · teclado OK · 320px OK
 UX.md: atualizado para <version> (o que mudou) | sem mudança de comportamento
+Pipeline (Forward cycle only): blueprint check <n errors> · criteria pass n / fail n / unknown n · DS adherence <verdict> · critique 6/6
 Pendências / riscos: …
 ```
 

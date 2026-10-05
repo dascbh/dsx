@@ -1,0 +1,4 @@
+{
+  "A6": { "value": 0, "evidence_class": "observed", "source": "tools/lint-raw-values.mjs src/orders", "revision": "abc1234" },
+  "A8": { "value": 0.4, "evidence_class": "synthetic", "source": "agent run", "note": "agent completion" }
+}

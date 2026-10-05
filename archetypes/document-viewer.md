@@ -1,7 +1,7 @@
 ---
 id: document-viewer
 title: Documento com visor
-summary: Tela de leitura de um documento pronto (contrato, parecer, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.
+summary: Tela de leitura de um documento pronto (pedido emitido, nota fiscal, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.
 register: [operational, editorial]
 when-to-use: SE a pessoa precisa ler, conferir ou despachar um documento que não edita nesta tela ENTÃO use documento com visor
 avoid-when: a pessoa vai alterar o texto (use editor com painel), o documento é curto o bastante para caber num painel lateral ou a tarefa é comparar muitos documentos ao mesmo tempo
@@ -15,11 +15,11 @@ rules: [T1, T3, T6, T7, F5]
 
 # Documento com visor
 
-O documento é o protagonista: a versão assinada de um contrato, um PDF enviado por terceiro, um parecer final. A pessoa lê, confere dados contra metadados, baixa, encaminha ou registra uma decisão. A tela não edita o texto — e deixa isso claro para ninguém procurar o cursor.
+O documento é o protagonista: o pedido de compra emitido, a nota fiscal enviada pelo fornecedor, um relatório final. A pessoa lê, confere dados contra metadados, baixa, encaminha ou registra uma decisão. A tela não edita o texto — e deixa isso claro para ninguém procurar o cursor.
 
 ## Quando usar
 
-- **SE** o conteúdo é um arquivo ou versão fechada (assinada, enviada, congelada) **ENTÃO** use documento com visor, e diga no cabeçalho que é somente leitura e por quê.
+- **SE** o conteúdo é um arquivo ou versão fechada (emitida, enviada, congelada) **ENTÃO** use documento com visor, e diga no cabeçalho que é somente leitura e por quê.
 - **SE** a pessoa confere o documento contra dados estruturados (partes, valores, datas) **ENTÃO** esses dados ficam no `info-panel`, lado a lado com o texto.
 - **SE** o documento tem várias versões **ENTÃO** a versão exibida aparece no cabeçalho, e trocar de versão é uma ação explícita no painel — nunca um visor que muda sozinho.
 - **SE** a pessoa precisa alterar o texto **ENTÃO** ofereça "Editar" que leva ao `editor-with-panel` (ou "Criar nova versão" quando a atual está congelada).
@@ -30,8 +30,8 @@ O documento é o protagonista: a versão assinada de um contrato, um PDF enviado
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header  ‹ Contratos / Título do documento (h1)            │
-│   Versão 3 · assinada em 12/03 · somente leitura [Ação prim.] │
+│ page-header  ‹ Pedidos / Título do documento (h1)              │
+│   Versão 3 · emitida em 12/03 · somente leitura [Ação prim.] │
 ├───────────────────────────────────────────┬──────────────────┤
 │ viewer-toolbar  ‹ 2/14 › · − 100% + · ⌕   │ painel-de-       │
 ├───────────────────────────────────────────┤ informacoes      │
@@ -80,7 +80,7 @@ Painel recolhido; visor ocupa a tela; cabeçalho reduzido a título e "Sair da t
 
 ### side-by-side-comparison
 Dois visores sincronizados (versão anterior × atual), com diferenças destacadas e navegação "próxima diferença".
-**Favorece:** revisão de alterações entre versões, conferência de aditivos.
+**Favorece:** revisão de alterações entre versões, conferência de notas fiscais contra o pedido.
 **Piora:** exige largura; diferenças só por cor reprovam — use também marcação de inserção/remoção em texto; rolagem sincronizada precisa poder ser desligada.
 
 ## Anti-padrões

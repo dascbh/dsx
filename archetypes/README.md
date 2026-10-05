@@ -44,7 +44,7 @@ Comece pela tarefa principal da tela — o que a pessoa vem fazer ali na maioria
    - **SE** o conteúdo está pronto e a pessoa lê, confere ou despacha **ENTÃO** [document-viewer](document-viewer.md).
 5. **SE** a tela gira em torno de muitos itens:
    - **SE** a pessoa só quer saber a situação e onde agir primeiro **ENTÃO** [monitoring-dashboard](monitoring-dashboard.md);
-   - **SE** os itens são reutilizáveis (modelos, cláusulas) e escolhidos pelo conteúdo **ENTÃO** [library](library.md);
+   - **SE** os itens são reutilizáveis (modelos, itens de catálogo) e escolhidos pelo conteúdo **ENTÃO** [library](library.md);
    - **SE** a pessoa processa os itens um após o outro, lendo cada um **ENTÃO** [master-detail](master-detail.md);
    - **SENÃO** (localizar, comparar e agir sobre registros de trabalho) **ENTÃO** [operational-list](operational-list.md).
 6. **SE** a pessoa ajusta parâmetros persistentes, sem ordem entre eles **ENTÃO** [settings](settings.md).

@@ -157,7 +157,7 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
       const name = accessibleName(root, b);
       if (GENERIC_DESTRUCTIVE_LABELS.includes(norm(name))) {
         flagged.add(b);
-        add('T5', regionLabel(regionOf(b)), `ação destrutiva com rótulo genérico "${name}" (diga o que acontece: "Excluir minuta")`, ev(b));
+        add('T5', regionLabel(regionOf(b)), `ação destrutiva com rótulo genérico "${name}" (diga o que acontece: "Excluir pedido")`, ev(b));
       }
     }
   }
@@ -194,7 +194,7 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
     withoutVerb.get(k).bs.push(b);
   }
   for (const { name, region, bs } of withoutVerb.values()) {
-    add('T7', region, `botão "${name}" sem verbo + objeto${bs.length > 1 ? ` (${bs.length}×)` : ''} (ex.: "Enviar minuta")`, evs(bs));
+    add('T7', region, `botão "${name}" sem verbo + objeto${bs.length > 1 ? ` (${bs.length}×)` : ''} (ex.: "Enviar pedido")`, evs(bs));
   }
 
   return { file, dialog_open: dialogOpen, findings };

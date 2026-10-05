@@ -1,0 +1,181 @@
+# ============================================================================
+# KERNEL INVARIANTS
+# ============================================================================
+# This file is NOT configuration. Nothing here is parameterizable per project,
+# per stack, per developer, or per weight. No key in fde.config.toml can turn
+# off, relax, or skip an invariant.
+#
+# Whoever needs to operate without one of these items must fork the framework.
+# The fork is visible; a silent exception would not be.
+# ============================================================================
+
+[meta]
+kernel_version = "0.55.1"
+mutable = false
+
+# ----------------------------------------------------------------------------
+# I1 — Every behavior change has a measure
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I1"
+name = "eval-precede-merge"
+statement = """
+No change that alters observable system behavior lands on the main branch
+without a corresponding entry in the evaluation suite.
+"""
+enforced_by = ["pre-commit", "ci"]
+verifiable_by = "python3 bin/fde/verify.py --gate eval-coverage"
+rationale = """
+Without a measure, prompt changes and code changes ship on opinion. It is the
+only mechanism that catches silent regression when the model shifts underneath
+the system.
+"""
+
+# ----------------------------------------------------------------------------
+# I2 — Adversarial review runs isolated
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I2"
+name = "adversarial-isolation"
+statement = """
+Adversarial review receives the artifact and the specification. It never
+receives the context, the history, or the reasoning of whoever built the
+artifact.
+"""
+enforced_by = ["ci", "adapter-isolation"]
+verifiable_by = "python3 bin/fde/verify.py --gate adversarial-isolation"
+rationale = """
+A reviewer who sees the very reasoning that produced the code agrees with
+itself. Without context isolation, the adversarial role is theater and the
+whole framework degrades into a checklist.
+"""
+
+# ----------------------------------------------------------------------------
+# I3 — Adversarial success is findings, not approval
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I3"
+name = "adversarial-incentive"
+statement = """
+The adversarial role is measured by failures found, not by deliveries
+approved. It has no write permission on the code under review — it can only
+record findings. Fixing is another role's job.
+"""
+enforced_by = ["role-tool-restriction", "ci"]
+verifiable_by = "python3 bin/fde/verify.py --gate adversarial-isolation"
+rationale = """
+A reviewer who can fix what they found fixes it silently, and the finding
+never reaches the record. The separation is what produces an auditable trail.
+"""
+
+# ----------------------------------------------------------------------------
+# I4 — Promotion has criteria declared before construction
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I4"
+name = "promotion-criteria-declared"
+statement = """
+No artifact is promoted to production without written, versioned, and dated
+acceptance criteria, declared before construction begins.
+"""
+enforced_by = ["ci"]
+verifiable_by = "python3 bin/fde/verify.py --gate promotion-criteria"
+rationale = """
+Criteria written after delivery are justification, not criteria. Declaring
+before is what separates high-standard delivery from retroactive
+rationalization.
+"""
+
+# ----------------------------------------------------------------------------
+# I5 — What is not observable is not verifiable
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I5"
+name = "observability-floor"
+statement = """
+Every promoted artifact emits the minimum needed to verify in production the
+quality attributes it declared to meet.
+"""
+enforced_by = ["ci"]
+verifiable_by = "python3 bin/fde/verify.py --gate observability"
+rationale = """
+It is the attribute every project downgrades under pressure and the only one
+whose absence makes all the others unverifiable after deploy.
+"""
+
+# ----------------------------------------------------------------------------
+# I6 — The client inherits the ability to verify
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I6"
+name = "client-runnable-gate"
+statement = """
+The gate runs in the client's environment, with the client's runner, with no
+framework component on the critical path. The deliverable includes the ability
+to run it without the FDE present.
+"""
+enforced_by = ["ci", "handoff"]
+verifiable_by = "python3 bin/fde/verify.py --gate portability"
+rationale = """
+A gate that only runs on the consultant's machine is dependency disguised as
+standard. The delivered asset is the specification of correctness, not the
+agent.
+"""
+
+# ----------------------------------------------------------------------------
+# I7 — Handoff between roles is by artifact on disk
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I7"
+name = "artifact-handoff"
+statement = """
+Roles communicate through versioned artifacts on disk (spec, ADR, suite,
+review report), never through conversation continuity.
+"""
+enforced_by = ["ci", "adapter-isolation"]
+verifiable_by = "python3 bin/fde/verify.py --gate artifact-handoff"
+rationale = """
+Handoff by conversation leaks reasoning between roles, collapses the
+separation, and leaves no trail. An artifact on disk is auditable and survives
+the session.
+"""
+
+# ----------------------------------------------------------------------------
+# I8 — Judgment cites its principle
+# ----------------------------------------------------------------------------
+[[invariant]]
+id = "I8"
+name = "principled-judgment"
+statement = """
+Quality that cannot be verified by execution (eval) or by demonstrated
+failure (adversarial probe) is verified by heuristic review: judgment
+against a declared, versioned principle catalog. Every finding cites either
+the probe that broke it or the principle it violates, with severity.
+Judgment without a named principle is not a finding.
+"""
+enforced_by = ["ci", "demand-loop"]
+verifiable_by = "python3 bin/fde/verify.py --gate finding-discipline"
+rationale = """
+Evals reach what executes; adversarial probes reach what can be shown to
+break. Usability, information architecture, and craft can be bad while
+everything passes — the only instrument left is expert judgment, and
+undisciplined judgment is taste. Naming the principle is what makes
+judgment auditable, contestable, and portable between reviewers.
+"""
+
+# ----------------------------------------------------------------------------
+# FLOORS — minimums that weight cannot reach
+# ----------------------------------------------------------------------------
+# Weight moves rigor upward or redistributes emphasis across dimensions.
+# Weight never goes below the floor. Weight zero does not exist.
+[floors]
+# quality attributes (vector A): floor in budget units
+functional_correctness = 20   # high floor: it is the definition of "delivered"
+observability         = 10   # see I5
+security_privacy      = 8    # base floor; escalated by triage, never reduced by weight
+# remaining attributes
+default_quality_floor = 3
+
+# technical domains (vector B): floor in depth 0..3
+qa_test_strategy      = 1    # depth 0 contradicts I1
+default_domain_floor  = 0

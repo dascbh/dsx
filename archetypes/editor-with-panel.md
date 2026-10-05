@@ -15,12 +15,12 @@ rules: [T1, T3, T4, T6, T7, F5]
 
 # Editor com painel
 
-Minuta de contrato, parecer, modelo de documento, regra complexa: a pessoa passa horas aqui. A área de edição precisa de calma e largura; o painel traz o que ajuda a escrever certo — comentários, campos a preencher, alternativas aprovadas, verificações, sugestões de IA. O cabeçalho diz em que estado o trabalho está e qual o próximo passo do ciclo.
+Pedido de compra com muitas linhas, especificação técnica, modelo de documento, regra complexa: a pessoa passa horas aqui. A área de edição precisa de calma e largura; o painel traz o que ajuda a escrever certo — comentários, campos a preencher, alternativas aprovadas, verificações, sugestões de IA. O cabeçalho diz em que estado o trabalho está e qual o próximo passo do ciclo.
 
 ## Quando usar
 
 - **SE** o conteúdo é longo e editado em várias sessões **ENTÃO** use editor com painel com salvamento automático e indicador de estado sempre visível.
-- **SE** há apoio contextual que a pessoa consulta enquanto escreve (comentários, variáveis, cláusulas da biblioteca, verificação) **ENTÃO** esse apoio vai no `side-panel`, nunca em diálogo que cobre o texto.
+- **SE** há apoio contextual que a pessoa consulta enquanto escreve (comentários, variáveis, itens do catálogo, verificação) **ENTÃO** esse apoio vai no `side-panel`, nunca em diálogo que cobre o texto.
 - **SE** o painel tem mais de um tipo de apoio **ENTÃO** use a variação `tabbed-panel`; não empilhe tudo num painel rolante.
 - **SE** partes do conteúdo são geradas ou sugeridas por IA **ENTÃO** marque a origem, mostre a base e exija aceite explícito antes de entrar no texto.
 - **SE** algo bloqueia o próximo passo (pendência, campo obrigatório, desvio a aprovar) **ENTÃO** a primária fica desabilitada com o motivo, e o painel lista as pendências com link para cada ponto do texto.
@@ -30,7 +30,7 @@ Minuta de contrato, parecer, modelo de documento, regra complexa: a pessoa passa
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header ‹ Minutas / Título (h1)  Rascunho  [Primária]        │
+│ page-header ‹ Pedidos / Título (h1)  Rascunho  [Primária]        │
 ├──────────────────────────────────────────────────────────────┤
 │ toolbar  B I U · Título ▾ · Inserir ▾ · ↶ ↷                  │
 ├──────────────────────────────────────────┬───────────────────┤
@@ -54,7 +54,7 @@ Minuta de contrato, parecer, modelo de documento, regra complexa: a pessoa passa
 
 ## Ações
 
-- **Primária:** uma, no `page-header`, top-right — avançar o ciclo ("Enviar para revisão", "Exportar minuta"). Salvar não é primária quando há salvamento automático.
+- **Primária:** uma, no `page-header`, top-right — avançar o ciclo ("Enviar para aprovação", "Exportar pedido"). Salvar não é primária quando há salvamento automático.
 - **Bloqueio:** primária desabilitada enquanto houver pendência impeditiva, com o motivo junto ("2 pendências impedem o envio") e caminho para resolvê-las.
 - **Desfazer:** desfazer/refazer sempre disponíveis para edição; ação que não se desfaz (enviar, congelar versão) pede confirmação.
 - **Destrutiva:** excluir o documento só no menu "Mais ações", com confirmação que nomeia o documento.

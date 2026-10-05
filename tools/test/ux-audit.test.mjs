@@ -10,10 +10,10 @@ import {
 } from '../ux-lint/audit.mjs';
 
 const CLI = fileURLToPath(new URL('../ux-lint/audit.mjs', import.meta.url));
-const SCREEN = `<!doctype html><html><body><main><h1>Contratos</h1>
-<button class="MuiButton-contained">Criar contrato</button><button class="MuiButton-contained">Importar</button>
+const SCREEN = `<!doctype html><html><body><main><h1>Pedidos</h1>
+<button class="MuiButton-contained">Criar pedido</button><button class="MuiButton-contained">Importar</button>
 <label for="n">Nome</label><input id="n"><input placeholder="Buscar"></main></body></html>`;
-const MAP = { screens: [{ id: 'lista', name: 'Contratos', type: 'page', route: '/c', parent: null }, { id: 'det', name: 'Detalhe', type: 'page', parent: 'lista' }],
+const MAP = { screens: [{ id: 'lista', name: 'Pedidos', type: 'page', route: '/c', parent: null }, { id: 'det', name: 'Detalhe', type: 'page', parent: 'lista' }],
   transitions: [{ id: 't1', from: 'lista', to: 'det', trigger: { type: 'button', label: 'Abrir' }, evidence: 'src/L.tsx:3' }], journeys: [] };
 const NOW = new Date('2026-10-03T12:00:00Z');
 

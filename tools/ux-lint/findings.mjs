@@ -28,6 +28,7 @@ import { parseArgs } from '../lib/cli.mjs';
 import { renderTextPages, normalizeElement, sortCases, PAGE_MAX_BYTES, MAX_OUTPUT_FILES } from './text-page.mjs';
 import { loadPreviews, attachPreviews, previewKeys, embeddedSize, embedded } from './lib/preview-page.mjs';
 import { normalizeCases, normalizeDetectorJson } from './lib/legacy.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
 
 /** Verificadores que produzem a entrada de cada família (nomes isolados aqui para renomear sem caçar no código). */
 export const DETECTORS = {
@@ -565,7 +566,7 @@ catch(e){saida.focus();saida.select();aviso.textContent=n+' decisão(ões) no ca
  * opts: { product, color, file, previews: manifesto de lib/preview-page.mjs (null = sem prévia), preview_files:
  *         caminho relativo da página até a pasta de prévias (referencia em vez de embutir), maxBytes, maxCases }.
  */
-export function renderPages(reg, options, decisions, { product = '', color = '#0E71B8', file = 'page.html', previews = null, previewFiles = null, maxBytes, maxCases } = {}) {
+export function renderPages(reg, options, decisions, { product = '', color = '#2B59C3', file = 'page.html', previews = null, previewFiles = null, maxBytes, maxCases } = {}) {
   const cases = pageCases(reg, options, decisions);
   if (previews) attachPreviews(cases, previews);
   const fixed = reg.items.filter((i) => i.status === 'fixed').length;
@@ -613,7 +614,7 @@ export function renderPage(reg, options, decisions, opts = {}) {
  * `previewsDir` (manifesto do preview.mjs); `previewFiles` referencia as imagens em vez de embutir. Devolve
  * { pages: [{ file, bytes, cases }], warnings }.
  */
-export function writePages(reg, options, decisions, out, { product = '', color = '#0E71B8', previewsDir = null, screensDir = null, previewFiles = false, noPreview = false, maxBytes, maxCases } = {}) {
+export function writePages(reg, options, decisions, out, { product = '', color = '#2B59C3', previewsDir = null, screensDir = null, previewFiles = false, noPreview = false, maxBytes, maxCases } = {}) {
   const warnings = [];
   const outDir = dirname(resolve(out));
   const previews = !noPreview && previewsDir ? loadPreviews(previewsDir, { screensDir }) : null;
@@ -647,21 +648,24 @@ const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|impor
   status   [--json]
   check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>] [--ux UX.md]
   page     <saida.html> [--product …] [--color …] [--previews <dir>] [--preview-files] [--no-preview] [--max-page-mb 10]
-  (--dir padrão: <root ou diretório atual>/.dsx/findings; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
+  (--dir padrão: paths.findings do projeto, senão <root ou diretório atual>/.dsx/findings; --config <file>; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
 
 function main() {
   const a = parseArgs();
   const [cmd, ...pos] = a._;
   if (!cmd || !a.module || a.module === true) { console.error(USO); process.exit(2); }
   const root = typeof a.root === 'string' ? resolve(a.root) : null;
-  const dir = typeof a.dir === 'string' ? resolve(a.dir) : join(root ?? process.cwd(), '.dsx', 'findings');
+  // caminhos do projeto: lib/project-paths.mjs (flag > --config/.dsx/config.json > `paths` do UX.md > padrão)
+  const pp = resolveProjectPaths({ root: root ?? process.cwd(), module: a.module, config: typeof a.config === 'string' ? a.config : null,
+    flags: { dir: typeof a.dir === 'string' ? resolve(a.dir) : null, ux: typeof a.ux === 'string' ? resolve(a.ux) : null, screens: typeof a.screens === 'string' ? resolve(a.screens) : null } });
+  const dir = pp.findings;
   const p = paths(dir, a.module);
   const st = load(p, a.module);
   const now = process.env.DSX_NOW ? new Date(process.env.DSX_NOW) : new Date();
   const str = (v) => (typeof v === 'string' ? v : null);
   const inputs = { text: str(a.text), screen: str(a.screen), flow: str(a.flow), states: str(a.states), consistency: str(a.consistency), layout: str(a.layout), root, includeSev0: !!a['include-sev0'] };
   const loc = (i) => (i.source?.[0] ?? (i.screens ?? []).join(', '));
-  const uxPath = str(a.ux) ? resolve(a.ux) : root && existsSync(join(root, 'UX.md')) ? join(root, 'UX.md') : null;
+  const uxPath = str(a.ux) ? resolve(a.ux) : root && existsSync(pp.ux) ? pp.ux : null;
   const uxDeviations = deviationsFromUx(uxPath);
 
   if (cmd === 'register') {
@@ -737,8 +741,8 @@ function main() {
     if (!pos[0]) { console.error(USO); process.exit(2); }
     restatus(st.findings, st.decisions);
     const r = writePages(st.findings, st.options, st.decisions, pos[0], {
-      product: str(a.product) ?? '', color: str(a.color) ?? '#0E71B8', previewsDir: str(a.previews) ? resolve(a.previews) : join(p.base, 'previews'),
-      screensDir: str(a.screens) ? resolve(a.screens) : root ? join(root, '.stitch', a.module, 'code') : null,
+      product: str(a.product) ?? '', color: str(a.color) ?? '#2B59C3', previewsDir: str(a.previews) ? resolve(a.previews) : join(p.base, 'previews'),
+      screensDir: str(a.screens) || root ? pp.captures : null,
       previewFiles: !!a['preview-files'], noPreview: !!a['no-preview'], maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1048576 : undefined,
     });
     for (const w of r.warnings) console.error(`AVISO: ${w}`);

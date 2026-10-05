@@ -13,9 +13,9 @@
 //   U6 desvio vencido (`until` no passado) ou que cita tela inexistente no mapa (sev 1)
 //
 // Uso: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <capturas>] [--geometry <pasta>]
-//        [--module <m> --root <projeto>] [--json] [--fail-at 2]
-//      Com --module e --root, os padrões são os da auditoria: <root>/.dsx/maps/flows-<m>.json,
-//      <root>/.stitch/<m>/code e <root>/.stitch/<m>/geometry.
+//        [--module <m> --root <projeto> [--config <file>]] [--json] [--fail-at 2]
+//      Com --module e --root, os padrões são os da auditoria (lib/project-paths.mjs): <root>/.dsx/maps/flows-<m>.json,
+//      <root>/.dsx/captures/<m> e <root>/.dsx/captures/<m>/geometry (legado .stitch/<m>/… lido com aviso).
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, basename, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -26,6 +26,7 @@ import { parseDeviations, coversScreen, expired, screenKey } from './lib/deviati
 import { loadInventory, archetypeOf, entryMatches, lastScreensChange } from './lib/ux-inventory.mjs';
 import { analyzeScreen } from './screen.mjs';
 import { analyzeGeometry, archetypeCatalog } from './layout.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
 
 export const SEVERITY = { U1: 2, U2: 2, U3: 2, U4: 2, U5: 1, U6: 1 };
 const PRINCIPAL = new Set(['success', 'open']);
@@ -184,7 +185,7 @@ export function driftHeadline(result) {
   return parts.join('; ');
 }
 
-const USAGE = 'Uso: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <capturas>] [--geometry <pasta>] [--module <m> --root <projeto>] [--json] [--fail-at 2]';
+const USAGE = 'Uso: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <capturas>] [--geometry <pasta>] [--module <m> --root <projeto> [--config <file>]] [--json] [--fail-at 2]';
 
 function main() {
   const a = parseCli('ux-lint/ux-md-drift.mjs');
@@ -192,10 +193,12 @@ function main() {
   if (!file || !existsSync(file)) { console.error(USAGE); process.exit(2); }
   const root = typeof a.root === 'string' ? resolve(a.root) : null;
   const mod = typeof a.module === 'string' ? a.module : null;
-  const pick = (flag, def) => (typeof a[flag] === 'string' ? resolve(a[flag]) : root && mod ? def : null);
-  const map = pick('map', root && mod ? join(root, '.dsx', 'maps', `flows-${mod}.json`) : null);
-  const screens = pick('screens', root && mod ? join(root, '.stitch', mod, 'code') : null);
-  const geometry = pick('geometry', root && mod ? join(root, '.stitch', mod, 'geometry') : null);
+  const pp = root && mod ? resolveProjectPaths({ root, module: mod, config: typeof a.config === 'string' ? a.config : null, flags: { ux: resolve(file) } }) : null;
+  for (const w of pp?.warnings ?? []) console.error(`AVISO ${w}`);
+  const pick = (flag, def) => (typeof a[flag] === 'string' ? resolve(a[flag]) : pp ? def : null);
+  const map = pick('map', pp?.map);
+  const screens = pick('screens', pp?.captures);
+  const geometry = pick('geometry', pp?.geometry);
   const now = process.env.DSX_NOW ? new Date(process.env.DSX_NOW) : new Date();
   const r = analyzeDrift(readFileSync(file, 'utf8'), { map, screens, geometry, root, now });
   const failAt = Number(a['fail-at'] ?? 2);

@@ -125,7 +125,7 @@ Ver [empty-state](../../patterns/feedback/empty-state.md).
 
 ### Estados conferidos pela máquina
 
-Cada estado da tela vira uma captura própria, para a revisão olhar o que a pessoa vê quando a lista vem vazia ou o servidor falha, não só o caso feliz. A convenção é `<nn>-<tela>.<estado>.html` ao lado da captura principal (`02-acervo.html`, `02-acervo.empty.html`, `02-acervo.error.html`); a lista de estados obrigatórios vem do `UX.md` e do arquétipo da tela. O verificador `tools/ux-lint/states.mjs` aplica três regras ([ux-md.md](ux-md.md), "Estados"):
+Cada estado da tela vira uma captura própria, para a revisão olhar o que a pessoa vê quando a lista vem vazia ou o servidor falha, não só o caso feliz. A convenção é `<nn>-<tela>.<estado>.html` ao lado da captura principal (`02-orders.html`, `02-orders.empty.html`, `02-orders.error.html`); a lista de estados obrigatórios vem do `UX.md` e do arquétipo da tela. O verificador `tools/ux-lint/states.mjs` aplica três regras ([ux-md.md](ux-md.md), "Estados"):
 
 | Id | O que reprova | Como corrigir |
 |---|---|---|

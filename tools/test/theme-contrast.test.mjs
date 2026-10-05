@@ -36,7 +36,7 @@ test('theme tokens: text over background ≥ 4.5:1 and control border ≥ 3:1, i
   }
 });
 
-test('theme tokens: dark accent needs dark text (white on #5AA9E6 is 2.5:1)', () => {
+test('theme tokens: dark accent needs dark text (white on #7EA6F2 is 2.5:1)', () => {
   const t = themes(THEME_TOKENS);
   assert.ok(contrast('#FFFFFF', t.dark.accent) < 4.5, 'o accent escuro é claro: texto branco não serve');
   assert.notEqual(t.dark['on-accent'].toUpperCase(), '#FFFFFF');

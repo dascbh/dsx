@@ -27,6 +27,8 @@ import { parseDeviations, bodyDeviationIds } from './ux-lint/lib/deviations.mjs'
 import { isModuleGlossary, readGlossarySource, glossaryFromMarkdown } from './ux-lint/lib/glossary.mjs';
 import { loadInventory, archetypeOf, entryMatches } from './ux-lint/lib/ux-inventory.mjs';
 import { analyzeDrift } from './ux-lint/ux-md-drift.mjs';
+import { KIT_IDS } from './ux-lint/lib/kits.mjs';
+import { PATH_KEYS } from './ux-lint/lib/project-paths.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -83,16 +85,20 @@ export const SCHEMA = {
   flows: { 'max-journey-steps': INT, 'max-stacked-dialogs': INT, 'dead-ends': INT },
   layout: Object.fromEntries(Object.keys(LAYOUT_DEFAULTS).map((k) => [k, NUM])),
   verification: {
+    kit: KIT_IDS,
     selectors: { regions: LIST, dialog: STR, 'dialog-footer': STR, primary: STR, destructive: STR, button: STR, field: STR, 'archetype-regions': MAP },
   },
   deviations: DEV,
+  // Caminhos do projeto (tools/ux-lint/lib/project-paths.mjs, docs/project-paths.md); `<module>` é trocado pelo módulo.
+  paths: Object.fromEntries(PATH_KEYS.map((k) => [k, k === 'code' ? LIST : STR])),
 };
 
 /** Versão do documento: MAJOR.MINOR.PATCH (mudou política ou arquétipo → menor; só texto → patch). */
 export const SEMVER = /^\d+\.\d+\.\d+$/;
 
 const BASE_STATES = ['loading', 'empty', 'error', 'no-access', 'success'];
-const VAGUE = /\b(intuitiv[oa]s?|amigáve(?:l|is)|moderno|moderna|clean|limp[oa]|simples de usar|fácil de usar|f[aá]cil|agradáve(?:l|is)|elegante|fluid[oa]|sem atrito|quando possível|se necessário|quando necessário|adequad[oa]s?|apropriad[oa]s?|etc\.?)(?![\wà-ú])/gi;
+// pt-BR e inglês (o UX.md pode estar em qualquer um dos dois)
+const VAGUE = /\b(intuitive|user-friendly|seamless(?:ly)?|easy to use|when possible|if needed|as needed|intuitiv[oa]s?|amigáve(?:l|is)|moderno|moderna|clean|limp[oa]|simples de usar|fácil de usar|f[aá]cil|agradáve(?:l|is)|elegante|fluid[oa]|sem atrito|quando possível|se necessário|quando necessário|adequad[oa]s?|apropriad[oa]s?|etc\.?)(?![\wà-ú])/gi;
 
 const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/^\d+[.)]?\s*/, '').replace(/[^a-z0-9& ]/g, '').replace(/\s+/g, ' ').trim();
 const kindOf = (v) => (Array.isArray(v) ? 'lista' : v === null ? 'vazio' : typeof v === 'object' ? 'grupo' : typeof v);
@@ -188,7 +194,8 @@ export function lintUxMd(md, { archetypesDir = join(ROOT, 'archetypes') } = {}) 
   if (!frontMatter) errors.push('Sem front matter YAML (--- ... ---): as decisões não são verificáveis por máquina.');
   else {
     try { fm = parseYaml(frontMatter); } catch (e) { errors.push(`Front matter inválido: ${e.message}`); }
-    const ph = frontMatter.split('\n').filter((l) => /<[^>]+>/.test(l.replace(/\s+#.*$/, '').replace(/^\s*#.*$/, '')));
+    // `<module>` em `paths` é variável do caminho (docs/project-paths.md), não placeholder
+    const ph = frontMatter.split('\n').filter((l) => /<[^>]+>/.test(l.replace(/\s+#.*$/, '').replace(/^\s*#.*$/, '').replace(/<module>/g, '')));
     if (ph.length) errors.push(`Front matter com ${ph.length} placeholder(s) não preenchido(s), ex.: "${ph[0].trim()}"`);
     // Nomes antigos (transição de 2026-10): converte e avisa.
     const legacy = normalizeUxFrontMatter(fm);
@@ -226,7 +233,7 @@ export function lintUxMd(md, { archetypesDir = join(ROOT, 'archetypes') } = {}) 
     const st = archetypeStatus(id, archetypesDir);
     if (st === 'unknown') errors.push(`archetypes.${id}: arquétipo inexistente no catálogo (ids válidos: ${ARCHETYPES.join(', ')}).`);
     if (st === 'no-card') warnings.push(`archetypes.${id}: id do DSX sem cartão em archetypes/${id}.md; o arranjo não tem referência até o cartão existir.`);
-    if (!Array.isArray(routes)) errors.push(`archetypes.${id}: esperado lista de rotas/telas, ex.: ["/contratos"].`);
+    if (!Array.isArray(routes)) errors.push(`archetypes.${id}: esperado lista de rotas/telas, ex.: ["/orders"].`);
     else if (!routes.length) warnings.push(`archetypes.${id}: lista vazia; remova a chave ou mapeie as telas.`);
     info.archetypes[id] = Array.isArray(routes) ? routes.length : 0;
   }
@@ -412,7 +419,7 @@ export function scoreUxMd(md, { uxPath = null, map = null, screens = null, geome
   const sec11 = sec(10);
   const rows = sec11.split('\n').filter((l) => /^\s*\|/.test(l) && !/^\s*\|[\s:|-]+\|\s*$/.test(l)).length - 1;
   const journeys = Math.max(rows, countItems(sec11.split('\n')));
-  const NUMBER_WORDS = { 0: /\b(nenhum|nenhuma|zero)\b/i, 1: /\b(um|uma|único|única)\b/i, 2: /\b(dois|duas)\b/i };
+  const NUMBER_WORDS = { 0: /\b(nenhum|nenhuma|zero|no|none)\b/i, 1: /\b(um|uma|único|única|one|single)\b/i, 2: /\b(dois|duas|two)\b/i };
   const justified = flowKeys.filter((k) => new RegExp(`(?<![\\d.])${fm.flows[k]}(?![\\d.])`).test(sec11) || NUMBER_WORDS[fm.flows[k]]?.test(sec11)).length;
   put('flow-limits', 0.4 * (flowKeys.length / 3) + 0.3 * (journeys >= 2 ? 1 : journeys / 2) + 0.3 * (flowKeys.length ? justified / flowKeys.length : 0),
     `${flowKeys.length}/3 limites em flows; ${Math.max(0, journeys)} jornada(s) na seção "Fluxos"; ${justified}/${flowKeys.length || 0} limite(s) citado(s) e justificado(s) no texto`);
@@ -445,7 +452,9 @@ export function scoreUxMd(md, { uxPath = null, map = null, screens = null, geome
 
   // 7. Seletores
   const sel = fm.verification?.selectors ?? {};
-  const selKeys = ['regions', 'dialog', 'primary', 'destructive', 'button', 'field'].filter((k) => sel[k] !== undefined && sel[k] !== '');
+  // um kit declarado (verification.kit, fora de `auto`) fornece primary e destructive (tools/ux-lint/lib/kits.mjs)
+  const kitDeclared = KIT_IDS.includes(fm.verification?.kit) && fm.verification.kit !== 'auto';
+  const selKeys = ['regions', 'dialog', 'primary', 'destructive', 'button', 'field'].filter((k) => (sel[k] !== undefined && sel[k] !== '') || (kitDeclared && (k === 'primary' || k === 'destructive')));
   const extra = sel['dialog-footer'] || sel['archetype-regions'] ? 1 : 0;
   put('verification-selectors', 0.8 * (selKeys.length / 6) + 0.2 * extra,
     `${selKeys.length}/6 seletores básicos${extra ? '; com dialog-footer ou archetype-regions' : '; sem dialog-footer nem archetype-regions'}`);

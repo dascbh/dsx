@@ -11,10 +11,14 @@
 //   node tools/ux-lint/variations.mjs decide   --root … --module … --flow … (--variant <id> | --compose screen=b,flow=b,behavior=a,text=a)
 //                                              [--comment "…"] [--by nome]
 //   node tools/ux-lint/variations.mjs import   --root … <decision.json>
+//   node tools/ux-lint/variations.mjs alternatives --root … --module … --flow … [--out specs/<demand-id>/design/alternatives.md]
+// Format 2 manifests carry falsifiable hypotheses per variant (audience, causal_bet, counter_hypothesis,
+// falsification_test, expected_metric, guardrail, lens) and the convergence (choice, rejected_tradeoffs); format 1
+// manifests still validate, with warnings. `decision.json` carries a `provenance` block (tools/lib/provenance.mjs).
 //
 // Manifesto: <root>/.dsx/variations/<module>/<flow>/variations.json (ou --manifest). Capturas e caminhos de `code`
 // são relativos à raiz do projeto. O Playwright (recorte das telas e geometria para o layout) é resolvido a partir do
-// diretório atual, como em preview.mjs: rode de uma pasta do projeto que o tenha (no AURIS, frontend/). Sem ele, a
+// diretório atual, como em preview.mjs: rode de uma pasta do projeto que o tenha (ex.: a pasta do front). Sem ele, a
 // página sai sem as telas recortadas e o lint não roda as regras de layout (L).
 // A página sai como documento completo (doctype, <html lang="pt-BR">, charset, viewport); --fragment tira o esqueleto
 // da página 1 para publicar como artefato (o host põe o esqueleto).
@@ -28,6 +32,7 @@ import { loadConfig } from './lib/config.mjs';
 import { parseHtml, querySelectorAll, isHidden, closest } from './lib/html.mjs';
 import { analyzeText, visibleText, indexSource, sourceOf } from './text.mjs';
 import { analyzeScreen } from './screen.mjs';
+import { loadDivergenceRules } from '../forward/lib/snapshot.mjs';
 import { analyzeStateCapture, CAPTURE_RE } from './states.mjs';
 import { normText } from './findings.mjs';
 import { resolvePlaywright, measure as measureGeometry, PLAYWRIGHT_MISSING } from './measure.mjs';
@@ -35,9 +40,23 @@ import { analyzeLayout } from './lib/geometry.mjs';
 import { archetypeCatalog, analyzeGeometry, limitsFrom } from './layout.mjs';
 import { encoder } from './preview.mjs';
 import { renderVariationsPages, PAGE_MAX_BYTES } from './lib/variations-page.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
+import { buildProvenance } from '../lib/provenance.mjs';
 
 const DSX = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const FORMAT = 1;
+/** Manifest formats read by `validate`: 1 (legacy: falsifiable hypothesis fields only warn) and 2 (they are required). */
+export const MANIFEST_FORMATS = [1, 2];
+export const MANIFEST_FORMAT = 2;
+/** Forward's lenses (USE-10, fde-design "The five lenses"): alternatives that share a lens count as one. */
+// lentes lidas do snapshot do gate do Forward (data/forward/bin/fde/design.py); a lista literal só vale se o snapshot faltar
+const FALLBACK_LENSES = ['subtract', 'invert', 'analogous', 'constraint-first', 'object-first'];
+export const LENSES = (() => { try { return loadDivergenceRules().lenses; } catch { return FALLBACK_LENSES; } })();
+/** Falsifiable hypothesis per variant (Forward spec/product-pipeline.md, "Hypotheses" stage). */
+export const HYPOTHESIS_FIELDS = ['audience', 'causal_bet', 'counter_hypothesis', 'falsification_test', 'expected_metric', 'guardrail', 'lens'];
+/** Internal criticism before implementation (Forward "Agent autonomy and internal criticism"); never replaces isolated review. */
+export const CRITIQUE_KEYS = ['counter_case', 'unsupported_claims', 'failure_recovery', 'accessibility', 'domain_data', 'security_ops'];
+export const CRITIQUE_STATUS = ['resolved', 'limitation', 'measurement'];
 export const KINDS = ['screen', 'state', 'behavior'];
 export const AXES = ['screen', 'flow', 'behavior', 'text'];
 export const AXIS_PT = { screen: 'Tela', flow: 'Fluxo', behavior: 'Comportamento', text: 'Texto' };
@@ -51,7 +70,9 @@ const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return 
 
 // ---------- manifesto ----------
 
-export const manifestPath = ({ root, module, flow }) => join(root, '.dsx', 'variations', module, flow, 'variations.json');
+/** Pastas do projeto (lib/project-paths.mjs: flag > .dsx/config.json > `paths` do UX.md > padrão). */
+const projectPaths = (root, module = null, config = null) => resolveProjectPaths({ root, module, config });
+export const manifestPath = ({ root, module, flow, dir = null, config = null }) => join(dir ?? projectPaths(root, module, config).variations, module, flow, 'variations.json');
 /** Raiz do projeto a partir do caminho do manifesto (`…/<root>/.dsx/variations/<m>/<f>/variations.json`). */
 export function rootFromManifest(file) {
   const abs = resolve(file);
@@ -79,8 +100,8 @@ export function loadCatalogs(dsx = DSX) {
 }
 
 /** Registro de achados do módulo: Map id → item (vazio quando não há registro). */
-export function loadRegistry(root, module) {
-  const f = join(root, '.dsx', 'findings', module, 'findings.json');
+export function loadRegistry(root, module, dir = null) {
+  const f = join(dir ?? projectPaths(root, module).findings, module, 'findings.json');
   if (!isFile(f)) return { file: null, items: new Map() };
   try { return { file: f, items: new Map((JSON.parse(readFileSync(f, 'utf8')).items ?? []).map((i) => [i.id, i])) }; } catch { return { file: f, items: new Map() }; }
 }
@@ -98,7 +119,7 @@ const codeExists = (root, p) => {
 export function validateManifest(m, { root, catalogs = loadCatalogs(), registry = new Map() } = {}) {
   const errors = [], warnings = [];
   const err = (s) => errors.push(s), warn = (s) => warnings.push(s);
-  if (m.format !== FORMAT) err(`format ${JSON.stringify(m.format)}: esperado ${FORMAT}`);
+  if (!MANIFEST_FORMATS.includes(m.format)) err(`format ${JSON.stringify(m.format)}: esperado ${MANIFEST_FORMATS.join(' ou ')}`);
   for (const k of ['module', 'flow', 'title']) if (!m[k]) err(`falta "${k}"`);
   for (const k of ['persona', 'task']) if (!m[k]) warn(`falta "${k}": a página abre com a tarefa e a persona`);
   if (!m.current) err('falta "current" (a versão de hoje)');
@@ -176,6 +197,7 @@ export function validateManifest(m, { root, catalogs = loadCatalogs(), registry 
     }
     for (const c of row.code ?? []) if (!codeExists(root, c)) warn(`${tag}: código "${c}" não encontrado`);
   }
+  checkHypotheses(m, { err, warn });
   const bySet = new Map();
   for (const v of m.variants ?? []) {
     const k = (v.frames ?? []).map((f) => f.capture).sort().join('|');
@@ -183,6 +205,99 @@ export function validateManifest(m, { root, catalogs = loadCatalogs(), registry 
     bySet.set(k, v.id);
   }
   return { errors, warnings };
+}
+
+/**
+ * Falsifiable hypotheses (format 2 requires them; format 1 only warns, so older manifests keep validating):
+ * every variant declares audience, causal bet, counter-hypothesis, falsification test, expected metric, guardrail
+ * and a Forward lens, lenses are distinct (USE-10), and the manifest records the convergence (`choice`) and what
+ * each discarded variant traded (`rejected_tradeoffs`).
+ */
+export function checkHypotheses(m, { err, warn }) {
+  const strict = m.format === MANIFEST_FORMAT;
+  const miss = strict ? err : (s) => warn(`${s} (format 1: warning; required from format ${MANIFEST_FORMAT})`);
+  const variants = m.variants ?? [];
+  const byLens = new Map();
+  for (const v of variants) {
+    const tag = `variant "${v.id}"`;
+    for (const k of HYPOTHESIS_FIELDS) if (!String(v[k] ?? '').trim()) miss(`${tag}: missing "${k}"`);
+    if (v.lens && !LENSES.includes(v.lens)) err(`${tag}: lens "${v.lens}" is not a Forward lens (${LENSES.join(', ')})`);
+    if (v.lens && LENSES.includes(v.lens)) {
+      if (byLens.has(v.lens)) (strict ? err : warn)(`variants "${byLens.get(v.lens)}" and "${v.id}" share the lens "${v.lens}": alternatives that share a lens count as one (USE-10)`);
+      else byLens.set(v.lens, v.id);
+    }
+    if (v.counter_hypothesis && v.causal_bet && String(v.counter_hypothesis).trim() === String(v.causal_bet).trim()) err(`${tag}: counter_hypothesis repeats causal_bet`);
+  }
+  const ids = new Set(variants.map((v) => v.id));
+  const choice = m.choice;
+  if (!choice) miss('missing "choice" ({ "variant": "<id or current>", "why": "…" }): the convergence the designer recommends');
+  else {
+    const chosen = typeof choice === 'string' ? choice : choice.variant;
+    if (!chosen || (chosen !== 'current' && chosen !== (m.current?.id ?? 'current') && !ids.has(chosen))) err(`choice: "${chosen}" is not a variant id or "current"`);
+    if (typeof choice === 'object' && !String(choice.why ?? '').trim()) miss('choice: missing "why"');
+  }
+  const chosen = typeof choice === 'string' ? choice : choice?.variant;
+  const rejected = m.rejected_tradeoffs ?? {};
+  if (m.rejected_tradeoffs !== undefined && (typeof rejected !== 'object' || Array.isArray(rejected))) { err('rejected_tradeoffs: an object { "<variant id>": "what it traded" }'); return; }
+  for (const k of Object.keys(rejected)) if (!ids.has(k)) err(`rejected_tradeoffs: "${k}" is not a variant id`);
+  if (chosen && rejected[chosen]) err(`rejected_tradeoffs: "${chosen}" is the choice, not a discard`);
+  for (const v of variants) if (v.id !== chosen && !String(rejected[v.id] ?? '').trim()) miss(`rejected_tradeoffs: missing what variant "${v.id}" traded`);
+  checkCritique(m.critique, { err, warn: strict ? warn : () => {} });
+}
+
+/**
+ * `critique`: { <key>: { status: resolved | limitation | measurement, note } } for the six CRITIQUE_KEYS. Missing block
+ * is a warning (format 2); a present block must be complete, each entry resolved or turned into a limitation or a
+ * measurement task.
+ */
+export function checkCritique(c, { err, warn }) {
+  if (c === undefined) { warn('missing "critique" (internal criticism: counter-case, unsupported claims, failure/recovery, accessibility, domain/data, security/ops)'); return; }
+  if (!c || typeof c !== 'object' || Array.isArray(c)) { err('critique: an object keyed by ' + CRITIQUE_KEYS.join(', ')); return; }
+  for (const k of CRITIQUE_KEYS) {
+    const e = c[k];
+    if (!e) { err(`critique: missing "${k}"`); continue; }
+    const status = typeof e === 'string' ? null : e.status;
+    const note = typeof e === 'string' ? e : e.note;
+    if (!CRITIQUE_STATUS.includes(status)) err(`critique.${k}: status ${JSON.stringify(status)} (use ${CRITIQUE_STATUS.join(' | ')})`);
+    if (!String(note ?? '').trim()) err(`critique.${k}: missing "note"`);
+  }
+  for (const k of Object.keys(c)) if (!CRITIQUE_KEYS.includes(k)) warn(`critique: unknown key "${k}"`);
+}
+
+/**
+ * Forward export: the manifest as `specs/<demand-id>/design/alternatives.md`, in the shape the `divergence` gate
+ * reads (`Lens:`, `Hypothesis:`, `Traded:`, `Chose:`). The manifest stays the DSX source; this is its Forward view.
+ */
+export function toAlternativesMarkdown(m) {
+  const L = [];
+  // nada inventado: só as formulações declaradas, e sem escolha real não há linha "Chose:" (o gate reprova, como deve);
+  // quem exporta (tools/forward/export.mjs) recusa antes e lista o que falta
+  const hmw = [].concat(m.how_might_we ?? []).filter(Boolean);
+  L.push('## How might we…');
+  for (const h of hmw) L.push(`- ${/^hmw\b/i.test(h) ? h : `HMW ${h}`}`);
+  L.push('', '## Alternatives');
+  const chosen = typeof m.choice === 'string' ? m.choice : m.choice?.variant ?? null;
+  const letter = (i) => String.fromCharCode(65 + i);
+  (m.variants ?? []).forEach((v, i) => {
+    L.push(`### ${letter(i)}. ${v.name ?? v.id}`);
+    if (v.lens) L.push(`Lens: ${v.lens}`);
+    const bet = v.causal_bet ?? v.hypothesis;
+    if (bet) L.push(`Hypothesis: ${v.audience ? `for ${v.audience}, ` : ''}${bet}`);
+    if (v.counter_hypothesis) L.push(`Counter-hypothesis: ${v.counter_hypothesis}`);
+    if (v.falsification_test) L.push(`Falsified if: ${v.falsification_test}`);
+    if (v.expected_metric) L.push(`Expected metric: ${v.expected_metric}`);
+    if (v.guardrail) L.push(`Guardrail: ${v.guardrail}`);
+    const traded = m.rejected_tradeoffs?.[v.id];
+    if (v.id !== chosen && traded) L.push(`Traded: ${traded}`);
+    L.push('');
+  });
+  L.push('## Convergence');
+  const idx = (m.variants ?? []).findIndex((v) => v.id === chosen);
+  const why = typeof m.choice === 'object' ? m.choice?.why : null;
+  if (idx >= 0) L.push(`Chose: ${letter(idx)}${why ? ` — ${why}` : ''}`);
+  else L.push('<!-- no choice recorded yet: the divergence gate fails until the owner decides -->');
+  L.push('', `<!-- generated by dsx tools/ux-lint/variations.mjs alternatives from .dsx/variations/${m.module}/${m.flow}/variations.json -->`);
+  return `${L.join('\n')}\n`;
 }
 
 // ---------- medida ----------
@@ -335,11 +450,11 @@ const DATA_FILE = /(^|[._-])(data|fixtures?|mocks?)\.[a-z]+$|^(data|fixtures?|mo
 
 /**
  * Índice do código onde o texto nasce, para separar texto de interface de dado fictício (como o registro faz):
- * as pastas de produção (`--code`, padrão `frontend/src`, `backend/shared`, `src`) e as pastas do `code` das
+ * as pastas de produção (`--code`; padrão: `paths.code` do projeto ou as pastas detectadas pela stack) e as pastas do `code` das
  * variantes e a pasta acima (dados compartilhados). Na pasta das variantes, só arquivo de dados conta como dado.
  */
 export function codeIndex(m, { root, code = null } = {}) {
-  const prod = (code ?? ['frontend/src', 'backend/shared', 'src']).map((p) => resolve(root, p)).filter(isDir);
+  const prod = (code ?? projectPaths(root).code).map((p) => resolve(root, p)).filter(isDir);
   const variantDirs = new Set();
   for (const v of m.variants ?? []) for (const c of v.code ?? []) {
     const fixed = resolve(root, c.slice(0, c.search(/[*?]/) === -1 ? c.length : c.search(/[*?]/)).replace(/[^/]*$/, ''));
@@ -398,7 +513,7 @@ export function lintManifest(m, { root, cfg, registry = new Map(), geometry = nu
 
 // ---------- decisão ----------
 
-export function decisionPath(root, m) { return join(root, '.dsx', 'variations', m.module, m.flow, 'decision.json'); }
+export function decisionPath(root, m) { return join(projectPaths(root, m.module).variations, m.module, m.flow, 'decision.json'); }
 
 /** Monta e confere a decisão: variante inteira ou composição por eixo (cada eixo: `current` ou id de variante). */
 export function makeDecision(m, { variant = null, compose = null, comment = '', by = 'dono', now = new Date() } = {}) {
@@ -418,10 +533,22 @@ export function makeDecision(m, { variant = null, compose = null, comment = '', 
 
 export const parseCompose = (s) => Object.fromEntries(String(s).split(',').map((p) => p.split('=').map((x) => x.trim())).filter(([k, v]) => k && v));
 
-export function writeDecision(root, m, decision) {
+export function writeDecision(root, m, decision, { manifest = null, now = new Date() } = {}) {
   const f = decisionPath(root, m);
   mkdirSync(dirname(f), { recursive: true });
-  writeFileSync(f, `${JSON.stringify(decision, null, 2)}\n`);
+  const captures = rowsOf(m).flatMap((r) => (r.frames ?? []).map((x) => x.capture)).filter(Boolean);
+  let provenance = null;
+  try {
+    provenance = buildProvenance({
+      root, ownerRole: 'orchestrator', generator: 'dsx tools/ux-lint/variations.mjs decide', now,
+      sources: [manifest ?? manifestPath({ root, module: m.module, flow: m.flow }), ...captures],
+      criteria: [].concat(m.criteria ?? []), evidenceClass: 'human',
+      assumptions: ['variants are test code rendered with fictional data, not production'],
+      gaps: (m.variants ?? []).filter((v) => !v.falsification_test).map((v) => `variant ${v.id}: no falsification test`),
+      superseded: isFile(f) ? 'previous decision.json (git history)' : null,
+    });
+  } catch { provenance = null; }
+  writeFileSync(f, `${JSON.stringify({ ...decision, ...(provenance ? { provenance } : {}) }, null, 2)}\n`);
   return f;
 }
 
@@ -558,12 +685,15 @@ export function behaviorPairs(m, shots) {
 function context(a) {
   const manifest = typeof a.manifest === 'string' ? resolve(a.manifest) : null;
   const root = resolve(typeof a.root === 'string' ? a.root : manifest ? rootFromManifest(manifest) : process.cwd());
-  const file = manifest ?? (typeof a.module === 'string' && typeof a.flow === 'string' ? manifestPath({ root, module: a.module, flow: a.flow }) : null);
+  const config = typeof a.config === 'string' ? a.config : null;
+  const paths = resolveProjectPaths({ root, module: typeof a.module === 'string' ? a.module : null, config, flags: { ux: typeof a.ux === 'string' ? resolve(a.ux) : null } });
+  for (const w of paths.warnings) console.error(`AVISO ${w}`);
+  const file = manifest ?? (typeof a.module === 'string' && typeof a.flow === 'string' ? manifestPath({ root, module: a.module, flow: a.flow, dir: paths.variations }) : null);
   if (!file) { console.error('Diga o manifesto: --root <projeto> --module <m> --flow <f>, ou --manifest <variations.json>'); process.exit(2); }
   if (!isFile(file)) { console.error(`Manifesto não encontrado: ${file}`); process.exit(2); }
   const m = JSON.parse(readFileSync(file, 'utf8'));
-  const ux = typeof a.ux === 'string' ? a.ux : isFile(join(root, 'UX.md')) ? join(root, 'UX.md') : null;
-  return { root, file, m, cfg: loadConfig(ux), registry: loadRegistry(root, m.module ?? a.module).items };
+  const ux = isFile(paths.ux) ? paths.ux : null;
+  return { root, file, m, cfg: loadConfig(ux), registry: loadRegistry(root, m.module ?? a.module, paths.findings).items };
 }
 
 const fmtMetric = (k) => ({ steps: 'passos', clicks_to_done: 'cliques até concluir', dialogs: 'diálogos', primary_actions: 'ações primárias', words_on_screen: 'palavras por tela', decisions: 'decisões' }[k] ?? k);
@@ -572,8 +702,8 @@ const STATUS_PT = { resolved: 'resolvido', persists: 'persiste', unverified: 'se
 async function main() {
   const a = parseArgs();
   const cmd = a._[0];
-  const usage = 'Uso: node tools/ux-lint/variations.mjs <validate|measure|lint|page|decide|import> --root <projeto> --module <m> --flow <f> [opções]';
-  if (!['validate', 'measure', 'lint', 'page', 'decide', 'import'].includes(cmd)) { console.error(usage); process.exit(2); }
+  const usage = 'Uso: node tools/ux-lint/variations.mjs <validate|measure|lint|page|decide|import|alternatives> --root <projeto> --module <m> --flow <f> [opções]';
+  if (!['validate', 'measure', 'lint', 'page', 'decide', 'import', 'alternatives'].includes(cmd)) { console.error(usage); process.exit(2); }
 
   if (cmd === 'import') {
     const src = a._[1];
@@ -582,7 +712,7 @@ async function main() {
     const ctx = context({ ...a, module: d.module, flow: d.flow });
     const r = makeDecision(ctx.m, { variant: d.mode === 'variant' ? d.variant : null, compose: d.mode === 'compose' ? d.compose : null, comment: d.comment, by: d.by, now: d.at ? new Date(d.at) : new Date() });
     if (r.errors.length) { console.error(r.errors.join('\n')); process.exit(1); }
-    console.log(`decisão gravada em ${writeDecision(ctx.root, ctx.m, r.decision)}`);
+    console.log(`decisão gravada em ${writeDecision(ctx.root, ctx.m, r.decision, { manifest: ctx.file })}`);
     return;
   }
 
@@ -600,10 +730,17 @@ async function main() {
     }
     process.exit(v.errors.length ? 1 : 0);
   }
+  if (cmd === 'alternatives') {
+    // Forward view of the manifest: specs/<demand-id>/design/alternatives.md (stdout, or --out <file>).
+    const md = toAlternativesMarkdown(m);
+    if (typeof a.out === 'string') { mkdirSync(dirname(resolve(a.out)), { recursive: true }); writeFileSync(resolve(a.out), md); console.log(`alternatives written to ${resolve(a.out)}${v.errors.length ? ` (manifest has ${v.errors.length} validation error(s))` : ''}`); }
+    else process.stdout.write(md);
+    return;
+  }
   if (cmd === 'decide') {
     const r = makeDecision(m, { variant: typeof a.variant === 'string' ? a.variant : null, compose: typeof a.compose === 'string' ? parseCompose(a.compose) : null, comment: typeof a.comment === 'string' ? a.comment : '', by: typeof a.by === 'string' ? a.by : 'dono' });
     if (r.errors.length) { console.error(r.errors.join('\n')); process.exit(1); }
-    console.log(`decisão gravada em ${writeDecision(root, m, r.decision)}`);
+    console.log(`decisão gravada em ${writeDecision(root, m, r.decision, { manifest: ctx.file })}`);
     return;
   }
   if (cmd === 'measure') {

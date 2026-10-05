@@ -5,14 +5,19 @@
 // (os que existirem), opcionalmente registra o resultado em .dsx/findings/<módulo>/ e imprime o relatório por
 // dimensão, lido da matriz data/ux-dimensions.json. Com --page, gera a página de decisão.
 //
-// Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--screens <dir>] [--code <dirs...>]
+// Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--config <file>] [--screens <dir>] [--code <dirs...>]
 //        [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register]
 //        [--preview [--min-severity <n>]] [--page <saida.html> [--preview-files] [--max-page-mb 10]] [--json]
+//        [--criteria <cycles/C-n/plan.md> [--evidence <recorded.json>] [--criteria-out <results.json>]] [--owner-role <role>]
+// Quality sections (data/pipeline-quality.json, tools/ux-lint/criteria.mjs): UI quality (5 metrics), UX quality
+// (5 dimensions) and design-system adherence, each with its own verdict per declared criterion (pass | fail | unknown |
+// not-applicable; unknown is never pass); the 14 dimensions follow as a diagnostic. The JSON carries `provenance`.
 // --preview roda tools/ux-lint/preview.mjs antes da página (prévias antes/depois tiradas das capturas; Playwright
 // resolvido a partir do diretório atual). A página sai paginada: <saida>.html, <saida>-2.html… (≤ 10 MB cada).
-// Padrões: --screens <root>/.stitch/<m>/code · --geometry <root>/.stitch/<m>/geometry (saída de measure.mjs; com
-//          --measure a auditoria mede antes) · --map <root>/.dsx/maps/flows-<m>.json · --ux <root>/UX.md ·
-//          --code <root>/frontend/src <root>/backend/shared (só os que existem) · --dir <root>/.dsx/findings
+// Caminhos: lib/project-paths.mjs (flag > --config/.dsx/config.json > `paths` do UX.md > padrão; docs/project-paths.md).
+// Padrões: --screens <root>/.dsx/captures/<m> · --geometry <root>/.dsx/captures/<m>/geometry (saída de measure.mjs;
+//          com --measure a auditoria mede antes) · --map <root>/.dsx/maps/flows-<m>.json · --ux <root>/UX.md ·
+//          --code pastas detectadas pela stack · --dir <root>/.dsx/findings. `.stitch/<m>/code` (legado) é lido com aviso.
 import { readFileSync, writeFileSync, existsSync, statSync, readdirSync, mkdtempSync, rmSync, mkdirSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute, dirname, basename } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -20,6 +25,9 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import * as findings from './findings.mjs';
 import { analyzeDrift, driftHeadline } from './ux-md-drift.mjs';
+import { evaluateForAudit, formatQuality } from './criteria.mjs';
+import { buildProvenance } from '../lib/provenance.mjs';
+import { resolveProjectPaths } from './lib/project-paths.mjs';
 
 const DSX = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const MATRIX_PATH = join(DSX, 'data', 'ux-dimensions.json');
@@ -79,17 +87,14 @@ const isFile = (p) => { try { return statSync(p).isFile(); } catch { return fals
 
 /** Completa os caminhos com os padrões do projeto. */
 export function resolveOptions(o) {
-  const root = resolve(o.root ?? process.cwd());
-  const abs = (p) => (p ? resolve(root, p) : null);
-  const code = o.code?.length ? o.code.map(abs) : ['frontend/src', 'backend/shared'].map((p) => join(root, p)).filter(isDir);
+  const p = resolveProjectPaths({
+    root: o.root, module: o.module, config: typeof o.config === 'string' ? o.config : null,
+    flags: { screens: o.screens, geometry: o.geometry, map: o.map, ux: o.ux, dir: o.dir, code: o.code },
+  });
   return {
-    module: o.module, root,
-    screens: abs(o.screens) ?? join(root, '.stitch', o.module, 'code'),
-    geometry: abs(o.geometry) ?? join(root, '.stitch', o.module, 'geometry'), measure: !!o.measure,
-    map: abs(o.map) ?? join(root, '.dsx', 'maps', `flows-${o.module}.json`),
-    ux: abs(o.ux) ?? join(root, 'UX.md'),
-    code, codeDefaulted: !o.code?.length,
-    dir: abs(o.dir) ?? join(root, '.dsx', 'findings'),
+    module: o.module, root: p.root,
+    screens: p.captures, geometry: p.geometry, measure: !!o.measure, map: p.map, ux: p.ux,
+    code: p.code, codeDefaulted: p.codeDefaulted, dir: p.findings, pathWarnings: p.warnings, pathSources: p.sources,
     register: !!o.register, page: o.page ? resolve(o.page) : null, json: !!o.json,
     preview: !!o.preview, previewFiles: !!o['preview-files'], minSeverity: o['min-severity'] !== undefined ? Number(o['min-severity']) : null,
     maxPageMb: o['max-page-mb'] !== undefined ? Number(o['max-page-mb']) : null,
@@ -112,7 +117,8 @@ export function checkPrerequisites(opt) {
   items.push(html.length
     ? { id: 'screens', ok: true, path: opt.screens, detail: `${rel(opt.screens)} (${html.length - states.length} telas, ${states.length} capturas de estado)` }
     : { id: 'screens', ok: false, path: opt.screens, detail: `sem capturas HTML em ${rel(opt.screens)}`,
-      fix: `capture as telas pelo código do projeto (skill de captura do projeto, ex.: code-to-stitch no AURIS) em ${rel(opt.screens)}; estados como <nn>-<tela>.<estado>.html ao lado da captura principal` });
+      fix: `capture as telas pelo código do projeto (skill capture-from-code do DSX, ou o harness de captura do projeto) em ${rel(opt.screens)}; estados como <nn>-<tela>.<estado>.html ao lado da captura principal` });
+  for (const w of opt.pathWarnings ?? []) items.push({ id: 'paths', ok: false, warning: true, path: null, detail: w });
   items.push(isFile(opt.map)
     ? { id: 'map', ok: true, path: opt.map, detail: rel(opt.map) }
     : { id: 'map', ok: false, path: opt.map, detail: `sem mapa de fluxo em ${rel(opt.map)}`,
@@ -309,6 +315,13 @@ export function formatReport(r) {
     for (const f of r.ux_drift.findings) L.push(`  ${f.rule} sev ${f.severity}${f.screen ? ` | ${f.screen}` : ''} | ${f.message}`);
   }
   L.push(`\nRegistro: ${r.registered ? `gravado em ${r.findings_file}` : `não gravado (use --register); comparado com ${r.findings_file}`}`);
+  if (r.quality) {
+    for (const p of r.quality.problems ?? []) L.push(`\nAVISO critérios: ${p}`);
+    for (const e of r.quality.validation?.errors ?? []) L.push(`\nAVISO critérios: ${e}`);
+    L.push(formatQuality(r.quality, { criteriaFile: r.quality.plan }));
+    if (r.quality.out) L.push(`  results: ${r.quality.out}`);
+    L.push('\nDiagnostic — 14 dimensions (raw counts; a count is not a verdict)');
+  }
   L.push('\nRelatório por dimensão');
   for (const d of r.dimensions) {
     const cov = d.coverage ? `${COVERAGE_PT[d.coverage]}${d.effective_coverage !== d.coverage ? ` → ${COVERAGE_PT[d.effective_coverage]} nesta execução` : ''}` : '';
@@ -411,13 +424,31 @@ export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatri
       for (const k of [4, 3, 2, 1]) t.by_severity[k] += d.by_severity[k] ?? 0;
       return t;
     }, { open: 0, added: 0, fixed: 0, regressions: 0, unregistered: 0, accepted: 0, by_severity: { 4: 0, 3: 0, 2: 0, 1: 0 } });
+    const quality = evaluateForAudit({
+      criteria: typeof raw.criteria === 'string' ? raw.criteria : null, evidence: typeof raw.evidence === 'string' ? raw.evidence : null,
+      screens: pre.available.screens, map: pre.available.map, ux: pre.available.ux, items: merged.after.items ?? [], findingsPath: merged.paths.findings, root: opt.root,
+    });
+    const provenance = buildProvenance({
+      root: opt.root, ownerRole: typeof raw['owner-role'] === 'string' ? raw['owner-role'] : 'orchestrator', generator: 'dsx tools/ux-lint/audit.mjs', now,
+      sources: [pre.available.screens, pre.available.map, pre.available.ux, pre.available.geometry, quality.plan, quality.evidence],
+      criteria: quality.results.map((r) => r.id),
+      evidenceClass: [...new Set(['observed', ...quality.results.map((r) => r.evidence?.class).filter(Boolean)])],
+      assumptions: ['captures render the real components with fictional data; static probes do not render the declared viewport'],
+      gaps: [...pre.items.filter((p) => !p.ok).map((p) => `${p.id}: ${p.detail}`), ...quality.problems, ...(quality.results.filter((r) => r.verdict === 'unknown').map((r) => `${r.id} unknown: ${r.reason}`))],
+    });
+    if (typeof raw['criteria-out'] === 'string') {
+      const out = resolve(raw['criteria-out']);
+      mkdirSync(dirname(out), { recursive: true });
+      writeFileSync(out, `${JSON.stringify({ format: 1, plan: quality.plan, provenance, validation: quality.validation, criteria: quality.results, report: quality.report }, null, 2)}\n`);
+      quality.out = out;
+    }
     let page = null, pages = null, preview = null, pageWarnings = [];
     const previewsDir = join(opt.dir, opt.module, 'previews');
     if (opt.preview) preview = runPreviewTool(merged, opt, workDir, previewsDir);
     if (opt.page) {
       findings.restatus(merged.after, merged.decisions);
       const w = findings.writePages(merged.after, merged.options, merged.decisions, opt.page, {
-        product: raw.product ?? '', color: raw.color ?? '#0E71B8', previewsDir, screensDir: opt.screens, previewFiles: opt.previewFiles,
+        product: raw.product ?? '', color: raw.color ?? '#2B59C3', previewsDir, screensDir: opt.screens, previewFiles: opt.previewFiles,
         noPreview: !opt.preview && !existsSync(join(previewsDir, 'previews.json')), ...(opt.maxPageMb ? { maxBytes: opt.maxPageMb * 1048576 } : {}),
       });
       page = opt.page;
@@ -429,13 +460,15 @@ export function runAudit(raw, { registry = DETECTOR_REGISTRY, matrix = loadMatri
       findings_file: merged.paths.findings, prerequisites: pre.items, ux_drift: pre.drift ? { findings: pre.drift.findings, summary: pre.drift.summary } : null,
       detectors: detectors.map(({ hits, file, ...d }) => d), unregistered: merged.unregistered,
       dimensions, totals, page, pages, page_warnings: pageWarnings, preview,
+      quality: { plan: quality.plan, out: quality.out ?? null, validation: quality.validation, problems: quality.problems, criteria: quality.results, ...quality.report },
+      provenance,
     };
   } finally {
     rmSync(workDir, { recursive: true, force: true });
   }
 }
 
-const USAGE = 'Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--screens <dir>] [--code <dirs...>] [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register] [--preview [--min-severity <n>]] [--page <saida.html> [--preview-files] [--max-page-mb 10]] [--json]';
+const USAGE = 'Uso: node tools/ux-lint/audit.mjs --module <m> --root <projeto> [--config <file>] [--screens <dir>] [--code <dirs...>] [--config <file>] [--map <flows.json>] [--ux UX.md] [--geometry <dir>] [--measure] [--dir <findings>] [--register] [--preview [--min-severity <n>]] [--page <saida.html> [--preview-files] [--max-page-mb 10]] [--criteria <cycles/C-n/plan.md> [--evidence <file.json>] [--criteria-out <file.json>]] [--owner-role <role>] [--json]';
 
 function main() {
   const a = parseAuditArgs(process.argv.slice(2));

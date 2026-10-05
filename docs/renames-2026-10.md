@@ -828,3 +828,18 @@ Nota: as chaves novas seguem o camelCase já usado no registro (`byStatus`); por
 | Stitch `metadata.json`: `designSystem.checkedAt` (`designSystem` e `assetId` ficam, são da API do Stitch) | `designSystem.checked_at` | sim |
 | rubricas YAML: `attempts_per_case`, `how_to_measure`, `product_metrics`, `max_score`, `generic_anchors`, `acceptance_test` | `attempts-per-case`, `how-to-measure`, `product-metrics`, `max-score`, `generic-anchors`, `acceptance-test` | não |
 | exemplo de rubrica em `knowledge/ia/evals.md`: `evaluator_inputs` (e valores `user_request`…), `pass_example`, `fail_example`, `decision_rules`, `output_passes`, `runs_per_case`, `judge_calibration` | `evaluator-inputs` (`user-request`…), `pass-example`, `fail-example`, `decision-rules`, `output-passes`, `runs-per-case`, `judge-calibration` | — (documento) |
+
+#### Round 3 — project paths and capture (2026-10-05)
+
+Nothing in the DSX names a project's folders any more (`docs/project-paths.md`, `docs/decoupling-2026-10.md`).
+
+| Old | New | Compatible read? |
+|---|---|---|
+| captures in `.stitch/<module>/code/` (fixed default) | `.dsx/captures/<module>/`, configurable (`paths.captures`) | yes: read when the new folder has no capture, with a warning |
+| geometry in `.stitch/<module>/geometry/` | `.dsx/captures/<module>/geometry/` (`paths.geometry`) | yes: follows legacy captures |
+| `--code` default `frontend/src` + `backend/shared` | folders detected from the stack; others in `paths.code` | — (projects with text outside the front end declare it) |
+| `verification.selectors.primary`/`destructive` default `.MuiButton-*` | `verification.kit` profile (`auto` = union of mui, shadcn, chakra, antd, bootstrap + generic) | yes: `auto` keeps MUI detection; explicit selectors still win |
+| project capture skill `code-to-stitch` (outside the DSX) | `skills/capture-from-code` + `templates/capture/` + `tools/capture/`, `tools/stitch/send.mjs`, `arrange-canvas.mjs`, `journeys.mjs` | — |
+| capture guard `STITCH_CAPTURE=1` | `DSX_CAPTURE=1` | yes: the template honors both |
+| real-name check hardcoded in the project's `send.sh` | project blocklist `capture.blocklist` / `capture.blocklist-file` in `.dsx/config.json` | — |
+| default page accent `#0E71B8` | `#2B59C3` (dark `#7EA6F2`) | — (`--color` still overrides) |

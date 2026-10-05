@@ -1,0 +1,35 @@
+# Adversarial review report
+# This file is written by the adversarial role and by no one else.
+
+[meta]
+demand_id = "{{DEMAND_ID}}"
+kind = "{{REVIEW_KIND}}"           # code | adversarial | plan | cycle (kernel ADR-0021)
+context_policy = "artifact_only"   # I2: no builder context, whatever the kind
+isolation_mode = "worktree"
+rounds_planned = {{ROUNDS_PLANNED}}   # demand review 1; cycle review XS/S 1, M/L 2 — never extended
+# round = 1                          # 1 is full; every later round is delta
+# notes = []                         # one line per observation past the cap of five findings
+# agent_transcript = "agent-<id>"  # your worktree directory name — links this
+#                                  # report to the harness transcript while it lives
+
+# Every finding cites a probe (adversarial pass) OR a principle (heuristic
+# pass) — I8. A finding with neither is opinion and the gate rejects it.
+
+# [[finding]]
+# attribute = "security_privacy"
+# severity  = "critical"   # critical | high | medium | low
+# probe     = "injection via observed content"
+# evidence  = "path:line or reproducible step"
+# blocking  = true         # only critical/high, inside the plan's threat model,
+#                          # breaking a declared criterion — never weight alone
+# fixed_in  = "<sha>"      # a blocker fixed inside its demand: the commit that
+#                          # fixed it — the finding is then closed
+
+# [[finding]]
+# attribute = "usability_accessibility"
+# severity  = "medium"
+# principle = "USE-3"      # from heuristic_principles in .fde/spec/dimensions/
+# evidence  = "screen or path + what violates the principle"
+# blocking  = false
+# backlog   = true         # a non-blocking finding is triaged by the builder
+#                          # (fde-review ## Triage): patch, defer or drop

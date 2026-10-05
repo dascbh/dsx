@@ -15,7 +15,7 @@ rules: [T1, T3, T4, T6, T7, F3, F5]
 
 # Assistente em etapas
 
-Criar um projeto novo com partes e responsáveis, importar uma planilha e mapear colunas, montar um lote de minutas a partir de um acervo. Tarefas que a pessoa faz poucas vezes, com decisões que dependem umas das outras. O assistente reduz a carga a uma pergunta por vez e mostra sempre onde a pessoa está e quanto falta.
+Criar um projeto novo com partes e responsáveis, importar uma planilha e mapear colunas, montar um lote de pedidos a partir de requisições aprovadas. Tarefas que a pessoa faz poucas vezes, com decisões que dependem umas das outras. O assistente reduz a carga a uma pergunta por vez e mostra sempre onde a pessoa está e quanto falta.
 
 ## Quando usar
 
@@ -48,7 +48,7 @@ Criar um projeto novo com partes e responsáveis, importar uma planilha e mapear
 - **page-header** — `h1` com o objetivo ("Novo projeto"), e a saída: "Sair e salvar rascunho" ou "Cancelar" com aviso se houver dados. Nada mais.
 - **step-trail** — etapas com nome curto e estado (concluída, atual, pendente, com erro), mais "Etapa X de Y" em texto. Etapas concluídas são clicáveis para revisão; pendentes, não.
 - **step-body** — título da etapa (`h2`), uma frase dizendo por que pedimos isto, campos com rótulo visível e ajuda. Uma coluna. Erros junto ao campo e um resumo no topo ao tentar avançar.
-- **navigation-footer** — "Voltar" à esquerda (secundária), "Continuar" à direita (primária); na última etapa, a primária diz o que acontece ("Criar projeto", "Enviar 12 minutas").
+- **navigation-footer** — "Voltar" à esquerda (secundária), "Continuar" à direita (primária); na última etapa, a primária diz o que acontece ("Criar projeto", "Enviar 12 pedidos").
 
 ## Ações
 

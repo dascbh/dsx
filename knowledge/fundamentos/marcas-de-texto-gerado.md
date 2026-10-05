@@ -20,7 +20,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Assinado fora da plataforma — sem certificado do provedor | Assinado fora da plataforma, sem certificado do provedor |
+| Aprovado fora da plataforma — sem registro do aprovador | Aprovado fora da plataforma, sem registro do aprovador |
 | Envio concluído — confira os anexos | Envio concluído. Confira os anexos. |
 | Célula: — | Não informado (ou célula vazia) |
 
@@ -35,7 +35,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 | Antes | Depois |
 |---|---|
 | Botão "Remover da lista — Ana Souza" | Botão "Remover", aria-label "Remover Ana Souza da lista" |
-| Revisar antes de gravar · cláusulas.docx | Título "Revisar antes de gravar"; apoio "Arquivo: cláusulas.docx" |
+| Revisar antes de gravar · itens.xlsx | Título "Revisar antes de gravar"; apoio "Arquivo: itens.xlsx" |
 | Preço · 3 | "Preço" com selo "3" |
 
 ## 3. "Não só X, mas Y" e tríades
@@ -48,12 +48,12 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Não só envia o aditivo, mas também acompanha cada etapa. | Envia o aditivo e mostra quem já respondeu. |
+| Não só envia o pedido, mas também acompanha cada etapa. | Envia o pedido e mostra quem já confirmou. |
 | Um fluxo simples, rápido e seguro. | (corte: a tela mostra o fluxo) |
 
 ## 4. Descrição que repete o título (X3)
 
-**Por que incomoda.** "Timbre do cliente" seguido de "Timbre deste cliente." gasta uma linha para dizer a mesma coisa. A pessoa lê duas vezes e aprende que o texto de apoio não vale a pena, e passa a ignorá-lo mesmo quando ele traz algo importante.
+**Por que incomoda.** "Endereço de entrega" seguido de "Endereço de entrega deste fornecedor." gasta uma linha para dizer a mesma coisa. A pessoa lê duas vezes e aprende que o texto de apoio não vale a pena, e passa a ignorá-lo mesmo quando ele traz algo importante.
 
 **Como reconhecer.** Texto logo abaixo do título que reutiliza a maior parte das palavras dele sem acrescentar fato, ou cuja primeira frase só reformula o título.
 
@@ -61,8 +61,8 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Título "Timbre do cliente"; apoio "Timbre deste cliente. Só o curador da biblioteca altera." | Título "Timbre do cliente"; apoio "Só o curador da biblioteca altera." |
-| Título "Minutas salvas"; apoio "Aqui ficam as minutas que foram salvas." | Título "Minutas salvas", sem apoio; ou apoio "Minutas ficam 90 dias depois de enviadas." |
+| Título "Endereço de entrega"; apoio "Endereço de entrega deste fornecedor. Só o comprador responsável altera." | Título "Endereço de entrega"; apoio "Só o comprador responsável altera." |
+| Título "Rascunhos salvos"; apoio "Aqui ficam os rascunhos que foram salvos." | Título "Rascunhos salvos", sem apoio; ou apoio "Rascunhos ficam 90 dias depois do último acesso." |
 
 ## 5. Abertura vazia (X4)
 
@@ -74,8 +74,8 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Aqui você pode acompanhar os aditivos enviados. | Aditivos enviados e quem já respondeu. |
-| Use esta aba para revisar as cláusulas antes de gravar. | Revise as cláusulas antes de gravar. |
+| Aqui você pode acompanhar os pedidos enviados. | Pedidos enviados e quem já confirmou. |
+| Use esta aba para revisar os itens antes de gravar. | Revise os itens antes de gravar. |
 | Clique aqui para baixar o modelo. | Link "Baixar modelo" |
 
 ## 6. Adjetivos genéricos
@@ -88,12 +88,12 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Importação inteligente de cláusulas | Importar cláusulas de um .docx |
-| Um jeito fácil de gerar minutas em lote | Gere até 50 minutas de uma vez |
+| Importação inteligente de itens | Importar itens de uma planilha .xlsx |
+| Um jeito fácil de gerar pedidos em lote | Gere até 50 pedidos de uma vez |
 
 ## 7. Parêntese explicativo (X9)
 
-**Por que incomoda.** "Configurar timbres (nome e logo)" admite que o rótulo não basta e remenda com um aposto. Em rótulo de campo, "(só nesta minuta)" esconde uma regra importante num cochicho.
+**Por que incomoda.** "Configurar fornecedores (nome e CNPJ)" admite que o rótulo não basta e remenda com um aposto. Em rótulo de campo, "(só neste pedido)" esconde uma regra importante num cochicho.
 
 **Como reconhecer.** Parêntese com palavras em rótulo, botão, título ou aba. Não contam números ("Histórico (3)"), siglas ("(CNPJ)") nem "(opcional)".
 
@@ -101,27 +101,27 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Configurar timbres (nome e logo) | Configurar timbre |
-| Texto da cláusula (só nesta minuta) | Rótulo "Texto da cláusula"; apoio "A mudança vale só para esta minuta." |
+| Configurar fornecedores (nome e CNPJ) | Configurar fornecedores |
+| Preço unitário (só neste pedido) | Rótulo "Preço unitário"; apoio "A mudança vale só para este pedido." |
 | Cadência (dias) | Cadência em dias |
 
 ## 8. Pontuação de redação em rótulo e botão (X5)
 
 **Por que incomoda.** Ponto final em botão, aba ou título e dois-pontos em rótulo acima do campo são hábitos de texto corrido. Na interface, viram ruído visual e deixam o rótulo com cara de frase.
 
-**Como reconhecer.** Botão, título ou aba terminados em "."; rótulo terminado em ":" ou ".". Reticências de progresso ("Carregando…") e interrogação de confirmação ("Excluir minuta?") estão certas.
+**Como reconhecer.** Botão, título ou aba terminados em "."; rótulo terminado em ":" ou ".". Reticências de progresso ("Carregando…") e interrogação de confirmação ("Excluir pedido?") estão certas.
 
 **Como reescrever.** Tire a pontuação. Se o título precisa de ponto porque é uma frase inteira, ele provavelmente é um texto de apoio.
 
 | Antes | Depois |
 |---|---|
-| Botão "Salvar minuta." | Salvar minuta |
+| Botão "Salvar pedido." | Salvar pedido |
 | Rótulo "Nome da parte:" | Nome da parte |
 | Título "Resposta registrada em 02/10/2026 14:37." | Título "Resposta registrada"; apoio "Em 02/10/2026, às 14:37" |
 
 ## 9. Caixa De Título (X10)
 
-**Por que incomoda.** "Contratos e Aditivos", "Sumário Executivo", "Baixar Word Assinado": maiúscula em cada palavra é convenção do inglês. Em pt-BR, só nomes próprios e siglas levam maiúscula no meio; o resto pesa a leitura e parece tradução.
+**Por que incomoda.** "Pedidos e Fornecedores", "Resumo Executivo", "Baixar Nota Assinada": maiúscula em cada palavra é convenção do inglês. Em pt-BR, só nomes próprios e siglas levam maiúscula no meio; o resto pesa a leitura e parece tradução.
 
 **Como reconhecer.** Botão, aba ou título em que todas as palavras de conteúdo depois da primeira começam com maiúscula. Siglas ("TO BE", "PDFs") ficam de fora; nomes próprios do domínio vão em `content.proper-nouns` no UX.md.
 
@@ -129,13 +129,13 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Contratos e Aditivos | Contratos e aditivos |
+| Pedidos e Fornecedores | Pedidos e fornecedores |
 | Simulador de Regimes | Simulador de regimes |
 | Baixar Word | Baixar Word (se "Word" estiver declarado como nome próprio) |
 
 ## 10. Botão que não é ação (X6)
 
-**Por que incomoda.** Botão com cinco palavras ou mais vira frase e perde a leitura de alvo. Botão sem verbo ("Nova cláusula", "Categorias") obriga a adivinhar se ele cria, abre ou filtra. "OK", "Sim" e "Confirmar" soltos não dizem o que confirmam.
+**Por que incomoda.** Botão com cinco palavras ou mais vira frase e perde a leitura de alvo. Botão sem verbo ("Novo item", "Categorias") obriga a adivinhar se ele cria, abre ou filtra. "OK", "Sim" e "Confirmar" soltos não dizem o que confirmam.
 
 **Como reconhecer.** Botão com mais de 4 palavras; botão que não começa por verbo no infinitivo (quando o UX.md pede `content.buttons: verb-object`); rótulos da lista sem objeto. Cartões clicáveis, itens de lista, ordenação e chips não são avaliados.
 
@@ -143,7 +143,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Nova cláusula | Criar cláusula |
+| Novo item | Criar item |
 | Baixar PDF para assinar fora | Baixar PDF |
 | Confirmar | Confirmar vínculo |
 
@@ -171,7 +171,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 
 | Antes | Depois |
 |---|---|
-| Documento (sha256, o mesmo do de acordo) | É o mesmo documento aprovado no de acordo |
+| Documento (sha256, o mesmo da aprovação) | É o mesmo documento que foi aprovado |
 | Erro 5xx ao enviar | Não conseguimos enviar agora. Tente de novo em instantes. |
 | Refaz o OCR das páginas | Lê de novo as páginas digitalizadas |
 
@@ -182,7 +182,7 @@ Texto de interface não é redação. Quem usa um produto operacional lê de pas
 O texto que aparece na tela quase nunca nasce na tela: vem de um arquivo de vocabulário, de um template com dado interpolado ou de uma resposta do servidor. Rode a ferramenta com `--code` para ter `arquivo:linha` de cada achado e corrija lá, uma vez, para todas as telas que usam o texto.
 
 - **SE** o achado aponta um template (`Remover da lista — ${nome}`) → ENTÃO corrija o template; todas as variantes somem juntas.
-- **SE** a peça acusada (o travessão, a maiúscula) veio do dado interpolado (nome de minuta, de pessoa, de categoria) → ENTÃO não é texto da interface; a ferramenta separa esses casos como "provável dado".
+- **SE** a peça acusada (o travessão, a maiúscula) veio do dado interpolado (nome de pedido, de pessoa, de categoria) → ENTÃO não é texto da interface; a ferramenta separa esses casos como "provável dado".
 - **SE** o mesmo texto aparece em muitas telas (navegação, cabeçalho) → ENTÃO corrija primeiro: o ganho é proporcional à frequência.
 
 ## Checklist

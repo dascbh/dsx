@@ -17,6 +17,7 @@ Este repositório é um **framework de design system, UI e UX para agentes de IA
 | Dúvida entre componentes/comportamentos ("modal ou página?") | `padroes` |
 | Revisar usabilidade de tela ou fluxo | `revisar-ux` |
 | Auditar a UX de um módulo inteiro, por dimensão, com registro e re-auditoria | `auditar-ux` |
+| Capture existing screens from the code (static HTML, no server) for audit, variations or Stitch; send to Stitch, arrange the canvas, journey page | `capture-from-code` |
 | Auditoria WCAG / acessibilidade | `acessibilidade` |
 | Qualquer texto visível na interface | `ux-writing` |
 | Feature com IA, chat, copiloto ou agente que executa ações | `ux-ia` |

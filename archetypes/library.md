@@ -1,7 +1,7 @@
 ---
 id: library
 title: Biblioteca
-summary: Acervo de itens reutilizáveis (modelos, cláusulas, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.
+summary: Acervo de itens reutilizáveis (modelos, itens de catálogo, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.
 register: [operational, editorial]
 when-to-use: SE a pessoa procura um item para reutilizar ou consultar, escolhendo por categoria, nome ou conteúdo ENTÃO use biblioteca
 avoid-when: os itens são casos de trabalho com status e prazo (use lista operacional) ou o acervo tem menos de ~10 itens (uma lista simples basta)
@@ -15,7 +15,7 @@ rules: [T1, T3, T5, T6, T7, F1]
 
 # Biblioteca
 
-Modelos de contrato, cláusulas aprovadas com alternativas, modelos de aditivo, peças de referência. A diferença para a lista operacional: aqui o item não "anda" — ele é escolhido, copiado, aplicado. A pessoa chega com uma ideia vaga ("aquela cláusula de foro") e precisa reconhecer o item certo pelo conteúdo, não pelo código.
+Itens de catálogo aprovados com alternativas, modelos de pedido, especificações técnicas, listas de preço de referência. A diferença para a lista operacional: aqui o item não "anda" — ele é escolhido, copiado, aplicado. A pessoa chega com uma ideia vaga ("aquele parafuso inox de 8 mm") e precisa reconhecer o item certo pelo conteúdo, não pelo código.
 
 ## Quando usar
 
@@ -34,11 +34,11 @@ Modelos de contrato, cláusulas aprovadas com alternativas, modelos de aditivo, 
 ├──────────────────┬───────────────────────────────────────────┤
 │ collection-      │ search-bar [Buscar no título e texto…]     │
 │ navigation       │ Tipo ▾  Situação ▾   chips ativos ×        │
-│ ▸ Contratos (34) ├──────────────────────────┬────────────────┤
-│ ▾ Cláusulas (120)│ content                  │ quick-view     │
+│ ▸ Modelos (34)   ├──────────────────────────┬────────────────┤
+│ ▾ Itens (120)    │ content                  │ quick-view     │
 │   · Foro         │ ┌──────┐ ┌──────┐        │                │
 │   · Pagamento    │ │Modelo│ │Modelo│        │ Prévia do texto│
-│ ▸ Aditivos (12)  │ └──────┘ └──────┘        │ [Usar modelo]  │
+│ ▸ Especific. (12)│ └──────┘ └──────┘        │ [Usar modelo]  │
 └──────────────────┴──────────────────────────┴────────────────┘
 ```
 
@@ -53,7 +53,7 @@ Modelos de contrato, cláusulas aprovadas com alternativas, modelos de aditivo, 
 ## Ações
 
 - **Primária da página:** uma, no `page-header`, top-right — criar ou importar, só para quem cura.
-- **Ação do item:** "Usar este modelo" / "Inserir cláusula" na visualização rápida ou no cartão; é o objetivo da maioria das visitas.
+- **Ação do item:** "Usar este modelo" / "Adicionar ao pedido" na visualização rápida ou no cartão; é o objetivo da maioria das visitas.
 - **Curadoria:** editar, aprovar, marcar obsoleto, excluir — em "Mais ações"; excluir item em uso avisa onde ele é usado e prefere "marcar como obsoleto".
 - **Envio de arquivos:** importação aceita arrastar e soltar, diz formatos e limite antes, mostra progresso por arquivo.
 
@@ -64,7 +64,7 @@ Modelos de contrato, cláusulas aprovadas com alternativas, modelos de aditivo, 
 - **empty-filtered** — nada encontrado: mostre o termo e os filtros, sugira buscar em todas as coleções e "Limpar filtros".
 - **error** — falha ao carregar: alerta no conteúdo com "Tentar novamente"; busca preservada.
 - **no-access** — coleção restrita: ela não aparece para quem não pode ver; acesso direto por endereço explica a restrição.
-- **success** — item criado ou usado: confirmação com link para o resultado ("Minuta criada a partir de Modelo X — Abrir").
+- **success** — item criado ou usado: confirmação com link para o resultado ("Pedido criado a partir de Modelo X — Abrir").
 
 ## Variações
 

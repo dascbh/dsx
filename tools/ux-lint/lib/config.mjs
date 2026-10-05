@@ -4,6 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from '../../lib/yaml-lite.mjs';
 import { normalizeUxFrontMatter } from './legacy.mjs';
+import { kitProfile } from './kits.mjs';
 
 export const DEFAULTS = Object.freeze({
   navigation: { 'max-depth': 3, back: 'mandatory' },
@@ -17,11 +18,12 @@ export const DEFAULTS = Object.freeze({
   content: { buttons: 'verb-object', forbidden: [] },
   flows: { 'max-journey-steps': 12, 'max-stacked-dialogs': 1, 'dead-ends': 0 },
   verification: {
+    // Component kit (lib/kits.mjs): auto | generic | mui | shadcn | chakra | antd | bootstrap. `primary` and
+    // `destructive` come from the kit profile unless declared in `selectors`.
+    kit: 'auto',
     selectors: {
       regions: ['header', 'nav', 'aside', 'main', '[role=dialog]'],
       dialog: '[role=dialog]',
-      primary: '.MuiButton-contained',
-      destructive: '.MuiButton-containedError, .MuiButton-colorError',
       button: 'button, [role=button]',
       field: 'input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select',
     },
@@ -44,13 +46,18 @@ function merge(base, over) {
  */
 export function configFrom(frontMatter = {}) {
   const { frontMatter: fm, warnings } = normalizeUxFrontMatter(frontMatter || {});
-  const cfg = merge(DEFAULTS, fm);
+  const cfg = merge(structuredClone(DEFAULTS), fm);
   const s = cfg.verification.selectors;
+  const kit = kitProfile(cfg.verification.kit);
+  if (!s.primary) s.primary = kit.primary;
+  if (!s.destructive) s.destructive = kit.destructive;
   // Seletores aceitam string única ou lista; normaliza para string (lista com vírgula).
   for (const k of Object.keys(s)) if (Array.isArray(s[k]) && k !== 'regions') s[k] = s[k].join(', ');
   if (typeof s.regions === 'string') s.regions = s.regions.split(',').map((x) => x.trim()).filter(Boolean);
   if (!Array.isArray(cfg.content.forbidden)) cfg.content.forbidden = [cfg.content.forbidden].filter(Boolean);
   Object.defineProperty(cfg, 'legacyWarnings', { value: warnings, enumerable: false });
+  // Resolved kit profile (dialog title/footer, archetype regions, cards, containers) for the detectors.
+  Object.defineProperty(cfg, 'kitProfile', { value: kit, enumerable: false });
   return cfg;
 }
 

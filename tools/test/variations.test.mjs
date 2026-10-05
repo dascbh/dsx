@@ -102,7 +102,7 @@ test('page helpers: slides, hero, equivalent step of today, deltas, leaders', ()
   // today's equivalent: compare_to, then same step name, then proportional order
   const today = slidesOf(rowsOf(m)[0]);
   const sb = slidesOf(m.variants[1]);
-  assert.equal(todaySlideFor(sb[0], 0, 2, today), 1, 'Destinatários casa pelo nome');
+  assert.equal(todaySlideFor(sb[0], 0, 2, today), 1, 'Fornecedores casa pelo nome');
   assert.equal(todaySlideFor(sb[1], 1, 2, today), 2, 'Conferir cai na posição proporcional');
   const withCmp = { ...sb[1], cell: { ...sb[1].cell, frame: { ...sb[1].cell.frame, compare_to: 'c1' } } };
   assert.equal(todaySlideFor(withCmp, 1, 2, today), 0);
@@ -124,14 +124,14 @@ test('page helpers: slides, hero, equivalent step of today, deltas, leaders', ()
 test('page helpers: problems in plain Portuguese and a human badge', () => {
   const r = (id) => registry.get(id);
   assert.equal(plainFinding(r('t-0000x1aa')), 'Travessão usado como pausa no texto: "Avançar — próximo passo"');
-  assert.equal(plainFinding(r('l-000l6dd'), { where: 'hoje em Destinatários' }), 'O botão principal só aparece rolando a página: "Avançar" (hoje em Destinatários)');
+  assert.equal(plainFinding(r('l-000l6dd'), { where: 'hoje em Fornecedores' }), 'O botão principal só aparece rolando a página: "Avançar" (hoje em Fornecedores)');
   assert.equal(plainFinding(r('t-000descee')), 'descrição que repete o que a tela já mostra');
   assert.equal(plainFinding({ family: 'layout', rule: 'L7', anchor: 'linha longa em "Cada arquivo traz"' }), 'Linha de texto longa demais para ler: "Cada arquivo traz…"');
   assert.equal(badgeOf({ status: 'resolved' }).label, 'resolvido');
   assert.equal(badgeOf({ status: 'persists' }).label, 'continua');
-  const sus = badgeOf({ status: 'resolved', suspect: true, family: 'text', rule: 'X6' }, { similar: [{ anchor: 'Gerar agora mesmo todas as minutas' }] });
+  const sus = badgeOf({ status: 'resolved', suspect: true, family: 'text', rule: 'X6' }, { similar: [{ anchor: 'Gerar agora mesmo todas as propostas' }] });
   assert.equal(sus.label, 'precisa conferir');
-  assert.match(sus.why, /"Gerar agora mesmo todas as minutas"/);
+  assert.match(sus.why, /"Gerar agora mesmo todas as propostas"/);
   assert.match(badgeOf({ status: 'unverified', family: 'flow' }).why, /caminho entre as telas/);
   assert.match(badgeOf({ status: 'unverified', family: 'layout' }).why, /posição na tela não foi medida/);
 });
@@ -168,7 +168,7 @@ test('page: answer first (question, summary Hoje | A | B with 4 numbers, gain an
   assert.match(html, /class="bt-cmp" aria-pressed="false" aria-describedby="cmp-nota-a">Comparar com hoje/);
   assert.match(html, /<p class="nota cmp-nota" id="cmp-nota-a">"Comparar com hoje" vale para todas as versões ao mesmo tempo\.<\/p>/);
   assert.ok(!html.includes('id="cmp-nota-current"'), 'a aba Hoje não fala de um botão que não tem');
-  assert.match(html, /<div class="cmp" hidden><figure><figcaption class="tag tag-hoje">Hoje · Destinatários/);
+  assert.match(html, /<div class="cmp" hidden><figure><figcaption class="tag tag-hoje">Hoje · Fornecedores/);
   assert.match(html, /<p class="acao"><span class="seta" aria-hidden="true"><\/span><span>clica em Gerar 4 documentos<\/span><\/p>/);
   assert.match(html, /figcaption class="tag">Antes<\/figcaption>/);
   assert.match(html, /figcaption class="tag tag-depois">Depois/);
@@ -320,7 +320,7 @@ test('page crops: focus of the comparison, change rectangle and mark of a behavi
   const r = changeRect({ x: 600, y: 300, w: 100, h: 20 }, { width: 1000, height: 800 }, { width: 1000, height: 800 });
   assert.equal(r.w, 500, 'no mínimo metade da largura');
   assert.ok(r.x <= 600 && r.x + r.w >= 700 && r.y <= 300 && r.y + r.h >= 320, JSON.stringify(r));
-  assert.equal(bare('Passo 1 de 3: tabela do acervo'), 'Tabela do acervo');
+  assert.equal(bare('Passo 1 de 3: tabela do catálogo'), 'Tabela do catálogo');
   assert.equal(bare('Etapa 2 de 2: valores comuns'), 'Valores comuns');
   assert.equal(bare('Antes: CNPJ vazio'), 'CNPJ vazio');
   // par antes/depois com a diferença: recorte nas duas imagens e contorno do que mudou
@@ -341,5 +341,5 @@ test('page crops: focus of the comparison, change rectangle and mark of a behavi
 test('page slides: a frame with an open dialog is not a step of the flow', () => {
   const m = load();
   const s = slidesOf(m.variants[1], { b1: { dialog_open: true } });
-  assert.deepEqual(s.map((x) => [x.step, x.part, x.n ?? null]), [['Conferir', 'path', 1], ['Destinatários', 'dialog', null]]);
+  assert.deepEqual(s.map((x) => [x.step, x.part, x.n ?? null]), [['Conferir', 'path', 1], ['Fornecedores', 'dialog', null]]);
 });

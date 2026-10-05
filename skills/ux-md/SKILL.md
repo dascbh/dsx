@@ -11,6 +11,10 @@ Contrato (schema, 13 seções, versão e frescor, desvios, nota e gates, drift U
 
 **Princípio:** o `DESIGN.md` diz como a tela **parece**; o `UX.md` diz **que tipo de tela é, onde fica cada coisa e como ela se comporta**. O valor está no que ele impede o agente de adivinhar: posição da primária, quando confirmar, o que mostrar no vazio, como se volta.
 
+## UX.md and the UX blueprint
+
+`UX.md` is the **product** contract: conventions every screen follows. The **objective** contract is the UX blueprint (`templates/ux-blueprint.md`), written into the front demand's Forward design family (`specs/<demand-id>/design/intended-model.md`, `flow.md`, `ia.md`). Keep them apart: UX.md never lists one objective's scenarios, and a blueprint cites UX.md policies by key instead of restating them. When a blueprint needs something UX.md forbids, record a deviation in UX.md (`deviations` + D… table) or revise UX.md in the same cycle; never let the two disagree silently. `tools/ux-lint/blueprint.mjs check` verifies the blueprint against the captures and the flow map; `ux-md-drift.mjs` keeps verifying UX.md against the product.
+
 ## Escolha o modo
 
 - Não existe `UX.md` e há produto/código → **Modo A: extrair**
@@ -21,7 +25,7 @@ Contrato (schema, 13 seções, versão e frescor, desvios, nota e gates, drift U
 
 1. **Mapas primeiro.** Se `.dsx/maps/` não existir ou estiver velho, rode a skill `mapear`. Leia `ui-map` (telas, diálogos, componentes), `flows` (grafo de navegação), `tasks` (passos e confirmações), `journey` (persona e momentos) e `domain` (vocabulário das entidades). Item em `uncertain` não é fato: confirme com `confirmar-mapas` ou marque "(inferido)".
 2. **Mapa de fluxo com evidência.** Para cada módulo, garanta um `.dsx/maps/flows-<module>.json` com `screens`, `transitions` (`trigger` + `evidence` `arquivo:linha`) e `journeys` (formato em `knowledge/fundamentos/ux-md.md`). Sem evidência no código, a transição não entra.
-3. **Capturas pelo código.** Se o projeto tem uma skill de captura pelo código (ex.: `code-to-stitch`), capture as telas principais e seus estados em HTML. São a entrada do ux-lint de tela e a referência de "como está hoje". Nunca reconstrua uma tela existente por texto.
+3. **Capturas pelo código.** Se o projeto tem uma skill de captura pelo código (`capture-from-code` do DSX, ou a do projeto), capture as telas principais e seus estados em HTML. São a entrada do ux-lint de tela e a referência de "como está hoje". Nunca reconstrua uma tela existente por texto.
 4. **Classifique cada tela num arquétipo.** Para cada rota/diálogo do mapa, leia os cartões de `archetypes/` e escolha o de `quando-usar` que casa com a **tarefa** da tela (não com a aparência). SE nenhum casa → ENTÃO registre o desvio na seção 5 com o motivo. SE a tela faz duas tarefas de tipos diferentes → ENTÃO registre como desvio e proponha a separação.
 5. **Derive as políticas do que o código já faz.** Conte, não suponha: onde está a primária nas telas do mesmo tipo, quantas primárias por região, ordem dos botões em diálogo, se ação irreversível pede confirmação, como o sucesso aparece (toast, inline), quais estados cada tela trata, como os formulários validam. A maioria vira a política no front matter; anote a evidência (arquivo ou tela) na prosa.
 6. **Inconsistências viram "Não faça".** Toda divergência entre telas do mesmo arquétipo (ex.: primária no rodapé numa lista e no topo na outra; diálogo sobre diálogo; "Confirmar" em ação destrutiva) entra no bloco "Não faça" com a tela onde aparece. Problemas recorrentes resolvidos bem viram "Faça".

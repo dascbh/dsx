@@ -15,7 +15,7 @@ rules: [T1, T3, T6, T7, F1, F5]
 
 # Mestre-detalhe
 
-Caixa de entrada de pendências, fila de documentos para revisar, lista de comentários de uma minuta: a pessoa abre um, resolve, passa para o próximo. A lista dá orientação ("onde estou, quanto falta"); o detalhe dá o conteúdo. As duas convivem na mesma tela, e a seleção é o fio que as liga.
+Caixa de entrada de pendências, fila de documentos para revisar, lista de comentários de um pedido: a pessoa abre um, resolve, passa para o próximo. A lista dá orientação ("onde estou, quanto falta"); o detalhe dá o conteúdo. As duas convivem na mesma tela, e a seleção é o fio que as liga.
 
 ## Quando usar
 

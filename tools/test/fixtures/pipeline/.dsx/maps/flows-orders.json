@@ -1,0 +1,16 @@
+{
+  "module": "orders",
+  "screens": [
+    { "id": "queue", "name": "Pending orders", "type": "page", "route": "/orders/pending", "parent": null },
+    { "id": "order", "name": "Order detail", "type": "page", "route": "/orders/:id", "parent": "queue" },
+    { "id": "settings", "name": "Approval settings", "type": "page", "route": "/settings", "parent": null }
+  ],
+  "transitions": [
+    { "id": "t-open", "from": "queue", "to": "order", "trigger": { "type": "row", "label": "PO-1042" }, "evidence": "src/Queue.tsx:12" },
+    { "id": "t-back", "from": "order", "to": "queue", "trigger": { "type": "link", "label": "Back" }, "evidence": "src/Order.tsx:8" },
+    { "id": "t-settings", "from": "queue", "to": "settings", "trigger": { "type": "link", "label": "Settings" }, "evidence": "src/Queue.tsx:30" }
+  ],
+  "journeys": [
+    { "id": "j-approve", "name": "Approve an order", "persona": "approver", "goal": "approve the oldest order", "steps": ["t-open", "t-back"] }
+  ]
+}

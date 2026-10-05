@@ -8,7 +8,7 @@ import { analyzeFlow } from '../ux-lint/flow.mjs';
 import { parseYaml } from '../lib/yaml-lite.mjs';
 
 const rules = (r) => r.findings.map((a) => a.rule).sort();
-const page = (body, h1 = '<h1>Contratos</h1>') =>
+const page = (body, h1 = '<h1>Pedidos</h1>') =>
   `<!doctype html><html><head><title>t</title><style>.x{}</style></head><body><header>Topo</header><main>${h1}${body}</main></body></html>`;
 const primaryBtn = (t) => `<button class="MuiButton-root MuiButton-contained">${t}</button>`;
 const secondaryBtn = (t) => `<button class="MuiButton-root MuiButton-text">${t}</button>`;
@@ -66,15 +66,15 @@ test('config: contract defaults and partial override', () => {
 });
 
 test('T1: two primaries in main; open dialog ignores the page behind', () => {
-  assert.deepEqual(rules(analyzeScreen(page(primaryBtn('Criar aditivo') + primaryBtn('Exportar PDF')))), ['T1']);
-  const withDialog = page(primaryBtn('Criar aditivo') + primaryBtn('Exportar PDF') + dialogHtml('Novo', '<p>x</p>', secondaryBtn('Cancelar') + primaryBtn('Criar')));
+  assert.deepEqual(rules(analyzeScreen(page(primaryBtn('Criar pedido') + primaryBtn('Exportar PDF')))), ['T1']);
+  const withDialog = page(primaryBtn('Criar pedido') + primaryBtn('Exportar PDF') + dialogHtml('Novo', '<p>x</p>', secondaryBtn('Cancelar') + primaryBtn('Criar')));
   assert.deepEqual(rules(analyzeScreen(withDialog)), []);
 });
 
 test('T2: dialog footer with the action before cancel', () => {
-  const r = analyzeScreen(page(dialogHtml('Excluir minuta?', '<p>x</p>', primaryBtn('Excluir minuta') + secondaryBtn('Cancelar'))));
+  const r = analyzeScreen(page(dialogHtml('Excluir proposta?', '<p>x</p>', primaryBtn('Excluir proposta') + secondaryBtn('Cancelar'))));
   assert.deepEqual(rules(r), ['T2']);
-  assert.match(r.findings[0].region, /diálogo "Excluir minuta\?"/);
+  assert.match(r.findings[0].region, /diálogo "Excluir proposta\?"/);
   // Botão de conteúdo antes do Fechar do rodapé não é rodapé: não compara.
   assert.deepEqual(rules(analyzeScreen(page(dialogHtml('Categorias', primaryBtn('Adicionar'), secondaryBtn('Fechar'))))), []);
   // Ordem inversa declarada no UX.md.
@@ -110,7 +110,7 @@ test('T6: forbidden term, whole word, case-insensitive', () => {
 });
 
 test('T7: label without verb is a warning (severity 1)', () => {
-  const r = analyzeScreen(page(secondaryBtn('OK') + secondaryBtn('Enviar minuta')));
+  const r = analyzeScreen(page(secondaryBtn('OK') + secondaryBtn('Enviar proposta')));
   assert.deepEqual(rules(r), ['T7']);
   assert.equal(r.findings[0].severity, 1);
 });

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journeys</title>
+<style>
+/* One horizontal lane per journey (screen → action → screen). Neutral theme; personas get colors in order of
+   appearance, so nothing here names a product, a role or a domain. Data is injected by tools/stitch/journeys.mjs. */
+:root {
+  --bg: #F6F7F9; --surface: #FFFFFF; --fg: #1D2230; --muted: #5E6878; --line: #CBD3DE; --line-soft: #E4E8EE;
+  --accent: #2B59C3; --ok: #15803D; --ok-bg: #EEF8F1;
+  --p0: #2B59C3; --p0-bg: #ECF1FB; --p1: #7A3FC2; --p1-bg: #F3EDFB; --p2: #A2560C; --p2-bg: #FBF2E8; --p3: #0F766E; --p3-bg: #E8F6F4;
+  --font: system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1520; --surface: #152031; --fg: #E7ECF3; --muted: #9AA6B6; --line: #2C3E55; --line-soft: #1E2D41;
+  --accent: #7EA6F2; --ok: #4ADE80; --ok-bg: #12301E;
+  --p0: #7EA6F2; --p0-bg: #1B2C4A; --p1: #BE9CF2; --p1-bg: #2B2147; --p2: #F0B062; --p2-bg: #3A2A14; --p3: #5ED3C4; --p3-bg: #123532; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1520; --surface: #152031; --fg: #E7ECF3; --muted: #9AA6B6; --line: #2C3E55; --line-soft: #1E2D41;
+  --accent: #7EA6F2; --ok: #4ADE80; --ok-bg: #12301E;
+  --p0: #7EA6F2; --p0-bg: #1B2C4A; --p1: #BE9CF2; --p1-bg: #2B2147; --p2: #F0B062; --p2-bg: #3A2A14; --p3: #5ED3C4; --p3-bg: #123532; color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 var(--font) }
+.page { padding: 28px 16px 64px; max-width: 1600px; margin: 0 auto; display: grid; gap: 28px }
+header { display: grid; gap: 10px }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600 }
+h1 { margin: 0; font-size: 24px; text-wrap: balance }
+.summary, .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px }
+.summary b { color: var(--fg) }
+.badge { padding: 2px 10px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); font-weight: 600; font-size: 12px }
+nav.index { display: flex; flex-wrap: wrap; gap: 8px }
+nav.index a { text-decoration: none; color: var(--fg); border: 1px solid var(--line); background: var(--surface); padding: 6px 12px; border-radius: 10px; font-size: 13px }
+nav.index a:hover, nav.index a:focus-visible { border-color: var(--accent); outline: 2px solid transparent }
+nav.index small { color: var(--muted) }
+.persona { display: inline-flex; align-items: center; gap: 6px; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid currentColor }
+.p0 { --c: var(--p0); --cb: var(--p0-bg) } .p1 { --c: var(--p1); --cb: var(--p1-bg) } .p2 { --c: var(--p2); --cb: var(--p2-bg) } .p3 { --c: var(--p3); --cb: var(--p3-bg) }
+.persona { color: var(--c); background: var(--cb) }
+section.journey { display: grid; gap: 12px; scroll-margin-top: 16px }
+.head h2 { margin: 0; font-size: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+.head p { margin: 4px 0 0; color: var(--muted); max-width: 90ch }
+.lane { overflow-x: auto; padding: 4px 2px 14px; border-top: 1px solid var(--line-soft) }
+.lane:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.track { display: flex; align-items: stretch; width: max-content; padding-top: 14px }
+.screen { width: 248px; flex: none; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--c, var(--line)); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden }
+.thumb { aspect-ratio: 16 / 10; background: var(--line-soft); display: grid; place-items: center; border-bottom: 1px solid var(--line-soft) }
+.thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block }
+.thumb span { font-size: 12px; color: var(--muted); text-align: center; padding: 8px }
+.body { padding: 10px 12px 12px; display: grid; gap: 6px }
+.name { font-weight: 600; line-height: 1.3 }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; color: var(--muted) }
+.type { border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em }
+.route, .evidence { font-family: var(--mono); font-size: 11px; color: var(--muted); word-break: break-all }
+.inner { margin: 4px 0 0; padding: 8px 0 0; border-top: 1px dashed var(--line); list-style: none; display: grid; gap: 4px; font-size: 12px }
+q { quotes: "“" "”"; font-weight: 600 }
+.action { width: 188px; flex: none; display: flex; flex-direction: column; justify-content: center; padding: 0 10px; gap: 4px }
+.arrow { height: 2px; background: var(--line); position: relative; margin: 6px 0 }
+.arrow::after { content: ""; position: absolute; right: -1px; top: -4px; border-left: 8px solid var(--line); border-top: 5px solid transparent; border-bottom: 5px solid transparent }
+.action.external .arrow { background: repeating-linear-gradient(90deg, var(--muted) 0 6px, transparent 6px 10px) }
+.trigger { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.condition { font-size: 11.5px; color: var(--muted); font-style: italic }
+.switch { width: 150px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border-inline: 2px dashed var(--line); margin: 0 12px; padding: 0 8px; text-align: center; font-size: 12px; color: var(--muted) }
+.notes { font-size: 12.5px; color: var(--muted); max-width: 110ch; margin: 0 }
+footer { color: var(--muted); font-size: 12px; border-top: 1px solid var(--line-soft); padding-top: 14px }
+@media (max-width: 640px) { h1 { font-size: 20px } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="eyebrow">Journey map · module __MODULE__ · extracted from the code</div>
+    <h1 id="title">Journeys</h1>
+    <div class="summary" id="summary"></div>
+    <div class="legend" id="legend"></div>
+    <nav class="index" id="index" aria-label="Journeys"></nav>
+  </header>
+  <main id="journeys" style="display:grid;gap:36px"></main>
+  <footer id="footer"></footer>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+const { flow, thumbnails, labels } = DATA;
+const L = Object.assign({ screens: 'screens', dialogs: 'dialogs', transitions: 'transitions', journeys: 'journeys', withCapture: 'screens captured from the code', checked: 'evidence checked in the code', pending: 'capture pending', steps: 'steps', now: 'now', capture: 'Capture of', external: 'dashed arrow = leaves the product (link sent outside)', inner: 'actions that stay on the screen are listed inside the card', personas: 'Personas' }, labels || {});
+const screens = Object.fromEntries((flow.screens || []).map(s => [s.id, s]));
+const transitions = Object.fromEntries((flow.transitions || []).map(t => [t.id, t]));
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const personaList = [];
+const personaClass = p => { const k = String(p || '—'); if (!personaList.includes(k)) personaList.push(k); return 'p' + (personaList.indexOf(k) % 4); };
+const pill = p => `<span class="persona ${personaClass(p)}">${esc(p || '—')}</span>`;
+
+function card(id, persona) {
+  const s = screens[id] || { name: id, type: '?' };
+  const c = el('article', `screen ${personaClass(persona)}`);
+  c.append(el('div', 'thumb', thumbnails[id] ? `<img alt="${esc(L.capture)} ${esc(s.name)}" src="${thumbnails[id]}">` : `<span>${esc(L.pending)}<br>${esc(s.type)}</span>`));
+  const b = el('div', 'body');
+  b.append(el('div', 'name', esc(s.name)));
+  b.append(el('div', 'meta', `<span class="type">${esc(s.type)}</span>${s.state ? `<span>${esc(s.state)}</span>` : ''}`));
+  if (s.route) b.append(el('div', 'route', esc(s.route)));
+  const list = el('ul', 'inner'); list.hidden = true; b.append(list); c.append(b);
+  c.add = t => { list.hidden = false; list.append(el('li', null, `<q>${esc(t.trigger?.label)}</q> <span class="evidence">${esc(t.evidence)}</span>`)); };
+  return c;
+}
+function arrow(t) {
+  const a = el('div', 'action' + (t.trigger?.type === 'external-link' ? ' external' : ''));
+  a.append(el('span', 'trigger', esc(t.trigger?.type)));
+  a.append(el('span', null, `<q>${esc(t.trigger?.label)}</q>`));
+  a.append(el('div', 'arrow'));
+  if (t.condition) a.append(el('span', 'condition', esc(t.condition)));
+  a.append(el('span', 'evidence', esc(t.evidence)));
+  return a;
+}
+// persona of each step: the journey persona, switched at persona_switches to the persona of the screen where the
+// stretch starts (its single declared persona), else to the next declared persona of the journey (`personas`)
+function stepPersonas(j) {
+  const sw = new Set(j.persona_switches || []);
+  const declared = [].concat(j.personas || [], j.persona || []).filter(Boolean);
+  let cur = declared[0] || null, k = 0;
+  return (j.steps || []).map((step, i) => {
+    if (i > 0 && sw.has(i)) {
+      const s = screens[transitions[step]?.from] || {};
+      const ps = [].concat(s.persona || []);
+      cur = ps.length === 1 ? ps[0] : declared[++k % Math.max(1, declared.length)] || cur;
+    }
+    return cur;
+  });
+}
+const nDialogs = (flow.screens || []).filter(s => /dialog|modal/.test(s.type)).length;
+document.getElementById('summary').innerHTML = `<span><b>${(flow.screens || []).length}</b> ${L.screens} (${nDialogs} ${L.dialogs})</span><span><b>${(flow.transitions || []).length}</b> ${L.transitions}</span><span><b>${(flow.journeys || []).length}</b> ${L.journeys}</span><span><b>${Object.keys(thumbnails).length}</b> ${L.withCapture}</span>${DATA.validated ? `<span class="badge">✓ ${L.checked}</span>` : ''}`;
+const index = document.getElementById('index'), root = document.getElementById('journeys');
+for (const j of flow.journeys || []) {
+  const ps = stepPersonas(j);
+  const link = el('a', null, `${esc(j.name)} <small>${(j.steps || []).length} ${L.steps}</small>`); link.href = '#' + encodeURIComponent(j.id); index.append(link);
+  const sec = el('section', 'journey'); sec.id = j.id;
+  sec.append(el('div', 'head', `<h2>${esc(j.name)} ${[...new Set(ps)].map(pill).join('')}</h2><p>${esc(j.goal || j.objective || '')}</p>`));
+  const lane = el('div', 'lane'); lane.tabIndex = 0; lane.setAttribute('aria-label', j.name);
+  const track = el('div', 'track');
+  let c = null, persona = ps[0];
+  (j.steps || []).forEach((step, i) => {
+    const t = transitions[step]; if (!t) return;
+    if (i === 0 || ps[i] !== persona) {
+      if (i > 0) track.append(el('div', 'switch', `${esc(L.now)} ${pill(ps[i])}`));
+      persona = ps[i]; c = card(t.from, persona); track.append(c);
+    }
+    if (t.to === t.from) { c.add(t); return; }
+    track.append(arrow(t)); c = card(t.to, persona); track.append(c);
+  });
+  lane.append(track); sec.append(lane);
+  if (j.notes) sec.append(el('p', 'notes', esc(j.notes)));
+  root.append(sec);
+}
+document.getElementById('legend').innerHTML = `<span>${esc(L.personas)}:</span>${personaList.map(pill).join('')}<span>· ${esc(L.external)} · ${esc(L.inner)}</span>`;
+document.getElementById('footer').textContent = `Source: ${flow.source || 'flow map'}${flow.generated_at ? ` · generated ${flow.generated_at}` : ''} · each action cites the file and line of its trigger · captures rendered from the real components with fictional data.`;
+</script>
+</body>
+</html>

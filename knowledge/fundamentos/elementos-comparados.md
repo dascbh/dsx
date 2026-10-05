@@ -11,7 +11,7 @@ Resumo em redação própria das convenções públicas mais citadas — Materia
 
 | Aspecto | Material 3 | Carbon | Polaris | GOV.UK | Atlassian | Apple HIG | DSX |
 |---|---|---|---|---|---|---|---|
-| Rótulo | curto, diz a ação | 1–3 palavras, verbo | verbo + objeto ("Adicionar produto") | verbo, descreve o que acontece ("Continuar", "Salvar e continuar") | curto, verbo | verbo ou nome curto da ação | **verbo + objeto**, até 4 palavras ("Criar aditivo") |
+| Rótulo | curto, diz a ação | 1–3 palavras, verbo | verbo + objeto ("Adicionar produto") | verbo, descreve o que acontece ("Continuar", "Salvar e continuar") | curto, verbo | verbo ou nome curto da ação | **verbo + objeto**, até 4 palavras ("Criar pedido") |
 | Caixa | só a primeira maiúscula | só a primeira maiúscula | só a primeira maiúscula | só a primeira maiúscula | só a primeira maiúscula | **cada palavra maiúscula** (inglês) | só a primeira maiúscula; em pt-BR caixa de título soa traduzido |
 | Pontuação | sem ponto | sem ponto | sem ponto | sem ponto | sem ponto | sem ponto | sem ponto, sem travessão, sem parêntese |
 | Primária por área | uma ação de maior ênfase | uma primária por grupo | uma primária por seção | uma por página (a página faz uma coisa) | uma primária por grupo | uma ação padrão por janela | **uma por região** (regra T1) |
@@ -46,7 +46,7 @@ Resumo em redação própria das convenções públicas mais citadas — Materia
 | Aspecto | Material 3 | Carbon | Polaris | GOV.UK | Atlassian | Apple HIG | DSX |
 |---|---|---|---|---|---|---|---|
 | Título de página | um, curto, diz onde se está | um por página | nome do objeto ou da tarefa | **um h1 por página**, a pergunta ou a tarefa | um | título da janela | um `h1`, sem separador composto ("X — Y" vira título + contexto abaixo) |
-| Título de diálogo | diz a ação ou a pergunta | diz a ação | verbo do botão principal repetido ("Excluir produto?" → "Excluir") | — | diz a ação | diz a ação | pergunta ou ação + objeto ("Excluir a minuta?") e botão com o mesmo verbo |
+| Título de diálogo | diz a ação ou a pergunta | diz a ação | verbo do botão principal repetido ("Excluir produto?" → "Excluir") | — | diz a ação | diz a ação | pergunta ou ação + objeto ("Excluir o pedido?") e botão com o mesmo verbo |
 | Descrição sob o título | opcional, curta | opcional | só se acrescentar | conteúdo antes do formulário, curto | opcional | opcional | **só se acrescentar** algo que o título não diz; nunca reformular o título (regra X3) |
 | Caixa | primeira maiúscula | primeira maiúscula | primeira maiúscula | primeira maiúscula | primeira maiúscula | cada palavra maiúscula (títulos, inglês) | primeira maiúscula |
 

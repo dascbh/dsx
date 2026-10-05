@@ -108,7 +108,7 @@
   {
     "id": "document-viewer",
     "title": "Documento com visor",
-    "summary": "Tela de leitura de um documento pronto (contrato, parecer, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.",
+    "summary": "Tela de leitura de um documento pronto (pedido emitido, nota fiscal, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.",
     "register": [
       "operational",
       "editorial"
@@ -273,7 +273,7 @@
   {
     "id": "library",
     "title": "Biblioteca",
-    "summary": "Acervo de itens reutilizáveis (modelos, cláusulas, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.",
+    "summary": "Acervo de itens reutilizáveis (modelos, itens de catálogo, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.",
     "register": [
       "operational",
       "editorial"
@@ -487,7 +487,7 @@
   {
     "id": "public-decision-page",
     "title": "Página pública de decisão",
-    "summary": "Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (de acordo, não concordância, aprovação, recusa).",
+    "summary": "Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (confirmação, recusa, aprovação, pedido de ajuste).",
     "register": [
       "consumer"
     ],

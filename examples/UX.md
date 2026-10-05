@@ -1,32 +1,32 @@
 ---
 version: 1.4.0
 format: alpha
-name: Pactum
-description: Plataforma web de gestão de contratos comerciais de uma distribuidora de alimentos (fictícia), desktop, densidade alta, uso diário pelo time comercial e jurídico.
-owner: time-de-produto-pactum
+name: Purchasing
+description: Web app for purchase orders, suppliers and approvals of a mid-size manufacturer (fictional), desktop, high density, used every day by the procurement team.
+owner: purchasing-product-team
 updated: 2026-10-02
 product:
-  persona: Analista de contratos que acompanha vencimentos, reajustes e renovações de 1.800 contratos com varejistas e fornecedores
+  persona: Buyer who turns requisitions into purchase orders, chases supplier confirmations and keeps 600 open orders on schedule
   register: operational
   platform: desktop
   density: high
 navigation:
-  model: "menu lateral por área + abas na página de detalhe"
+  model: "side menu by area + tabs on the detail page"
   max-depth: 3
   back: mandatory
 archetypes:
-  monitoring-dashboard: ["/inicio"]
-  operational-list: ["/contratos", "/reajustes"]
-  detail-side-panel: ["/contratos (painel do cliente)"]
-  master-detail: ["/clientes"]
-  document-viewer: ["/contratos/:id/documento"]
-  editor-with-panel: ["/minutas/:id"]
-  step-wizard: ["/contratos/novo"]
-  library: ["/modelos"]
-  settings: ["/configuracoes"]
-  public-decision-page: ["/aceite/:token"]
-  form-dialog: ["Registrar reajuste", "Adicionar responsável"]
-  confirmation-dialog: ["Encerrar contrato", "Descartar minuta"]
+  monitoring-dashboard: ["/home"]
+  operational-list: ["/orders", "/requisitions"]
+  detail-side-panel: ["/orders (supplier panel)"]
+  master-detail: ["/suppliers"]
+  document-viewer: ["/orders/:id/document"]
+  editor-with-panel: ["/orders/:id/edit"]
+  step-wizard: ["/orders/new"]
+  library: ["/catalog"]
+  settings: ["/settings"]
+  public-decision-page: ["/confirm/:token"]
+  form-dialog: ["Record delivery", "Add approver"]
+  confirmation-dialog: ["Cancel order", "Discard draft"]
 actions:
   primary-per-region: 1
   primary-position: top-right
@@ -46,199 +46,202 @@ forms:
   validation: on-blur
   required: mark-optional
 content:
-  glossary: inline                # tabela na seção "Conteúdo e microcopy"; por módulo: { default: <caminho>, <módulo>: <caminho> }
+  glossary: inline                # table in "Content & Microcopy"; per module: { default: <file>, <module>: <file> }
   buttons: verb-object
   forbidden: [tenant, payload, job, status_code, null, ERP_ID]
 flows:
   max-journey-steps: 10
   max-stacked-dialogs: 1
   dead-ends: 0
+# Where the tools find this product's artifacts (docs/project-paths.md). Omitted keys use the DSX defaults.
+paths:
+  captures: .dsx/captures/<module>
+  code: [web/src]
 verification:
+  kit: mui                        # component kit profile: auto | generic | mui | shadcn | chakra | antd | bootstrap
   selectors:
     regions: ["header", "nav", "aside", "main", "[role=dialog]"]
     dialog: "[role=dialog]"
-    primary: ".MuiButton-contained"
-    destructive: ".MuiButton-containedError, .MuiButton-colorError"
     button: "button, [role=button]"
     field: "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select"
-# Desvios aceitos (seção "Arquétipos de tela"). Achado de uma regra de `rules` em tela de `screens` vira
-# accepted-deviation no registro de achados; rules vazio = desvio só documental.
+# Accepted deviations (section "Screen Archetypes"). A finding of a rule in `rules` on a screen in `screens`
+# becomes accepted-deviation in the findings registry; empty rules = documentation-only deviation.
 deviations:
   - id: D1
-    screens: [inicio]
+    screens: [home]
     rules: [L9]
-    reason: "Painel sem gráficos: cada bloco é uma lista curta clicável, porque a pergunta é o que fazer hoje"
-    decided-by: "time-de-produto-pactum"
+    reason: "Dashboard without charts: each block is a short clickable queue, because the question is what to do today"
+    decided-by: "purchasing-product-team"
   - id: D2
-    screens: [reajustes]
+    screens: [requisitions]
     rules: []
-    reason: "Lista agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo"
-    decided-by: "time-de-produto-pactum"
+    reason: "List grouped by cost center with a subtotal in the group header"
+    decided-by: "purchasing-product-team"
   - id: D3
-    screens: [minuta]
+    screens: [order-edit]
     rules: []
-    reason: "Painel abre em Diferenças em relação ao modelo, não em Propriedades"
-    decided-by: "jurídico"
+    reason: "Panel opens on Changes since approval, not on Properties"
+    decided-by: "finance"
     until: 2027-06-30
 ---
 
-# Pactum — UX
+# Purchasing — UX
 
-Produto fictício, usado como exemplo de referência do formato. As decisões abaixo vieram do código (mapas de `.dsx/maps/`), de 6 entrevistas com analistas e do registro de chamados de suporte do primeiro semestre; o que foi deduzido sem evidência direta está marcado "(inferido)". Em conflito, vale o comportamento mais restritivo (confirmação, retorno visível) até a próxima revisão.
+Fictional product, used as the reference example of the format. The decisions below came from the code (maps in `.dsx/maps/`), from 6 interviews with buyers and from the first-half support log; whatever was deduced without direct evidence is marked "(inferred)". On conflict, the more restrictive behavior wins (confirmation, visible way back) until the next review. The product's interface text is in English; a product in another language writes its labels in that language and keeps this structure.
 
-## Visão geral
+## Overview
 
-O Pactum é a mesa de trabalho do time de contratos da distribuidora: 9 analistas e 3 advogadas passam o dia nele, em monitor de 24", acompanhando o que vence, o que precisa de reajuste e o que está em negociação. A pessoa abre o produto para responder "o que eu preciso resolver hoje?" e fecha quando a fila do dia zerou.
+Purchasing is the procurement team's workbench: 8 buyers and 2 approvers spend the day in it on 24" monitors, following what is late, what needs approval and what a supplier has not confirmed yet. People open it to answer "what do I need to unblock today?" and close it when the day's queue is empty.
 
-O cliente varejista só toca o produto pela página pública de aceite de renovação, sem login.
+Suppliers only touch the product through the public confirmation page, without signing in.
 
-O Pactum **nunca** aplica reajuste, renovação ou encerramento sem que uma pessoa confirme na tela, e **nunca** envia nada ao cliente sem mostrar antes o texto exato que ele vai receber.
+Purchasing **never** sends an order, cancels an order or changes a price without a person confirming on screen, and **never** sends anything to a supplier without first showing the exact text the supplier will receive.
 
-## Personas e tarefas
+## Personas & Tasks
 
-| Persona | Tarefa | Frequência | Erro crítico |
+| Persona | Task | Frequency | Critical error |
 |---|---|---|---|
-| Analista de contratos | Tratar a fila de vencimentos dos próximos 60 dias | Diária, 20–40 itens | Deixar um contrato renovar automaticamente com preço defasado |
-| Analista de contratos | Registrar reajuste anual pelo índice do contrato | Semanal, picos em janeiro e julho | Aplicar o índice errado ou sobre a base errada |
-| Advogada | Revisar e aprovar minuta de aditivo | 5–10 por semana | Aprovar cláusula alterada sem perceber a alteração |
-| Gestor comercial | Ver carteira por cliente e risco de vencimento | Semanal | Decidir com número desatualizado |
-| Cliente varejista (externo) | Aceitar ou recusar a renovação proposta | Uma vez por contrato por ano | Aceitar sem ver o novo valor |
+| Buyer | Turn approved requisitions into purchase orders | Daily, 15–30 items | Ordering from a supplier with an expired price list |
+| Buyer | Chase unconfirmed orders older than 3 days | Daily | Missing a delivery date the plant depends on |
+| Approver | Approve orders above the spending limit | 10–20 per week | Approving a changed quantity without noticing the change |
+| Procurement manager | Review spend by supplier and late deliveries | Weekly | Deciding with stale numbers |
+| Supplier (external) | Confirm or reject an order and its delivery date | Once per order | Confirming without seeing the final quantity |
 
-## Arquitetura da informação
+## Information Architecture
 
-Quatro áreas no menu lateral, com estes nomes exatos: **Início**, **Contratos**, **Reajustes**, **Clientes**. Abaixo, separadas por divisor: **Modelos** e **Configurações**.
+Four areas in the side menu, with these exact names: **Home**, **Orders**, **Requisitions**, **Suppliers**. Below a divider: **Catalog** and **Settings**.
 
-- **Início** é a entrada: o que vence, o que está parado e o que espera a pessoa.
-- **Contratos** é a lista de trabalho; cada contrato abre num detalhe com abas *Resumo*, *Documento*, *Aditivos*, *Histórico*.
-- **Reajustes** é uma fila própria porque o trabalho é em lote por índice e mês.
-- **Clientes** agrupa contratos por razão social; o detalhe do cliente nunca edita contrato, só leva até ele.
-- **Modelos** guarda as minutas-base aprovadas pelo jurídico.
+- **Home** is the entry point: what is late, what is waiting for approval and what is waiting for the person.
+- **Orders** is the work list; each order opens in a detail page with the tabs *Summary*, *Document*, *Deliveries*, *History*.
+- **Requisitions** is its own queue because the work is batched by cost center and week.
+- **Suppliers** groups orders by supplier; the supplier detail never edits an order, it only links to it.
+- **Catalog** keeps the approved items and their price lists.
 
-O número do contrato (ex.: CT-2026-0412) é o identificador que aparece em toda tela; o código interno do ERP nunca aparece.
+The order number (e.g. PO-2026-0412) is the identifier shown on every screen; the internal ERP code never appears.
 
-## Navegação
+## Navigation
 
-Menu lateral fixo, sempre visível, com a área atual marcada. Na página de detalhe, migalha "Contratos › CT-2026-0412" no topo e abas logo abaixo do título. Profundidade máxima 3: área → detalhe → aba ou editor. O editor de minuta é o nível mais fundo e tem botão "Voltar ao contrato" no cabeçalho.
+Fixed side menu, always visible, with the current area marked. On the detail page, the breadcrumb "Orders › PO-2026-0412" at the top and the tabs right below the title. Maximum depth 3: area → detail → tab or editor. The order editor is the deepest level and has a "Back to order" button in its header.
 
-Filtros da lista vivem na URL (padrão `applying-filters`): voltar do detalhe devolve a lista com os mesmos filtros, a mesma página e a linha de onde se saiu destacada por 2 s.
+List filters live in the URL (pattern `applying-filters`): coming back from the detail restores the list with the same filters and page, and highlights the row the person left for 2 s.
 
-## Arquétipos de tela
+## Screen Archetypes
 
-| Tela | Arquétipo | Variação | Desvio |
+| Screen | Archetype | Variation | Deviation |
 |---|---|---|---|
-| `/inicio` | monitoring-dashboard | três blocos de fila com contagem | D1 |
-| `/contratos` | operational-list | with-bulk-actions | — |
-| `/reajustes` | operational-list | with-bulk-actions | D2 |
-| painel do cliente em `/contratos` | detail-side-panel | — | — |
-| `/clientes` | master-detail | lista à esquerda | — |
-| `/contratos/:id/documento` | document-viewer | metadados à direita | — |
-| `/minutas/:id` | editor-with-panel | painel de comparação | D3 |
-| `/contratos/novo` | step-wizard | 4 etapas | — |
-| `/modelos` | library | — | — |
-| `/configuracoes` | settings | — | — |
-| `/aceite/:token` | public-decision-page | — | — |
-| "Registrar reajuste", "Adicionar responsável" | form-dialog | — | — |
-| "Encerrar contrato", "Descartar minuta" | confirmation-dialog | digitar o número | — |
+| `/home` | monitoring-dashboard | three queue blocks with counts | D1 |
+| `/orders` | operational-list | with-bulk-actions | — |
+| `/requisitions` | operational-list | with-bulk-actions | D2 |
+| supplier panel on `/orders` | detail-side-panel | — | — |
+| `/suppliers` | master-detail | list on the left | — |
+| `/orders/:id/document` | document-viewer | metadata on the right | — |
+| `/orders/:id/edit` | editor-with-panel | changes panel | D3 |
+| `/orders/new` | step-wizard | 4 steps | — |
+| `/catalog` | library | — | — |
+| `/settings` | settings | — | — |
+| `/confirm/:token` | public-decision-page | — | — |
+| "Record delivery", "Add approver" | form-dialog | — | — |
+| "Cancel order", "Discard draft" | confirmation-dialog | type the order number | — |
 
-Cada arquétipo da coluna do meio é um cartão `archetypes/<id>.md` do DSX; os desvios valem só para o Pactum e estão também no bloco `deviations` do front matter, que é o que o ux-lint lê.
+Each archetype in the middle column is a DSX card `archetypes/<id>.md`; the deviations apply only to Purchasing and are also in the `deviations` block of the front matter, which is what the ux-lint reads.
 
-### Desvios declarados
+### Declared deviations
 
-| # | Tela | Desvio | Motivo |
+| # | Screen | Deviation | Reason |
 |---|---|---|---|
-| D1 | `/inicio` (`inicio`) | Sem gráficos nem a região de indicadores do cartão | A pergunta da tela é "o que fazer", não "como está"; cada bloco é uma lista curta clicável |
-| D2 | `/reajustes` (`reajustes`) | Agrupada por índice (IPCA, IGP-M) com subtotal no cabeçalho do grupo | O trabalho é em lote por índice e mês |
-| D3 | `/minutas/:id` (`minuta`) | O painel abre em "Diferenças em relação ao modelo", não em "Propriedades" | A advogada aprova olhando o que mudou; vale até 30/06/2027, quando a comparação vira aba própria |
+| D1 | `/home` (`home`) | No charts and no indicator region from the card | The screen's question is "what to do", not "how it is going"; each block is a short clickable queue |
+| D2 | `/requisitions` (`requisitions`) | Grouped by cost center with a subtotal in the group header | The work is batched by cost center and week |
+| D3 | `/orders/:id/edit` (`order-edit`) | The panel opens on "Changes since approval", not on "Properties" | The approver decides by looking at what changed; valid until 2027-06-30, when the comparison becomes its own tab |
 
-## Layout e regiões
+## Layout & Regions
 
-- **Cabeçalho do produto** (56 px): logo, busca global por número de contrato ou razão social, avatar. Nada de ação de página aqui.
-- **Menu lateral** (240 px, recolhe para 64 px): as seis áreas.
-- **Cabeçalho da página**: migalha, título (o único `h1`), metadado curto (situação, vencimento) e a ação primária à direita.
-- **Conteúdo**: lista, documento ou editor.
-- **Painel lateral** (420 px, sobre o conteúdo, sem escurecer a página): detalhe rápido sem sair da lista; fecha com Esc e devolve o foco à linha.
+- **Product header** (56 px): logo, global search by order number or supplier name, avatar. No page actions here.
+- **Side menu** (240 px, collapses to 64 px): the six areas.
+- **Page header**: breadcrumb, title (the only `h1`), short metadata (status, delivery date) and the primary action on the right.
+- **Content**: list, document or editor.
+- **Side panel** (420 px, over the content, without dimming the page): quick detail without leaving the list; closes with Esc and returns focus to the row.
 
-## Ações
+## Actions
 
-- Uma ação primária (botão cheio) por região, no canto superior direito do cabeçalho da página: "Novo contrato", "Registrar reajustes selecionados", "Aprovar minuta" (padrões `action-placement` e `button-hierarchy`).
-- Secundárias em botão contornado ao lado da primária, no máximo duas; o resto vai no menu "Mais ações".
-- Ações por linha aparecem como ícone com rótulo acessível e dica ao passar o mouse; no máximo três por linha.
-- Destrutiva com rótulo específico: "Encerrar contrato", "Descartar minuta". Nunca "Confirmar", "OK" ou "Sim" (padrões `destructive-action` e `confirm-deletion`).
-- Ação que a pessoa não pode executar por permissão fica **escondida**; ação que ela poderá executar depois de cumprir uma condição fica **visível e desabilitada com o motivo ao lado** ("Aprovar minuta — falta a revisão do jurídico"; padrão `disabled-button`).
+- One primary action (filled button) per region, in the top-right corner of the page header: "New order", "Create orders from selected", "Approve order" (patterns `action-placement` and `button-hierarchy`).
+- Secondary actions as outlined buttons next to the primary, at most two; the rest goes into the "More actions" menu.
+- Row actions appear as icons with an accessible name and a tooltip; at most three per row.
+- Destructive actions with a specific label: "Cancel order", "Discard draft". Never "Confirm", "OK" or "Yes" (patterns `destructive-action` and `confirm-deletion`).
+- An action the person cannot run because of permissions is **hidden**; an action they will be able to run after meeting a condition is **visible and disabled with the reason next to it** ("Approve order — waiting for the budget check"; pattern `disabled-button`).
 
-## Feedback e estados
+## Feedback & States
 
-- Sucesso: toast de 6 s com o que aconteceu e, quando reversível, "Desfazer" ("Reajuste registrado em 14 contratos. Desfazer"; padrões `toast-vs-inline-alert`, `toast-duration` e `undo`).
-- Erro de campo: abaixo do campo, ao sair dele. Erro de sistema: alerta no topo do conteúdo, com "Tentar de novo" e o que já foi salvo.
-- Carregando: esqueleto com a forma da tela quando a espera passa de 1 s; antes disso, nada (padrão `skeleton-vs-spinner`).
-- Vazio: diz por que está vazio e oferece o próximo passo. Lista vazia por filtro tem "Limpar filtros", nunca o convite de primeiro uso (padrões `empty-state` e `no-search-results`).
-- Sem acesso: página com o nome da área, o motivo e quem concede o acesso.
+- Success: 6 s toast saying what happened and, when reversible, "Undo" ("12 orders created. Undo"; patterns `toast-vs-inline-alert`, `toast-duration` and `undo`).
+- Field error: below the field, on blur. System error: alert at the top of the content, with "Try again" and what was already saved.
+- Loading: a skeleton shaped like the screen when the wait passes 1 s; before that, nothing (pattern `skeleton-vs-spinner`).
+- Empty: says why it is empty and offers the next step. A list empty because of a filter has "Clear filters", never the first-use invitation (patterns `empty-state` and `no-search-results`).
+- No access: page with the area name, the reason and who grants access.
 
-| Tipo de tela | Vazio | Erro |
+| Screen type | Empty | Error |
 |---|---|---|
-| Lista operacional | "Nenhum contrato vence nos próximos 60 dias." | Alerta acima da tabela; a tabela anterior continua visível |
-| Editor com painel | Não se aplica (sempre há texto) | Alerta no cabeçalho; o texto digitado nunca é descartado |
-| Página pública de decisão | — | Página com o contato do analista responsável |
+| Operational list | "No orders are late this week." | Alert above the table; the previous table stays visible |
+| Editor with panel | Not applicable (there is always an order) | Alert in the header; typed changes are never discarded |
+| Public decision page | — | Page with the contact of the responsible buyer |
 
-## Formulários
+## Forms
 
-- Rótulo sempre visível acima do campo; o exemplo vai no texto de apoio, nunca só no placeholder (padrão `label-vs-placeholder`).
-- Quase todos os campos são obrigatórios, então se marca o que é **opcional** (padrão `required-fields`).
-- Até 5 campos e uma decisão: diálogo ("Registrar reajuste"; padrão `when-to-use-modal`). Mais que isso, ou com etapas que dependem umas das outras: página ou assistente ("Novo contrato").
-- Valor monetário com máscara de real e duas casas; data no formato dd/mm/aaaa com calendário opcional.
-- O botão de envio nunca fica desabilitado para impedir erro: ao clicar com pendência, o foco vai ao primeiro campo com problema.
+- Label always visible above the field; the example goes in the helper text, never only in the placeholder (pattern `label-vs-placeholder`).
+- Almost every field is required, so the **optional** ones are marked (pattern `required-fields`).
+- Up to 5 fields and one decision: dialog ("Record delivery"; pattern `when-to-use-modal`). More than that, or steps that depend on each other: page or wizard ("New order").
+- Amounts with the currency mask and two decimals; dates as yyyy-mm-dd with an optional calendar.
+- The submit button is never disabled to prevent errors: on click with pending issues, focus moves to the first field with a problem.
 
-## Conteúdo e microcopy
+## Content & Microcopy
 
-- Glossário: a tabela abaixo (`content.glossary: inline`). "Contrato", "aditivo", "minuta", "reajuste" e "renovação" têm um único sentido cada.
+- Glossary: the table below (`content.glossary: inline`). "Order", "requisition", "supplier", "approval" and "delivery" have one meaning each.
 
-| Termo | Significado | Nunca chamar de |
+| Term | Meaning | Never call it |
 |---|---|---|
-| Contrato | Acordo comercial vigente com um varejista ou fornecedor | "acordo", "pedido" |
-| Aditivo | Instrumento que altera um contrato vigente | "adendo", "anexo" |
-| Minuta | Rascunho editável de um aditivo ou contrato | "rascunho", "documento" |
-| Reajuste | Atualização anual do preço pelo índice do contrato | "aumento", "correção" |
-| Renovação | Prorrogação do contrato por novo período | "extensão", "renovamento" |
-| Aceite | Concordância do cliente com a renovação, pela página pública | "aprovação", "assinatura" |
-| Modelo | Minuta-base aprovada pelo jurídico | "template", "padrão" |
-| Situação | Fase do contrato (vigente, em negociação, encerrado) | "status" |
-- Botões com verbo + objeto: "Registrar reajuste", "Enviar para aceite", "Aprovar minuta".
-- Termos de implementação nunca aparecem: tenant, payload, job, status_code, null, ERP_ID.
-- Tom direto, na segunda pessoa implícita: "Revise o novo valor antes de enviar."
-- Fórmula de erro: o que houve + o que fazer ("Não foi possível calcular o reajuste: o contrato não tem índice. Defina o índice na aba Resumo.").
-- Fórmula de confirmação destrutiva: consequência + o que não volta ("O contrato CT-2026-0412 deixa de gerar cobranças a partir de 01/11/2026. Esta ação não pode ser desfeita.").
+| Order | Purchase order sent to one supplier | "PO request", "ticket" |
+| Requisition | Internal request that becomes one or more orders | "demand", "request form" |
+| Supplier | Company that sells to us | "vendor account", "partner" |
+| Approval | Sign-off of an order above the spending limit | "authorization", "sign-off form" |
+| Delivery | Goods received against an order line | "arrival", "receipt event" |
+| Confirmation | Supplier's acceptance of an order, on the public page | "acknowledgement", "signature" |
+| Catalog | Approved items with their price lists | "inventory", "products" |
+| Status | Stage of the order (draft, sent, confirmed, delivered) | "state" |
+- Buttons with verb + object: "Create order", "Send to supplier", "Approve order".
+- Implementation terms never appear: tenant, payload, job, status_code, null, ERP_ID.
+- Direct tone, implicit second person: "Check the final quantity before sending."
+- Error formula: what happened + what to do ("Couldn't send the order: the supplier has no email. Add one in the Suppliers area.").
+- Destructive confirmation formula: consequence + what does not come back ("Order PO-2026-0412 will stop being sent to the supplier. This can't be undone.").
 
-## Fluxos
+## Flows
 
-| Jornada | Início → fim | Passos | Troca de canal |
+| Journey | Start → end | Steps | Channel switch |
 |---|---|---|---|
-| Tratar vencimento | Início → contrato → enviar para aceite | 5 | E-mail ao cliente com link para `/aceite/:token` |
-| Reajuste em lote | Reajustes → selecionar → registrar → conferir | 4 | — |
-| Aditivo | Contrato → nova minuta → revisão jurídica → aprovação | 8 | Notificação à advogada |
-| Novo contrato | Contratos → assistente (4 etapas) → contrato criado | 6 | — |
+| Chase a late order | Home → order → send reminder | 5 | Email to the supplier with a link to `/confirm/:token` |
+| Batch orders | Requisitions → select → create orders → review | 4 | — |
+| Approval | Order → approval request → approver review → approved | 8 | Notification to the approver |
+| New order | Orders → wizard (4 steps) → order created | 6 | — |
 
-Limites: nenhuma jornada passa de 10 passos; nunca mais de um diálogo aberto; o aceite pelo cliente termina numa página que diz o que acontece depois e com quem falar.
+Limits: no journey goes past 10 steps; never more than one dialog open; zero dead ends — the supplier confirmation ends on a page that says what happens next and whom to contact.
 
-## Faça e não faça
+## Do's and Don'ts
 
-### Faça
+### Do
 
-- Devolva a lista com filtros, página e linha de origem ao voltar do detalhe — 3 chamados por semana pediam isso antes da mudança.
-- Mostre o valor antigo, o índice e o valor novo lado a lado antes de registrar um reajuste no diálogo "Registrar reajuste".
-- Abra o editor de minuta (`/minutas/:id`) com as diferenças em relação ao modelo à vista; a advogada aprova olhando o que mudou.
-- Use o número do contrato como título do detalhe e na migalha.
+- Restore the list with filters, page and origin row when coming back from the detail — 3 support tickets per week asked for this before the change.
+- Show the old price, the catalog price and the new total side by side before creating orders in the "Create orders from selected" dialog.
+- Open the order editor (`/orders/:id/edit`) with the changes since approval in view; the approver decides by looking at what changed.
+- Use the order number as the detail title and in the breadcrumb.
 
-### Não faça
+### Don't
 
-- Não use diálogo de confirmação para ação reversível; ofereça "Desfazer" no toast. O diálogo antigo em "Arquivar" era confirmado sem leitura.
-- Não empilhe diálogo sobre diálogo: "Adicionar responsável" de dentro de "Registrar reajuste" fazia a pessoa perder o reajuste digitado.
-- Não mostre o código do ERP (`ERP_ID`) nem a situação técnica de integração na tela do analista.
-- Não esconda o botão "Aprovar minuta" quando falta uma condição; deixe visível, desabilitado, com o motivo.
+- Don't use a confirmation dialog for a reversible action; offer "Undo" in the toast. The old "Archive" dialog was confirmed without reading.
+- Don't stack a dialog on a dialog: "Add approver" from inside "Record delivery" made people lose the delivery they had typed.
+- Don't show the ERP code (`ERP_ID`) or the technical integration status on the buyer's screen.
+- Don't hide the "Approve order" button when a condition is missing; keep it visible, disabled, with the reason.
 
-## Instruções para agentes
+## Agent Instructions
 
-- Consulte este arquivo antes de criar ou rearranjar qualquer tela do Pactum; ache o arquétipo da tela na seção "Arquétipos de tela" e leia o cartão correspondente.
-- Preserve: uma primária por região no topo direito, menu lateral com as seis áreas, filtros na URL, retorno visível em toda tela não raiz.
-- Tela nova sem arquétipo na tabela: proponha o arquétipo e registre a linha antes de construir.
-- Mudou comportamento de UI (tela, arquétipo, política, fluxo, estado): atualize este arquivo no mesmo commit, suba `version` (política ou arquétipo → menor; só texto → patch) e `updated`.
-- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md --score` (com `--map` e `--screens`) e `node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md`, e rode o ux-lint de tela e de fluxo sobre as capturas; achado de severidade 3 ou 4 bloqueia a entrega.
+- Read this file before creating or rearranging any Purchasing screen; find the screen's archetype in "Screen Archetypes" and read the matching card.
+- Preserve: one primary per region in the top right, side menu with the six areas, filters in the URL, a visible way back on every non-root screen.
+- A new screen without an archetype in the table: propose the archetype and add the row before building.
+- UI behavior changed (screen, archetype, policy, flow, state): update this file in the same commit, bump `version` (policy or archetype → minor; text only → patch) and `updated`.
+- Validate with `node <DSX>/tools/lint-ux-md.mjs UX.md --score` (with `--map` and `--screens`) and `node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md`, and run the screen and flow ux-lint on the captures; a severity 3 or 4 finding blocks the delivery.

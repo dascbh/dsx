@@ -17,10 +17,10 @@ Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não 
    ```bash
    node tools/ux-lint/text.mjs --screens <pasta-de-capturas> --code <pastas-do-front> <pastas-de-vocabulário> --ux UX.md [--ignore <arquivo.html>] [--json]
    ```
-   Sem capturas, gere-as antes (skill `code-to-stitch` no projeto, ou qualquer HTML renderizado).
+   Sem capturas, gere-as antes (skill `capture-from-code`, ou qualquer HTML renderizado).
 2. Leia o resumo por regra e o ranking "Textos mais problemáticos" (severidade × número de telas). Priorize por severidade e frequência: texto da navegação ou do cabeçalho, que aparece em todas as telas, vem primeiro.
 3. Corrija **na origem** (`arquivo:linha` do relatório), uma vez: o vocabulário ou o template, não a captura. Um achado com "variantes do mesmo template" se resolve numa linha só.
-4. Ignore a seção "Provável dado": ali a marca veio do conteúdo interpolado (nome de minuta, pessoa, categoria), não do texto da interface.
+4. Ignore a seção "Provável dado": ali a marca veio do conteúdo interpolado (nome de pedido, pessoa, categoria), não do texto da interface.
 5. Para reescrever cada achado, use os antes/depois de `knowledge/fundamentos/marcas-de-texto-gerado.md`. As marcas que a ferramenta não acusa (tríades, "não só … mas também", adjetivos genéricos) entram na revisão manual abaixo.
 6. Rode de novo depois de corrigir e recapturar: o número de achados da interface deve cair, sem achado novo.
 

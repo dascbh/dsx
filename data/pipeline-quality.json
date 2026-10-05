@@ -1,0 +1,228 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-10-05",
+  "description": "UI quality metrics, UX quality dimensions and the separate design-system adherence verdict of the Forward unified product pipeline (forward spec/product-pipeline.md, 'UI quality: five mother metrics' and 'UX quality: equivalent journey measures'; spec/design-system-lifecycle.md, 'Separate adherence verdict'), with the DSX rules, measures and tools that feed each one. Source of the quality sections of tools/ux-lint/audit.mjs and of tools/ux-lint/criteria.mjs. Principle ids are the Forward catalog (heuristic_principles in forward spec/dimensions/quality-attributes.toml); DSX rules are probes that cite them, never a parallel catalog.",
+  "source": {
+    "spec": "forward/spec/product-pipeline.md",
+    "spec_date": "2026-09-30",
+    "ds_spec": "forward/spec/design-system-lifecycle.md",
+    "principles": "forward/spec/dimensions/quality-attributes.toml"
+  },
+  "aggregation": "none: every metric, dimension and criterion gets its own verdict; there is no score or weighted average, and a raw rule count is a diagnostic, never a verdict",
+  "verdicts": {
+    "pass": "a declared criterion was measured against its target with admissible evidence and met it",
+    "fail": "a declared criterion was measured and missed its target, or a blocking finding is open against it",
+    "unknown": "no criterion, no baseline where the target needs one, no measurement, or only synthetic evidence; never silently pass",
+    "not-applicable": "declared not applicable with a reason (for example a backend-only objective)"
+  },
+  "evidence_classes": {
+    "observed": "measured on the artifact itself: a probe, detector or script run on captures, geometry, the flow map or a browser journey",
+    "expert-inferred": "a reviewer's judgment citing a named principle (I8); labeled as inference, not measurement",
+    "human": "observed behaviour of real participants or production telemetry within privacy bounds",
+    "synthetic": "simulated users, agent runs or generated data; generates hypotheses, never passes a criterion (Forward fde-design 'User validation', USE-14)"
+  },
+  "verification_modes": {
+    "automatic": "a DSX detector or measure answers most of the question from captures, geometry or the flow map",
+    "mixed": "automatic probes answer part; the rest needs expert judgment against the cited principles",
+    "judgment": "expert review against named principles; automatic signals are diagnostics only",
+    "human": "only observed people (or production telemetry) can answer it; agent completion is not evidence (USE-14)"
+  },
+  "criterion_fields": {
+    "required": ["id", "kind", "metric", "scenario", "baseline", "target", "counter-metric", "method", "sample", "decision"],
+    "ui_scope": ["surface", "state", "viewport"],
+    "ux_scope": ["population", "journey"],
+    "optional": ["register", "reference", "volume", "probe", "principles", "evidence"],
+    "kinds": ["ui", "ux", "ds"]
+  },
+  "probes": {
+    "words": { "unit": "words", "source": "captures", "detail": "visible words of the surface capture (tools/ux-lint/variations.mjs measureCapture: content without header/nav, dialog only when one is open)" },
+    "primary-actions": { "unit": "actions", "source": "captures", "detail": "visible primary actions on the surface capture (UX.md selectors.primary)" },
+    "dialog-open": { "unit": "0/1", "source": "captures", "detail": "1 when the surface capture shows an open dialog" },
+    "journey-steps": { "unit": "transitions", "source": "flow map", "detail": "transitions of the declared journey in .dsx/maps/flows-<module>.json" },
+    "open-findings": { "unit": "findings", "source": "findings registry", "detail": "open findings of the rules named after the colon (open-findings:T1,L1) on the surface, or of the metric's DSX rules when no rule is named" }
+  },
+  "ui_metrics": [
+    {
+      "id": "information-density",
+      "name": "Information density",
+      "operational_measure": "Relevant information per visible area; scan/task time at realistic volume; overflow and zoom behaviour.",
+      "gate_question": "Can the intended user find needed information within the declared bound without losing readability?",
+      "evidence": ["register and reference surface", "screenshots at realistic volume (20+ rows, long names)", "task probes", "200% zoom check"],
+      "caveat": "More density is not automatically better: the register decides.",
+      "principles": ["USE-8", "USE-7", "USE-6"],
+      "dsx_rules": ["L4", "L7", "L9", "X3", "X4"],
+      "dsx_measures": ["words (variations measureCapture)", "geometry first fold (tools/ux-lint/measure.mjs)", "UX.md register and archetype regions"],
+      "verification": "mixed",
+      "automatic": "words per surface, line length (L7), alignment (L4), archetype regions present (L9)",
+      "judgment": "relevance of what is shown for the job; density against the register; realistic volume",
+      "human": "scan/task time when the bound is a time",
+      "dimensions": ["layout", "text", "cognitive-laws"]
+    },
+    {
+      "id": "semantic-economy",
+      "name": "Semantic economy",
+      "operational_measure": "Duplicate labels/concepts, unexplained terms, competing synonyms, text needed to identify an object or action.",
+      "gate_question": "Is each term necessary, consistent with the glossary and comprehensible?",
+      "evidence": ["real microcopy from captures", "UX.md glossary and forbidden terms", "task confusion observations"],
+      "caveat": "Shorter is not automatically better.",
+      "principles": ["USE-2", "USE-3", "USE-7", "USE-9", "DOM-2"],
+      "dsx_rules": ["X1", "X1b", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "T6", "T7", "C1", "C3"],
+      "dsx_measures": ["glossary per module (content.glossary)", "synonym detection (C1, C3)"],
+      "verification": "mixed",
+      "automatic": "implementation terms, forbidden terms, synonyms between screens, generated-text marks",
+      "judgment": "whether a term is necessary and comprehensible to the persona",
+      "human": "comprehension failures in usability sessions",
+      "dimensions": ["text", "consistency"]
+    },
+    {
+      "id": "action-topology",
+      "name": "Action topology",
+      "operational_measure": "Primary actions per task, distance and order from context to action, navigation depth and recovery reachability.",
+      "gate_question": "Are actions located at the correct object/cardinality and decision point, with one primary action per screen?",
+      "evidence": ["flow-to-UI parity", "realistic task traces", "primary action count per region"],
+      "principles": ["USE-8", "DOM-1", "USE-4", "USE-11"],
+      "dsx_rules": ["T1", "T2", "T5", "L1", "L6", "F1", "F4", "F5"],
+      "dsx_measures": ["primary-actions (variations)", "clicks_to_done and decisions (variations manifest)", "flow map depth"],
+      "verification": "mixed",
+      "automatic": "primary actions per region, declared position, destructive labels, exits and back paths",
+      "judgment": "object/cardinality placement (DOM-1) and decision-point placement",
+      "human": "none required unless the criterion is discoverability",
+      "dimensions": ["actions", "navigation", "flows"]
+    },
+    {
+      "id": "visual-hierarchy-alignment",
+      "name": "Visual hierarchy alignment",
+      "operational_measure": "Order, emphasis and grouping of job-critical information versus the intended reading/decision sequence.",
+      "gate_question": "Does prominence match task priority and domain grouping across states?",
+      "evidence": ["annotated screenshots", "focus and heading order", "a cited hierarchy principle"],
+      "principles": ["USE-8", "USE-1"],
+      "dsx_rules": ["T3", "L2", "L3", "L5", "L6"],
+      "dsx_measures": ["geometry: visual weight in the first fold, heading scale, proximity (tools/ux-lint/measure.mjs)"],
+      "verification": "mixed",
+      "automatic": "single h1, heading scale, competing emphasis, proximity, primary above the fold",
+      "judgment": "whether the emphasized element is the job-critical one in each state",
+      "human": "none required unless the criterion is a reading sequence",
+      "dimensions": ["hierarchy", "layout"]
+    },
+    {
+      "id": "interaction-friction",
+      "name": "Interaction friction",
+      "operational_measure": "Unnecessary steps, repeated input, context switches, errors, recovery effort and latency.",
+      "gate_question": "Does the task stay within its declared effort and response bounds, including failure and resume?",
+      "evidence": ["browser journeys (evals/journeys)", "timings", "keyboard and race probes"],
+      "principles": ["USE-4", "USE-5", "USE-13"],
+      "dsx_rules": ["F3", "T4", "S2", "S3"],
+      "dsx_measures": ["journey-steps (flow map)", "steps, clicks_to_done, dialogs, decisions (variations manifest)"],
+      "verification": "mixed",
+      "automatic": "journey length, dialogs per step, labelled fields, error exits",
+      "judgment": "unnecessary steps and repeated input",
+      "human": "latency and time on task need a running build or telemetry",
+      "dimensions": ["flows", "forms", "states"]
+    }
+  ],
+  "ux_dimensions": [
+    {
+      "id": "task-effectiveness",
+      "name": "Task effectiveness",
+      "baseline_measure": "Completion and correct domain outcome per actor/scenario, including error and resume.",
+      "gate_question": "Does each actor reach the correct domain outcome in each declared scenario, error and resume included?",
+      "evidence": ["journey assertions (evals/journeys/<demand-id>/*.journey.toml)", "observed human completion when validating discoverability"],
+      "principles": ["DOM-3", "DOM-7", "USE-14"],
+      "dsx_rules": ["F1", "F0", "S2"],
+      "dsx_measures": ["flow map journeys", "state captures"],
+      "verification": "human",
+      "automatic": "dead ends and broken transitions in the map; missing error exits",
+      "judgment": "whether the domain outcome is the correct one (DOM-3)",
+      "human": "completion by unprepared people; an agent completing the journey only proves the path exists",
+      "dimensions": ["flows", "states"]
+    },
+    {
+      "id": "cognitive-economy",
+      "name": "Cognitive economy",
+      "baseline_measure": "Decisions, terminology interpretations, recall burden, comprehension failures.",
+      "gate_question": "Does the journey ask for no more decisions, interpretations and recall than the intended model declares?",
+      "evidence": ["intended model (specs/<demand-id>/design/intended-model.md)", "blind walkthrough divergence (USE-15)", "human observations or a cited heuristic, labeled"],
+      "principles": ["USE-5", "USE-2", "USE-13", "USE-15"],
+      "dsx_rules": ["C1", "C3", "X11", "T6"],
+      "dsx_measures": ["decisions (variations manifest)", "glossary"],
+      "verification": "judgment",
+      "automatic": "synonyms and implementation terms (diagnostic)",
+      "judgment": "decisions and recall burden against the intended model",
+      "human": "comprehension failures",
+      "dimensions": ["text", "consistency", "information-architecture", "cognitive-laws", "heuristics"]
+    },
+    {
+      "id": "journey-topology",
+      "name": "Journey topology",
+      "baseline_measure": "Steps, handoffs, dead ends, responsibility and recovery paths.",
+      "gate_question": "Does every journey have valid exits, a recovery path and, at each handoff, recipient context, notification and deadline?",
+      "evidence": ["flow coverage (tools/ux-lint/blueprint.mjs check)", "recipient context, notification/deadline and valid exits"],
+      "principles": ["DOM-4", "DOM-5", "USE-4"],
+      "dsx_rules": ["F1", "F2", "F3", "F4", "F5"],
+      "dsx_measures": ["journey-steps", "blueprint coverage"],
+      "verification": "automatic",
+      "automatic": "exits, back paths, journey length, stacked dialogs, screens outside journeys, blueprint orphans",
+      "judgment": "handoff context and deadlines",
+      "human": "none required",
+      "dimensions": ["flows", "navigation", "information-architecture"]
+    },
+    {
+      "id": "expectation-feedback-alignment",
+      "name": "Expectation/feedback alignment",
+      "baseline_measure": "Predicted versus actual state/result; feedback visibility and time.",
+      "gate_question": "Does every action show its result and state change within the declared time, as the intended model predicts?",
+      "evidence": ["state transitions (state captures)", "latency checks", "error messaging", "walkthrough perceived vs intended model"],
+      "principles": ["USE-1", "USE-9", "USE-15"],
+      "dsx_rules": ["S1", "S2", "S3"],
+      "dsx_measures": ["state captures (<nn>-<screen>.<state>.html)", "behaviour before/after frames (variations)"],
+      "verification": "mixed",
+      "automatic": "required states captured, error guidance, exits from empty/error",
+      "judgment": "predicted versus shown result",
+      "human": "latency in a running build",
+      "dimensions": ["states", "heuristics"]
+    },
+    {
+      "id": "effort-and-recovery",
+      "name": "Effort and recovery",
+      "baseline_measure": "Time on task, repeated entry, error frequency, abandonment and recovery cost.",
+      "gate_question": "Do time, repeated entry, errors and recovery cost stay within the declared bounds, by keyboard too?",
+      "evidence": ["timed tasks", "keyboard and accessibility probes", "production telemetry with privacy bounds"],
+      "principles": ["USE-4", "USE-6", "USE-13"],
+      "dsx_rules": ["T4", "T5", "S2", "S3", "L8"],
+      "dsx_measures": ["clicks_to_done (variations)", "target size (L8)"],
+      "verification": "human",
+      "automatic": "labelled fields, destructive labels, error guidance, target size",
+      "judgment": "recovery cost of each error path",
+      "human": "time on task, abandonment",
+      "dimensions": ["forms", "states", "accessibility", "dark-patterns"]
+    }
+  ],
+  "ds_adherence": {
+    "separate": true,
+    "rule": "Design-system adherence has its own verdict per changed consumer (pass/fail/unknown/not-applicable, with foundation revision, scope and evidence). Passing adherence cannot compensate for a poor task topology; passing UI quality cannot excuse unexplained DS drift.",
+    "principles": ["MNT-5", "MNT-11", "USE-3", "USE-6", "USE-11"],
+    "checks": [
+      { "id": "tokens-and-kit", "name": "Tokens and kit", "evidence": "consumer/source diff, raw-value and duplicate search with documented exceptions", "dsx_tools": ["tools/lint-raw-values.mjs", "tools/lint-design-md.mjs", "skill auditar-ds"], "dsx_rules": [] },
+      { "id": "semantics", "name": "Semantics", "evidence": "glossary, status/action meaning, object/cardinality, allowed composition", "dsx_tools": ["UX.md glossary", "skill auditar-ds"], "dsx_rules": ["C2"] },
+      { "id": "rendered-parity", "name": "Rendered parity", "evidence": "approved reference/wireframe comparison across affected states, themes and viewports", "dsx_tools": ["captures", "tools/stitch/analyze-html.mjs"], "dsx_rules": [] },
+      { "id": "interaction-accessibility", "name": "Interaction and accessibility", "evidence": "keyboard/focus/zoom, APG contract, axe, recovery/race probes", "dsx_tools": ["tools/contrast.mjs", "skill acessibilidade"], "dsx_rules": ["L8"] },
+      { "id": "adoption", "name": "Adoption", "evidence": "consumer list, migrations/deprecations, rollback and explicit debt against the declared revision scope", "dsx_tools": ["design/foundation.md drift/debt log"], "dsx_rules": [] }
+    ]
+  },
+  "dimension_map": {
+    "text": { "ui": ["semantic-economy", "information-density"], "ux": ["cognitive-economy"], "ds": false },
+    "actions": { "ui": ["action-topology"], "ux": ["effort-and-recovery"], "ds": false },
+    "layout": { "ui": ["information-density", "visual-hierarchy-alignment"], "ux": [], "ds": true },
+    "hierarchy": { "ui": ["visual-hierarchy-alignment"], "ux": [], "ds": false },
+    "information-architecture": { "ui": ["action-topology"], "ux": ["journey-topology", "cognitive-economy"], "ds": false },
+    "navigation": { "ui": ["action-topology"], "ux": ["journey-topology"], "ds": false },
+    "flows": { "ui": ["interaction-friction"], "ux": ["task-effectiveness", "journey-topology"], "ds": false },
+    "forms": { "ui": ["interaction-friction"], "ux": ["effort-and-recovery"], "ds": false },
+    "states": { "ui": ["interaction-friction"], "ux": ["expectation-feedback-alignment", "effort-and-recovery", "task-effectiveness"], "ds": false },
+    "consistency": { "ui": ["semantic-economy"], "ux": ["cognitive-economy"], "ds": true },
+    "accessibility": { "ui": [], "ux": ["effort-and-recovery"], "ds": true },
+    "heuristics": { "ui": [], "ux": ["cognitive-economy", "expectation-feedback-alignment"], "ds": false, "note": "supporting knowledge: Nielsen heuristics justify findings that cite USE principles" },
+    "cognitive-laws": { "ui": ["information-density"], "ux": ["cognitive-economy"], "ds": false, "note": "supporting knowledge: UX laws size findings, they do not decide verdicts" },
+    "dark-patterns": { "ui": [], "ux": ["effort-and-recovery"], "ds": false }
+  }
+}

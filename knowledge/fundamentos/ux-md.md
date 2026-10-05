@@ -45,13 +45,13 @@ navigation:
   max-depth: 3                            # níveis a partir da entrada do módulo
   back: mandatory                         # mandatory | optional — mandatory: toda tela não raiz tem caminho de volta visível
 archetypes:                               # tipo de tela → rotas/telas do produto (ids de archetypes/)
-  operational-list: ["/contratos"]
-  editor-with-panel: ["/contratos/minutas/:id"]
+  operational-list: ["/orders"]
+  editor-with-panel: ["/orders/:id/edit"]
 actions:
   primary-per-region: 1                   # máximo de ações primárias (botão cheio) por região
   primary-position: top-right             # top-right | bottom-right | inline
   dialog-order: cancel-action             # cancel-action (Cancelar à esquerda) | action-cancel
-  destructive-specific-label: true        # "Excluir minuta", nunca "Confirmar"/"OK"/"Sim"
+  destructive-specific-label: true        # "Excluir pedido", nunca "Confirmar"/"OK"/"Sim"
 confirmation:
   irreversible: dialog                    # dialog | type-name
   reversible: undo                        # undo | none
@@ -66,21 +66,25 @@ forms:
   validation: on-blur                     # on-blur | on-submit | realtime
   required: mark-required                 # mark-required | mark-optional
 content:
-  glossary: <caminho do glossário ou "inline">   # ou por módulo: { default: <caminho>, contratos: <caminho ou inline> }
-  buttons: verb-object                    # "Criar aditivo", não "OK"
+  glossary: <caminho do glossário ou "inline">   # ou por módulo: { default: <caminho>, purchasing: <caminho ou inline> }
+  buttons: verb-object                    # "Criar pedido", não "OK"
   forbidden: [snapshot, tenant, RLS]      # termos de implementação que nunca aparecem na tela
   proper-nouns: [Word, Excel]             # nomes próprios do domínio, fora da regra de caixa de título (X10)
 flows:
   max-journey-steps: 12
   max-stacked-dialogs: 1
   dead-ends: 0                            # telas (não diálogo) sem nenhuma saída
+paths:                                    # onde as ferramentas acham os artefatos (docs/project-paths.md); omitido = padrão do DSX
+  captures: .dsx/captures/<module>        # capturas <nn>-<tela>[.<estado>].html; <module> vira o módulo
+  code: [src]                             # pastas onde o texto nasce; sem isso, detectadas pela stack
 verification:                             # como o ux-lint reconhece o kit do projeto nas capturas
-  selectors:
+  kit: auto                               # perfil de seletores: auto | generic | mui | shadcn | chakra | antd | bootstrap (tools/ux-lint/lib/kits.mjs)
+  selectors:                              # cada chave declarada vence o perfil do kit
     regions: ["header", "nav", "aside", "main", "[role=dialog]"]
     dialog: "[role=dialog]"
-    dialog-footer: ".MuiDialogActions-root"   # opcional: onde ficam os botões do diálogo (T2); sem ele, o ux-lint infere
-    primary: ".MuiButton-contained"
-    destructive: ".MuiButton-containedError, .MuiButton-colorError"
+    dialog-footer: ".modal-footer"        # opcional: onde ficam os botões do diálogo (T2); sem ele, vale o do kit ou o ux-lint infere
+    primary: ".btn-primary"               # opcional: sem ele, vale o do kit
+    destructive: ".btn-danger"            # opcional: sem ele, vale o do kit
     button: "button, [role=button]"
     field: "input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]), textarea, select"
 deviations:                               # desvios aceitos (ver "Desvios declarados"); silenciam os achados cobertos
@@ -154,7 +158,7 @@ O drift não entra no registro de achados: ele diz que o **documento** está vel
 
 ## Glossário por módulo
 
-`content.glossary` aceita um caminho (`.md` com tabela de colunas "Termo" e "Nunca chamar de"/"Evitar"), `inline` (tabela no corpo do `UX.md`), um mapa termo → sinônimos, ou um **mapa por módulo**: `{ default: design/product.md, contratos: inline }`. O mapa é por módulo quando tem `default` ou quando todos os valores são caminhos `.md`, `inline` ou mapas. `consistency.mjs` (C3) e `text.mjs` escolhem a entrada pelo `--module` (a auditoria repassa o dela); módulo sem entrada usa `default`. No `text.mjs`, os termos canônicos com maiúscula no meio ("Radar Tributário") valem como nomes próprios no X10.
+`content.glossary` aceita um caminho (`.md` com tabela de colunas "Termo" e "Nunca chamar de"/"Evitar"), `inline` (tabela no corpo do `UX.md`), um mapa termo → sinônimos, ou um **mapa por módulo**: `{ default: design/product.md, purchasing: inline }`. O mapa é por módulo quando tem `default` ou quando todos os valores são caminhos `.md`, `inline` ou mapas. `consistency.mjs` (C3) e `text.mjs` escolhem a entrada pelo `--module` (a auditoria repassa o dela); módulo sem entrada usa `default`. No `text.mjs`, os termos canônicos com maiúscula no meio ("Ordem de Compra") valem como nomes próprios no X10.
 
 ## Seções do corpo (nesta ordem)
 
@@ -236,9 +240,9 @@ Corpo: **Quando usar** (SE → ENTÃO), **Mapa de regiões** (diagrama ASCII), *
 Entradas: capturas HTML das telas (ex.: skill de captura pelo código do projeto) e o mapa de fluxo `.dsx/maps/flows-<module>.json`:
 
 ```json
-{ "screens": [{ "id": "lista", "name": "Contratos", "type": "page", "route": "/contratos", "parent": null, "persona": "analista" }],
+{ "screens": [{ "id": "lista", "name": "Pedidos", "type": "page", "route": "/orders", "parent": null, "persona": "analista" }],
   "transitions": [{ "id": "t1", "from": "lista", "to": "detalhe", "trigger": { "type": "button", "label": "Abrir" }, "evidence": "src/Lista.tsx:42" }],
-  "journeys": [{ "id": "j1", "name": "Renovar contrato", "steps": ["t1", "t2"], "persona_switches": [] }] }
+  "journeys": [{ "id": "j1", "name": "Aprovar pedido", "steps": ["t1", "t2"], "persona_switches": [] }] }
 ```
 
 `type` da tela: `page`, `dialog`, `tab`, `panel` ou `drawer` (`dialog` e `modal` contam como diálogo nas regras F1/F4). O formato antigo (`telas`, `transicoes` com `de`/`para`, `gatilho {tipo, rotulo}`, `evidencia`, `jornadas` com `passos` e `trocas_persona`, tipo `dialogo`) é lido com aviso.
@@ -256,7 +260,7 @@ Saída (`--json`): achados com `rule`, `severity` (0–4, escala de `heuristicas
 
 O S2 procura a mensagem do estado (alerta de erro; no vazio, o texto "Nenhum…", "Ainda não…") e olha a região dela (`verification.selectors.regions`, ou o diálogo): abas, ordenação, campos e botões desabilitados não contam como saída. O S3 lê cada alerta de erro (na captura de erro, qualquer `role=alert`) e aceita a mensagem que tem verbo de próximo passo ("tente", "verifique", "peça", "de novo"…) ou uma ação dentro do próprio alerta, salvo quando o texto é só falha ou código.
 
-**Consistência (`tools/ux-lint/consistency.mjs`).** `node tools/ux-lint/consistency.mjs <pasta-de-capturas> [--ux UX.md] [--json]`. Compara o inventário de botões, títulos e abas de todas as capturas (o mesmo inventário do verificador de texto). Critério de "mesma ação" no C1: mesmo grupo de verbo — excluir/remover/apagar; salvar/gravar; criar/novo/adicionar; editar/alterar; baixar/exportar/download — sobre o mesmo objeto (a primeira palavra de conteúdo depois do verbo, sem plural; "Adicionar à minuta" tem destino, não objeto). Rótulo só com verbo pega o objeto do nome acessível ou do título do diálogo; sem objeto nenhum, fica fora. Cancelar/voltar/fechar só conta dentro de diálogo e com o mesmo papel: "dispensar" quando o rodapé tem ação principal, "fechar" quando não tem; o ✕ de ícone fica fora. O C2 compara o mesmo rótulo só no mesmo contexto: o gatilho na página ("Remover", texto) e a confirmação no diálogo ("Remover", cheio) têm papéis diferentes. O C3 usa o glossário (`content.glossary`: caminho de um `.md` com tabela de colunas "Termo" e "Nunca chamar de"/"Evitar", mapa termo → sinônimos, ou `inline` para a tabela no próprio UX.md) e uma lista curta de pares conhecidos (configurações × preferências, modelo × template…); termo de evitar que é termo canônico de outra linha não conta. Glossário de outro domínio do produto (ex.: o do Tributário aplicado a Contratos) gera falso positivo: declare o glossário do módulo (`content.glossary: { default: …, contratos: … }`, ver "Glossário por módulo") e rode com `--module`.
+**Consistência (`tools/ux-lint/consistency.mjs`).** `node tools/ux-lint/consistency.mjs <pasta-de-capturas> [--ux UX.md] [--json]`. Compara o inventário de botões, títulos e abas de todas as capturas (o mesmo inventário do verificador de texto). Critério de "mesma ação" no C1: mesmo grupo de verbo — excluir/remover/apagar; salvar/gravar; criar/novo/adicionar; editar/alterar; baixar/exportar/download — sobre o mesmo objeto (a primeira palavra de conteúdo depois do verbo, sem plural; "Adicionar à proposta" tem destino, não objeto). Rótulo só com verbo pega o objeto do nome acessível ou do título do diálogo; sem objeto nenhum, fica fora. Cancelar/voltar/fechar só conta dentro de diálogo e com o mesmo papel: "dispensar" quando o rodapé tem ação principal, "fechar" quando não tem; o ✕ de ícone fica fora. O C2 compara o mesmo rótulo só no mesmo contexto: o gatilho na página ("Remover", texto) e a confirmação no diálogo ("Remover", cheio) têm papéis diferentes. O C3 usa o glossário (`content.glossary`: caminho de um `.md` com tabela de colunas "Termo" e "Nunca chamar de"/"Evitar", mapa termo → sinônimos, ou `inline` para a tabela no próprio UX.md) e uma lista curta de pares conhecidos (configurações × preferências, modelo × template…); termo de evitar que é termo canônico de outra linha não conta. Glossário de outro domínio do produto (ex.: o de Finanças aplicado a Compras) gera falso positivo: declare o glossário do módulo (`content.glossary: { default: …, contratos: … }`, ver "Glossário por módulo") e rode com `--module`.
 
 Os dois escrevem `--json` em `snake_case`, que o registro de achados lê (`findings.mjs register --states st.json --consistency c.json`; famílias `states` e `consistency`, ids `st-` e `c-`).
 

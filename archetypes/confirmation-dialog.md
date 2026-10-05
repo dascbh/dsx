@@ -15,7 +15,7 @@ rules: [T1, T2, T5, T6, T7, F4]
 
 # Diálogo de confirmação
 
-"Excluir projeto", "Enviar 12 minutas para assinatura", "Revogar acesso de Ana", "Aplicar sugestões do agente a 300 itens". Confirmação existe para dar uma última chance consciente — e só funciona se for rara. Confirmar tudo treina a pessoa a clicar sem ler, e a confirmação que importava passa batida.
+"Excluir projeto", "Enviar 12 pedidos aos fornecedores", "Revogar acesso de Ana", "Aplicar sugestões do agente a 300 itens". Confirmação existe para dar uma última chance consciente — e só funciona se for rara. Confirmar tudo treina a pessoa a clicar sem ler, e a confirmação que importava passa batida.
 
 ## Quando usar
 

@@ -59,6 +59,10 @@ Ordem padrão (cada etapa destrava a seguinte):
 5. Escrever/atualizar DESIGN.md (skill `design-md`) e UX.md (skill `ux-md`) e conectar os dois aos agentes (skill `iniciar`, passo 6). A auditoria de comportamento por módulo é a skill `auditar-ux`.
 6. Colocar gates no CI: `tools/build-tokens.mjs --check`, `lint-raw-values`, `lint-ux-md` e `ux-md-drift.mjs`, axe.
 
+## Separate adherence verdict (Forward contract)
+
+Design-system adherence is a verdict of its own, separate from UI and UX quality (`data/pipeline-quality.json`, `ds_adherence`; Forward `design-system-lifecycle.md`). For each changed consumer give pass/fail/unknown/not-applicable with the pinned foundation revision, scope and evidence, per check: **tokens and kit** (raw-value and duplicate search with documented exceptions — `tools/lint-raw-values.mjs`), **semantics** (glossary, status/action meaning, object/cardinality; rule C2), **rendered parity** (reference/wireframe comparison across states, themes, viewports), **interaction and accessibility** (keyboard, focus, zoom, APG, axe; `tools/contrast.mjs`, rule L8) and **adoption** (consumers migrated, deprecations, rollback, explicit debt with owner and revisit trigger). No aggregate score compensates a failed check; maturity level and drift per 1,000 lines are diagnostics, not the verdict. Classify the state per subsystem (absent, implicit, fragmented, explicit) and record the inventory in the Forward discovery file `discovery/<objective>-design-system.md`, with the source revision of each item. When a cycle plan declares DS criteria (`kind: ds`), record the results as evidence for `audit.mjs --criteria` (`--evidence`).
+
 ## Saída
 
 ```
@@ -67,5 +71,6 @@ Drift: X ocorrências em Y linhas (Z/1000) — top 5 valores crus → token suge
 Componentes: N no kit; duplicatas: …; estados ausentes críticos: …
 Acessibilidade: bloqueadores: …
 Plano (máx. 8 itens, em ordem): item — esforço (P/M/G) — impacto
+DS adherence (separate verdict): tokens/kit <v> · semantics <v> · rendered parity <v> · interaction/a11y <v> · adoption <v> — foundation <path>@<sha>
 Métrica para acompanhar: drift/1000 linhas, % de telas usando só o kit, nota do DESIGN.md, nota do UX.md e % de telas com arquétipo
 ```

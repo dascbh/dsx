@@ -1,0 +1,153 @@
+# ============================================================================
+# ROLES
+# ============================================================================
+# Six roles. They are not job titles — each one exists because it has
+# DIFFERENT ACCESS (tools, context, artifacts). A role running the same model,
+# in the same context, with the same tools as another role is the same role in
+# a different hat, and the "architect" approves what they themselves designed.
+#
+# What produces real separation:
+#   1. write_scope   — enforced by the guard hook (loop tier) and charged by
+#                      the gate at commit everywhere else; the role CANNOT
+#                      write what is not its output
+#   2. isolation     — the role does not SEE the builder's reasoning
+#   3. inputs/outputs — handoff by artifact on disk (I7), not by conversation
+#
+# PM, PO, squad lead, and tech lead were deliberately collapsed. They exist in
+# human org charts because humans lack shared context. Agents have it. Keeping
+# them would be token overhead and one more point of intent degradation.
+# ============================================================================
+
+[meta]
+spec_version = "0.1.0"
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "spec"
+label = "Specification"
+purpose = """
+Plan the cycle: dated criteria and failure modes with ids, threat model,
+demand list, deploy plan. Then derive one-page demand specs that cite the
+plan's ids and decide nothing new (kernel ADR-0019). The measure exists BEFORE
+any code does.
+"""
+inputs = ["discovery/**", "backlog.md", "docs/adr/**", "fde.config.toml"]
+outputs = ["cycles/C-<n>/plan.md", "cycles/C-<n>/deploy.md", "specs/<demand-id>/spec.md",
+           "specs/<front-demand-id>/design/intended-model.md"]
+write_scope = ["specs/**", "discovery/**", "cycles/**", "backlog.md"]
+denied_paths = ["src/**", "tests/**", "infra/**"]
+isolation = false
+satisfies = ["I1", "I4"]
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "architecture"
+label = "Architecture"
+purpose = """
+Decide boundaries, contracts, and trade-offs in light of the weight vector,
+at cycle planning. Each ADR names the demands that realize it; the ADR is
+the only home of a decision (kernel ADR-0019). Produces recorded decisions, not
+code.
+"""
+inputs = ["cycles/**:read", "specs/**", "fde.config.toml", "src/**:read"]
+outputs = ["docs/adr/*.md",
+           "walkthroughs/<front-demand-id>/perceived-model-a.toml",
+           "walkthroughs/<front-demand-id>/perceived-model-b.toml",
+           "walkthroughs/<front-demand-id>/divergence.toml"]
+write_scope = ["docs/adr/**", "specs/**", "walkthroughs/**", "backlog.md", "cycles/*/board.md"]
+denied_paths = ["src/**", "tests/**"]
+isolation = false
+satisfies = ["I7"]
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "implementation"
+label = "Implementation"
+purpose = """
+Build the artifact and the corresponding suite. It is the only role with write
+access to production code. It does not judge its own delivery.
+"""
+inputs = ["specs/**", "docs/adr/**", "cycles/**:read"]
+outputs = ["src/**", "tests/**", "evals/**"]
+write_scope = ["src/**", "tests/**", "evals/**", "infra/**", "backlog.md", "cycles/*/board.md"]
+# specs/**/acceptance.md: per-demand criteria of a cycle opened before kernel ADR-0019
+denied_paths = ["cycles/*/plan.md", "cycles/*/deploy.md", "cycles/*/review.md",
+                "cycles/*/promotion.md", "reviews/**", "specs/**/acceptance.md"]
+denied_reason = "cannot rewrite the criteria it will be judged by, nor the findings against it"
+isolation = false
+satisfies = ["I1"]
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "adversarial"
+label = "Adversarial review"
+purpose = """
+Try to break it, then judge it. Receives artifact + spec, never the
+builder's context. Demand mode: the code against the demand spec and the
+cycle ADRs it cites. Cycle mode: functioning (every plan criterion end to
+end on the integrated result) and readiness (deploy plan, I5 signals,
+runbook); it never re-reviews a demand. Two passes with the same access: adversarial
+(demonstrate failure via probes) and heuristic (judge attributes whose
+verified_by includes heuristic against their principle catalog — every
+finding cites its principle, I8). Success is findings, not approval. It
+CANNOT fix what it found — a reviewer who silently fixes destroys the
+record of the finding.
+"""
+inputs = ["src/**:read", "specs/**:read", "cycles/**:read", "docs/adr/**:read",
+          "evals/**:read", "walkthroughs/**:read"]
+outputs = ["reviews/<demand-id>/findings.toml", "cycles/C-<n>/review.md"]
+write_scope = ["reviews/**", "cycles/**", "backlog.md"]
+denied_paths = ["src/**", "tests/**", "evals/**", "specs/**", "infra/**"]
+isolation = true                            # mandatory — I2
+isolation_mode = "worktree"
+context_policy = "artifact_only"
+probe_order = "derived_from_vector_A_weights"
+success_metric = "findings_by_severity"
+satisfies = ["I2", "I3", "I8"]
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "promotion"
+label = "Promotion"
+purpose = """
+Per cycle: confront plan.md's criteria with evidence and decide promotion.
+Checks declared criteria only; a new defect goes to backlog.md. Does not
+build, does not review. promotions/** only for a cycle opened before
+kernel ADR-0019 (rule 15).
+"""
+inputs = ["cycles/**:read", "specs/**:read", "reviews/**:read", "evals/**:read"]
+outputs = ["cycles/C-<n>/promotion.md", "backlog.md"]
+write_scope = ["cycles/**", "backlog.md", "promotions/**"]
+denied_paths = ["src/**", "tests/**", "evals/**", "specs/**", "reviews/**"]
+isolation = true
+isolation_mode = "worktree"
+satisfies = ["I4", "I5", "I6"]
+
+# ----------------------------------------------------------------------------
+[[role]]
+id = "walkthrough-evaluator"
+label = "Walkthrough evaluator"
+purpose = """
+Explore a running target cold, as a first-time visitor, and report what
+the interface communicates it is, what it implies you can do, and what
+happens if you do it. Never told the spec, the wireframe, the glossary,
+the code, or the builder's intent — structurally incapable of seeing any
+of it. Two independent instances of this role produce two perceived
+models; where they diverge on the same interface, that divergence is
+evidence about the artifact, never a claim about real users.
+"""
+inputs = ["target-url (supplied at invocation; not a repository artifact)"]
+outputs = ["perceived-model (returned as the run's own final message; nothing written to disk by this role)"]
+write_scope = []
+denied_paths = ["src/**", "tests/**", "evals/**", "infra/**", "specs/**",
+                "discovery/**", "docs/**", "reviews/**", "promotions/**",
+                "walkthroughs/**"]
+isolation = true
+isolation_mode = "fresh-agent"
+context_policy = "blind"
+tools = ["mcp__claude-in-chrome__navigate", "mcp__claude-in-chrome__computer",
+         "mcp__claude-in-chrome__find", "mcp__claude-in-chrome__form_input",
+         "mcp__claude-in-chrome__get_page_text", "mcp__claude-in-chrome__read_page",
+         "mcp__claude-in-chrome__resize_window", "mcp__claude-in-chrome__tabs_context_mcp",
+         "mcp__claude-in-chrome__tabs_create_mcp", "mcp__claude-in-chrome__tabs_close_mcp"]
+satisfies = []
