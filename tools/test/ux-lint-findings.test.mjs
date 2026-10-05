@@ -367,3 +367,13 @@ test('relink: a reworded detector message (pt-BR → English) keeps the register
   assert.equal(reg.items[0].message, '2 primary actions in the same region');
   assert.deepEqual(r.relinked.map((x) => x.to), [old.id]);
 });
+
+test('options: a preview declared on a case option survives the import', () => {
+  const reg = newRegistry();
+  const options = { items: {} };
+  const pv = [{ op: 'synthesize-state', state: 'field-error', text: 'Escreva a mensagem.' }];
+  const cases = [{ id: 'r-01', element: 'button', rule: 'H9', severity: 2, text: 'Enviar', screens: ['08-form'], problem: 'p',
+    options: [{ text: 'Deixar o botão ativo e mostrar o erro no campo', convention: 'x', preview: pv }], recommended: { index: 0, why: '' } }];
+  const r = importOptions(reg, options, cases, { now: day('01') });
+  assert.deepEqual(options.items[r.links[0].ids[0]].options[0].preview, pv);
+});

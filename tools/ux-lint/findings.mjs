@@ -459,7 +459,7 @@ export function importOptions(reg, options, input, { now = new Date() } = {}) {
     for (const id of ids) {
       options.items[id] = {
         problem: entry.problem ?? '',
-        options: (entry.options ?? []).map((o) => ({ text: o.text, convention: o.convention ?? '', note: o.note ?? '' })),
+        options: (entry.options ?? []).map((o) => ({ text: o.text, convention: o.convention ?? '', note: o.note ?? '', ...(o.preview !== undefined ? { preview: o.preview } : {}) })),
         recommended: entry.recommended ? { index: entry.recommended.index, why: entry.recommended.why ?? '' } : null,
         ...(entry.id ? { case: entry.id } : {}),
       };
