@@ -1,6 +1,6 @@
 ---
 id: ai-error-recovery
-title: Como oferecer recuperação quando a IA falha?
+title: How do you offer recovery when the AI fails?
 category: ai
 components: [alert, button, error-message]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["3.3.1", "3.3.3", "4.1.3", "1.4.1"]
 related: [retry, ai-uncertainty, confirm-ai-action, technical-error-code, helpful-error-message]
 ---
 
-# Como oferecer recuperação quando a IA falha?
+# How do you offer recovery when the AI fails?
 
-> **Regra:** Identifique a etapa que falhou, explique a causa em linguagem simples, preserve o pedido e o trabalho, e ofereça ao menos uma ação de recuperação específica no mesmo contexto.
+> **Rule:** Identify the step that failed, explain the cause in plain language, keep the request and the work, and offer at least one specific recovery action in the same context.
 
-## Contexto
+## Context
 
-Sistemas de IA falham por indisponibilidade, limite de uso, entrada extensa demais, fonte inacessível, permissão insuficiente, resposta interrompida ou erro de ferramenta. Reduzir tudo a um aviso genérico deixa a pessoa num beco sem saída.
+AI systems fail because of unavailability, usage limits, oversized input, an unreachable source, insufficient permission, an interrupted response or a tool error. Collapsing all of that into a generic notice leaves the person at a dead end.
 
-A interface deve explicar em linguagem acessível o que falhou e sugerir um passo seguinte à altura da causa, sem perder o trabalho feito. Quando a ação tem efeito externo, diga se algo foi executado, foi executado em parte ou nem começou, de modo a evitar duplicidade na repetição.
+The interface must explain in accessible language what failed and suggest a next step that fits the cause, without losing the work already done. When the action has an external effect, say whether something was executed, partly executed or never started, so that retrying does not duplicate it.
 
-## Decisão
+## Decision
 
-- **SE** a falha é temporária ou a resposta foi interrompida **ENTÃO** ofereça "Tentar novamente" ou "Gerar de novo" junto à resposta.
-- **SE** é limite de uso ou contexto excedido **ENTÃO** explique o limite e ofereça "Reduzir arquivos", "Iniciar nova conversa" ou aguardar.
-- **SE** a entrada é inválida **ENTÃO** ofereça "Editar pedido", apontando o problema.
-- **SE** a fonte ou conector falhou **ENTÃO** ofereça "Reconectar fonte" ou revisar permissões.
-- **SE** houve ação externa e o estado é incerto **ENTÃO** informe o estado e não ofereça repetir às cegas.
-- **SE** foi parcialmente concluída **ENTÃO** mostre o que foi feito e permita revisar antes de repetir.
-- **SE** repetir não basta **ENTÃO** ofereça alternativa (status do serviço, permissões, suporte).
-- **SE** há identificador técnico **ENTÃO** deixe-o em camada secundária, nunca como ação principal.
-- **SE** a recusa é de segurança ou política **ENTÃO** diga isso e permita ajustar o pedido; não a disfarce de erro técnico.
-- **SENÃO** preserve prompt, anexos e contexto.
+- **IF** the failure is temporary or the response was interrupted **THEN** offer "Try again" or "Regenerate" next to the response.
+- **IF** a usage limit or the context was exceeded **THEN** explain the limit and offer "Reduce files", "Start a new conversation" or waiting.
+- **IF** the input is invalid **THEN** offer "Edit request", pointing out the problem.
+- **IF** the source or connector failed **THEN** offer "Reconnect source" or reviewing permissions.
+- **IF** an external action happened and its state is uncertain **THEN** report the state and do not offer a blind retry.
+- **IF** it was partly completed **THEN** show what was done and allow review before retrying.
+- **IF** retrying is not enough **THEN** offer an alternative (service status, permissions, support).
+- **IF** there is a technical identifier **THEN** keep it in a secondary layer, never as the main action.
+- **IF** the refusal is for safety or policy reasons **THEN** say so and allow the request to be adjusted; do not disguise it as a technical error.
+- **ELSE** keep the prompt, attachments and context.
 
-## Quando usar
+## When to use
 
-- Interrupção na geração de texto, imagem, áudio, código ou análise.
-- Falha de ferramenta, agente, conector ou integração.
-- Limite de uso, excesso de contexto, capacidade indisponível.
-- Falha de autenticação, permissão ou conexão.
-- Ação com resultado incerto.
+- Interrupted generation of text, image, audio, code or analysis.
+- Failure of a tool, agent, connector or integration.
+- Usage limit, context overflow, capacity unavailable.
+- Authentication, permission or connection failure.
+- An action with an uncertain result.
 
-## Quando evitar
+## When to avoid
 
-- Mostrar erro enquanto o estado ainda carrega → **use em vez disso:** indicador de carregamento.
-- "Tentar novamente" com risco de duplicar efeito externo → **use em vez disso:** verificar o estado primeiro.
-- Código como única explicação → **use em vez disso:** mensagem contextual com código secundário.
+- Showing an error while the state is still loading → **use instead:** a loading indicator.
+- "Try again" with a risk of duplicating an external effect → **use instead:** check the state first.
+- A code as the only explanation → **use instead:** a contextual message with a secondary code.
 
-## Faça
+## Do
 
-- Nomeie o que falhou.
-- Use verbos específicos nos controles.
-- Mantenha a ação de recuperação junto da falha.
-- Preserve pedido, arquivos e trabalho.
+- Name what failed.
+- Use specific verbs on controls.
+- Keep the recovery action next to the failure.
+- Keep the request, files and work.
 
-## Evite
+## Avoid
 
-- "Algo deu errado" isolado.
-- Painel vazio ou carregamento infinito.
-- Repetir automaticamente ação externa sem esclarecer o estado.
-- Obrigar a recomeçar quando o contexto pode ser preservado.
-- Botão genérico sem consequência clara.
+- "Something went wrong" on its own.
+- An empty panel or endless loading.
+- Automatically retrying an external action without clarifying its state.
+- Forcing a restart when the context could be kept.
+- A generic button with no clear consequence.
 
-## Acessibilidade
+## Accessibility
 
-- Mensagem de erro em texto com nome acessível (WCAG 3.3.1) e sugestão de correção (WCAG 3.3.3).
-- Anuncie novas falhas em região ao vivo adequada, sem repetir a cada mudança irrelevante (WCAG 4.1.3).
-- Causa e próximo passo em texto, não só cor ou ícone (WCAG 1.4.1).
-- Ações com nomes explícitos e foco visível; não mova o foco durante a resposta em andamento.
-- Preserve conteúdo digitado e anexos.
+- Error message in text with an accessible name (WCAG 3.3.1) and a correction suggestion (WCAG 3.3.3).
+- Announce new failures in a suitable live region, without repeating on every irrelevant change (WCAG 4.1.3).
+- Cause and next step in text, not color or icon alone (WCAG 1.4.1).
+- Actions with explicit names and visible focus; do not move focus while a response is in progress.
+- Keep typed content and attachments.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Resposta interrompida | "A resposta foi interrompida. Gerar de novo" |
-| Limite | "O arquivo é grande demais. Reduza o tamanho ou divida em partes." |
-| Fonte | "Perdemos a conexão com o Drive. Reconectar" |
-| Ação parcial | "2 de 5 e-mails foram enviados. Revise antes de continuar." |
+| Interrupted response | "The response was interrupted. Regenerate" |
+| Limit | "The file is too large. Reduce its size or split it into parts." |
+| Source | "We lost the connection to Drive. Reconnect" |
+| Partial action | "2 of 5 emails were sent. Review before continuing." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A interface identifica o que falhou?
-- [ ] A causa está em linguagem compreensível?
-- [ ] Há ação de recuperação no mesmo contexto?
-- [ ] O controle usa verbo específico?
-- [ ] Pedido, arquivos e trabalho foram preservados?
-- [ ] O estado de ação externa está claro?
-- [ ] Repetir não duplica efeitos?
-- [ ] Existe alternativa quando repetir não resolve?
-- [ ] Detalhes técnicos ficam em camada secundária?
-- [ ] O erro é compreensível sem cor ou ícone?
+- [ ] Does the interface identify what failed?
+- [ ] Is the cause in understandable language?
+- [ ] Is there a recovery action in the same context?
+- [ ] Does the control use a specific verb?
+- [ ] Were the request, files and work kept?
+- [ ] Is the state of any external action clear?
+- [ ] Does retrying avoid duplicating effects?
+- [ ] Is there an alternative when retrying does not help?
+- [ ] Are technical details in a secondary layer?
+- [ ] Is the error understandable without color or icon?
 
-## Fundamentação
+## Rationale
 
-- Microsoft Fluent 2 (Responsible AI): comunicar falhas e manter controle.
-- IBM Carbon for AI: padrões de recuperação em experiências de IA.
-- Documentação de ajuda de assistentes de IA e de ferramentas de código: orientações de regenerar, reduzir entrada, nova conversa e reenviar pergunta.
-- Documentação de conectores de IA: reconexão e permissões.
+- Microsoft Fluent 2 (Responsible AI): communicate failures and keep control.
+- IBM Carbon for AI: recovery patterns in AI experiences.
+- Help documentation of AI assistants and coding tools: guidance on regenerating, reducing input, starting a new conversation and resending the question.
+- AI connector documentation: reconnection and permissions.

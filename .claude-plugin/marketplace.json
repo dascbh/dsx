@@ -5,7 +5,7 @@
     {
       "name": "dsx",
       "source": "./",
-      "description": "Framework de design system, UI e UX para agentes de IA."
+      "description": "Design system, UI and UX framework for AI agents."
     }
   ]
 }

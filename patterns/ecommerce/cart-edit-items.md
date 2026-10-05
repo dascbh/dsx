@@ -1,6 +1,6 @@
 ---
 id: cart-edit-items
-title: Como alterar quantidade e remover itens no carrinho?
+title: How do you change quantities and remove items in the cart?
 category: ecommerce
 components: [cart, stepper, number-field, icon-button]
 type: recommendation
@@ -11,87 +11,87 @@ wcag: ["2.5.8", "4.1.3", "4.1.2", "1.4.1"]
 related: [undo, guest-checkout, product-variants, confirm-deletion, touch-target]
 ---
 
-# Como alterar quantidade e remover itens no carrinho?
+# How do you change quantities and remove items in the cart?
 
-> **Regra:** Ofereça stepper (mais e menos) com campo numérico quando a faixa for ampla, atualize totais sem botão "Atualizar" e torne a remoção explícita e reversível.
+> **Rule:** Offer a stepper (plus and minus) with a number field when the range is wide, update totals without an "Update" button, and make removal explicit and reversible.
 
-## Contexto
+## Context
 
-O carrinho é a etapa de revisão que antecede o checkout. Alterar quantidades e remover itens soam triviais, mas seletores ruins, totais defasados e controles ambíguos levam a pedidos errados e abandono.
+The cart is the review step before checkout. Changing quantities and removing items sound trivial, but poor selectors, stale totals and ambiguous controls lead to wrong orders and abandonment.
 
-Pesquisa aplicada de e-commerce encontrou dificuldade em seletores baseados só em campo aberto ou lista suspensa. Atualização imediata, alvos adequados e recuperação após remover reduzem atrito e mantêm quantidade, subtotal e total coerentes.
+Applied e-commerce research found difficulty with selectors based only on an open field or a dropdown. Immediate updates, adequate targets and recovery after removal reduce friction and keep quantity, subtotal and total consistent.
 
-## Decisão
+## Decision
 
-- **SE** a quantidade típica é pequena e frequente **ENTÃO** use botões de aumentar e diminuir.
-- **SE** quantidades grandes são plausíveis **ENTÃO** combine os botões com campo numérico editável e teclado numérico no mobile.
-- **SE** a pessoa altera a quantidade **ENTÃO** atualize item, subtotal, desconto, frete e total sem botão "Atualizar carrinho".
-- **SE** a quantidade está em 1 e a pessoa diminui **ENTÃO** remova o item ou conduza claramente à remoção; não bloqueie o botão.
-- **SE** a remoção é reversível **ENTÃO** remova sem diálogo bloqueador, mostre confirmação e ofereça "Desfazer".
-- **SE** a remoção afeta kit, desconto, assinatura ou frete **ENTÃO** explique o efeito antes ou na confirmação.
-- **SE** a quantidade viola estoque, mínimo, máximo ou múltiplo **ENTÃO** valide e mostre o limite no próprio item.
-- **SE** a atualização é assíncrona **ENTÃO** mostre carregamento e impeça ação duplicada.
-- **SE** a atualização falha **ENTÃO** restaure o valor anterior e ofereça tentar de novo.
-- **SENÃO** mantenha também um botão "Remover" visível para facilitar a descoberta.
+- **IF** the typical quantity is small and frequent **THEN** use increase and decrease buttons.
+- **IF** large quantities are plausible **THEN** combine the buttons with an editable number field and a numeric keyboard on mobile.
+- **IF** the person changes the quantity **THEN** update the item, subtotal, discount, shipping and total without an "Update cart" button.
+- **IF** the quantity is 1 and the person decreases it **THEN** remove the item or clearly lead to removal; do not disable the button.
+- **IF** removal is reversible **THEN** remove without a blocking dialog, show a confirmation and offer "Undo".
+- **IF** removal affects a bundle, discount, subscription or shipping **THEN** explain the effect beforehand or in the confirmation.
+- **IF** the quantity violates stock, minimum, maximum or multiple **THEN** validate and show the limit on the item itself.
+- **IF** the update is asynchronous **THEN** show loading and prevent duplicate actions.
+- **IF** the update fails **THEN** restore the previous value and offer to try again.
+- **ELSE** also keep a visible "Remove" button to make it easier to discover.
 
-## Quando usar
+## When to use
 
-- Carrinhos com quantidade editável antes do checkout.
-- Mini carrinhos e listas de compra com edição direta.
-- Compras recorrentes ou de várias unidades.
+- Carts with editable quantities before checkout.
+- Mini carts and shopping lists with direct editing.
+- Recurring purchases or purchases of several units.
 
-## Quando evitar
+## When to avoid
 
-- Só stepper com intervalo muito amplo → **use em vez disso:** entrada direta validada.
-- Lista suspensa extensa para quantidades comuns → **use em vez disso:** stepper e campo.
-- Confirmação bloqueadora em toda remoção reversível → **use em vez disso:** desfazer.
+- A stepper alone with a very wide range → **use instead:** validated direct input.
+- A long dropdown for common quantities → **use instead:** a stepper and field.
+- A blocking confirmation on every reversible removal → **use instead:** undo.
 
-## Faça
+## Do
 
-- Selecione o valor atual ao focar o campo para facilitar a substituição.
-- Dê controles grandes e espaçados, e remoção em local previsível.
-- Comunique sucesso ou erro no próprio item.
+- Select the current value when the field gets focus, to make replacing it easier.
+- Provide large, well-spaced controls, and removal in a predictable place.
+- Communicate success or error on the item itself.
 
-## Evite
+## Avoid
 
-- Botão "Atualizar carrinho" como único modo de confirmar.
-- Campo livre sem limites ou validação.
-- Remoção silenciosa ou totais desatualizados.
-- Controles pequenos e comprimidos.
+- An "Update cart" button as the only way to confirm.
+- A free field with no limits or validation.
+- Silent removal or stale totals.
+- Small, cramped controls.
 
-## Acessibilidade
+## Accessibility
 
-- Botões nativos com nomes específicos: "Aumentar quantidade de [produto]", "Diminuir quantidade de [produto]", "Remover [produto]".
-- Campo editável com rótulo, valor atual, mínimo, máximo e estado inválido programáticos; preserve teclado e setas.
-- Alvos com no mínimo 24 × 24 CSS px, ou com espaçamento que compense (2.5.8).
-- Comunique mudança de total, remoção, desfazer e erros como mensagens de status, sem deslocar o foco (4.1.3).
-- Não dependa só de cor.
+- Native buttons with specific names: "Increase quantity of [product]", "Decrease quantity of [product]", "Remove [product]".
+- An editable field with a programmatic label, current value, minimum, maximum and invalid state; preserve keyboard and arrow keys.
+- Targets of at least 24 × 24 CSS px, or with spacing that compensates (2.5.8).
+- Communicate total changes, removal, undo and errors as status messages, without moving focus (4.1.3).
+- Do not rely only on color.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Remoção | "Camiseta azul removida do carrinho." |
-| Desfazer | "Desfazer" |
-| Limite de estoque | "Só temos 3 unidades disponíveis." |
-| Múltiplo | "Este item é vendido em caixas de 6." |
-| Falha | "Não foi possível atualizar a quantidade. Tentar novamente" |
+| Removal | "Blue T-shirt removed from your cart." |
+| Undo | "Undo" |
+| Stock limit | "We only have 3 units available." |
+| Multiple | "This item is sold in boxes of 6." |
+| Failure | "We couldn't update the quantity. Try again" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Existem botões de aumentar e diminuir e, se preciso, um campo numérico.
-- [ ] A quantidade atual pode ser substituída sem concatenar dígitos.
-- [ ] Item, subtotal e total atualizam juntos, sem botão separado.
-- [ ] Diminuir em 1 não vira beco sem saída.
-- [ ] A remoção tem feedback e opção de desfazer.
-- [ ] Validam-se limites de estoque, mínimo, máximo e múltiplos.
-- [ ] Estados de carregamento e erro impedem ação duplicada.
-- [ ] Controles têm nome acessível, foco, alvo e contraste adequados.
+- [ ] There are increase and decrease buttons and, if needed, a number field.
+- [ ] The current quantity can be replaced without concatenating digits.
+- [ ] Item, subtotal and total update together, without a separate button.
+- [ ] Decreasing at 1 does not become a dead end.
+- [ ] Removal has feedback and an undo option.
+- [ ] Stock, minimum, maximum and multiple limits are validated.
+- [ ] Loading and error states prevent duplicate actions.
+- [ ] Controls have adequate accessible names, focus, target and contrast.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute (carrinho e alteração de quantidade): dificuldade com campo aberto e lista suspensa; atualização imediata e recuperação.
-- WCAG 2.2, critério 2.5.8: tamanho mínimo de alvo.
-- WCAG 2.2, critério 4.1.3: mensagens de status.
-- W3C WAI-ARIA APG (Spinbutton): comportamento de entrada numérica por teclado.
-- Design systems de plataformas de e-commerce (stepper e botão de ícone): exemplos de implementação, não evidência independente.
+- Baymard Institute (cart and quantity changes): difficulty with an open field and a dropdown; immediate updates and recovery.
+- WCAG 2.2, criterion 2.5.8: minimum target size.
+- WCAG 2.2, criterion 4.1.3: status messages.
+- W3C WAI-ARIA APG (Spinbutton): keyboard behavior for numeric input.
+- E-commerce platform design systems (stepper and icon button): implementation examples, not independent evidence.

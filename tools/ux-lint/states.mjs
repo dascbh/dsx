@@ -1,25 +1,27 @@
 #!/usr/bin/env node
-// ux-lint, nível estados: aplica as regras S1–S3 do contrato do UX.md (knowledge/fundamentos/ux-md.md, "Estados")
-// sobre a pasta de capturas HTML. Sem dependências.
+// ux-lint, states level: applies rules S1–S3 of the UX.md contract (knowledge/foundations/ux-md.md, "States")
+// to the folder of HTML captures. No dependencies.
 //
-// Uso: node tools/ux-lint/states.mjs <pasta-de-capturas> [--ux UX.md] [--archetypes <pasta>] [--order capture-order.json]
-//                                    [--json] [--fail-at 3]
+// Usage: node tools/ux-lint/states.mjs <captures-folder> [--ux UX.md] [--archetypes <folder>] [--order capture-order.json]
+//                                      [--json] [--fail-at 3]
 //
-// Convenção de captura: `<nn>-<screen-id>.html` é o estado principal da tela (com dado, ou o diálogo aberto);
-// `<nn>-<screen-id>.<state>.html` é um estado dela (`02-acervo.empty.html`, `03-documento.error.html`).
-// Tipo e mãe de cada tela vêm, quando existe, do `capture-order.json` da pasta ou da pasta acima
-// ([{ nn, id, type, parent }], o mesmo da skill de captura pelo código); sem ele, toda tela não diálogo é página.
+// Capture convention: `<nn>-<screen-id>.html` is the screen's main state (with data, or the dialog open);
+// `<nn>-<screen-id>.<state>.html` is one of its states (`02-library.empty.html`, `03-document.error.html`).
+// Type and parent of each screen come, when present, from `capture-order.json` in the folder or the one above
+// ([{ nn, id, type, parent }], the same as the capture-from-code skill); without it, every non-dialog screen is a page.
 //
-// S1 estado obrigatório sem captura · S2 estado vazio/erro sem ação de saída · S3 mensagem de erro sem orientação.
-// Estados obrigatórios por tipo de tela (a regra está em knowledge/fundamentos/ux-md.md, "Estados"):
-//   página  — `states` do UX.md ∪ `states` do arquétipo, menos o principal (`success`) e os momentâneos
-//             (`running`, `submitting`, `saving`); `empty`/`empty-filtered` do UX.md só quando o arquétipo tem
-//             algum estado vazio (detalhe e editor não têm lista vazia) ou a tela não tem arquétipo.
-//   filha   — aba, painel ou passo com mãe capturada (`parent` no capture-order): o conjunto da página menos o
-//             que a mãe já exige (carregar, erro e sem acesso da mãe valem para a filha).
-//   diálogo — só `error` quando o diálogo tem ação que chama o servidor (primária ou destrutiva) e `field-error`
-//             quando o arquétipo o declara e o diálogo tem campo obrigatório; nunca `loading`, `empty`, `no-access`.
-//   painel sem arquétipo nem mãe (ex.: menu) — nenhum estado exigido.
+// S1 required state without a capture · S2 empty/error state without an exit action · S3 error message without guidance.
+// Required states per screen type (the rule is in knowledge/foundations/ux-md.md, "States"):
+//   page   — UX.md `states` ∪ archetype `states`, minus the main one (`success`) and the transient ones
+//            (`running`, `submitting`, `saving`); UX.md `empty`/`empty-filtered` only when the archetype has
+//            some empty state (detail and editor have no empty list) or the screen has no archetype.
+//   child  — tab, panel or step with a captured parent (`parent` in capture-order): the page set minus what the
+//            parent already requires (the parent's loading, error and no-access cover the child).
+//   dialog — only `error` when the dialog has an action that calls the server (primary or destructive), and
+//            `field-error` when the archetype declares it and the dialog has a required field; never `loading`,
+//            `empty`, `no-access`.
+//   panel with no archetype and no parent (e.g. a menu) — no required state.
+// Empty-state wording, guidance verbs and dismiss labels come from every language pack (lib/lang/).
 // JSON (--json): { summary, screens: [{ screen, nn, kind, archetype, parent, captures, required,
 //                  findings: [{ rule, severity, state, region, message, evidence }] }] }.
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
@@ -27,50 +29,46 @@ import { join, basename, dirname } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { parseCli } from '../lib/legacy-cli.mjs';
 import { loadConfig, configFrom } from './lib/config.mjs';
+import { anyEmptyText, unionList } from './lib/lang/index.mjs';
 import { parseHtml, querySelectorAll, matches, closest, isHidden, textOf, contains } from './lib/html.mjs';
 import { loadArchetypes } from '../lint-archetypes.mjs';
 
 export const SEVERITY = { S1: 2, S2: 2, S3: 2 };
-/** Mínimo do contrato quando o UX.md não declara `states`. */
+/** Contract minimum when UX.md does not declare `states`. */
 export const DEFAULT_STATES = ['loading', 'empty', 'error', 'no-access', 'success'];
-/** Estados momentâneos: a captura é bem-vinda, mas não é exigida (somem em menos de um segundo). */
+/** Transient states: a capture is welcome but not required (they last less than a second). */
 export const TRANSIENT_STATES = ['running', 'submitting', 'saving'];
-/** Estado coberto pela captura principal, por tipo de tela. */
+/** State covered by the main capture, per screen type. */
 export const PRINCIPAL_STATE = { page: 'success', child: 'success', dialog: 'open', panel: 'success' };
 export const DIALOG_ARCHETYPES = ['confirmation-dialog', 'form-dialog'];
-/** Estados de carga que a mãe cobre pela filha. */
+/** Loading states the parent covers for the child. */
 const PAGE_LOAD_STATES = ['loading', 'error', 'no-access'];
-/** Estados em que a pessoa precisa de uma saída (S2). */
+/** States where the person needs a way out (S2). */
 export const EXIT_STATES = /^(empty|empty-filtered|nothing-selected|no-data-in-period|error|no-access|invalid-link|expired-link|unavailable|item-removed)$/;
 const ERROR_STATES = /^(error|no-access|invalid-link|expired-link|unavailable|item-removed|conflict)$/;
 const EMPTY_STATES = /^(empty|empty-filtered|nothing-selected|no-data-in-period)$/;
-/** Nome de arquivo de captura: `<nn>-<screen-id>[.<state>].html`. */
+/** Capture file name: `<nn>-<screen-id>[.<state>].html`. */
 export const CAPTURE_RE = /^(\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)(?:\.([a-z0-9]+(?:-[a-z0-9]+)*))?\.html$/;
 
 const ERROR_ALERT = '.MuiAlert-standardError, .MuiAlert-filledError, .MuiAlert-outlinedError, .MuiAlert-colorError';
 const ANY_ALERT = '[role=alert], .MuiAlert-root';
 const ACTION = 'button, [role=button], a[href], [role=link]';
 const NOT_EXIT = '[role=tab], .MuiTab-root, .MuiTableSortLabel-root, [role=combobox], [role=switch], [role=checkbox], [role=radio]';
-const EMPTY_TEXT = /^(nenhum|nenhuma|ainda não|ainda nao|não há|nao ha|sem (resultados|itens|dados|registros)|vazio|no (results|items|data)|nothing)\b|\bainda não (tem|há|foi)\b/i;
-/** Verbos e expressões de próximo passo numa mensagem de erro (pt-BR e inglês). Sem acento, minúsculas. */
-const GUIDANCE = new RegExp(`\\b(${[
-  'tente', 'tentar', 'verifique', 'verificar', 'confira', 'conferir', 'recarregue', 'recarregar', 'atualize', 'atualizar',
-  'volte', 'voltar', 'contate', 'contatar', 'entre em contato', 'fale com', 'peca', 'pedir', 'solicite', 'solicitar',
-  'aguarde', 'aguardar', 'selecione', 'selecionar', 'preencha', 'preencher', 'corrija', 'corrigir', 'revise', 'revisar',
-  'envie', 'enviar', 'reenvie', 'carregue', 'carregar', 'abra', 'abrir', 'clique', 'use', 'usar', 'escolha', 'escolher',
-  'faca', 'fazer', 'informe', 'informar', 'avise', 'avisar', 'acesse', 'acessar', 'reprocesse', 'reprocessar', 'crie', 'criar',
-  'digite', 'conecte', 'conectar', 'remova', 'de novo', 'novamente', 'mais tarde', 'em instantes',
-  'try', 'retry', 'check', 'reload', 'refresh', 'contact', 'again', 'later',
-].join('|')})\\b`, 'i');
-const ONLY_FAILURE = /^(erro|falha|falhou|error|failed|algo deu errado|ocorreu um erro|something went wrong)\b[^a-z]{0,40}$/i;
+/** Product-text vocabulary from every language pack (lib/lang/): a screen in either language is recognized. */
+const anyOf = (list) => list.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+const EMPTY_TEXT = { test: (t) => anyEmptyText(t) };
+/** Next-step verbs and phrases in an error message (every pack). No diacritics, lowercase. */
+const GUIDANCE = new RegExp(`\\b(${anyOf(unionList('guidance'))})\\b`, 'i');
+const ONLY_FAILURE = new RegExp(`^(${anyOf(unionList('onlyFailure'))})\\b[^a-z]{0,40}$`, 'i');
+const DISMISS = new RegExp(`^(${anyOf(unionList('dismiss'))})$`, 'i');
 const CODE_LIKE = /\b(HTTP\s*)?[45]\d\d\b|\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b|\bERR[_-]/;
 
 const fold = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 
-// ---------- entradas ----------
+// ---------- inputs ----------
 
-/** Lista as capturas de uma pasta e agrupa por tela: Map<screenId, { nn, main, states: Map<state, file> }>. */
+/** Lists the captures of a folder grouped by screen: Map<screenId, { nn, main, states: Map<state, file> }>. */
 export function discoverCaptures(dir) {
   const screens = new Map();
   for (const f of readdirSync(dir).sort()) {
@@ -85,7 +83,7 @@ export function discoverCaptures(dir) {
   return screens;
 }
 
-/** Arquétipos: id → { states, regions, primary_action }. Lê index.json quando existe; senão, os cartões. */
+/** Archetypes: id → { states, regions, primary_action }. Reads index.json when present; otherwise the cards. */
 export function loadArchetypeStates(dir) {
   const out = {};
   if (!dir || !existsSync(dir)) return out;
@@ -98,7 +96,7 @@ export function loadArchetypeStates(dir) {
   return out;
 }
 
-/** capture-order.json da pasta ou da pasta acima → Map<id, { type, parent }>. */
+/** capture-order.json of the folder or the one above → Map<id, { type, parent }>. */
 export function loadOrder(dir, explicit = null) {
   const file = explicit ?? [join(dir, 'capture-order.json'), join(dirname(dir), 'capture-order.json')].find(existsSync);
   if (!file || !existsSync(file)) return { file: null, order: new Map() };
@@ -106,14 +104,14 @@ export function loadOrder(dir, explicit = null) {
   return { file, order: new Map((Array.isArray(list) ? list : list.screens ?? []).map((x) => [x.id, { type: x.type ?? null, parent: x.parent ?? null }])) };
 }
 
-/** Mapa tela → arquétipo a partir de `archetypes` do UX.md ({ arquétipo: [telas] }). */
+/** Screen → archetype map from UX.md `archetypes` ({ archetype: [screens] }). */
 export function archetypeByScreen(cfg) {
   const out = new Map();
   for (const [arch, screens] of Object.entries(cfg.archetypes ?? {})) for (const s of [].concat(screens ?? [])) out.set(String(s), arch);
   return out;
 }
 
-// ---------- análise de uma captura ----------
+// ---------- analysis of one capture ----------
 
 function regionOf(root, node, cfg) {
   const sel = cfg.verification.selectors;
@@ -124,8 +122,8 @@ function regionOf(root, node, cfg) {
 }
 
 const regionName = (r, cfg) => {
-  if (!r || r.type !== 'element') return '(tela)';
-  if (matches(r, cfg.verification.selectors.dialog)) return 'diálogo';
+  if (!r || r.type !== 'element') return '(screen)';
+  if (matches(r, cfg.verification.selectors.dialog)) return 'dialog';
   return r.tag + (r.attrs.role ? `[role=${r.attrs.role}]` : '');
 };
 
@@ -136,12 +134,12 @@ function disabled(n) {
   return false;
 }
 
-/** Ações que tiram a pessoa do estado: botão ou link visível e habilitado (abas, ordenação e campos não contam). */
+/** Actions that take the person out of the state: a visible, enabled button or link (tabs, sorting and fields do not count). */
 function exits(scope) {
   return querySelectorAll(scope, ACTION).filter((b) => !isHidden(b) && !disabled(b) && !matches(b, NOT_EXIT) && !closest(b, NOT_EXIT) && !closest(b, '[aria-hidden=true]'));
 }
 
-/** Mensagens de estado na captura: alertas de erro (e qualquer alerta numa captura de erro) ou o texto de vazio. */
+/** State messages in the capture: error alerts (and any alert in an error capture) or the empty text. */
 function stateMessages(root, state, cfg) {
   const sel = cfg.verification.selectors;
   const dialogs = querySelectorAll(root, sel.dialog).filter((d) => !isHidden(d));
@@ -158,8 +156,8 @@ function stateMessages(root, state, cfg) {
 }
 
 /**
- * Analisa a captura de um estado (ou a principal, `state = null`, só para o S3). Devolve achados S2/S3.
- * `file` entra na evidência.
+ * Analyzes the capture of a state (or the main one, `state = null`, for S3 only). Returns S2/S3 findings.
+ * `file` goes into the evidence.
  */
 export function analyzeStateCapture(html, state, cfg = configFrom({}), file = 'tela.html') {
   const root = parseHtml(html);
@@ -168,21 +166,21 @@ export function analyzeStateCapture(html, state, cfg = configFrom({}), file = 't
   const add = (rule, region, message, evidence) => findings.push({ rule, severity: SEVERITY[rule], state: state ?? 'principal', region, message, evidence });
   const { kind, nodes } = stateMessages(root, state, cfg);
 
-  // S2 — vazio/erro sem ação de saída na região do estado.
+  // S2: empty/error without an exit action in the state's region.
   if (state && EXIT_STATES.test(state)) {
     const sel = cfg.verification.selectors;
     const dialogs = querySelectorAll(root, sel.dialog).filter((d) => !isHidden(d));
     const anchor = nodes[0] ?? dialogs[0] ?? querySelectorAll(root, 'main')[0] ?? root;
     const region = anchor === root ? root : regionOf(root, anchor, cfg);
     if (!exits(region).length) {
-      add('S2', regionName(region, cfg), `estado "${state}" sem botão ou link de saída na região (ofereça o próximo passo: tentar de novo, limpar filtro, criar, voltar)`, anchor === root ? file : ev(anchor));
+      add('S2', regionName(region, cfg), `state "${state}" without an exit button or link in the region (offer the next step: try again, clear the filter, create, go back)`, anchor === root ? file : ev(anchor));
     }
   }
 
-  // S3 — mensagem de erro sem orientação.
+  // S3: error message without guidance.
   if (kind === 'error') {
     if (state && ERROR_STATES.test(state) && !nodes.length) {
-      add('S3', '(tela)', `estado "${state}" sem mensagem de erro visível (diga o que aconteceu e o que fazer)`, file);
+      add('S3', '(screen)', `state "${state}" without a visible error message (say what happened and what to do)`, file);
     }
     for (const n of nodes) {
       const text = clean(textOf(n));
@@ -190,19 +188,19 @@ export function analyzeStateCapture(html, state, cfg = configFrom({}), file = 't
       const guided = GUIDANCE.test(fold(text));
       const bare = ONLY_FAILURE.test(fold(text)) || (CODE_LIKE.test(text) && text.split(' ').length <= 6);
       if (!bare && (guided || hasAction)) continue;
-      add('S3', regionName(regionOf(root, n, cfg), cfg), `mensagem de erro sem orientação: "${text.slice(0, 100)}" (diga o que aconteceu e o que a pessoa pode fazer)`, ev(n));
+      add('S3', regionName(regionOf(root, n, cfg), cfg), `error message without guidance: "${text.slice(0, 100)}" (say what happened and what the person can do)`, ev(n));
     }
   }
   return findings;
 }
 
-/** O diálogo da captura principal chama o servidor (primária/destrutiva fora de cancelar) e tem campo obrigatório? */
+/** Does the main capture's dialog call the server (primary/destructive other than cancel) and have a required field? */
 function dialogTraits(html, cfg) {
   const root = parseHtml(html);
   const sel = cfg.verification.selectors;
   const dialogs = querySelectorAll(root, sel.dialog).filter((d) => !isHidden(d));
   const scope = dialogs.length ? dialogs : [];
-  const cancel = /^(cancelar|voltar|fechar|não|nao|cancel|close|back)$/i;
+  const cancel = DISMISS;
   let serverAction = false, requiredField = false;
   for (const d of scope) {
     for (const b of querySelectorAll(d, sel.button)) {
@@ -214,11 +212,11 @@ function dialogTraits(html, cfg) {
   return { open: dialogs.length > 0, serverAction, requiredField };
 }
 
-// ---------- estados obrigatórios ----------
+// ---------- required states ----------
 
 /**
- * Estados exigidos de uma tela. `kind`: page | child | dialog | panel. `parentRequired`: conjunto exigido da mãe
- * (filhas). `traits`: { serverAction, requiredField } do diálogo; { public } de página sem login (sem `no-access`).
+ * Required states of a screen. `kind`: page | child | dialog | panel. `parentRequired`: the parent's required set
+ * (children). `traits`: { serverAction, requiredField } of the dialog; { public } of a page without login (no `no-access`).
  */
 export function requiredStates({ kind, archetype = null, uxStates = DEFAULT_STATES, archetypeStates = null, parentRequired = [], traits = {} }) {
   const arch = archetypeStates ?? [];
@@ -234,29 +232,29 @@ export function requiredStates({ kind, archetype = null, uxStates = DEFAULT_STAT
   let out = [...new Set([...fromUx, ...arch])]
     .filter((s) => s !== PRINCIPAL_STATE[kind] && s !== 'open' && !TRANSIENT_STATES.includes(s));
   if (kind === 'child') out = out.filter((s) => !parentRequired.includes(s) && !PAGE_LOAD_STATES.includes(s));
-  // página pública sem login não tem "sem acesso": quem tem o link entra (link inválido/expirado vêm do arquétipo)
+  // a public page without login has no "no access": whoever has the link gets in (invalid/expired link come from the archetype)
   if (traits.public) out = out.filter((s) => s !== 'no-access');
   return out;
 }
 
-/** De onde vem cada estado exigido (para a mensagem do S1). */
+/** Where each required state comes from (for the S1 message). */
 function origin(state, uxStates, archetype, archStates, kind) {
-  if (kind === 'dialog') return state === 'error' ? 'diálogo com ação que chama o servidor' : `diálogo com campo obrigatório, arquétipo ${archetype}`;
+  if (kind === 'dialog') return state === 'error' ? 'dialog with an action that calls the server' : `dialog with a required field, archetype ${archetype}`;
   const ux = uxStates.includes(state), ar = (archStates ?? []).includes(state);
-  if (ux && ar) return `UX.md e arquétipo ${archetype}`;
-  return ux ? 'UX.md' : `arquétipo ${archetype}`;
+  if (ux && ar) return `UX.md and archetype ${archetype}`;
+  return ux ? 'UX.md' : `archetype ${archetype}`;
 }
 
 /**
  * Analisa a pasta inteira. Devolve [{ screen, nn, kind, archetype, parent, captures, required, findings }].
- * `archetypes`: id → { states } (loadArchetypeStates); `order`: Map de loadOrder.
+ * `archetypes`: id → { states } (loadArchetypeStates); `order`: Map from loadOrder.
  */
 export function analyzeStates(dir, cfg = configFrom({}), { archetypes = {}, order = new Map() } = {}) {
   const captures = discoverCaptures(dir);
   const byScreen = archetypeByScreen(cfg);
   const uxStates = Array.isArray(cfg.states) && cfg.states.length ? cfg.states : DEFAULT_STATES;
   const info = new Map();
-  // 1º passo: tipo de cada tela.
+  // Step 1: type of each screen.
   for (const [id, c] of captures) {
     const archetype = byScreen.get(id) ?? null;
     const o = order.get(id) ?? {};
@@ -268,7 +266,7 @@ export function analyzeStates(dir, cfg = configFrom({}), { archetypes = {}, orde
     if (o.type === 'public') traits.public = true;
     info.set(id, { kind, archetype, parent: o.parent ?? null, traits });
   }
-  // 2º passo: exigidos. A filha desconta tudo o que a mãe (e as mães dela) já exigem.
+  // Step 2: required. A child subtracts everything its parent (and the parent's parents) already require.
   const req = new Map();
   const covered = new Map();
   const requiredOf = (id, seen = new Set()) => {
@@ -292,14 +290,14 @@ export function analyzeStates(dir, cfg = configFrom({}), { archetypes = {}, orde
     for (const s of required) {
       if (c.states.has(s)) continue;
       findings.push({
-        rule: 'S1', severity: SEVERITY.S1, state: s, region: '(tela)',
-        message: `estado "${s}" exigido (${origin(s, uxStates, i.archetype, archetypes[i.archetype]?.states, i.kind)}) sem captura ${c.nn}-${id}.${s}.html`,
+        rule: 'S1', severity: SEVERITY.S1, state: s, region: '(screen)',
+        message: `state "${s}" required (${origin(s, uxStates, i.archetype, archetypes[i.archetype]?.states, i.kind)}) without capture ${c.nn}-${id}.${s}.html`,
         evidence: mainFile,
       });
     }
     if (c.main) findings.push(...analyzeStateCapture(readFileSync(c.main, 'utf8'), null, cfg, c.main));
     for (const [s, f] of c.states) findings.push(...analyzeStateCapture(readFileSync(f, 'utf8'), s, cfg, f));
-    results.push({ screen: id, nn: c.nn, kind: i.kind, archetype: i.archetype, parent: i.parent, captures: [...(c.main ? ['(principal)'] : []), ...c.states.keys()], required, findings });
+    results.push({ screen: id, nn: c.nn, kind: i.kind, archetype: i.archetype, parent: i.parent, captures: [...(c.main ? ['(main)'] : []), ...c.states.keys()], required, findings });
   }
   return results.sort((a, b) => a.nn.localeCompare(b.nn, 'en', { numeric: true }) || a.screen.localeCompare(b.screen));
 }
@@ -310,7 +308,7 @@ export function summarize(results) {
   for (const r of results) for (const a of r.findings) { byRule[a.rule] = (byRule[a.rule] || 0) + 1; bySeverity[a.severity]++; }
   return {
     screens: results.length,
-    state_captures: results.reduce((s, r) => s + r.captures.filter((c) => c !== '(principal)').length, 0),
+    state_captures: results.reduce((s, r) => s + r.captures.filter((c) => c !== '(main)').length, 0),
     screens_with_findings: results.filter((r) => r.findings.length).length,
     findings: results.reduce((s, r) => s + r.findings.length, 0),
     by_rule: byRule,
@@ -318,7 +316,7 @@ export function summarize(results) {
   };
 }
 
-const USAGE = 'Uso: node tools/ux-lint/states.mjs <pasta-de-capturas> [--ux UX.md] [--archetypes <pasta>] [--order capture-order.json] [--json] [--fail-at 3]';
+const USAGE = 'Usage: node tools/ux-lint/states.mjs <captures-folder> [--ux UX.md] [--archetypes <folder>] [--order capture-order.json] [--json] [--fail-at 3]';
 const DEFAULT_ARCHETYPES = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'archetypes');
 
 function main() {
@@ -335,13 +333,13 @@ function main() {
     console.log(JSON.stringify({ summary, ...(orderFile ? { order: orderFile } : {}), screens: results, ...(cfg.legacyWarnings.length ? { warnings: cfg.legacyWarnings } : {}) }, null, 2));
   } else {
     for (const r of results) {
-      const tag = `${r.nn}-${r.screen} [${r.kind}${r.archetype ? ` · ${r.archetype}` : ''}] estados: ${r.captures.join(', ') || '—'}; exigidos: ${r.required.join(', ') || '—'}`;
+      const tag = `${r.nn}-${r.screen} [${r.kind}${r.archetype ? ` · ${r.archetype}` : ''}] states: ${r.captures.join(', ') || '—'}; required: ${r.required.join(', ') || '—'}`;
       if (!r.findings.length) { console.log(`✓ ${tag}`); continue; }
       console.log(`✗ ${tag}`);
       for (const a of r.findings) console.log(`   ${a.rule} sev ${a.severity} | ${a.state} | ${a.region} | ${a.message}\n      ${a.evidence}`);
     }
-    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum';
-    console.log(`\nResumo: ${summary.screens} telas, ${summary.state_captures} capturas de estado, ${summary.findings} achados (${rules})${orderFile ? `; tipos de ${basename(orderFile)}` : ''}`);
+    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'none';
+    console.log(`\nSummary: ${summary.screens} screens, ${summary.state_captures} state captures, ${summary.findings} findings (${rules})${orderFile ? `; types from ${basename(orderFile)}` : ''}`);
   }
   process.exit(results.some((r) => r.findings.some((a) => a.severity >= threshold)) ? 1 : 0);
 }

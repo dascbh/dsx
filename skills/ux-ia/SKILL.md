@@ -1,69 +1,69 @@
 ---
 name: ux-ia
-description: "Desenha e revisa features de IA e agentes: autonomia por risco, confirmação específica, progresso, incerteza, fontes, rotulagem, revisão e recuperação de erro. Use em chat, copiloto, agente que executa ações ou resposta gerada."
+description: "Designs and reviews AI features and agents: autonomy by risk, specific confirmation, progress, uncertainty, sources, labeling, review and error recovery. Use for chat, copilots, agents that take actions or generated responses."
 ---
 
-# UX de IA e agentes
+# AI and agent UX
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. The `knowledge/` and `patterns/` paths are relative to it.
 
-Referências: `knowledge/ia/ux-para-agentes.md`, `generative-ui.md`, `multimodal.md`, `rag-e-fontes.md`, `conteudo-sintetico.md`; padrões `patterns/ai/*`.
+References: `knowledge/ia/ux-for-agents.md`, `generative-ui.md`, `multimodal.md`, `rag-and-sources.md`, `synthetic-content.md`; patterns `patterns/ai/*`.
 
-**Tese:** a IA barateia o rascunho, não o erro. O trabalho de UX é tornar o comportamento do sistema **compreensível, supervisionável e reversível**.
+**Thesis:** AI makes the draft cheaper, not the mistake. The UX job is to make the system's behavior **understandable, supervisable and reversible**.
 
-## 1. Classifique cada ação do sistema por risco
+## 1. Classify each system action by risk
 
-Liste tudo que a IA/agente pode **fazer** (não só dizer). Para cada ação:
+List everything the AI/agent can **do** (not just say). For each action:
 
-| Risco | Exemplo | UI obrigatória |
+| Risk | Example | Required UI |
 |---|---|---|
-| Baixo, reversível | reorganizar uma lista, rascunho | executar e informar; desfazer disponível |
-| Moderado | alterar registro interno reversível | mostrar plano antes; acompanhar progresso; desfazer |
-| Alto | enviar mensagem externa, publicar, convidar pessoas | **confirmação específica**: ação + alvo + consequência, com prévia |
-| Crítico | mover dinheiro, apagar dados, mudar permissões | confirmação reforçada (revisão completa, digitar/2º fator), trilha de auditoria, nunca em lote silencioso |
+| Low, reversible | reorder a list, a draft | execute and inform; undo available |
+| Moderate | change a reversible internal record | show the plan first; track progress; undo |
+| High | send an external message, publish, invite people | **specific confirmation**: action + target + consequence, with preview |
+| Critical | move money, delete data, change permissions | reinforced confirmation (full review, typing/2nd factor), audit trail, never in a silent batch |
 
-Regras:
-- Confirmação uniforme para tudo gera fadiga e aprovação automática — **calibre pelo risco**. `patterns/ai/confirm-ai-action.md`
-- Nunca automação irreversível em fluxo sensível sem caminho de recuperação.
-- Distinga na interface **sugerir** de **agir**.
+Rules:
+- Uniform confirmation for everything breeds fatigue and automatic approval — **calibrate by risk**. `patterns/ai/confirm-ai-action.md`
+- Never irreversible automation in a sensitive flow without a recovery path.
+- Distinguish **suggesting** from **acting** in the interface.
 
-## 2. Ciclo de interação que a UI precisa cobrir
+## 2. Interaction loop the UI must cover
 
-1. **Intenção:** mostre o que o sistema entendeu (objetivo, escopo, restrições). Se ambíguo, pergunte com opções concretas ("Encontrei 2 pessoas chamadas Ana. Qual?").
-2. **Plano/progresso:** passo atual, ferramentas e fontes em uso, decisões pendentes. Spinner genérico não basta para tarefas > 10s. `patterns/feedback/long-loading.md`
-3. **Resultado:** rotulado como gerado por IA (`patterns/ai/label-ai-content.md`), com fontes/critérios quando afirma fatos (`patterns/ai/ai-sources.md`), e limites comunicados de forma acionável — não porcentagem solta (`patterns/ai/ai-uncertainty.md`).
-4. **Revisão:** editar, refazer, refinar, aceitar parcialmente, descartar — sem perder a versão anterior (`patterns/ai/review-ai-output.md`).
-5. **Falha:** diga o que falhou, preserve o que foi feito, repita só a etapa falha, ofereça caminho manual ou humano (`patterns/ai/ai-error-recovery.md`).
-6. **Rastro:** histórico do que foi feito, com que dados e com qual aprovação.
+1. **Intent:** show what the system understood (goal, scope, constraints). If ambiguous, ask with concrete options (pt-BR example: "Encontrei 2 pessoas chamadas Ana. Qual?").
+2. **Plan/progress:** current step, tools and sources in use, pending decisions. A generic spinner is not enough for tasks > 10s. `patterns/feedback/long-loading.md`
+3. **Result:** labeled as AI-generated (`patterns/ai/label-ai-content.md`), with sources/criteria when it states facts (`patterns/ai/ai-sources.md`), and limits communicated in an actionable way — not a bare percentage (`patterns/ai/ai-uncertainty.md`).
+4. **Review:** edit, redo, refine, partially accept, discard — without losing the previous version (`patterns/ai/review-ai-output.md`).
+5. **Failure:** say what failed, preserve what was done, retry only the failed step, offer a manual or human path (`patterns/ai/ai-error-recovery.md`).
+6. **Trail:** history of what was done, with which data and with which approval.
 
-## 3. Permissões e dados
+## 3. Permissions and data
 
-- Peça permissão **no momento da necessidade**, explicando o benefício.
-- Escopo limitável (por tarefa, prazo, conjunto de dados) e revogável; mostre onde revisar.
-- Separe níveis: ler, sugerir, alterar, publicar.
-- Captura ativa (microfone, câmera, tela) sempre perceptível e interrompível.
+- Ask for permission **at the moment of need**, explaining the benefit.
+- Limitable scope (per task, time window, data set) and revocable; show where to review it.
+- Separate levels: read, suggest, change, publish.
+- Active capture (microphone, camera, screen) always noticeable and interruptible.
 
-## 4. Handoff para humano
+## 4. Handoff to a human
 
-Ao transferir, leve: objetivo, passos feitos, evidências, decisões pendentes e motivo da transferência. A pessoa nunca repete o que já contou.
+When transferring, carry: goal, steps done, evidence, pending decisions and the reason for the transfer. The person never repeats what they already said.
 
-## 5. UI generativa (quando a IA monta a interface)
+## 5. Generative UI (when the AI assembles the interface)
 
-- Gere a partir de **catálogo aprovado** de componentes, por especificação declarativa — nunca código arbitrário em runtime.
-- **Invariantes fixos:** navegação, identidade, mensagens legais, ações de alto risco. Só áreas contextuais variam.
-- Todo layout gerado passa pelos mesmos gates: contraste, ordem de foco, nomes acessíveis, estados de erro/vazio.
-- Fallback para interface fixa quando a geração falha.
-- Prefira interface fixa para tarefas frequentes que dependem de memória espacial, operações de alto risco e ambientes regulados.
+- Generate from an **approved catalog** of components, via declarative specification — never arbitrary code at runtime.
+- **Fixed invariants:** navigation, identity, legal messages, high-risk actions. Only contextual areas vary.
+- Every generated layout passes the same gates: contrast, focus order, accessible names, error/empty states.
+- Fallback to a fixed interface when generation fails.
+- Prefer a fixed interface for frequent tasks that depend on spatial memory, high-risk operations and regulated environments.
 
-## 6. Anti-padrões (bloqueie)
+## 6. Anti-patterns (block them)
 
-Humanizar a IA para parecer mais capaz do que é · esconder que o conteúdo é gerado · "Continuar?" como confirmação · confiança maximizada em vez de calibrada · ação autônoma em dado sensível sem reversão · handoff sem contexto · medir só taxa de conclusão · respostas longas em voz quando a pessoa precisa comparar.
+Humanizing the AI to look more capable than it is · hiding that content is generated · "Continue?" as a confirmation · maximized instead of calibrated confidence · autonomous action on sensitive data without reversal · handoff without context · measuring only completion rate · long voice responses when the person needs to compare.
 
-## Saída (desenho ou revisão)
+## Output (design or review)
 
 ```
-Ações do sistema e risco: <ação> → <nível> → <UI exigida> (✔ existe / ✘ falta)
-Ciclo coberto: intenção ✔ progresso ✔ rotulagem ✔ fontes ✔ revisão ✔ falha ✔ rastro ✔
-Permissões: …
-Riscos residuais e como medir: <métrica de confiança calibrada, taxa de correção, handoffs> — ver skill `evals`
+System actions and risk: <action> → <level> → <required UI> (✔ exists / ✘ missing)
+Loop covered: intent ✔ progress ✔ labeling ✔ sources ✔ review ✔ failure ✔ trail ✔
+Permissions: …
+Residual risks and how to measure them: <calibrated-confidence metric, correction rate, handoffs> — see skill `evals`
 ```

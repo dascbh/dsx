@@ -1,11 +1,11 @@
 ---
 version: alpha
-name: <Nome do produto>
-description: <Tipo de produto, público, densidade. Ex.: "App financeiro mobile para MEI, densidade baixa, uso em trânsito.">
-owner: <time ou pessoa responsável>
-updated: <AAAA-MM-DD>
-# Cores por PAPEL, nunca por aparência ("primary", não "blue").
-# Para cada cor de fundo usada com texto, declare o par "on-<papel>": o linter verifica o contraste.
+name: <Product name>
+description: <Product type, audience, density. E.g. "Mobile finance app for sole traders, low density, used on the go.">
+owner: <responsible team or person>
+updated: <YYYY-MM-DD>
+# Colors by ROLE, never by appearance ("primary", not "blue").
+# For every background color used with text, declare the "on-<role>" pair: the linter checks the contrast.
 colors:
   canvas: "<#hex>"
   surface: "<#hex>"
@@ -20,20 +20,20 @@ colors:
   on-danger: "<#hex>"
 typography:
   h1:
-    fontFamily: <família>
+    fontFamily: <family>
     fontSize: <px>
-    fontWeight: <peso>
-    lineHeight: <número>
+    fontWeight: <weight>
+    lineHeight: <number>
   body:
-    fontFamily: <família>
+    fontFamily: <family>
     fontSize: <px>
-    fontWeight: <peso>
-    lineHeight: <número>
+    fontWeight: <weight>
+    lineHeight: <number>
   label:
-    fontFamily: <família>
+    fontFamily: <family>
     fontSize: <px>
-    fontWeight: <peso>
-    lineHeight: <número>
+    fontWeight: <weight>
+    lineHeight: <number>
 spacing:
   "1": 4px
   "2": 8px
@@ -44,68 +44,68 @@ rounded:
   sm: <px>
   md: <px>
 components:
-  # Componentes referenciam tokens com {grupo.chave}; não repita valores crus.
+  # Components reference tokens with {group.key}; do not repeat raw values.
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.md}"
 ---
 
-# <Nome do produto>
+# <Product name>
 
-<!-- Diga de onde vêm os valores (tokens, código, Figma) e qual fonte vence em caso de conflito. -->
+<!-- Say where the values come from (tokens, code, Figma) and which source wins in a conflict. -->
 
 ## Overview
 
-<!-- Direção visual em critérios OBSERVÁVEIS, não adjetivos. Troque "moderno e clean" por
-"no máximo uma cor de destaque por viewport; hierarquia por tipografia e espaço; sem sombras em cards".
-Inclua: tipo de uso (tarefa x vitrine), densidade, personalidade, o que a interface NUNCA faz. -->
+<!-- Visual direction in OBSERVABLE criteria, not adjectives. Replace "modern and clean" with
+"at most one accent color per viewport; hierarchy through typography and space; no shadows on cards".
+Include: type of use (task vs. showcase), density, personality, what the interface NEVER does. -->
 
 ## Colors
 
-<!-- Tabela: Papel | Token | Onde aparece | Onde NUNCA aparece.
-Regras de contraste (≥ 4.5:1 texto, ≥ 3:1 UI não textual), regra de "cor nunca é o único sinal",
-comportamento no tema escuro. -->
+<!-- Table: Role | Token | Where it appears | Where it NEVER appears.
+Contrast rules (≥ 4.5:1 text, ≥ 3:1 non-text UI), the "color is never the only signal" rule,
+dark theme behavior. -->
 
 ## Typography
 
-<!-- Regras de HIERARQUIA (h1 é título único da página…), não só lista de tamanhos.
-Escala e razão, tamanho mínimo, pesos permitidos, largura máxima de linha. -->
+<!-- HIERARCHY rules (h1 is the page's only title…), not just a list of sizes.
+Scale and ratio, minimum size, allowed weights, maximum line length. -->
 
 ## Layout
 
-<!-- Grade de espaçamento, ritmo vertical (entre rótulo/campo, campos, grupos, seções), containers,
-breakpoints, comportamento mobile, posição das ações primárias. -->
+<!-- Spacing grid, vertical rhythm (between label/field, fields, groups, sections), containers,
+breakpoints, mobile behavior, position of primary actions. -->
 
 ## Elevation & Depth
 
-<!-- Como camadas são comunicadas (superfície, borda, sombra) e limite de empilhamento. -->
+<!-- How layers are communicated (surface, border, shadow) and the stacking limit. -->
 
 ## Shapes
 
-<!-- Raios por tipo de elemento, linguagem de ícones. -->
+<!-- Radii per element type, icon language. -->
 
 ## Components
 
-<!-- Para cada componente central: quando usar, variantes, TODOS os estados
-(padrão, hover, foco, ativo, desabilitado, carregando, erro, vazio, sucesso), contraindicações. -->
+<!-- For each core component: when to use, variants, ALL states
+(default, hover, focus, active, disabled, loading, error, empty, success), contraindications. -->
 
 ## Do's and Don'ts
 
-<!-- Derive de erros REAIS observados em gerações anteriores, não de platitudes. Mínimo 3 de cada. -->
+<!-- Derive from REAL mistakes seen in earlier generations, not platitudes. At least 3 of each. -->
 
-**Faça**
+**Do**
 
-- <regra>
+- <rule>
 
-**Não faça**
+**Don't**
 
-- <regra>
+- <rule>
 
 ## Accessibility
 
-<!-- Meta WCAG, foco, alvo de toque, movimento reduzido, zoom/reflow, texto alternativo. Tudo verificável. -->
+<!-- WCAG target, focus, touch target, reduced motion, zoom/reflow, alternative text. All verifiable. -->
 
 ## Agent Instructions
 
-<!-- QUANDO consultar este arquivo, O QUE preservar, COMO validar (comandos, checklist). -->
+<!-- WHEN to consult this file, WHAT to preserve, HOW to validate (commands, checklist). -->

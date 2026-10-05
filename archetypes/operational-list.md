@@ -1,10 +1,10 @@
 ---
 id: operational-list
-title: Lista operacional
-summary: Tela de trabalho diário que mostra muitos registros do mesmo tipo para a pessoa encontrar, comparar e agir sobre eles.
+title: Operational list
+summary: Everyday work screen that shows many records of the same type so the person can find, compare and act on them.
 register: [operational]
-when-to-use: SE a tarefa principal é localizar, triar ou acompanhar muitos registros do mesmo tipo ENTÃO use lista operacional
-avoid-when: o conjunto tem poucos itens heterogêneos, a pessoa precisa ler o conteúdo inteiro de cada item ou a tarefa é editar um item só
+when-to-use: IF the main task is finding, triaging or tracking many records of the same type THEN use an operational list
+avoid-when: the set has few heterogeneous items, the person needs to read each item's full content, or the task is editing a single item
 regions: [page-header, filter-bar, bulk-actions-bar, content, list-footer]
 primary-action: { region: page-header, position: top-right, max: 1 }
 states: [loading, empty, empty-filtered, error, no-access, success]
@@ -13,103 +13,103 @@ variations: [with-bulk-actions, cards-on-mobile, filters-in-side-panel, grouped-
 rules: [T1, T3, T5, T6, T7, F1]
 ---
 
-# Lista operacional
+# Operational list
 
-A tela onde a pessoa passa o dia: pedidos em andamento, requisições a aprovar, documentos pendentes, itens a classificar. O valor está em **achar rápido, comparar linhas lado a lado e despachar** — não em ler cada registro por inteiro. Densidade e previsibilidade vencem decoração.
+The screen where the person spends the day: orders in progress, requests to approve, pending documents, items to classify. Its value lies in **finding fast, comparing rows side by side and dispatching**, not in reading each record in full. Density and predictability beat decoration.
 
-## Quando usar
+## When to use
 
-- **SE** a pessoa trabalha sobre muitos registros do mesmo tipo (dezenas a milhares) **ENTÃO** use lista operacional com tabela.
-- **SE** os registros são comparados por atributos (status, data, valor, responsável) **ENTÃO** cada atributo vira coluna ordenável; não esconda atributo de comparação dentro do detalhe.
-- **SE** a tarefa mais frequente é "achar um registro específico" **ENTÃO** a busca textual fica visível na barra de filtros, não atrás de um ícone.
-- **SE** a pessoa precisa ler ou editar o registro sem perder a posição na lista **ENTÃO** combine com `detail-side-panel` ou troque para `master-detail`.
-- **SE** os itens são reutilizáveis (modelos, itens de catálogo) e a pessoa escolhe por semelhança visual ou por categoria **ENTÃO** prefira `library`.
-- **SE** a pessoa só precisa saber "como estão as coisas" sem agir item a item **ENTÃO** prefira `monitoring-dashboard`.
-- **SENÃO** (menos de ~7 itens, heterogêneos) **ENTÃO** uma lista simples dentro de outra tela resolve; não monte o arquétipo completo.
+- **IF** the person works on many records of the same type (dozens to thousands) **THEN** use an operational list with a table.
+- **IF** records are compared by attributes (status, date, amount, owner) **THEN** each attribute becomes a sortable column; do not hide a comparison attribute inside the detail.
+- **IF** the most frequent task is "find a specific record" **THEN** text search stays visible in the filter bar, not behind an icon.
+- **IF** the person needs to read or edit the record without losing their place in the list **THEN** combine it with `detail-side-panel` or switch to `master-detail`.
+- **IF** the items are reusable (templates, catalog items) and the person picks by visual similarity or by category **THEN** prefer `library`.
+- **IF** the person only needs to know "how things are" without acting item by item **THEN** prefer `monitoring-dashboard`.
+- **ELSE** (fewer than ~7 heterogeneous items) **THEN** a simple list inside another screen is enough; do not build the full archetype.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header   Título (h1) · contagem    [Ação primária]        │
+│ page-header   Title (h1) · count            [Primary action]   │
 ├──────────────────────────────────────────────────────────────┤
-│ filter-bar  [Buscar…] [Status ▾] [Período ▾]  Limpar           │
-│                   chips: Status: Pendente ×  Resp.: Ana ×      │
+│ filter-bar  [Search…] [Status ▾] [Period ▾]  Clear             │
+│                   chips: Status: Pending ×  Owner: Ana ×       │
 ├──────────────────────────────────────────────────────────────┤
-│ bulk-actions-bar (só com seleção) 3 selecionados [Ação]       │
+│ bulk-actions-bar (only with a selection) 3 selected [Action]  │
 ├──────────────────────────────────────────────────────────────┤
-│ content   ☐ Nome ▲      Status      Responsável   Atualizado  │
-│            ☐ ……………      ● Pendente  Ana           há 2 h     │
-│            ☐ ……………      ● Concluído Bruno         ontem      │
+│ content   ☐ Name ▲      Status      Owner         Updated     │
+│            ☐ ……………      ● Pending   Ana           2 h ago    │
+│            ☐ ……………      ● Done      Bruno         yesterday  │
 ├──────────────────────────────────────────────────────────────┤
-│ list-footer  1–50 de 1.284     [‹] 1 2 3 … 26 [›]  50/pág     │
+│ list-footer  1–50 of 1,284     [‹] 1 2 3 … 26 [›]  50/page    │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **page-header** — título único da tela (o `h1`, com o nome do conjunto no plural: "Pedidos"), contagem total opcional, a ação primária de criação ("Novo pedido") e no máximo duas ações secundárias de página (exportar, importar). Nada de filtro aqui.
-- **filter-bar** — busca textual primeiro, à esquerda; depois os 3–5 filtros mais usados como controles visíveis; o restante em "Mais filtros". Abaixo, os filtros ativos como chips removíveis e "Limpar filtros". A barra reflete o estado na URL para a lista poder ser compartilhada e restaurada ao voltar.
-- **bulk-actions-bar** — aparece só quando há seleção; diz quantos itens estão selecionados, oferece "Selecionar todos os N resultados" quando a seleção cobre só a página, e as ações que valem para o lote. Substitui visualmente a barra de filtros ou fica fixa logo acima da tabela.
-- **content** — a tabela. Primeira coluna identifica o registro e é o link para o detalhe; status com texto e cor (nunca só cor); números alinhados à direita; datas relativas com a absoluta no título. Ações por linha no fim da linha, no máximo duas visíveis e o resto em menu "Mais ações".
-- **list-footer** — intervalo exibido e total, paginação e tamanho de página. Em lista curta (uma página só) o rodapé mostra apenas a contagem.
+- **page-header**: the screen's single title (the `h1`, naming the set in the plural: "Orders"), an optional total count, the primary create action ("New order") and at most two secondary page actions (export, import). No filters here.
+- **filter-bar**: text search first, on the left; then the 3–5 most used filters as visible controls; the rest under "More filters". Below, the active filters as removable chips and "Clear filters". The bar mirrors its state in the URL so the list can be shared and restored when coming back.
+- **bulk-actions-bar**: appears only when there is a selection; says how many items are selected, offers "Select all N results" when the selection covers only the page, and the actions that apply to the batch. It visually replaces the filter bar or stays fixed right above the table.
+- **content**: the table. The first column identifies the record and is the link to the detail; status with text and color (never color alone); numbers right-aligned; relative dates with the absolute date in the title attribute. Row actions at the end of the row, at most two visible and the rest in a "More actions" menu.
+- **list-footer**: displayed range and total, pagination and page size. In a short list (a single page) the footer shows only the count.
 
-## Ações
+## Actions
 
-- **Primária:** uma só, no `page-header`, top-right — normalmente criar um registro do tipo listado. Se a tela não cria nada, não invente primária; deixe a região sem botão cheio.
-- **Por linha:** abrir (o link da primeira coluna) e no máximo duas ações frequentes como botão de texto ou ícone com nome acessível; destrutivas vão para o menu "Mais ações", nunca como ícone solto ao lado de "Editar".
-- **Em lote:** só aparecem com seleção; a destrutiva em lote diz quantos itens afeta no rótulo ("Arquivar 12 pedidos") e pede confirmação proporcional (ver `confirmation-dialog`).
-- **Desabilitado × escondido:** ação que a pessoa nunca poderá usar (falta de permissão) some; ação que depende de estado do registro fica desabilitada com o motivo no texto de ajuda.
+- **Primary:** only one, in the `page-header`, top-right, usually creating a record of the listed type. If the screen creates nothing, do not invent a primary; leave the region without a filled button.
+- **Per row:** open (the first column's link) and at most two frequent actions as text buttons or icons with an accessible name; destructive actions go into the "More actions" menu, never as a loose icon next to "Edit".
+- **Bulk:** only appear with a selection; the bulk destructive action states how many items it affects in its label ("Archive 12 orders") and asks for proportional confirmation (see `confirmation-dialog`).
+- **Disabled vs hidden:** an action the person can never use (lack of permission) disappears; an action that depends on the record's state is disabled with the reason in the help text.
 
-## Estados
+## States
 
-- **loading** — esqueleto com as colunas e a altura de ~10 linhas; cabeçalho e filtros já interativos. Ao paginar ou filtrar, mantenha as linhas antigas esmaecidas com indicador discreto em vez de piscar a tela.
-- **empty** — nenhum registro existe ainda: explique o que aparece aqui e ofereça a ação primária ("Nenhum pedido ainda. Crie o primeiro ou importe uma planilha.").
-- **empty-filtered** — existem registros, mas o filtro não trouxe nenhum: diga isso, mostre os filtros ativos e ofereça "Limpar filtros". Nunca reutilize a mensagem do vazio inicial.
-- **error** — falha ao carregar: alerta na própria região de conteúdo com o que aconteceu e "Tentar novamente"; filtros continuam visíveis e preservados.
-- **no-access** — a pessoa não pode ver este conjunto: título continua, conteúdo explica a quem pedir acesso; nenhuma ação primária.
-- **success** — depois de criar, editar ou agir em lote: confirmação breve (toast) e a linha afetada destacada por alguns segundos, na posição em que ficou.
+- **loading**: a skeleton with the columns and the height of ~10 rows; header and filters already interactive. When paginating or filtering, keep the old rows dimmed with a discreet indicator instead of flashing the screen.
+- **empty**: no record exists yet: explain what shows up here and offer the primary action ("No orders yet. Create the first one or import a spreadsheet.").
+- **empty-filtered**: records exist, but the filter returned none: say so, show the active filters and offer "Clear filters". Never reuse the initial empty message.
+- **error**: loading failed: an alert in the content region itself with what happened and "Try again"; filters stay visible and preserved.
+- **no-access**: the person cannot see this set: the title stays, the content explains whom to ask for access; no primary action.
+- **success**: after creating, editing or acting in bulk: brief confirmation (toast) and the affected row highlighted for a few seconds, in the position it ended up.
 
-## Variações
+## Variations
 
 ### with-bulk-actions
-Caixas de seleção na primeira coluna e `bulk-actions-bar` ao selecionar.
-**Favorece:** triagem de volume (arquivar, atribuir, mudar status de dezenas de itens de uma vez); reduz cliques repetidos.
-**Piora:** adiciona uma coluna e um modo de seleção que confunde quem só quer abrir itens; aumenta o risco de ação destrutiva em massa — exige confirmação com contagem e, se possível, desfazer.
+Checkboxes in the first column and a `bulk-actions-bar` on selection.
+**Favors:** high-volume triage (archiving, assigning, changing the status of dozens of items at once); reduces repeated clicks.
+**Worsens:** adds a column and a selection mode that confuses people who only want to open items; raises the risk of mass destructive actions, so it requires confirmation with a count and, if possible, undo.
 
 ### cards-on-mobile
-Abaixo de um ponto de quebra, cada linha vira um cartão com título, status e dois atributos-chave; o restante vai para o detalhe.
-**Favorece:** uso em telas estreitas sem rolagem horizontal; toque confortável.
-**Piora:** perde comparação lado a lado e ordenação por coluna; precisa de um seletor de ordenação explícito no topo.
+Below a breakpoint, each row becomes a card with title, status and two key attributes; the rest moves to the detail.
+**Favors:** use on narrow screens without horizontal scrolling; comfortable touch.
+**Worsens:** loses side-by-side comparison and column sorting; needs an explicit sort selector at the top.
 
 ### filters-in-side-panel
-Filtros numa coluna à esquerda, sempre abertos, em vez de uma barra horizontal.
-**Favorece:** conjuntos com muitos critérios combináveis (8+), contagem por opção, refino exploratório.
-**Piora:** rouba largura da tabela; em telas médias força rolagem horizontal; exagera para quem só busca por nome.
+Filters in a left column, always open, instead of a horizontal bar.
+**Favors:** sets with many combinable criteria (8+), count per option, exploratory refinement.
+**Worsens:** takes width from the table; on medium screens forces horizontal scrolling; overkill for someone who only searches by name.
 
 ### grouped-by-status
-Linhas agrupadas por status (ou etapa), com cabeçalho de grupo recolhível e contagem.
-**Favorece:** fluxos com etapas claras, onde a pergunta é "o que está parado em cada fase".
-**Piora:** paginação fica ambígua (por grupo ou global); ordenação por outra coluna quebra o agrupamento — declare qual vence.
+Rows grouped by status (or stage), with a collapsible group header and count.
+**Favors:** flows with clear stages, where the question is "what is stuck in each phase".
+**Worsens:** pagination becomes ambiguous (per group or global); sorting by another column breaks the grouping, so declare which one wins.
 
-## Anti-padrões
+## Anti-patterns
 
-- Mesma mensagem para "nada cadastrado" e "nenhum resultado para o filtro".
-- Filtro que se perde ao abrir o detalhe e voltar.
-- Status comunicado só pela cor do ponto.
-- Três botões cheios no cabeçalho (criar, importar, exportar) disputando a primária.
-- Ícone de lixeira solto em cada linha, ao lado de editar, sem confirmação.
-- Paginação que volta para a página 1 depois de qualquer ação na linha.
-- Tabela que encolhe colunas até truncar o identificador do registro.
-- Ação em lote que age só na página visível quando a pessoa acreditava ter selecionado tudo.
+- The same message for "nothing created yet" and "no result for the filter".
+- Filters lost when opening the detail and coming back.
+- Status conveyed only by the dot's color.
+- Three filled buttons in the header (create, import, export) competing for primary.
+- A loose trash icon on every row, next to edit, with no confirmation.
+- Pagination that goes back to page 1 after any row action.
+- A table that shrinks columns until the record identifier is truncated.
+- A bulk action that only acts on the visible page when the person believed they had selected everything.
 
 ## Checklist
 
-- [ ] Um único `h1` com o nome do conjunto; no máximo uma ação primária no cabeçalho.
-- [ ] Busca textual visível; filtros ativos mostrados como chips com "Limpar filtros".
-- [ ] Estado de filtros, ordenação e página preservado ao voltar do detalhe (URL).
-- [ ] `empty` e `empty-filtered` têm textos e ações diferentes.
-- [ ] Status com texto além da cor; números alinhados à direita.
-- [ ] Destrutivas no menu da linha ou em lote, com rótulo específico e confirmação com contagem.
-- [ ] Esqueleto no primeiro carregamento; sem tela piscando ao paginar.
-- [ ] Em tela estreita, sem rolagem horizontal da página (cards ou colunas prioritárias).
+- [ ] A single `h1` with the set's name; at most one primary action in the header.
+- [ ] Visible text search; active filters shown as chips with "Clear filters".
+- [ ] Filter, sort and page state preserved when returning from the detail (URL).
+- [ ] `empty` and `empty-filtered` have different texts and actions.
+- [ ] Status with text besides color; numbers right-aligned.
+- [ ] Destructive actions in the row menu or in bulk, with a specific label and confirmation with a count.
+- [ ] Skeleton on first load; no screen flashing when paginating.
+- [ ] On a narrow screen, no horizontal page scrolling (cards or priority columns).

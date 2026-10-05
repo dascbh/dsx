@@ -1,6 +1,6 @@
-// Inventário de telas de um módulo, para confrontar com o UX.md (nota e drift): telas do mapa de fluxo
-// (.dsx/maps/flows-<module>.json) e das capturas (<nn>-<tela>[.<estado>].html), e a data da última mudança
-// delas (git quando os arquivos estão versionados; senão, a data do arquivo). Sem dependências.
+// Screen inventory of a module, to compare against the UX.md (score and drift): screens of the flow map
+// (.dsx/maps/flows-<module>.json) and of the captures (<nn>-<screen>[.<state>].html), and the date of their last
+// change (git when the files are versioned; otherwise the file date). No dependencies.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, relative, isAbsolute } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -13,7 +13,7 @@ const normRoute = (s) => String(s ?? '').trim().replace(/[?#].*$/, '').replace(/
 const fold = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 /**
- * Lê o mapa e as capturas. Devolve { screens: Map<id, { id, name, route, type, in_map, captures: [arquivo],
+ * Reads the map and the captures. Returns { screens: Map<id, { id, name, route, type, in_map, captures: [file],
  * states: Set }>, map, screens_dir, has_map, has_captures }.
  */
 export function loadInventory({ map = null, screens = null } = {}) {
@@ -46,7 +46,7 @@ export function loadInventory({ map = null, screens = null } = {}) {
   return { screens: out, map: hasMap ? map : null, screens_dir: hasCaptures ? screens : null, has_map: hasMap, has_captures: hasCaptures };
 }
 
-/** A entrada do front matter (`archetypes.<id>: [entradas]`) nomeia esta tela (id, rota ou nome)? */
+/** Does the front matter entry (`archetypes.<id>: [entries]`) name this screen (id, route or name)? */
 export function entryMatches(entry, screen) {
   const v = String(entry ?? '').trim();
   if (!v) return false;
@@ -56,7 +56,7 @@ export function entryMatches(entry, screen) {
   return false;
 }
 
-/** Arquétipo atribuído à tela pelo front matter, ou null. */
+/** Archetype assigned to the screen by the front matter, or null. */
 export function archetypeOf(screen, archetypes = {}) {
   for (const [arch, entries] of Object.entries(archetypes || {})) {
     if ([].concat(entries ?? []).some((e) => entryMatches(e, screen))) return arch;
@@ -71,9 +71,9 @@ function gitRoot(dir) {
 }
 
 /**
- * Última mudança das telas: o commit mais recente que tocou o mapa ou a pasta de capturas (data AAAA-MM-DD), ou,
- * sem nada versionado, a data de modificação do arquivo mais novo. Devolve { date, source: 'git'|'mtime', paths }
- * ou null.
+ * Last change of the screens: the most recent commit touching the map or the captures folder (date YYYY-MM-DD), or,
+ * with nothing versioned, the modification date of the newest file. Returns { date, source: 'git'|'mtime', paths }
+ * or null.
  */
 export function lastScreensChange({ map = null, screens = null, root = null } = {}) {
   const paths = [map, screens].filter((p) => p && existsSync(p));
@@ -83,7 +83,7 @@ export function lastScreensChange({ map = null, screens = null, root = null } = 
     try {
       const date = execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths.map((p) => rel(top, p))], { cwd: top, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
       if (date) return { date, source: 'git', paths };
-    } catch { /* sem histórico */ }
+    } catch { /* no history */ }
   }
   let newest = 0;
   for (const p of paths) {

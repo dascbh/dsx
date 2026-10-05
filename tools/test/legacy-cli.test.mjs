@@ -8,7 +8,7 @@ const run = (tool, argv) => { const w = []; const out = normalizeArgv(tool, argv
 test('legacy CLI: old subcommand runs the new one with a warning', () => {
   const { out, w } = run('stitch/design-system.mjs', ['exportar', 'DESIGN.md', '-o', 'x.md']);
   assert.deepEqual(out, ['export', 'DESIGN.md', '-o', 'x.md']);
-  assert.match(w[0], /"exportar" é nome antigo, use "export"/);
+  assert.match(w[0], /"exportar" is an old name, use "export"/);
 });
 
 test('legacy CLI: only the first positional is treated as subcommand', () => {
@@ -40,6 +40,6 @@ test('legacy CLI: new names pass untouched and silent; unknown tool is a no-op',
 test('legacy CLI: every tool in the table exists and uses the table', () => {
   for (const tool of Object.keys(LEGACY_CLI)) {
     const src = readFileSync(new URL(`../${tool}`, import.meta.url), 'utf8');
-    assert.ok(src.includes(`'${tool}'`) && /legacy-cli\.mjs/.test(src), `${tool} não usa tools/lib/legacy-cli.mjs`);
+    assert.ok(src.includes(`'${tool}'`) && /legacy-cli\.mjs/.test(src), `${tool} does not use tools/lib/legacy-cli.mjs`);
   }
 });

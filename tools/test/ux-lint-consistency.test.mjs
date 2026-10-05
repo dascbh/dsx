@@ -56,7 +56,7 @@ test('consistency: C1 dismiss compares only dialog buttons with the same role', 
     '05-pagina.html': page(b('Voltar')),
   });
   assert.deepEqual(ids(f), ['C1:dismiss|cancel']);
-  assert.equal(f[0].text, 'dispensar diálogo com ação');
+  assert.equal(f[0].text, 'dismiss dialog with an action');
   assert.match(f[0].message, /"Cancelar" \(01-dlg\) × "Voltar" \(02-dlg\)/);
 });
 
@@ -64,7 +64,7 @@ test('consistency: C2 same label, different visual variant, same context only', 
   const f = run({
     '01-a.html': page(b('Salvar', 'contained')),
     '02-b.html': page(b('Salvar', 'outlined')),
-    // gatilho (texto na página) × confirmação (cheio no diálogo): papéis diferentes, não acusa
+    // trigger (text on the page) × confirmation (contained in the dialog): different roles, not flagged
     '03-c.html': page(b('Remover', 'text')),
     '04-d.html': dialog('Remover do catálogo?', `${b('Cancelar')}${b('Remover', 'contained')}`),
   });
@@ -81,9 +81,9 @@ test('consistency: C3 glossary deny-list and known synonym pairs in titles and t
     '02-b.html': page('<h2>Templates da empresa</h2>'),
     '03-c.html': page('<h2>Catálogo oficial</h2>'),
   }, { glossary });
-  // "catálogo" é termo canônico de outra linha: não acusa
+  // "catálogo" is the canonical term of another row: not flagged
   assert.deepEqual(ids(f), ['C3:glossary|rascunho', 'C3:synonyms|modelo|template']);
-  assert.match(f[0].message, /"Rascunhos salvos" usa "rascunho"; o glossário chama de "Proposta"/);
+  assert.match(f[0].message, /"Rascunhos salvos" uses "rascunho"; the glossary calls it "Proposta"/);
 });
 
 test('consistency: glossary from UX.md (path, map, inline)', () => {
@@ -111,14 +111,26 @@ test('consistency: CLI JSON goes into findings.mjs with stable c- ids anchored o
   writeFileSync(f, out);
   const a = collect({ consistency: f });
   assert.match(a.items[0].id, /^c-[0-9a-f]{8}$/);
-  // mais uma tela com o mesmo problema não muda o id
+  // one more screen with the same problem does not change the id
   writeFileSync(join(dir, '03-outra.html'), page(b('Remover proposta')));
   const out2 = execFileSync(process.execPath, [join(import.meta.dirname, '..', 'ux-lint', 'consistency.mjs'), dir, '--json'], { encoding: 'utf8' });
   writeFileSync(f, out2);
   assert.equal(collect({ consistency: f }).items[0].id, a.items[0].id);
 });
 
-test('adicionar (algo existente) e criar (objeto novo) são grupos diferentes', async () => {
+test('add (something existing) and create (a new object) are different groups', async () => {
   const { VERB_GROUPS } = await import('../ux-lint/consistency.mjs');
   if (VERB_GROUPS.create.includes('adicionar') || !VERB_GROUPS.add.includes('adicionar')) throw new Error('grupos');
+});
+
+test('consistency: English labels group by verb, and synonyms follow content.language', async () => {
+  const { analyzeConsistency: analyze, inventory: inv } = await import('../ux-lint/consistency.mjs');
+  const btnHtml = (t) => `<!doctype html><html><body><main><h1>Orders</h1><button class="MuiButton-root MuiButton-contained">${t}</button></main></body></html>`;
+  const entries = [...inv(btnHtml('Delete order'), configFrom({}), '01-a.html'), ...inv(btnHtml('Remove order'), configFrom({}), '02-b.html')];
+  assert.deepEqual(analyze(entries).map((f) => f.rule), ['C1']);
+  const heads = (t) => `<!doctype html><html><body><main><h1>${t}</h1></main></body></html>`;
+  const en = configFrom({ content: { language: 'en' } });
+  const titles = [...inv(heads('Settings'), en, '01-a.html'), ...inv(heads('Preferences'), en, '02-b.html')];
+  assert.deepEqual(analyze(titles, { cfg: en }).map((f) => f.rule), ['C3']);
+  assert.deepEqual(analyze(titles).map((f) => f.rule), [], 'the default pt-BR pack has no English synonym pairs');
 });

@@ -1,6 +1,6 @@
 ---
 id: skeleton-vs-spinner
-title: Skeleton ou spinner: quando usar cada um?
+title: "Skeleton or spinner: when should you use each?"
 category: feedback
 components: [skeleton, spinner, progress-bar, loading]
 type: contextual-decision
@@ -11,97 +11,97 @@ wcag: ["4.1.3", "2.2.2", "2.3.3", "1.4.1"]
 related: [skeleton-screen, progress-percentage, long-loading, double-submit]
 ---
 
-# Skeleton ou spinner: quando usar cada um?
+# Skeleton or spinner: when should you use each?
 
-> **Regra:** Skeleton para a carga inicial de conteúdo com formato conhecido; spinner inline para ações curtas; barra de progresso só quando houver medida real.
+> **Rule:** A skeleton for the initial load of content with a known shape; an inline spinner for short actions; a progress bar only when there is a real measure.
 
-## Contexto
+## Context
 
-Sem retorno, tela vazia parece defeito e a ação parece não ter surtido efeito. Skeleton, spinner, loading de página, barra de progresso e carregamento progressivo atendem a casos diferentes. Para escolher, descubra o que está carregando, a duração provável, se a estrutura é previsível e se a pessoa ainda pode interagir.
+Without feedback, a blank screen looks like a defect and an action looks like it had no effect. Skeletons, spinners, page loading, progress bars and progressive loading serve different cases. To choose, find out what is loading, how long it will probably take, whether the structure is predictable and whether the person can still interact.
 
-O padrão errado também prejudica: spinner de página inteira esconde a estrutura, skeleton em controle não explica uma ação e porcentagem inventada cria falsa expectativa. Esperas sem retorno geram ansiedade e cliques repetidos.
+The wrong pattern also does harm: a full-page spinner hides the structure, a skeleton on a control does not explain an action and an invented percentage creates false expectations. Waits without feedback cause anxiety and repeated clicks.
 
-Não existe limite de tempo universal. Os marcos clássicos de 0,1, 1 e 10 segundos são uma heurística histórica de resposta, e não critério para escolher o indicador.
+There is no universal time limit. The classic 0.1, 1 and 10 second milestones are a historical response-time heuristic, not a criterion for choosing the indicator.
 
-## Decisão
+## Decision
 
-- **SE** é a carga inicial de lista, card, tabela ou área com formato conhecido **ENTÃO** use skeleton que reproduza a estrutura aproximada.
-- **SE** é ação assíncrona curta (salvar, atualizar, pesquisar, enviar) **ENTÃO** use spinner ou loading inline junto do alvo e impeça acionamento repetido.
-- **SE** a página ou uma área crítica está realmente bloqueada **ENTÃO** use loading de página ou sobreposição apenas nessa área.
-- **SE** a tarefa é longa e há etapas ou percentual reais **ENTÃO** use progresso determinado.
-- **SE** a espera existe mas a duração é desconhecida **ENTÃO** use progresso indeterminado.
-- **SE** a página é lenta ou usa várias fontes **ENTÃO** carregue de forma progressiva: estrutura primeiro, dados depois, sem apagar o que já existe.
-- **SE** a espera é longa **ENTÃO** informe o estado e ofereça cancelar, tentar novamente ou sair.
-- **SENÃO** spinner inline com rótulo.
+- **IF** it is the initial load of a list, card, table or area with a known shape **THEN** use a skeleton that reproduces the approximate structure.
+- **IF** it is a short asynchronous action (save, refresh, search, submit) **THEN** use a spinner or inline loading next to the target and prevent repeated activation.
+- **IF** the page or a critical area is really blocked **THEN** use page loading or an overlay on that area only.
+- **IF** the task is long and there are real steps or a real percentage **THEN** use determinate progress.
+- **IF** there is a wait but its duration is unknown **THEN** use indeterminate progress.
+- **IF** the page is slow or uses several sources **THEN** load progressively: structure first, data next, without wiping what already exists.
+- **IF** the wait is long **THEN** report the state and offer cancel, try again or leave.
+- **ELSE** a labeled inline spinner.
 
-## Quando usar
+## When to use
 
-- Skeleton: carga inicial com layout previsível.
-- Spinner inline: ação localizada.
-- Progresso determinado: upload, download, importação com medida real.
-- Progressivo: dashboards e filtros com várias fontes.
+- Skeleton: initial load with a predictable layout.
+- Inline spinner: a localized action.
+- Determinate progress: upload, download, import with a real measure.
+- Progressive: dashboards and filters with several sources.
 
-## Quando evitar
+## When to avoid
 
-- Skeleton em botões, campos, menus, modais ou toasts → **use em vez disso:** spinner inline ou estado desabilitado com rótulo.
-- Spinner de página para área pequena → **use em vez disso:** indicador local.
-- Percentual sem medição → **use em vez disso:** indeterminado.
-- Vários loaders concorrentes → **use em vez disso:** um indicador por escopo.
-- Spinner sem erro nem saída → **use em vez disso:** timeout com tentar novamente.
+- A skeleton on buttons, fields, menus, modals or toasts → **use instead:** an inline spinner or a labeled disabled state.
+- A page spinner for a small area → **use instead:** a local indicator.
+- A percentage without measurement → **use instead:** indeterminate.
+- Several competing loaders → **use instead:** one indicator per scope.
+- A spinner with no error or way out → **use instead:** a timeout with try again.
 
-## Faça
+## Do
 
-- Preserve o layout para evitar saltos.
-- Aproxime o indicador do alvo.
-- Informe conclusão, falha e timeout.
-- Respeite redução de movimento.
-- Teste duração e recuperação reais.
+- Preserve the layout to avoid jumps.
+- Place the indicator close to the target.
+- Report completion, failure and timeout.
+- Respect reduced motion.
+- Test real duration and recovery.
 
-## Evite
+## Avoid
 
-- Bloquear a interface inteira sem necessidade.
-- Simular porcentagem.
-- Depender só de animação ou cor.
-- Remover do DOM o controle que tem foco.
+- Blocking the whole interface unnecessarily.
+- Simulating a percentage.
+- Relying only on animation or color.
+- Removing the focused control from the DOM.
 
-## Acessibilidade
+## Accessibility
 
-- Comunique o estado por texto e semântica, não só por movimento (1.4.1).
-- Use `role="status"` ou região aria-live, sem mover o foco (4.1.3).
-- Use `aria-busy="true"` na região em atualização e remova ao terminar.
-- Progresso determinado: `role="progressbar"` com nome e valores mínimo, atual e máximo.
-- Spinner com rótulo acessível ("Salvando").
-- Respeite `prefers-reduced-motion` (2.3.3) e dê controle sobre animações longas (2.2.2).
+- Communicate the state through text and semantics, not only motion (1.4.1).
+- Use `role="status"` or an aria-live region, without moving focus (4.1.3).
+- Use `aria-busy="true"` on the updating region and remove it when done.
+- Determinate progress: `role="progressbar"` with a name and minimum, current and maximum values.
+- A spinner with an accessible label ("Saving").
+- Respect `prefers-reduced-motion` (2.3.3) and give control over long animations (2.2.2).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Spinner de ação | "Salvando…" |
-| Carga de lista | "Carregando resultados…" |
-| Espera longa | "Isso está levando mais tempo que o normal." |
-| Timeout | "Não conseguimos carregar. Tentar novamente" |
-| Concluído | "Resultados atualizados." |
+| Action spinner | "Saving…" |
+| List load | "Loading results…" |
+| Long wait | "This is taking longer than usual." |
+| Timeout | "We couldn't load it. Try again" |
+| Done | "Results updated." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Está claro o que está carregando.
-- [ ] O padrão escolhido corresponde ao escopo.
-- [ ] O skeleton reflete a estrutura final.
-- [ ] O spinner fica junto do alvo.
-- [ ] A página só é bloqueada quando necessário.
-- [ ] Porcentagens refletem progresso real.
-- [ ] Esperas longas oferecem status e saída.
-- [ ] Cliques duplicados são impedidos sem perder o foco.
-- [ ] Há anúncio por região de status.
-- [ ] Foi testado com teclado, zoom e redução de movimento.
+- [ ] It is clear what is loading.
+- [ ] The chosen pattern matches the scope.
+- [ ] The skeleton reflects the final structure.
+- [ ] The spinner sits next to the target.
+- [ ] The page is blocked only when necessary.
+- [ ] Percentages reflect real progress.
+- [ ] Long waits offer status and a way out.
+- [ ] Duplicate clicks are prevented without losing focus.
+- [ ] There is an announcement through a status region.
+- [ ] It was tested with keyboard, zoom and reduced motion.
 
-## Fundamentação
+## Rationale
 
-- IBM Carbon (Loading pattern, Inline loading, Progress bar): diferença entre skeleton, loading e progresso; aviso contra loaders concorrentes.
-- Shopify Polaris (Spinner): rótulo acessível e não usar spinner de página inteira.
-- Padrão Digital GOV.BR (Loading): indicadores determinados e indeterminados com ARIA.
-- W3C WAI (mensagens de status) e WCAG 4.1.3: estado anunciado sem mover o foco.
-- Baymard Institute: ansiedade e cliques repetidos em esperas sem retorno.
-- Nielsen Norman Group (tempos de resposta, indicadores de progresso): expectativa e feedback, com ressalva de que os limites são históricos.
-- GitHub Primer (Degraded experiences): informar carregamento, erro e timeout.
+- IBM Carbon (Loading pattern, Inline loading, Progress bar): the difference between skeleton, loading and progress; a warning against competing loaders.
+- Shopify Polaris (Spinner): an accessible label and no full-page spinner.
+- Brazilian Government Digital Standard GOV.BR (Loading): determinate and indeterminate indicators with ARIA.
+- W3C WAI (status messages) and WCAG 4.1.3: state announced without moving focus.
+- Baymard Institute: anxiety and repeated clicks during waits without feedback.
+- Nielsen Norman Group (response times, progress indicators): expectations and feedback, with the caveat that the limits are historical.
+- GitHub Primer (Degraded experiences): report loading, error and timeout.

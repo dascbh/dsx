@@ -1,10 +1,10 @@
 @AGENTS.md
 
-## Notas para o Claude Code
+## Notes for Claude Code
 
-- Este repositório é um plugin do Claude Code (`.claude-plugin/plugin.json`): skills em `skills/`, subagentes em `agents/`.
-- Ao editar o próprio framework, rode `npm run check` antes de concluir.
-- Nomes: código e dados em inglês (arquivos de ferramentas, subcomandos, flags, chaves e valores de JSON/YAML, ids, mapas, testes, identificadores); documento para pessoas em português (`knowledge/`, `templates/`, skills, agentes, mensagens, texto de interface, títulos de seção). Chaves em `snake_case` em JSON e em `kebab-case` em YAML; exceção única para nomes de API ou formato externo (Figma `fileKey`, Stitch, W3C DTCG, DESIGN.md, `hooks.json`). Durante a transição, o que as ferramentas leem de um projeto aceita o nome antigo com aviso; o que escrevem usa só o novo; subcomandos e flags antigos são apelidos com aviso (`tools/lib/legacy-cli.mjs`). Tabela e compatibilidade: `docs/renames-2026-10.md`.
-- Conteúdo em pt-BR. Escreva com redação própria; não copie texto de fontes externas e não cite fontes por URL em `patterns/` (o linter bloqueia).
-- Exceção declarada: `references/` guarda conteúdo de terceiros com licença que permite cópia (ex.: designmd.app, CC BY 4.0), sem alterações e com o crédito exigido. Não é texto do DSX; não edite à mão — regenere com `tools/references.mjs`.
-- `data/` guarda dados próprios do DSX lidos pelas ferramentas: a matriz de dimensões de UX (`data/ux-dimensions.json`) e as análises de lacunas contra fontes externas (`data/gap-analysis/`, só paráfrase).
+- This repository is a Claude Code plugin (`.claude-plugin/plugin.json`): skills in `skills/`, subagents in `agents/`. Old Portuguese skill and agent names remain as deprecated alias stubs pointing to the new names.
+- When editing the framework itself, run `npm run check` before finishing.
+- Naming: everything in English — code, data (tool files, subcommands, flags, JSON/YAML keys and values, ids, maps, tests, identifiers), docs, `knowledge/`, `templates/`, skills, agents and tool messages. The only exception is text the product's end user sees (interface text, microcopy examples), which follows the project's language; the pt-BR text detectors remain and an `en` pack exists. Keys in `snake_case` in JSON and `kebab-case` in YAML; the single exception is names from an external API or format (Figma `fileKey`, Stitch, W3C DTCG, DESIGN.md, `hooks.json`). During the transition, what the tools read from a project accepts the old name with a warning; what they write uses only the new one; old subcommands and flags are aliases with a warning (`tools/lib/legacy-cli.mjs`). Table and compatibility: `docs/renames-2026-10.md`.
+- Write in your own words; do not copy text from external sources and do not cite sources by URL in `patterns/` (the linter blocks it).
+- Declared exception: `references/` holds third-party content under a license that allows copying (e.g. designmd.app, CC BY 4.0), unchanged and with the required credit. It is not DSX text; do not edit it by hand — regenerate it with `tools/references.mjs`.
+- `data/` holds DSX's own data read by the tools: the UX dimensions matrix (`data/ux-dimensions.json`) and the gap analyses against external sources (`data/gap-analysis/`, paraphrase only).

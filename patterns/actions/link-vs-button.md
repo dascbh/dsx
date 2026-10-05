@@ -1,6 +1,6 @@
 ---
 id: link-vs-button
-title: Link ou botão: qual usar?
+title: Link or button, which one should you use?
 category: actions
 components: [link, button]
 type: recommendation
@@ -11,90 +11,90 @@ wcag: ["4.1.2", "2.1.1", "2.4.4", "2.4.7", "1.3.1"]
 related: [link-text, button-text, link-in-new-tab, icon-only-button]
 ---
 
-# Link ou botão: qual usar?
+# Link or button, which one should you use?
 
-> **Regra:** Se a pessoa é levada a outro lugar, use link (`<a href>`); se algo acontece no ponto em que ela está, use botão (`<button>`). Defina a semântica antes do visual.
+> **Rule:** If the person is taken somewhere else, use a link (`<a href>`); if something happens where they are, use a button (`<button>`). Settle the semantics before the visuals.
 
-## Contexto
+## Context
 
-Link e botão podem ter estilo semelhante, mas o visual não determina o comportamento. O link leva a um destino com URL; o botão dispara uma ação na página, num formulário ou em outro componente.
+Links and buttons can look alike, but appearance does not determine behavior. A link leads to a destination with a URL; a button triggers an action on the page, in a form or in another component.
 
-Trocar a semântica por conveniência de estilo ou de script elimina comportamentos esperados: abrir em outra aba, copiar o endereço, acessar o menu de contexto, reagir às teclas corretas e ser lido com o papel certo pelos leitores de tela.
+Swapping semantics for styling or scripting convenience removes expected behaviors: opening in another tab, copying the address, using the context menu, responding to the right keys and being announced with the right role by screen readers.
 
-Classifique a intenção da interação primeiro. A aparência vem depois e pode ser invertida sem trocar o elemento.
+Classify the intent of the interaction first. Appearance comes later and can be swapped without changing the element.
 
-## Decisão
+## Decision
 
-- **SE** existe um destino representável por URL (página, seção, arquivo, e-mail, telefone) **ENTÃO** use `<a href>`.
-- **SE** a interação envia, salva, exclui, abre modal ou menu, expande, alterna estado ou executa operação **ENTÃO** use `<button>`.
-- **SE** a navegação é a chamada principal **ENTÃO** mantenha `<a>` e estilize como botão.
-- **SE** a ação é secundária **ENTÃO** mantenha `<button>` e estilize de forma discreta.
-- **SE** o botão está dentro de um formulário **ENTÃO** use `type="submit"` para enviar e `type="button"` para o que não deve enviar.
-- **SE** um componente visual recebe URL **ENTÃO** renderize link por baixo; **SE** dispara ação **ENTÃO** renderize botão.
-- **SENÃO** (dúvida) pergunte: "isso muda de lugar ou muda algo aqui?"
+- **IF** there is a destination that can be represented by a URL (page, section, file, email, phone) **THEN** use `<a href>`.
+- **IF** the interaction submits, saves, deletes, opens a modal or menu, expands, toggles state or runs an operation **THEN** use `<button>`.
+- **IF** navigation is the main call to action **THEN** keep `<a>` and style it as a button.
+- **IF** the action is secondary **THEN** keep `<button>` and style it discreetly.
+- **IF** the button is inside a form **THEN** use `type="submit"` to submit and `type="button"` for anything that must not submit.
+- **IF** a visual component receives a URL **THEN** render a link underneath; **IF** it triggers an action **THEN** render a button.
+- **ELSE** (in doubt) ask: "does this change place or change something here?"
 
-## Quando usar
+## When to use
 
-- Link: outra página, seção da mesma página, documento, download, e-mail, telefone.
-- Botão: enviar, salvar, excluir, abrir modal ou menu, expandir, alternar.
+- Link: another page, a section of the same page, a document, a download, email, phone.
+- Button: submit, save, delete, open a modal or menu, expand, toggle.
 
-## Quando evitar
+## When to avoid
 
-- Botão com JavaScript para navegar → **use em vez disso:** `<a href>`.
-- Link com `href="#"` para executar ação → **use em vez disso:** `<button>`.
-- `role="button"` ou `role="link"` como primeira opção → **use em vez disso:** elemento nativo.
-- Escolher o elemento pelo visual → **use em vez disso:** escolher pela intenção.
+- A button with JavaScript to navigate → **use instead:** `<a href>`.
+- A link with `href="#"` to run an action → **use instead:** `<button>`.
+- `role="button"` or `role="link"` as the first option → **use instead:** the native element.
+- Choosing the element by appearance → **use instead:** choose by intent.
 
-## Faça
+## Do
 
-- Defina "destino ou ação" antes de escolher o componente.
-- Escreva texto que diga o destino ou o resultado.
-- Preserve foco visível, estados e feedback.
-- Teste copiar endereço, abrir em nova aba e menu de contexto nos links.
-- Teste o botão com Enter e Espaço.
+- Decide "destination or action" before choosing the component.
+- Write text that says the destination or the result.
+- Keep visible focus, states and feedback.
+- Test copy address, open in new tab and context menu on links.
+- Test the button with Enter and Space.
 
-## Evite
+## Avoid
 
-- Usar div ou span clicável no lugar de elemento nativo.
-- Remover o contorno de foco para esconder a diferença.
-- Rótulos vagos como "clique aqui" ou "enviar" sem contexto.
-- Diferenciar link e botão só por cor ou formato.
+- Using a clickable div or span instead of a native element.
+- Removing the focus outline to hide the difference.
+- Vague labels like "click here" or "submit" without context.
+- Distinguishing link and button by color or shape alone.
 
-## Acessibilidade
+## Accessibility
 
-- Elementos nativos expõem nome, papel, estado e teclado (4.1.2, 2.1.1).
-- Link ativa com Enter; botão com Enter e Espaço.
-- O propósito do link deve ser compreensível fora do parágrafo (2.4.4).
-- Foco visível (2.4.7) e ordem lógica.
-- Controles customizados inevitáveis exigem nome, papel, estado e teclas testados com tecnologia assistiva.
+- Native elements expose name, role, state and keyboard behavior (4.1.2, 2.1.1).
+- A link activates with Enter; a button with Enter and Space.
+- The link's purpose must be understandable outside the paragraph (2.4.4).
+- Visible focus (2.4.7) and a logical order.
+- Unavoidable custom controls require name, role, state and keys tested with assistive technology.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Link de destino | "Ver política de reembolso" |
-| Botão de ação | "Salvar alterações" |
-| Link com aparência de botão | "Ir para o painel" |
-| Botão que abre modal | "Adicionar membro" |
-| Evitar | "Clique aqui" |
+| Destination link | "View refund policy" |
+| Action button | "Save changes" |
+| Link styled as a button | "Go to dashboard" |
+| Button that opens a modal | "Add member" |
+| Avoid | "Click here" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A interação foi classificada como destino ou ação.
-- [ ] O elemento HTML corresponde a essa intenção.
-- [ ] Todo link tem `href` com destino real.
-- [ ] Todo botão tem o `type` correto.
-- [ ] O texto informa destino ou resultado.
-- [ ] O controle funciona por teclado.
-- [ ] Links mantêm copiar, nova aba e menu de contexto.
-- [ ] Nenhum link usa `href="#"` para ação.
-- [ ] O foco é visível.
-- [ ] A aparência não contradiz a semântica.
+- [ ] The interaction was classified as destination or action.
+- [ ] The HTML element matches that intent.
+- [ ] Every link has an `href` with a real destination.
+- [ ] Every button has the correct `type`.
+- [ ] The text states the destination or result.
+- [ ] The control works by keyboard.
+- [ ] Links keep copy, new tab and context menu.
+- [ ] No link uses `href="#"` for an action.
+- [ ] Focus is visible.
+- [ ] Appearance does not contradict semantics.
 
-## Fundamentação
+## Rationale
 
-- MDN Web Docs (elementos a e button): hiperlink com href, uso de type e substituição de links falsos por botão.
-- W3C WAI-ARIA APG (Link Pattern) e técnica H91: preferir elementos nativos; role não traz comportamento de navegação.
-- GitHub Primer (Links and buttons): navegação versus ação; link com aparência de botão continua link.
-- Adobe Spectrum (Link, Button): links em texto corrido, hierarquia visual de botões.
-- Padrão Digital GOV.BR (Button): teclado, foco, área de toque e tag button.
+- MDN Web Docs (a and button elements): hyperlink with href, use of type and replacing fake links with buttons.
+- W3C WAI-ARIA APG (Link Pattern) and technique H91: prefer native elements; a role brings no navigation behavior.
+- GitHub Primer (Links and buttons): navigation versus action; a link that looks like a button is still a link.
+- Adobe Spectrum (Link, Button): links in running text, visual hierarchy of buttons.
+- GOV.BR Digital Standard (Button): keyboard, focus, touch area and the button tag.

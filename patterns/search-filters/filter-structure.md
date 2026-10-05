@@ -1,6 +1,6 @@
 ---
 id: filter-structure
-title: Como estruturar filtros em uma interface?
+title: How do you structure filters in an interface?
 category: search-filters
 components: [filter, checkbox, radio, select, side-panel]
 type: recommendation
@@ -11,93 +11,93 @@ wcag: ["1.3.1", "3.3.2", "4.1.3", "1.4.10"]
 related: [active-filters, applying-filters, no-search-results, date-range-filter]
 ---
 
-# Como estruturar filtros em uma interface?
+# How do you structure filters in an interface?
 
-> **Regra:** Ofereça só filtros que respondem a decisões reais da tarefa, agrupados por significado, com lógica de combinação previsível, estado ativo visível e saída simples (remover um, limpar todos).
+> **Rule:** Offer only filters that answer real decisions in the task, grouped by meaning, with predictable combination logic, a visible active state and a simple way out (remove one, clear all).
 
-## Contexto
+## Context
 
-Filtros restringem uma coleção já exibida por critérios como categoria, status, faixa de preço ou data. Funcionam quando a pessoa percebe o que é filtrável, como os critérios se somam e como desfazer.
+Filters narrow a collection that is already shown by criteria such as category, status, price range or date. They work when the person can tell what is filterable, how the criteria add up and how to undo.
 
-Estruturar filtros não é despejar todos os atributos do banco numa lateral. É escolher critérios úteis, agrupá-los no vocabulário do domínio, usar o controle correto e comunicar o efeito de cada escolha.
+Structuring filters is not dumping every database attribute into a sidebar. It is choosing useful criteria, grouping them in the domain's vocabulary, using the right control and communicating the effect of each choice.
 
-Filtros numerosos, vagos ou mal agrupados levam o usuário a ignorar critérios importantes, aplicar combinações que não entende ou concluir que o item não existe.
+Numerous, vague or poorly grouped filters lead the user to ignore important criteria, apply combinations they do not understand or conclude that the item does not exist.
 
-## Decisão
+## Decision
 
-- **SE** o usuário precisa achar algo que pode não estar na lista **ENTÃO** use busca, não filtro.
-- **SE** só precisa mudar a sequência **ENTÃO** use ordenação, em controle separado do filtro.
-- **SE** a lista é pequena e fácil de percorrer **ENTÃO** não ofereça filtros.
-- **SE** o critério permite várias escolhas **ENTÃO** use caixas de seleção; **SE** só uma **ENTÃO** use rádio ou select; **SE** é valor numérico **ENTÃO** use intervalo; **SE** é período **ENTÃO** use controle de data.
-- **SE** uma lista de opções é extensa **ENTÃO** adicione busca interna ou agrupamento.
-- **SE** várias opções do mesmo atributo estão marcadas **ENTÃO** trate-as como alternativas (amplia); **SE** são grupos diferentes **ENTÃO** combine-os restringindo — e confirme isso em teste.
-- **SE** há filtros secundários **ENTÃO** coloque-os em "Mais filtros" apenas se não esconderem algo decisivo.
-- **SE** a tela é estreita **ENTÃO** abra os filtros em painel ou gaveta, com o botão mostrando a quantidade de filtros ativos.
-- **SE** a combinação não retorna itens **ENTÃO** explique e ofereça remover ou relaxar filtros.
-- **SENÃO** mostre os critérios mais usados primeiro.
+- **IF** the user needs to find something that may not be in the list **THEN** use search, not a filter.
+- **IF** they only need to change the order **THEN** use sorting, in a control separate from the filter.
+- **IF** the list is small and easy to scan **THEN** do not offer filters.
+- **IF** the criterion allows several choices **THEN** use checkboxes; **IF** only one **THEN** use radio buttons or a select; **IF** it is a numeric value **THEN** use a range; **IF** it is a period **THEN** use a date control.
+- **IF** a list of options is long **THEN** add an inner search or grouping.
+- **IF** several options of the same attribute are checked **THEN** treat them as alternatives (widens); **IF** they are different groups **THEN** combine them by narrowing — and confirm this in testing.
+- **IF** there are secondary filters **THEN** put them under "More filters" only if they do not hide something decisive.
+- **IF** the screen is narrow **THEN** open the filters in a panel or drawer, with the button showing the number of active filters.
+- **IF** the combination returns no items **THEN** explain and offer to remove or relax filters.
+- **ELSE** show the most used criteria first.
 
-## Quando usar
+## When to use
 
-- Listas extensas e catálogos pesquisáveis.
-- Coleções com atributos relevantes para decisão.
-- Dashboards com muitos registros.
-- Tarefas que combinam mais de um critério.
+- Long lists and searchable catalogs.
+- Collections with attributes relevant to the decision.
+- Dashboards with many records.
+- Tasks that combine more than one criterion.
 
-## Quando evitar
+## When to avoid
 
-- Listas curtas → **use em vez disso:** listar tudo.
-- Encontrar conteúdo ausente da lista → **use em vez disso:** busca.
-- Apenas reordenar → **use em vez disso:** ordenação.
-- Atributos sem efeito real ou que ninguém explica → **use em vez disso:** removê-los.
+- Short lists → **use instead:** listing everything.
+- Finding content that is not in the list → **use instead:** search.
+- Only reordering → **use instead:** sorting.
+- Attributes with no real effect, or that nobody can explain → **use instead:** removing them.
 
-## Faça
+## Do
 
-- Parta das perguntas da tarefa, não dos campos do banco.
-- Dê a cada grupo um nome curto e específico.
-- Mostre os filtros ativos e a contagem de resultados.
-- Permita remover um filtro e limpar todos.
-- Preserve as escolhas ao recarregar ou voltar para a lista.
+- Start from the task's questions, not the database fields.
+- Give each group a short, specific name.
+- Show the active filters and the result count.
+- Allow removing one filter and clearing all.
+- Preserve the choices when reloading or returning to the list.
 
-## Evite
+## Avoid
 
-- Misturar busca e filtro no mesmo controle.
-- Expor todos os atributos disponíveis.
-- Zerar escolhas sem aviso.
-- Depender só de cor para mostrar o que está ativo.
+- Mixing search and filter in the same control.
+- Exposing every available attribute.
+- Resetting choices without warning.
+- Relying only on color to show what is active.
 
-## Acessibilidade
+## Accessibility
 
-- Use controles nativos com `label` visível (WCAG 3.3.2).
-- Agrupe opções relacionadas com `fieldset` e `legend` (WCAG 1.3.1).
-- Em gaveta: botão com nome claro, estado expandido e contagem; foco entra no painel, fica visível e retorna ao acionador ao fechar.
-- Anuncie mudança de resultados em região de status (WCAG 4.1.3).
-- Garanta funcionamento em zoom de 200% e 400% e em tela estreita (WCAG 1.4.10).
+- Use native controls with a visible `label` (WCAG 3.3.2).
+- Group related options with `fieldset` and `legend` (WCAG 1.3.1).
+- In a drawer: a button with a clear name, expanded state and count; focus enters the panel, stays visible and returns to the trigger on close.
+- Announce result changes in a status region (WCAG 4.1.3).
+- Make sure it works at 200% and 400% zoom and on a narrow screen (WCAG 1.4.10).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Botão de painel | "Filtros (3)" |
-| Limpar tudo | "Limpar filtros" |
-| Resultado | "24 resultados" |
-| Sem itens | "Nenhum item com esses filtros. Remova um filtro para ampliar." |
+| Panel button | "Filters (3)" |
+| Clear all | "Clear filters" |
+| Result | "24 results" |
+| No items | "No items match these filters. Remove a filter to widen the results." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Cada filtro responde a uma tarefa real?
-- [ ] Busca e ordenação estão separadas dos filtros?
-- [ ] Os critérios estão agrupados com nomes claros?
-- [ ] O tipo de controle combina com o tipo de escolha?
-- [ ] Os filtros ativos estão visíveis?
-- [ ] Existe remover individual e limpar todos?
-- [ ] Mudança de resultados é anunciada a leitor de tela?
-- [ ] Grupos usam `fieldset`/`legend`?
-- [ ] Filtros funcionam com teclado e em tela estreita?
+- [ ] Does each filter answer a real task?
+- [ ] Are search and sorting separate from the filters?
+- [ ] Are the criteria grouped with clear names?
+- [ ] Does the control type match the type of choice?
+- [ ] Are the active filters visible?
+- [ ] Is there individual removal and clear all?
+- [ ] Is a change in results announced to screen readers?
+- [ ] Do groups use `fieldset`/`legend`?
+- [ ] Do filters work with the keyboard and on a narrow screen?
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute: disponibilidade, escopo, lógica, layout e descoberta de filtros em listas de produtos (forte em e-commerce; validar em outros domínios).
-- IBM Carbon: escolha do método de seleção, indicador de filtros aplicados, limpeza por categoria e global.
-- GitHub Primer: distinção entre busca e filtro, estado recuperável, comunicação a tecnologias assistivas.
-- W3C WAI (agrupar e rotular controles): fieldset/legend e label.
-- Padrão Digital GOV.BR: referência de controles de seleção acessíveis.
+- Baymard Institute: availability, scope, logic, layout and discoverability of filters in product lists (strong in e-commerce; validate in other domains).
+- IBM Carbon: choosing the selection method, applied-filters indicator, per-category and global clearing.
+- GitHub Primer: the distinction between search and filter, recoverable state, communication to assistive technologies.
+- W3C WAI (grouping and labeling controls): fieldset/legend and label.
+- GOV.BR Digital Standard: reference for accessible selection controls.

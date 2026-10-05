@@ -1,10 +1,10 @@
-// Apelidos de CLI da transição de nomes (docs/renames-2026-10.md): subcomandos, flags e valores antigos
-// em português continuam funcionando, com aviso "nome antigo, use X". Tabela única para todas as ferramentas.
-// Cada ferramenta chama normalizeArgv('<ferramenta>', argv) antes de interpretar os argumentos
-// (ou parseCli, que já devolve o resultado de parseArgs).
+// CLI aliases of the naming transition (docs/renames-2026-10.md): old Portuguese subcommands, flags and values
+// keep working, with an "old name, use X" warning. One table for every tool.
+// Each tool calls normalizeArgv('<tool>', argv) before parsing its arguments
+// (or parseCli, which already returns the parseArgs result).
 import { parseArgs } from './cli.mjs';
 
-/** ferramenta (caminho relativo a tools/) → { commands, flags, values: { flag: { antigo: novo } } } */
+/** tool (path relative to tools/) → { commands, flags, values: { flag: { old: new } } } */
 export const LEGACY_CLI = {
   'references.mjs': {
     commands: { indice: 'index', buscar: 'search', baixar: 'fetch', avaliar: 'evaluate', curar: 'curate' },
@@ -24,11 +24,11 @@ export const LEGACY_CLI = {
   'figma/tokens-to-figma.mjs': { flags: { colecao: 'collection' } },
 };
 
-const say = (msg) => console.error(`AVISO  ${msg} (docs/renames-2026-10.md)`);
+const say = (msg) => console.error(`WARNING  ${msg} (docs/renames-2026-10.md)`);
 
 /**
- * Troca subcomando (primeiro posicional), flags e valores antigos pelos novos, avisando cada troca.
- * Aceita `--flag valor` e `--flag=valor`. Devolve um novo argv.
+ * Replaces old subcommand (first positional), flags and values with the new ones, warning on each.
+ * Accepts `--flag value` and `--flag=value`. Returns a new argv.
  */
 export function normalizeArgv(tool, argv = process.argv.slice(2), warn = say) {
   const t = LEGACY_CLI[tool];
@@ -39,29 +39,29 @@ export function normalizeArgv(tool, argv = process.argv.slice(2), warn = say) {
     let a = argv[i];
     if (a.startsWith('--')) {
       let [k, inline] = a.slice(2).split(/=(.*)/s);
-      if (t.flags?.[k]) { warn(`--${k} é nome antigo, use --${t.flags[k]}`); k = t.flags[k]; }
+      if (t.flags?.[k]) { warn(`--${k} is an old name, use --${t.flags[k]}`); k = t.flags[k]; }
       const vals = t.values?.[k];
       if (inline !== undefined) {
-        if (vals?.[inline]) { warn(`--${k} ${inline} é nome antigo, use ${vals[inline]}`); inline = vals[inline]; }
+        if (vals?.[inline]) { warn(`--${k} ${inline} is an old name, use ${vals[inline]}`); inline = vals[inline]; }
         out.push(`--${k}=${inline}`);
       } else {
         out.push(`--${k}`);
         const next = argv[i + 1];
         if (vals && next !== undefined && !next.startsWith('--')) {
           i++;
-          if (vals[next]) { warn(`--${k} ${next} é nome antigo, use ${vals[next]}`); out.push(vals[next]); } else out.push(next);
+          if (vals[next]) { warn(`--${k} ${next} is an old name, use ${vals[next]}`); out.push(vals[next]); } else out.push(next);
         }
       }
       continue;
     }
-    if (!seenPositional && t.commands?.[a]) { warn(`subcomando "${a}" é nome antigo, use "${t.commands[a]}"`); a = t.commands[a]; }
+    if (!seenPositional && t.commands?.[a]) { warn(`subcommand "${a}" is an old name, use "${t.commands[a]}"`); a = t.commands[a]; }
     seenPositional = true;
     out.push(a);
   }
   return out;
 }
 
-/** parseArgs com os apelidos da ferramenta aplicados. */
+/** parseArgs with the tool's aliases applied. */
 export function parseCli(tool, argv = process.argv.slice(2), warn = say) {
   return parseArgs(normalizeArgv(tool, argv, warn));
 }

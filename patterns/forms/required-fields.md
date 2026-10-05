@@ -1,6 +1,6 @@
 ---
 id: required-fields
-title: Como indicar corretamente campos obrigatórios?
+title: How do you correctly mark required fields?
 category: forms
 components: [text-field, label, fieldset, legend, form]
 type: recommendation
@@ -11,89 +11,89 @@ wcag: ["3.3.2", "1.3.1", "1.4.1", "4.1.2"]
 related: [label-vs-placeholder, form-errors, field-order, validation-timing]
 ---
 
-# Como indicar corretamente campos obrigatórios?
+# How do you correctly mark required fields?
 
-> **Regra:** Marque a obrigatoriedade em texto no rótulo, com uma única convenção por formulário, e exponha o estado também de forma programática.
+> **Rule:** Mark required status in text in the label, with a single convention per form, and expose the state programmatically as well.
 
-## Contexto
+## Context
 
-A pessoa precisa saber, antes de enviar, quais campos são necessários. Um campo marcado só de vermelho, com símbolo sem legenda ou sem indicação para tecnologia assistiva pode parecer opcional.
+The person needs to know, before submitting, which fields are needed. A field marked only in red, with an unexplained symbol, or with no indication for assistive technology may look optional.
 
-Sinalizar cedo evita envios incompletos e idas e vindas para corrigir. Uma convenção clara também ajuda quem usa zoom, leitor de tela ou comando de voz a compreender a tarefa antes de tocar em cada campo.
+Signaling early avoids incomplete submissions and back-and-forth corrections. A clear convention also helps people using zoom, screen readers or voice commands to understand the task before touching each field.
 
-Antes de marcar, pergunte se o campo precisa existir: exigir dado que a tarefa não usa é o pior caso.
+Before marking, ask whether the field needs to exist at all: requiring data the task does not use is the worst case.
 
-## Decisão
+## Decision
 
-- **SE** quase todos os campos são obrigatórios **ENTÃO** marque os opcionais com "(opcional)" e diga no topo que os demais são obrigatórios.
-- **SE** a maioria é opcional **ENTÃO** marque os obrigatórios com "(obrigatório)".
-- **SE** todos são obrigatórios **ENTÃO** informe isso uma vez no subtítulo e não marque campo a campo.
-- **SE** usar asterisco **ENTÃO** explique o significado no início do formulário e exponha o estado também em texto ou atributo.
-- **SE** o campo é obrigatório **ENTÃO** aplique `required` (ou `aria-required`) e associe o rótulo ao campo.
-- **SE** um grupo de opções é obrigatório **ENTÃO** use `fieldset` e `legend` e marque a legenda.
-- **SE** o dado não é necessário para a tarefa **ENTÃO** remova o campo.
-- **SENÃO** use "(obrigatório)" no rótulo, a convenção mais explícita.
+- **IF** almost every field is required **THEN** mark the optional ones with "(optional)" and say at the top that the rest are required.
+- **IF** most fields are optional **THEN** mark the required ones with "(required)".
+- **IF** every field is required **THEN** say so once in the subtitle and do not mark field by field.
+- **IF** you use an asterisk **THEN** explain its meaning at the start of the form and expose the state in text or an attribute as well.
+- **IF** the field is required **THEN** apply `required` (or `aria-required`) and associate the label with the field.
+- **IF** a group of options is required **THEN** use `fieldset` and `legend` and mark the legend.
+- **IF** the data is not needed for the task **THEN** remove the field.
+- **ELSE** use "(required)" in the label, the most explicit convention.
 
-## Quando usar
+## When to use
 
-- Formulários com campos obrigatórios e opcionais.
-- Grupos de opções obrigatórias.
-- Formulários longos ou críticos.
-- Interfaces usadas com teclado ou leitor de tela.
+- Forms with required and optional fields.
+- Groups of required options.
+- Long or critical forms.
+- Interfaces used with a keyboard or a screen reader.
 
-## Quando evitar
+## When to avoid
 
-- Obrigatoriedade só pela cor → **use em vez disso:** texto no rótulo.
-- Asterisco sem legenda → **use em vez disso:** legenda explícita ou texto.
-- Convenções misturadas (obrigatório e opcional ao mesmo tempo) → **use em vez disso:** uma só convenção.
-- Regra escondida no placeholder → **use em vez disso:** rótulo visível.
+- Required status shown only by color → **use instead:** text in the label.
+- An asterisk with no legend → **use instead:** an explicit legend or text.
+- Mixed conventions (required and optional at the same time) → **use instead:** a single convention.
+- A rule hidden in the placeholder → **use instead:** a visible label.
 
-## Faça
+## Do
 
-- Escolha uma convenção e aplique em todo o produto.
-- Associe cada rótulo ao seu campo.
-- Teste a leitura com leitor de tela.
+- Choose one convention and apply it across the product.
+- Associate each label with its field.
+- Test how it reads with a screen reader.
 
-## Evite
+## Avoid
 
-- Marcar campos sem validação correspondente.
-- Exigir dados que a tarefa não usa.
-- Usar asterisco para indicar campo opcional.
-- Marcar quase todos os campos quando a exceção é pequena.
+- Marking fields with no matching validation.
+- Requiring data the task does not use.
+- Using an asterisk to indicate an optional field.
+- Marking almost every field when the exception is small.
 
-## Acessibilidade
+## Accessibility
 
-- Rótulos ou instruções para entrada de dados (3.3.2); indicação no rótulo ou na legenda do grupo (técnica H90).
-- Estado obrigatório exposto programaticamente (`required`), não só visualmente (1.3.1, 4.1.2).
-- Não dependa só de cor (1.4.1).
-- Teste rótulo, indicação e instruções com teclado, zoom e leitor de tela.
+- Labels or instructions for data entry (3.3.2); the marker in the label or in the group legend (technique H90).
+- Required state exposed programmatically (`required`), not only visually (1.3.1, 4.1.2).
+- Do not rely only on color (1.4.1).
+- Test label, marker and instructions with keyboard, zoom and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Campo obrigatório | "Nome completo (obrigatório)" |
-| Campo opcional | "Telefone (opcional)" |
-| Todos obrigatórios | "Todos os campos são obrigatórios." |
-| Legenda de asterisco | "* Campo obrigatório" |
+| Required field | "Full name (required)" |
+| Optional field | "Phone (optional)" |
+| All required | "All fields are required." |
+| Asterisk legend | "* Required field" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Todos os campos obrigatórios estão identificados em texto.
-- [ ] Há uma única convenção no formulário.
-- [ ] A convenção está explicada quando usa asterisco.
-- [ ] A indicação não depende só de cor.
-- [ ] O atributo `required` (ou equivalente) está presente.
-- [ ] Cada rótulo está associado ao seu campo.
-- [ ] Grupos de opções usam `fieldset` e `legend`.
-- [ ] Nenhum campo exige dado desnecessário.
+- [ ] Every required field is identified in text.
+- [ ] There is a single convention in the form.
+- [ ] The convention is explained when it uses an asterisk.
+- [ ] The marker does not rely only on color.
+- [ ] The `required` attribute (or equivalent) is present.
+- [ ] Each label is associated with its field.
+- [ ] Option groups use `fieldset` and `legend`.
+- [ ] No field requires unnecessary data.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 3.3.2 (Labels or Instructions): rótulos ou instruções, o que inclui marcar os campos obrigatórios.
-- W3C, técnica H90: indicar obrigatoriedade no rótulo ou na legenda.
-- Material Design 3 (text fields): asterisco no rótulo com explicação em texto auxiliar.
-- Padrão Digital de Governo (GOV.BR), formulário e input: "(obrigatório)" ou "(opcional)" no rótulo, uma convenção por formulário.
-- U.S. Web Design System (Form): indicar obrigatório ou opcional e usar `required`.
-- Adobe Spectrum (Field label): marcar só a minoria e explicar o asterisco.
-- AMAWeb (checklist e manual de acessibilidade): não indicar obrigatório só pela cor.
+- WCAG 2.2, criterion 3.3.2 (Labels or Instructions): labels or instructions, which includes marking required fields.
+- W3C, technique H90: indicate required status in the label or legend.
+- Material Design 3 (text fields): an asterisk in the label with an explanation in helper text.
+- Brazilian Government Digital Standard (GOV.BR), form and input: "(required)" or "(optional)" in the label, one convention per form.
+- U.S. Web Design System (Form): indicate required or optional and use `required`.
+- Adobe Spectrum (Field label): mark only the minority and explain the asterisk.
+- AMAWeb (accessibility checklist and manual): do not indicate required status only by color.

@@ -1,6 +1,6 @@
 ---
 id: address-by-postal-code
-title: Como aproveitar o CEP para completar o endereço no checkout?
+title: How do you use the postal code to complete the address at checkout?
 category: ecommerce
 components: [postal-code-field, address-form, autocomplete]
 type: recommendation
@@ -11,94 +11,94 @@ wcag: ["1.3.5", "2.1.1", "3.3.1", "3.3.4", "1.4.1"]
 related: [autofill, form-errors, guest-checkout, preserve-data-after-error]
 ---
 
-# Como aproveitar o CEP para completar o endereço no checkout?
+# How do you use the postal code to complete the address at checkout?
 
-> **Regra:** Peça o CEP primeiro, consulte ao completar o valor, preencha só o que a fonte retornou e mantenha tudo revisável, editável e com fallback manual.
+> **Rule:** Ask for the postal code first, look it up once the value is complete, fill in only what the source returned and keep everything reviewable, editable and with a manual fallback.
 
-## Contexto
+## Context
 
-Num checkout brasileiro, o CEP é um bom ponto de partida para achar cidade, estado, logradouro e outros dados. Digita-se menos, principalmente no celular. Porém o resultado nem sempre vem completo ou correto para entrega: podem faltar número, complemento, unidade ou referência.
+In a Brazilian checkout, the postal code (CEP) is a good starting point to find the city, state, street and other data; the same applies wherever a postal code maps reliably to an address. People type less, especially on mobile. But the result is not always complete or correct for delivery: the house number, complement, unit or landmark may be missing.
 
-A automação deve agilizar a tarefa sem ocultar a decisão. A pessoa precisa reconhecer o endereço encontrado, ajustar qualquer dado, completar as lacunas e preencher manualmente se o CEP não for achado.
+Automation should speed up the task without hiding the decision. The person needs to recognize the address found, adjust any field, fill in the gaps and enter it manually if the postal code is not found.
 
-Em testes de checkout, uma fração relevante dos endereços digitados à mão tinha erro de ortografia ou de informação; a busca automática completa foi a solução mais eficiente quando aplicável.
+In checkout tests, a relevant share of manually typed addresses had spelling or information errors; full automatic lookup was the most efficient solution where applicable.
 
-## Decisão
+## Decision
 
-- **SE** o CEP é chave confiável para o território atendido **ENTÃO** peça-o no início do bloco de endereço.
-- **SE** o CEP tem o número completo de dígitos válidos **ENTÃO** dispare a consulta automaticamente, sem botão separado.
-- **SE** o usuário ainda digita **ENTÃO** não consulte a cada tecla; espere o valor completo.
-- **SE** a consulta retorna endereço **ENTÃO** exiba-o em grupo identificável, editável, e deixe número e complemento em branco para a pessoa.
-- **SE** o CEP não é localizado, é ambíguo ou a consulta falha **ENTÃO** mantenha o formulário manual e mostre mensagem acionável.
-- **SE** a pessoa troca ou limpa o CEP **ENTÃO** preserve número, complemento e referência.
-- **SE** já havia endereço informado **ENTÃO** não o substitua silenciosamente.
-- **SE** o país não usa CEP **ENTÃO** use o formato local de endereço.
-- **SENÃO** valide o endereço inteiro antes de liberar a finalização do pedido.
+- **IF** the postal code is a reliable key for the territory served **THEN** ask for it at the start of the address block.
+- **IF** the postal code has the full number of valid digits **THEN** trigger the lookup automatically, without a separate button.
+- **IF** the user is still typing **THEN** do not look it up on every keystroke; wait for the complete value.
+- **IF** the lookup returns an address **THEN** show it in an identifiable, editable group, and leave the number and complement blank for the person.
+- **IF** the postal code is not found, is ambiguous or the lookup fails **THEN** keep the manual form and show an actionable message.
+- **IF** the person changes or clears the postal code **THEN** preserve the number, complement and landmark.
+- **IF** an address had already been entered **THEN** do not replace it silently.
+- **IF** the country does not use this kind of postal code **THEN** use the local address format.
+- **ELSE** validate the whole address before allowing the order to be placed.
 
-## Quando usar
+## When to use
 
-- Existe fonte de consulta confiável para a área atendida.
-- A resposta chega rápido na conexão esperada.
-- A pessoa pode revisar número e complemento antes de concluir.
-- O serviço trata ausência, ambiguidade e falha sem travar.
+- There is a reliable lookup source for the area served.
+- The response arrives quickly on the expected connection.
+- The person can review the number and complement before finishing.
+- The service handles absence, ambiguity and failure without blocking.
 
-## Quando evitar
+## When to avoid
 
-- Consulta com baixa cobertura sem correção simples → **use em vez disso:** formulário manual completo.
-- Digitação bloqueada até a resposta da API → **use em vez disso:** campos sempre editáveis.
-- Preenchimento que sobrescreve dados → **use em vez disso:** preencher só campos vazios.
-- Resultado não revisado antes de compra irreversível → **use em vez disso:** etapa de conferência.
+- A lookup with low coverage and no simple correction → **use instead:** a complete manual form.
+- Typing blocked until the API responds → **use instead:** fields that are always editable.
+- Filling that overwrites data → **use instead:** fill only empty fields.
+- A result not reviewed before an irreversible purchase → **use instead:** a review step.
 
-## Faça
+## Do
 
-- Rotule o campo como "CEP" com texto de ajuda curto, se preciso.
-- Exiba como estados separados: carregando, com resultado, sem resultado e com erro.
-- Preserve o valor digitado durante a consulta.
-- Teste com teclado, leitor de tela, autofill, celular e conexão lenta.
+- Label the field with the local name (e.g., "Postal code", or "CEP" in Brazil) with short help text if needed.
+- Show separate states: loading, with result, no result and error.
+- Preserve the typed value during the lookup.
+- Test with keyboard, screen reader, autofill, mobile and slow connections.
 
-## Evite
+## Avoid
 
-- Seguir automaticamente para a próxima etapa sem espaço de revisão.
-- Spinner sem dizer o que está sendo consultado.
-- Remover o formulário manual quando não há resultado.
-- Confundir endereço sugerido com confirmado.
-- `type="number"` no CEP (perde zeros à esquerda e atrapalha máscara).
-- Exibir só erro técnico da API.
+- Moving automatically to the next step without room to review.
+- A spinner that does not say what is being looked up.
+- Removing the manual form when there is no result.
+- Confusing a suggested address with a confirmed one.
+- `type="number"` on the postal code (it drops leading zeros and gets in the way of masks).
+- Showing only the API's technical error.
 
-## Acessibilidade
+## Accessibility
 
-- Rótulo visível ligado a cada campo; tokens de `autocomplete` (`postal-code`, `address-line1`, `address-line2`, `address-level2`, `address-level1`, `country`) segundo 1.3.5.
-- O CEP aceita colar e editar; a máscara não pode impedir isso.
-- Busca operável por teclado (2.1.1) e estados anunciados sem mover o foco.
-- Mensagens de validação em texto, identificando o problema e preservando dados válidos (3.3.1).
-- Permita revisar e corrigir antes de ação crítica (3.3.4).
+- A visible label tied to each field; `autocomplete` tokens (`postal-code`, `address-line1`, `address-line2`, `address-level2`, `address-level1`, `country`) per 1.3.5.
+- The postal code accepts paste and editing; the mask must not prevent that.
+- The lookup is operable by keyboard (2.1.1) and states are announced without moving focus.
+- Validation messages in text, identifying the problem and preserving valid data (3.3.1).
+- Allow reviewing and correcting before a critical action (3.3.4).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulo | "CEP" |
-| Consultando | "Buscando endereço…" |
-| Não encontrado | "Não encontramos esse CEP. Preencha o endereço manualmente." |
-| Revisão | "Confira o endereço e informe o número." |
-| Falha | "Não foi possível consultar agora. Você pode preencher à mão." |
+| Label | "Postal code" |
+| Looking up | "Looking up address…" |
+| Not found | "We couldn't find this postal code. Enter the address manually." |
+| Review | "Check the address and enter the number." |
+| Failure | "We can't look it up right now. You can fill it in by hand." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O CEP é pedido no início do bloco de endereço.
-- [ ] A consulta começa sozinha ao completar o valor.
-- [ ] O endereço encontrado é visível e editável.
-- [ ] Número e complemento não são preenchidos automaticamente.
-- [ ] Existe fallback manual para ausência, ambiguidade e erro.
-- [ ] Durante o carregamento, o CEP e os dados já preenchidos permanecem.
-- [ ] O endereço é validado antes de finalizar o pedido.
-- [ ] Campos têm rótulo visível e tokens de autocomplete.
-- [ ] Foi testado em celular, teclado e leitor de tela.
+- [ ] The postal code is requested at the start of the address block.
+- [ ] The lookup starts on its own once the value is complete.
+- [ ] The address found is visible and editable.
+- [ ] The number and complement are not filled in automatically.
+- [ ] There is a manual fallback for absence, ambiguity and error.
+- [ ] During loading, the postal code and already-filled data remain.
+- [ ] The address is validated before the order is placed.
+- [ ] Fields have visible labels and autocomplete tokens.
+- [ ] It was tested on mobile, keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute (endereços no checkout): falhas frequentes na digitação manual; busca automática completa como melhor opção; detecção de cidade e estado a partir do CEP como alternativa; validação do endereço antes de finalizar.
-- WCAG 2.2, critério 1.3.5 (Identify Input Purpose): propósito do campo identificado programaticamente.
-- WCAG 2.2, critério 2.1.1 (Keyboard) e 1.4.1 (Use of Color): operação por teclado e informação sem depender de cor.
-- WAI (prevenção de erros): permitir revisar e corrigir antes de ação crítica.
-- Design systems de campos de texto de plataformas de e-commerce: referência de rótulos, ajuda e estados, não prova de redução de erros.
+- Baymard Institute (addresses at checkout): frequent failures in manual typing; full automatic lookup as the best option; detecting city and state from the postal code as an alternative; validating the address before placing the order.
+- WCAG 2.2, criterion 1.3.5 (Identify Input Purpose): the field's purpose identified programmatically.
+- WCAG 2.2, criteria 2.1.1 (Keyboard) and 1.4.1 (Use of Color): keyboard operation and information that does not depend on color.
+- WAI (error prevention): allow reviewing and correcting before a critical action.
+- Text field design systems of e-commerce platforms: a reference for labels, help and states, not proof of error reduction.

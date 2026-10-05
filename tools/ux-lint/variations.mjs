@@ -1,27 +1,29 @@
 #!/usr/bin/env node
-// Variações de UX de um fluxo (skill repensar-ux): confere o manifesto, mede as capturas, roda os detectores do
-// ux-lint nos frames de cada variante cruzando com os achados que ela diz resolver, gera a página de comparação e
-// grava a decisão do dono. Contrato do manifesto: skills/repensar-ux/SKILL.md.
+// UX variations of a flow (rethink-ux skill): checks the manifest, measures the captures, runs the ux-lint detectors on
+// each variant's frames against the findings it claims to solve, builds the comparison page and records the owner's
+// decision. Manifest contract: skills/rethink-ux/SKILL.md.
 //
 //   node tools/ux-lint/variations.mjs validate --root <projeto> --module <m> --flow <f> [--manifest <variations.json>] [--json]
 //   node tools/ux-lint/variations.mjs measure  --root … --module … --flow … [--ux UX.md] [--json]
 //   node tools/ux-lint/variations.mjs lint     --root … --module … --flow … [--ux UX.md] [--no-layout] [--json] [--fail-at 3]
-//   node tools/ux-lint/variations.mjs page     --root … --module … --flow … --out <saida.html> [--shots <pasta>] [--no-shots]
+//   node tools/ux-lint/variations.mjs page     --root … --module … --flow … --out <out.html> [--shots <dir>] [--no-shots]
 //                                              [--no-layout] [--product …] [--findings-page <url>] [--max-page-mb 10] [--fragment]
+//                                              [--lang en|pt-BR]
 //   node tools/ux-lint/variations.mjs decide   --root … --module … --flow … (--variant <id> | --compose screen=b,flow=b,behavior=a,text=a)
-//                                              [--comment "…"] [--by nome]
+//                                              [--comment "…"] [--by name]
 //   node tools/ux-lint/variations.mjs import   --root … <decision.json>
 //   node tools/ux-lint/variations.mjs alternatives --root … --module … --flow … [--out specs/<demand-id>/design/alternatives.md]
 // Format 2 manifests carry falsifiable hypotheses per variant (audience, causal_bet, counter_hypothesis,
 // falsification_test, expected_metric, guardrail, lens) and the convergence (choice, rejected_tradeoffs); format 1
 // manifests still validate, with warnings. `decision.json` carries a `provenance` block (tools/lib/provenance.mjs).
 //
-// Manifesto: <root>/.dsx/variations/<module>/<flow>/variations.json (ou --manifest). Capturas e caminhos de `code`
-// são relativos à raiz do projeto. O Playwright (recorte das telas e geometria para o layout) é resolvido a partir do
-// diretório atual, como em preview.mjs: rode de uma pasta do projeto que o tenha (ex.: a pasta do front). Sem ele, a
-// página sai sem as telas recortadas e o lint não roda as regras de layout (L).
-// A página sai como documento completo (doctype, <html lang="pt-BR">, charset, viewport); --fragment tira o esqueleto
-// da página 1 para publicar como artefato (o host põe o esqueleto).
+// Manifest: <root>/.dsx/variations/<module>/<flow>/variations.json (or --manifest). Captures and `code` paths are
+// relative to the project root. Playwright (screen crops and geometry for layout) is resolved from the current
+// directory, as in preview.mjs: run it from a project folder that has it (e.g. the front-end folder). Without it, the
+// page comes out without the cropped screens and lint does not run the layout rules (L).
+// The page comes out as a full document (doctype, <html lang>, charset, viewport); --fragment drops the skeleton of
+// page 1 to publish it as an artifact (the host adds the skeleton). --lang picks the page language: en (default) or
+// pt-BR (also pt, pt-br, en-US…).
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, mkdtempSync, rmSync } from 'node:fs';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -40,6 +42,8 @@ import { analyzeLayout } from './lib/geometry.mjs';
 import { archetypeCatalog, analyzeGeometry, limitsFrom } from './layout.mjs';
 import { encoder } from './preview.mjs';
 import { renderVariationsPages, PAGE_MAX_BYTES } from './lib/variations-page.mjs';
+import { pageLang, STRINGS } from './lib/variations-strings.mjs';
+import { dataText } from '../lib/data-text.mjs';
 import { resolveProjectPaths } from './lib/project-paths.mjs';
 import { buildProvenance } from '../lib/provenance.mjs';
 
@@ -49,7 +53,7 @@ export const FORMAT = 1;
 export const MANIFEST_FORMATS = [1, 2];
 export const MANIFEST_FORMAT = 2;
 /** Forward's lenses (USE-10, fde-design "The five lenses"): alternatives that share a lens count as one. */
-// lentes lidas do snapshot do gate do Forward (data/forward/bin/fde/design.py); a lista literal só vale se o snapshot faltar
+// lenses read from the snapshot of Forward's gate (data/forward/bin/fde/design.py); the literal list only applies when the snapshot is missing
 const FALLBACK_LENSES = ['subtract', 'invert', 'analogous', 'constraint-first', 'object-first'];
 export const LENSES = (() => { try { return loadDivergenceRules().lenses; } catch { return FALLBACK_LENSES; } })();
 /** Falsifiable hypothesis per variant (Forward spec/product-pipeline.md, "Hypotheses" stage). */
@@ -59,28 +63,30 @@ export const CRITIQUE_KEYS = ['counter_case', 'unsupported_claims', 'failure_rec
 export const CRITIQUE_STATUS = ['resolved', 'limitation', 'measurement'];
 export const KINDS = ['screen', 'state', 'behavior'];
 export const AXES = ['screen', 'flow', 'behavior', 'text'];
-export const AXIS_PT = { screen: 'Tela', flow: 'Fluxo', behavior: 'Comportamento', text: 'Texto' };
+/** Axis names in messages. `AXIS_PT`: pt-BR names, kept for importers of the old export. */
+export const AXIS_NAMES = { screen: 'screen', flow: 'flow', behavior: 'behavior', text: 'text' };
+export const AXIS_PT = STRINGS['pt-BR'].axis;
 export const METRICS = ['steps', 'clicks_to_done', 'dialogs', 'primary_actions', 'words_on_screen', 'decisions'];
-/** Métricas que as capturas medem (as outras só o manifesto declara). */
+/** Metrics the captures measure (the others are only declared by the manifest). */
 export const MEASURED = ['dialogs', 'primary_actions', 'words_on_screen'];
 const SHOTS_VERSION = 2;
 const sha1 = (...p) => createHash('sha1').update(p.map((x) => (typeof x === 'string' || Buffer.isBuffer(x) ? x : JSON.stringify(x))).join('\u0000')).digest('hex');
 const isFile = (p) => { try { return statSync(p).isFile(); } catch { return false; } };
 const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
 
-// ---------- manifesto ----------
+// ---------- manifest ----------
 
-/** Pastas do projeto (lib/project-paths.mjs: flag > .dsx/config.json > `paths` do UX.md > padrão). */
+/** Project folders (lib/project-paths.mjs: flag > .dsx/config.json > UX.md `paths` > default). */
 const projectPaths = (root, module = null, config = null) => resolveProjectPaths({ root, module, config });
 export const manifestPath = ({ root, module, flow, dir = null, config = null }) => join(dir ?? projectPaths(root, module, config).variations, module, flow, 'variations.json');
-/** Raiz do projeto a partir do caminho do manifesto (`…/<root>/.dsx/variations/<m>/<f>/variations.json`). */
+/** Project root from the manifest path (`…/<root>/.dsx/variations/<m>/<f>/variations.json`). */
 export function rootFromManifest(file) {
   const abs = resolve(file);
   const i = abs.lastIndexOf(`${sep}.dsx${sep}variations${sep}`);
   return i >= 0 ? abs.slice(0, i) : dirname(abs);
 }
 
-/** Todas as linhas da comparação: hoje primeiro, depois as variantes. */
+/** Every row of the comparison: today first, then the variants. */
 export const rowsOf = (m) => [{ ...(m.current ?? {}), id: m.current?.id ?? 'current', is_current: true }, ...(m.variants ?? []).map((v) => ({ ...v, is_current: false }))];
 
 export function loadCatalogs(dsx = DSX) {
@@ -94,12 +100,12 @@ export function loadCatalogs(dsx = DSX) {
   return {
     archetypes: new Set(arch.map((a) => a.id)), archetype_cards: Object.fromEntries(arch.map((a) => [a.id, a])), patterns,
     pattern_cards: Object.fromEntries(patList.map((p) => [p.id, { title: p.title, category: p.category }])),
-    laws: new Set(Object.keys(dims.laws_index ?? {})), law_cards: Object.fromEntries(Object.entries(dims.laws_index ?? {}).map(([k, v]) => [k, v.name_pt ?? k])),
+    laws: new Set(Object.keys(dims.laws_index ?? {})), law_cards: Object.fromEntries(Object.entries(dims.laws_index ?? {}).map(([k, v]) => [k, dataText(v, 'name', k)])),
     rules: { ...(dims.rules_index ?? {}), ...(dims.review_rules ?? {}) },
   };
 }
 
-/** Registro de achados do módulo: Map id → item (vazio quando não há registro). */
+/** The module's findings registry: Map id → item (empty when there is no registry). */
 export function loadRegistry(root, module, dir = null) {
   const f = join(dir ?? projectPaths(root, module).findings, module, 'findings.json');
   if (!isFile(f)) return { file: null, items: new Map() };
@@ -112,96 +118,96 @@ const codeExists = (root, p) => {
 };
 
 /**
- * Confere o manifesto. Erro impede a página e a decisão; aviso é variação fraca ou dado faltando que não quebra.
- * Regras contra variação falsa: as quatro mudanças por eixo, frames próprios (não os de hoje nem os de outra
- * variante) e ao menos um padrão, arquétipo ou lei citados.
+ * Checks the manifest. An error blocks the page and the decision; a warning is a weak variation or missing data that
+ * does not break anything. Rules against fake variations: the four changes per axis, own frames (not today's nor
+ * another variant's) and at least one cited pattern, archetype or law.
  */
 export function validateManifest(m, { root, catalogs = loadCatalogs(), registry = new Map() } = {}) {
   const errors = [], warnings = [];
   const err = (s) => errors.push(s), warn = (s) => warnings.push(s);
-  if (!MANIFEST_FORMATS.includes(m.format)) err(`format ${JSON.stringify(m.format)}: esperado ${MANIFEST_FORMATS.join(' ou ')}`);
-  for (const k of ['module', 'flow', 'title']) if (!m[k]) err(`falta "${k}"`);
-  for (const k of ['persona', 'task']) if (!m[k]) warn(`falta "${k}": a página abre com a tarefa e a persona`);
-  if (!m.current) err('falta "current" (a versão de hoje)');
-  if (!(m.variants ?? []).length) err('nenhuma variante em "variants"');
-  if ((m.variants ?? []).length && m.variants.length < 2) warn(`${m.variants.length} variante: o método pede 3, realmente diferentes`);
+  if (!MANIFEST_FORMATS.includes(m.format)) err(`format ${JSON.stringify(m.format)}: expected ${MANIFEST_FORMATS.join(' or ')}`);
+  for (const k of ['module', 'flow', 'title']) if (!m[k]) err(`missing "${k}"`);
+  for (const k of ['persona', 'task']) if (!m[k]) warn(`missing "${k}": the page opens with the task and the persona`);
+  if (!m.current) err('missing "current" (today\'s version)');
+  if (!(m.variants ?? []).length) err('no variant in "variants"');
+  if ((m.variants ?? []).length && m.variants.length < 2) warn(`${m.variants.length} variant: the method asks for 3, really different ones`);
   const ids = new Set();
   const captureOwner = new Map();
   const currentIds = new Set((m.current?.frames ?? []).map((f) => f.id));
   for (const row of rowsOf(m)) {
-    const tag = row.is_current ? 'current' : `variante "${row.id}"`;
-    if (ids.has(row.id)) err(`${tag}: id repetido`);
+    const tag = row.is_current ? 'current' : `variant "${row.id}"`;
+    if (ids.has(row.id)) err(`${tag}: duplicate id`);
     ids.add(row.id);
     const frames = row.frames ?? [];
-    if (!frames.length) err(`${tag}: sem frames`);
+    if (!frames.length) err(`${tag}: no frames`);
     const fids = new Set(frames.map((f) => f.id));
     const seen = new Set();
     for (const f of frames) {
       const ft = `${tag}, frame "${f.id}"`;
-      if (!f.id) err(`${tag}: frame sem id`);
-      if (seen.has(f.id)) err(`${ft}: id repetido`);
+      if (!f.id) err(`${tag}: frame without an id`);
+      if (seen.has(f.id)) err(`${ft}: duplicate id`);
       seen.add(f.id);
-      if (!f.step) err(`${ft}: falta "step"`);
+      if (!f.step) err(`${ft}: missing "step"`);
       if (!KINDS.includes(f.kind)) err(`${ft}: kind ${JSON.stringify(f.kind)} (use ${KINDS.join(' | ')})`);
-      if (!f.capture) err(`${ft}: falta "capture"`);
-      else if (!isFile(join(root, f.capture))) err(`${ft}: captura não existe (${f.capture})`);
+      if (!f.capture) err(`${ft}: missing "capture"`);
+      else if (!isFile(join(root, f.capture))) err(`${ft}: capture does not exist (${f.capture})`);
       else if (!row.is_current) {
         const owner = captureOwner.get(f.capture);
-        if (owner && owner !== row.id) err(`${ft}: a mesma captura de "${owner}" (${f.capture}); variação precisa de frames próprios`);
+        if (owner && owner !== row.id) err(`${ft}: the same capture as "${owner}" (${f.capture}); a variation needs its own frames`);
       }
       if (f.capture) { if (row.is_current) captureOwner.set(f.capture, 'current'); else if (!captureOwner.has(f.capture)) captureOwner.set(f.capture, row.id); }
       if (f.kind === 'behavior') {
         const b = f.behavior ?? {};
-        if (!b.action) err(`${ft}: frame de comportamento sem "behavior.action"`);
-        for (const k of ['before', 'after']) if (b[k] && !fids.has(b[k])) err(`${ft}: behavior.${k} "${b[k]}" não é frame desta linha`);
-        if (!b.before) warn(`${ft}: comportamento sem "behavior.before"; a página mostra só o depois`);
+        if (!b.action) err(`${ft}: behavior frame without "behavior.action"`);
+        for (const k of ['before', 'after']) if (b[k] && !fids.has(b[k])) err(`${ft}: behavior.${k} "${b[k]}" is not a frame of this row`);
+        if (!b.before) warn(`${ft}: behavior without "behavior.before"; the page shows only the after`);
       }
     }
-    if (row.hero && !fids.has(row.hero)) err(`${tag}: hero "${row.hero}" não é frame desta linha`);
-    for (const f of frames) if (f.compare_to && !row.is_current && !currentIds.has(f.compare_to)) err(`${tag}, frame "${f.id}": compare_to "${f.compare_to}" não é frame de hoje`);
+    if (row.hero && !fids.has(row.hero)) err(`${tag}: hero "${row.hero}" is not a frame of this row`);
+    for (const f of frames) if (f.compare_to && !row.is_current && !currentIds.has(f.compare_to)) err(`${tag}, frame "${f.id}": compare_to "${f.compare_to}" is not a frame of today`);
     for (const f of frames) {
       const c = f.compare_focus;
       if (c === undefined) continue;
       const ok = c && ['x', 'y', 'w', 'h'].every((k) => Number.isFinite(c[k]) && c[k] >= 0 && c[k] <= 1) && c.w > 0 && c.h > 0 && c.x + c.w <= 1.0001 && c.y + c.h <= 1.0001;
-      if (!ok) err(`${tag}, frame "${f.id}": compare_focus precisa de x, y, w, h entre 0 e 1 (frações da imagem), sem passar da borda`);
+      if (!ok) err(`${tag}, frame "${f.id}": compare_focus needs x, y, w, h between 0 and 1 (fractions of the image), within the edges`);
     }
     const metrics = row.metrics ?? {};
-    for (const k of METRICS) if (!Number.isFinite(Number(metrics[k])) || metrics[k] === null || metrics[k] === '') err(`${tag}: métrica "${k}" ausente ou não numérica`);
+    for (const k of METRICS) if (!Number.isFinite(Number(metrics[k])) || metrics[k] === null || metrics[k] === '') err(`${tag}: metric "${k}" missing or not numeric`);
     for (const [k, v] of Object.entries(row.metrics_detail ?? {})) {
       if (k === 'not_comparable') {
         for (const [mk, why] of Object.entries(v ?? {})) {
-          if (!METRICS.includes(mk)) err(`${tag}: metrics_detail.not_comparable.${mk} não é métrica (${METRICS.join(', ')})`);
-          else if (!String(why ?? '').trim()) err(`${tag}: metrics_detail.not_comparable.${mk} sem motivo`);
+          if (!METRICS.includes(mk)) err(`${tag}: metrics_detail.not_comparable.${mk} is not a metric (${METRICS.join(', ')})`);
+          else if (!String(why ?? '').trim()) err(`${tag}: metrics_detail.not_comparable.${mk} without a reason`);
         }
         continue;
       }
-      if (!METRICS.includes(k)) { err(`${tag}: metrics_detail.${k} não é métrica (${METRICS.join(', ')})`); continue; }
-      if (!Array.isArray(v) || v.some((x) => typeof x !== 'string' || !x.trim())) { err(`${tag}: metrics_detail.${k} precisa ser uma lista de textos (o que foi contado, um por item)`); continue; }
-      if (Number(metrics[k]) !== v.length) warn(`${tag}: metrics_detail.${k} lista ${v.length} e a métrica diz ${metrics[k]}`);
+      if (!METRICS.includes(k)) { err(`${tag}: metrics_detail.${k} is not a metric (${METRICS.join(', ')})`); continue; }
+      if (!Array.isArray(v) || v.some((x) => typeof x !== 'string' || !x.trim())) { err(`${tag}: metrics_detail.${k} must be a list of texts (what was counted, one per item)`); continue; }
+      if (Number(metrics[k]) !== v.length) warn(`${tag}: metrics_detail.${k} lists ${v.length} and the metric says ${metrics[k]}`);
     }
     if (row.is_current) continue;
-    for (const k of ['name', 'concept', 'hypothesis']) if (!row[k]) err(`${tag}: falta "${k}"`);
-    if (!(row.tradeoffs ?? []).length) err(`${tag}: sem "tradeoffs" (toda variação piora alguma coisa; diga o quê)`);
+    for (const k of ['name', 'concept', 'hypothesis']) if (!row[k]) err(`${tag}: missing "${k}"`);
+    if (!(row.tradeoffs ?? []).length) err(`${tag}: no "tradeoffs" (every variation makes something worse; say what)`);
     const empty = AXES.filter((a) => !String(row.changes?.[a] ?? '').trim());
-    if (!row.changes) err(`${tag}: falta "changes"`);
-    else if (empty.length >= 3) err(`${tag}: muda só ${AXIS_PT[AXES.find((a) => !empty.includes(a))] ?? 'nada'}; variação de verdade muda tela, fluxo, comportamento e texto`);
-    else if (empty.length) warn(`${tag}: sem mudança em ${empty.map((a) => AXIS_PT[a].toLowerCase()).join(', ')}`);
-    if (row.archetype && !catalogs.archetypes.has(row.archetype)) err(`${tag}: arquétipo "${row.archetype}" não existe em archetypes/`);
-    for (const p of row.patterns ?? []) if (!catalogs.patterns.has(p)) err(`${tag}: padrão "${p}" não existe em patterns/`);
-    for (const l of row.laws ?? []) if (!catalogs.laws.has(l)) err(`${tag}: lei "${l}" não existe em data/ux-dimensions.json (laws_index)`);
-    if (!row.archetype && !(row.patterns ?? []).length && !(row.laws ?? []).length) err(`${tag}: sem arquétipo, padrão nem lei; a variação precisa de âncora no catálogo`);
+    if (!row.changes) err(`${tag}: missing "changes"`);
+    else if (empty.length >= 3) err(`${tag}: changes only ${AXIS_NAMES[AXES.find((a) => !empty.includes(a))] ?? 'nothing'}; a real variation changes screen, flow, behavior and text`);
+    else if (empty.length) warn(`${tag}: no change in ${empty.map((a) => AXIS_NAMES[a]).join(', ')}`);
+    if (row.archetype && !catalogs.archetypes.has(row.archetype)) err(`${tag}: archetype "${row.archetype}" does not exist in archetypes/`);
+    for (const p of row.patterns ?? []) if (!catalogs.patterns.has(p)) err(`${tag}: pattern "${p}" does not exist in patterns/`);
+    for (const l of row.laws ?? []) if (!catalogs.laws.has(l)) err(`${tag}: law "${l}" does not exist in data/ux-dimensions.json (laws_index)`);
+    if (!row.archetype && !(row.patterns ?? []).length && !(row.laws ?? []).length) err(`${tag}: no archetype, pattern or law; the variation needs an anchor in the catalog`);
     for (const id of row.resolves ?? []) {
       const it = registry.get(id);
-      if (!it) err(`${tag}: achado "${id}" não existe no registro do módulo`);
-      else if (['fixed', 'ignored'].includes(it.status)) warn(`${tag}: achado "${id}" já está ${it.status === 'fixed' ? 'corrigido' : 'ignorado'}`);
+      if (!it) err(`${tag}: finding "${id}" does not exist in the module registry`);
+      else if (['fixed', 'ignored'].includes(it.status)) warn(`${tag}: finding "${id}" is already ${it.status}`);
     }
-    for (const c of row.code ?? []) if (!codeExists(root, c)) warn(`${tag}: código "${c}" não encontrado`);
+    for (const c of row.code ?? []) if (!codeExists(root, c)) warn(`${tag}: code "${c}" not found`);
   }
   checkHypotheses(m, { err, warn });
   const bySet = new Map();
   for (const v of m.variants ?? []) {
     const k = (v.frames ?? []).map((f) => f.capture).sort().join('|');
-    if (k && bySet.has(k)) err(`variantes "${bySet.get(k)}" e "${v.id}" têm os mesmos frames`);
+    if (k && bySet.has(k)) err(`variants "${bySet.get(k)}" and "${v.id}" have the same frames`);
     bySet.set(k, v.id);
   }
   return { errors, warnings };
@@ -270,8 +276,8 @@ export function checkCritique(c, { err, warn }) {
  */
 export function toAlternativesMarkdown(m) {
   const L = [];
-  // nada inventado: só as formulações declaradas, e sem escolha real não há linha "Chose:" (o gate reprova, como deve);
-  // quem exporta (tools/forward/export.mjs) recusa antes e lista o que falta
+  // nothing invented: only the declared statements, and with no real choice there is no "Chose:" line (the gate fails,
+  // as it should); the exporter (tools/forward/export.mjs) refuses first and lists what is missing
   const hmw = [].concat(m.how_might_we ?? []).filter(Boolean);
   L.push('## How might we…');
   for (const h of hmw) L.push(`- ${/^hmw\b/i.test(h) ? h : `HMW ${h}`}`);
@@ -300,15 +306,15 @@ export function toAlternativesMarkdown(m) {
   return `${L.join('\n')}\n`;
 }
 
-// ---------- medida ----------
+// ---------- measurement ----------
 
 const WORD = /[\p{L}\p{N}]+(?:[-'’][\p{L}\p{N}]+)*/gu;
 export const countWords = (s) => (String(s ?? '').match(WORD) ?? []).length;
 
 /**
- * Mede uma captura com os seletores do UX.md: palavras visíveis (com diálogo aberto, só o diálogo; senão as regiões
- * de conteúdo, sem `header` e `nav`, que são a moldura do produto; fora `aria-hidden`, `aria-live` e `legend`; com o valor dos campos de texto),
- * ações primárias visíveis e diálogo aberto.
+ * Measures a capture with the UX.md selectors: visible words (with an open dialog, only the dialog; else the content
+ * regions, without `header` and `nav`, which are the product shell; excluding `aria-hidden`, `aria-live` and `legend`;
+ * including the value of text fields), visible primary actions and open dialog.
  */
 export function measureCapture(html, cfg) {
   const root = parseHtml(html);
@@ -327,13 +333,13 @@ export function measureCapture(html, cfg) {
   return { words, primary_actions: new Set(primaries).size, dialog_open: dialogs.length > 0 };
 }
 
-/** Frames que contam como "tela do caminho": os de tipo `screen` (sem nenhum, todos). */
+/** Frames that count as "screen of the path": the `screen` ones (with none, all of them). */
 const pathFrames = (row) => { const s = (row.frames ?? []).filter((f) => f.kind === 'screen'); return s.length ? s : row.frames ?? []; };
 
 /**
- * Métricas medidas de uma linha: words_on_screen = média de palavras por tela do caminho; primary_actions = maior
- * número de primárias visíveis numa mesma tela do caminho; dialogs = passos cujo frame mostra diálogo aberto.
- * `steps`, `clicks_to_done` e `decisions` dependem do cenário e ficam só declaradas.
+ * Measured metrics of a row: words_on_screen = average words per screen of the path; primary_actions = highest number
+ * of visible primaries on a single screen of the path; dialogs = steps whose frame shows an open dialog.
+ * `steps`, `clicks_to_done` and `decisions` depend on the scenario and stay declared only.
  */
 export function measureRow(row, { root, cfg }) {
   const per = new Map();
@@ -354,7 +360,7 @@ export function measureRow(row, { root, cfg }) {
   };
 }
 
-/** Divergência entre declarada e medida: palavras com tolerância de 10%; as demais exatas. */
+/** Divergence between declared and measured: words with a 10% tolerance; the others exact. */
 export function divergences(declared = {}, measured = {}) {
   const out = [];
   for (const k of MEASURED) {
@@ -371,7 +377,7 @@ export function divergences(declared = {}, measured = {}) {
 const stateOfFrame = (f) => f.state ?? CAPTURE_RE.exec(basename(f.capture ?? ''))?.[3] ?? null;
 const keyOf = (x) => `${x.family}|${x.rule}|${x.state ?? ''}|${normText(x.anchor)}`;
 
-/** Roda texto, tela e estados (e layout, com geometria) nos frames de uma linha. */
+/** Runs text, screen and states (and layout, with geometry) on the frames of a row. */
 export function lintRow(row, { root, cfg, geometry = null, archetypes = {}, index = null }) {
   const out = [];
   const states = new Set();
@@ -386,7 +392,7 @@ export function lintRow(row, { root, cfg, geometry = null, archetypes = {}, inde
     const doc = parseHtml(html);
     texts.push(normText(visibleText(querySelectorAll(doc, 'body')[0] ?? querySelectorAll(doc, 'html')[0] ?? doc)));
     for (const a of analyzeText(html, cfg, f.capture).findings) {
-      // como no registro: texto sem origem no código, ou com a peça acusada vinda de dado, é dado (severidade 0)
+      // as in the registry: text with no origin in the code, or whose flagged piece comes from data, is data (severity 0)
       const src = index?.length ? sourceOf(index, a.text, a.piece) : undefined;
       const data = index?.length ? !src || src.location === 'data' : false;
       out.push({ family: 'text', rule: a.rule, severity: data ? 0 : a.severity, anchor: a.text, message: `${a.message}: "${a.text}"`, ...(data ? { probable_data: true } : {}), ...where });
@@ -412,35 +418,35 @@ export function lintRow(row, { root, cfg, geometry = null, archetypes = {}, inde
 const patternOf = (template) => new RegExp(normText(template).split('{}').map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*?'));
 
 /**
- * Situação de cada achado que a variante diz resolver: `resolved` (sumiu), `persists` (o detector ainda acha ou o
- * texto citado continua na tela), `unverified` (família que as capturas não medem: fluxo, consistência, layout sem
- * geometria, ou revisão sem texto). `suspect`: resolvido, mas a mesma regra aparece como achado novo com outro texto.
+ * Status of each finding the variant claims to solve: `resolved` (gone), `persists` (the detector still finds it or the
+ * cited text is still on screen), `unverified` (a family the captures do not measure: flow, consistency, layout without
+ * geometry, or review without text). `suspect`: resolved, but the same rule shows up as a new finding with other text.
  */
 export function checkResolves(ids, registry, lint, { layout = false, fresh = [] } = {}) {
   return ids.map((id) => {
     const it = registry.get(id);
-    if (!it) return { id, status: 'unverified', reason: 'achado fora do registro' };
+    if (!it) return { id, status: 'unverified', reason: 'finding not in the registry' };
     const base = { id, rule: it.rule, family: it.family, severity: it.severity, text: it.text };
     const same = (x) => x.family === it.family && x.rule === it.rule;
     const textual = [it.text, ...(it.variants ?? [])].filter(Boolean);
-    if (it.family === 'flow' || it.family === 'consistency') return { ...base, status: 'unverified', reason: `família ${it.family === 'flow' ? 'fluxo' : 'consistência'}: conferir no mapa e no julgamento` };
-    if (it.family === 'layout' && !layout) return { ...base, status: 'unverified', reason: 'layout sem geometria (rode com o Playwright do projeto)' };
+    if (it.family === 'flow' || it.family === 'consistency') return { ...base, status: 'unverified', reason: `${it.family} family: check it on the map and by judgment` };
+    if (it.family === 'layout' && !layout) return { ...base, status: 'unverified', reason: 'layout without geometry (run with the project\'s Playwright)' };
     if (it.family === 'states' && it.rule === 'S1') {
-      const st = /estado "([^"]+)"/.exec(it.message ?? it.text ?? '')?.[1] ?? String(it.region ?? '').split(' · ')[0];
-      return lint.states.has(st) ? { ...base, status: 'resolved', reason: `estado "${st}" capturado` } : { ...base, status: 'persists', reason: `nenhum frame do estado "${st}"` };
+      const st = /(?:estado|state) "([^"]+)"/.exec(it.message ?? it.text ?? '')?.[1] ?? String(it.region ?? '').split(' · ')[0];
+      return lint.states.has(st) ? { ...base, status: 'resolved', reason: `state "${st}" captured` } : { ...base, status: 'persists', reason: `no frame of the state "${st}"` };
     }
     let hit = null;
     if (it.origin !== 'review') {
       hit = lint.findings.find((x) => same(x) && (it.family === 'text' ? textual.some((t) => patternOf(t).test(normText(x.anchor))) : normText(x.anchor) === normText(it.text)));
     }
-    if (hit) return { ...base, status: 'persists', reason: `${hit.rule} ainda acusado em ${hit.frames.join(', ')}` };
+    if (hit) return { ...base, status: 'persists', reason: `${hit.rule} still flagged in ${hit.frames.join(', ')}` };
     if (it.family === 'text' && it.origin === 'review') {
       const still = textual.some((t) => lint.texts.some((s) => patternOf(t).test(s)));
-      return still ? { ...base, status: 'persists', reason: 'o texto citado continua na tela' } : { ...base, status: 'resolved', reason: 'o texto citado saiu da tela' };
+      return still ? { ...base, status: 'persists', reason: 'the cited text is still on screen' } : { ...base, status: 'resolved', reason: 'the cited text left the screen' };
     }
-    if (it.origin === 'review') return { ...base, status: 'unverified', reason: 'achado de revisão: conferir no julgamento' };
+    if (it.origin === 'review') return { ...base, status: 'unverified', reason: 'review finding: check it by judgment' };
     const suspect = fresh.some((x) => same(x));
-    return { ...base, status: 'resolved', reason: suspect ? `a regra ${it.rule} reaparece com outro texto: conferir` : 'o detector não acusa mais', ...(suspect ? { suspect: true } : {}) };
+    return { ...base, status: 'resolved', reason: suspect ? `rule ${it.rule} shows up again with other text: check it` : 'the detector no longer flags it', ...(suspect ? { suspect: true } : {}) };
   });
 }
 
@@ -449,9 +455,10 @@ const SRC = /\.(tsx?|jsx?|mjs|cjs|py|json)$/;
 const DATA_FILE = /(^|[._-])(data|fixtures?|mocks?)\.[a-z]+$|^(data|fixtures?|mocks?)\b/i;
 
 /**
- * Índice do código onde o texto nasce, para separar texto de interface de dado fictício (como o registro faz):
- * as pastas de produção (`--code`; padrão: `paths.code` do projeto ou as pastas detectadas pela stack) e as pastas do `code` das
- * variantes e a pasta acima (dados compartilhados). Na pasta das variantes, só arquivo de dados conta como dado.
+ * Index of the code where text is born, to tell interface text from fictional data (as the registry does): the
+ * production folders (`--code`; default: the project's `paths.code` or the folders detected from the stack) and the
+ * folders of the variants' `code` plus the folder above (shared data). In the variants' folder, only a data file
+ * counts as data.
  */
 export function codeIndex(m, { root, code = null } = {}) {
   const prod = (code ?? projectPaths(root).code).map((p) => resolve(root, p)).filter(isDir);
@@ -474,7 +481,7 @@ export function codeIndex(m, { root, code = null } = {}) {
   return [...out.values()];
 }
 
-/** Mede a geometria dos frames (Playwright). Devolve Map capture → geometria, ou null sem Playwright. */
+/** Measures the geometry of the frames (Playwright). Returns Map capture → geometry, or null without Playwright. */
 export async function measureAllGeometry(m, { root, cfg, playwright, width = 1440, height = 900 }) {
   if (!playwright) return null;
   const tmp = mkdtempSync(join(tmpdir(), 'dsx-variations-'));
@@ -491,8 +498,8 @@ export async function measureAllGeometry(m, { root, cfg, playwright, width = 144
 }
 
 /**
- * Lint do manifesto inteiro. Para cada variante: achados novos (que hoje não tem), os de severidade ≥ `failAt`
- * bloqueiam, e a situação de cada id de `resolves`.
+ * Lint of the whole manifest. For each variant: new findings (that today does not have), those with severity ≥
+ * `failAt` block, and the status of each id in `resolves`.
  */
 export function lintManifest(m, { root, cfg, registry = new Map(), geometry = null, failAt = 3, archetypes = archetypeCatalog(), index = codeIndex(m, { root }) }) {
   const rows = rowsOf(m);
@@ -511,24 +518,24 @@ export function lintManifest(m, { root, cfg, registry = new Map(), geometry = nu
   return result;
 }
 
-// ---------- decisão ----------
+// ---------- decision ----------
 
 export function decisionPath(root, m) { return join(projectPaths(root, m.module).variations, m.module, m.flow, 'decision.json'); }
 
-/** Monta e confere a decisão: variante inteira ou composição por eixo (cada eixo: `current` ou id de variante). */
-export function makeDecision(m, { variant = null, compose = null, comment = '', by = 'dono', now = new Date() } = {}) {
+/** Builds and checks the decision: whole variant or composition per axis (each axis: `current` or a variant id). */
+export function makeDecision(m, { variant = null, compose = null, comment = '', by = 'owner', now = new Date() } = {}) {
   const ids = new Set(rowsOf(m).map((r) => r.id).concat('current'));
   const errors = [];
   let mode;
-  if (variant && compose) errors.push('use --variant ou --compose, não os dois');
-  if (variant) { mode = 'variant'; if (!ids.has(variant)) errors.push(`variante "${variant}" não existe`); }
+  if (variant && compose) errors.push('use --variant or --compose, not both');
+  if (variant) { mode = 'variant'; if (!ids.has(variant)) errors.push(`variant "${variant}" does not exist`); }
   else if (compose) {
     mode = 'compose';
-    for (const a of AXES) if (!compose[a]) errors.push(`compor: falta o eixo ${a}`);
-    for (const [a, v] of Object.entries(compose)) { if (!AXES.includes(a)) errors.push(`eixo desconhecido "${a}"`); else if (!ids.has(v)) errors.push(`eixo ${a}: variante "${v}" não existe`); }
-  } else errors.push('diga a escolha: --variant <id> ou --compose screen=…,flow=…,behavior=…,text=…');
+    for (const a of AXES) if (!compose[a]) errors.push(`compose: missing the ${a} axis`);
+    for (const [a, v] of Object.entries(compose)) { if (!AXES.includes(a)) errors.push(`unknown axis "${a}"`); else if (!ids.has(v)) errors.push(`axis ${a}: variant "${v}" does not exist`); }
+  } else errors.push('give the choice: --variant <id> or --compose screen=…,flow=…,behavior=…,text=…');
   const at = now.toISOString().slice(0, 10);
-  return { errors, decision: { format: FORMAT, module: m.module, flow: m.flow, mode, ...(mode === 'variant' ? { variant } : { compose }), comment: comment || '', by: by || 'dono', at } };
+  return { errors, decision: { format: FORMAT, module: m.module, flow: m.flow, mode, ...(mode === 'variant' ? { variant } : { compose }), comment: comment || '', by: by || 'owner', at } };
 }
 
 export const parseCompose = (s) => Object.fromEntries(String(s).split(',').map((p) => p.split('=').map((x) => x.trim())).filter(([k, v]) => k && v));
@@ -552,13 +559,13 @@ export function writeDecision(root, m, decision, { manifest = null, now = new Da
   return f;
 }
 
-// ---------- imagens ----------
+// ---------- images ----------
 
 /**
- * Recorte do conteúdo de cada captura, em WebP (qualidade 0,75), com cache pelo conteúdo da captura: a região de
- * conteúdo (`main`, ou a 1ª região do UX.md que não é moldura) sem o cabeçalho e o menu do produto, a 1x, até a
- * altura do conteúdo (no máximo `maxHeight`). Com diálogo aberto, a parte visível da região, com o diálogo por cima.
- * Sem região de conteúdo, a página inteira. Devolve Map captura → { content, width, height }.
+ * Content crop of each capture, in WebP (quality 0.75), cached by the capture's content: the content region (`main`,
+ * or the first UX.md region that is not the shell) without the product header and menu, at 1x, down to the content
+ * height (at most `maxHeight`). With an open dialog, the visible part of the region, with the dialog on top. With no
+ * content region, the whole page. Returns Map capture → { content, width, height }.
  */
 export async function shootCaptures(captures, { root, shotsDir, playwright, width = 1440, height = 900, contentSelector = 'main', dialogSelector = '[role=dialog], dialog[open]', maxHeight = 2400, quality = 0.75, log = () => {} }) {
   mkdirSync(shotsDir, { recursive: true });
@@ -603,10 +610,10 @@ export async function shootCaptures(captures, { root, shotsDir, playwright, widt
 }
 
 /**
- * Regiões (px) do que mudou entre duas imagens já recortadas (antes e depois de um comportamento): compara blocos de
- * 16 × 16 px num canvas do navegador (a média por bloco ignora o ruído da compressão), junta blocos vizinhos em
- * regiões e devolve as maiores. Cache em `shotsDir` pelo nome das duas imagens. Devolve Map "<antes>|<depois>" →
- * { boxes: [{ x, y, w, h }], width, height } ou null (nada mudou). Sem Playwright, só o que já está em cache.
+ * Regions (px) of what changed between two already-cropped images (before and after a behavior): compares 16 × 16 px
+ * blocks on a browser canvas (the per-block average ignores compression noise), merges neighboring blocks into regions
+ * and returns the largest. Cached in `shotsDir` by the names of the two images. Returns Map "<before>|<after>" →
+ * { boxes: [{ x, y, w, h }], width, height } or null (nothing changed). Without Playwright, only what is cached.
  */
 export async function diffShots(pairs, { shotsDir, playwright, block = 16, threshold = 16, maxBoxes = 8 }) {
   const out = new Map();
@@ -615,7 +622,7 @@ export async function diffShots(pairs, { shotsDir, playwright, block = 16, thres
     const key = `${a}|${b}`;
     if (out.has(key)) continue;
     const f = join(shotsDir, `diff.${sha1(SHOTS_VERSION, 'blocks', a, b, block, threshold).slice(0, 16)}.json`);
-    if (isFile(f)) { try { out.set(key, JSON.parse(readFileSync(f, 'utf8')).diff ?? null); continue; } catch { /* refaz */ } }
+    if (isFile(f)) { try { out.set(key, JSON.parse(readFileSync(f, 'utf8')).diff ?? null); continue; } catch { /* redo */ } }
     if (isFile(join(shotsDir, a)) && isFile(join(shotsDir, b))) todo.push([a, b, key, f]);
   }
   if (!todo.length || !playwright) return out;
@@ -638,7 +645,7 @@ export async function diffShots(pairs, { shotsDir, playwright, block = 16, thres
           for (let y = by * bs; y < Math.min(H, (by + 1) * bs); y++) for (let x = bx * bs; x < Math.min(W, (bx + 1) * bs); x++) { const i = (y * W + x) * 4; s += Math.abs(pa[i] - pb[i]) + Math.abs(pa[i + 1] - pb[i + 1]) + Math.abs(pa[i + 2] - pb[i + 2]); c++; }
           if (s / c > th) hot[by * cols + bx] = 1;
         }
-        // regiões: blocos quentes a até 2 blocos de distância ficam na mesma região
+        // regions: hot blocks up to 2 blocks apart stay in the same region
         const seen = new Uint8Array(cols * rows), boxes = [];
         for (let i = 0; i < hot.length; i++) {
           if (!hot[i] || seen[i]) continue;
@@ -666,7 +673,7 @@ export async function diffShots(pairs, { shotsDir, playwright, block = 16, thres
   return out;
 }
 
-/** Pares (imagem antes, imagem depois) dos frames de comportamento, para `diffShots`. */
+/** Pairs (before image, after image) of the behavior frames, for `diffShots`. */
 export function behaviorPairs(m, shots) {
   const pairs = [];
   for (const r of rowsOf(m)) {
@@ -687,32 +694,32 @@ function context(a) {
   const root = resolve(typeof a.root === 'string' ? a.root : manifest ? rootFromManifest(manifest) : process.cwd());
   const config = typeof a.config === 'string' ? a.config : null;
   const paths = resolveProjectPaths({ root, module: typeof a.module === 'string' ? a.module : null, config, flags: { ux: typeof a.ux === 'string' ? resolve(a.ux) : null } });
-  for (const w of paths.warnings) console.error(`AVISO ${w}`);
+  for (const w of paths.warnings) console.error(`WARNING ${w}`);
   const file = manifest ?? (typeof a.module === 'string' && typeof a.flow === 'string' ? manifestPath({ root, module: a.module, flow: a.flow, dir: paths.variations }) : null);
-  if (!file) { console.error('Diga o manifesto: --root <projeto> --module <m> --flow <f>, ou --manifest <variations.json>'); process.exit(2); }
-  if (!isFile(file)) { console.error(`Manifesto não encontrado: ${file}`); process.exit(2); }
+  if (!file) { console.error('Give the manifest: --root <project> --module <m> --flow <f>, or --manifest <variations.json>'); process.exit(2); }
+  if (!isFile(file)) { console.error(`Manifest not found: ${file}`); process.exit(2); }
   const m = JSON.parse(readFileSync(file, 'utf8'));
   const ux = isFile(paths.ux) ? paths.ux : null;
   return { root, file, m, cfg: loadConfig(ux), registry: loadRegistry(root, m.module ?? a.module, paths.findings).items };
 }
 
-const fmtMetric = (k) => ({ steps: 'passos', clicks_to_done: 'cliques até concluir', dialogs: 'diálogos', primary_actions: 'ações primárias', words_on_screen: 'palavras por tela', decisions: 'decisões' }[k] ?? k);
-const STATUS_PT = { resolved: 'resolvido', persists: 'persiste', unverified: 'sem verificação' };
+const fmtMetric = (k) => ({ steps: 'steps', clicks_to_done: 'clicks to finish', dialogs: 'dialogs', primary_actions: 'primary actions', words_on_screen: 'words per screen', decisions: 'decisions' }[k] ?? k);
+const STATUS_LABEL = { resolved: 'resolved', persists: 'persists', unverified: 'unverified' };
 
 async function main() {
   const a = parseArgs();
   const cmd = a._[0];
-  const usage = 'Uso: node tools/ux-lint/variations.mjs <validate|measure|lint|page|decide|import|alternatives> --root <projeto> --module <m> --flow <f> [opções]';
+  const usage = 'Usage: node tools/ux-lint/variations.mjs <validate|measure|lint|page|decide|import|alternatives> --root <project> --module <m> --flow <f> [options]';
   if (!['validate', 'measure', 'lint', 'page', 'decide', 'import', 'alternatives'].includes(cmd)) { console.error(usage); process.exit(2); }
 
   if (cmd === 'import') {
     const src = a._[1];
-    if (!src || !isFile(src)) { console.error('Uso: node tools/ux-lint/variations.mjs import --root <projeto> <decision.json>'); process.exit(2); }
+    if (!src || !isFile(src)) { console.error('Usage: node tools/ux-lint/variations.mjs import --root <project> <decision.json>'); process.exit(2); }
     const d = JSON.parse(readFileSync(src, 'utf8'));
     const ctx = context({ ...a, module: d.module, flow: d.flow });
     const r = makeDecision(ctx.m, { variant: d.mode === 'variant' ? d.variant : null, compose: d.mode === 'compose' ? d.compose : null, comment: d.comment, by: d.by, now: d.at ? new Date(d.at) : new Date() });
     if (r.errors.length) { console.error(r.errors.join('\n')); process.exit(1); }
-    console.log(`decisão gravada em ${writeDecision(ctx.root, ctx.m, r.decision, { manifest: ctx.file })}`);
+    console.log(`decision written to ${writeDecision(ctx.root, ctx.m, r.decision, { manifest: ctx.file })}`);
     return;
   }
 
@@ -724,9 +731,9 @@ async function main() {
   if (cmd === 'validate') {
     if (a.json) console.log(JSON.stringify(v, null, 2));
     else {
-      for (const e of v.errors) console.log(`ERRO  ${e}`);
-      for (const w of v.warnings) console.log(`AVISO ${w}`);
-      console.log(`\n${ctx.file}: ${(m.variants ?? []).length} variante(s), ${v.errors.length} erro(s), ${v.warnings.length} aviso(s)`);
+      for (const e of v.errors) console.log(`ERROR   ${e}`);
+      for (const w of v.warnings) console.log(`WARNING ${w}`);
+      console.log(`\n${ctx.file}: ${(m.variants ?? []).length} variant(s), ${v.errors.length} error(s), ${v.warnings.length} warning(s)`);
     }
     process.exit(v.errors.length ? 1 : 0);
   }
@@ -738,71 +745,73 @@ async function main() {
     return;
   }
   if (cmd === 'decide') {
-    const r = makeDecision(m, { variant: typeof a.variant === 'string' ? a.variant : null, compose: typeof a.compose === 'string' ? parseCompose(a.compose) : null, comment: typeof a.comment === 'string' ? a.comment : '', by: typeof a.by === 'string' ? a.by : 'dono' });
+    const r = makeDecision(m, { variant: typeof a.variant === 'string' ? a.variant : null, compose: typeof a.compose === 'string' ? parseCompose(a.compose) : null, comment: typeof a.comment === 'string' ? a.comment : '', by: typeof a.by === 'string' ? a.by : 'owner' });
     if (r.errors.length) { console.error(r.errors.join('\n')); process.exit(1); }
-    console.log(`decisão gravada em ${writeDecision(root, m, r.decision, { manifest: ctx.file })}`);
+    console.log(`decision written to ${writeDecision(root, m, r.decision, { manifest: ctx.file })}`);
     return;
   }
   if (cmd === 'measure') {
-    const rows = rowsOf(m).map((r) => ({ id: r.id, name: r.name ?? 'Hoje', declared: r.metrics ?? {}, ...measureRow(r, { root, cfg }) }));
+    const rows = rowsOf(m).map((r) => ({ id: r.id, name: r.name ?? 'Today', declared: r.metrics ?? {}, ...measureRow(r, { root, cfg }) }));
     for (const r of rows) r.divergences = divergences(r.declared, r.metrics);
     if (a.json) { console.log(JSON.stringify(rows.map(({ frames, ...r }) => r), null, 2)); return; }
     for (const r of rows) {
-      console.log(`${r.is_current ? 'Hoje' : r.id} · ${r.name}`);
+      console.log(`${r.is_current ? 'Today' : r.id} · ${r.name}`);
       for (const k of METRICS) {
         const d = r.declared[k], x = r.metrics[k];
         const div = r.divergences.find((y) => y.metric === k);
-        console.log(`   ${fmtMetric(k).padEnd(22)} declarada ${String(d ?? '—').padStart(5)}  medida ${String(x ?? '—').padStart(5)}${div ? '  ← diverge' : ''}`);
+        console.log(`   ${fmtMetric(k).padEnd(22)} declared ${String(d ?? '—').padStart(5)}  measured ${String(x ?? '—').padStart(5)}${div ? '  ← differs' : ''}`);
       }
     }
-    console.log('\nA medida não sobrescreve o manifesto: corrija a declarada ou explique a diferença na legenda do frame.');
+    console.log('\nThe measurement does not overwrite the manifest: fix the declared value or explain the difference in the frame caption.');
     return;
   }
-  if (v.errors.length) { for (const e of v.errors) console.error(`ERRO  ${e}`); console.error('Manifesto inválido: corrija antes de rodar o lint ou a página (validate).'); process.exit(1); }
+  if (v.errors.length) { for (const e of v.errors) console.error(`ERROR   ${e}`); console.error('Invalid manifest: fix it before running lint or page (validate).'); process.exit(1); }
 
   const playwright = resolvePlaywright();
-  const geometry = a['no-layout'] ? null : await measureAllGeometry(m, { root, cfg, playwright }).catch((e) => { console.error(`geometria não medida: ${String(e.message).split('\n')[0]}`); return null; });
-  if (!geometry && !a['no-layout']) console.error('Sem Playwright no diretório atual: o lint roda sem as regras de layout (L).');
+  const geometry = a['no-layout'] ? null : await measureAllGeometry(m, { root, cfg, playwright }).catch((e) => { console.error(`geometry not measured: ${String(e.message).split('\n')[0]}`); return null; });
+  if (!geometry && !a['no-layout']) console.error('No Playwright in the current directory: lint runs without the layout rules (L).');
   const failAt = Number(a['fail-at'] ?? 3);
   const lint = lintManifest(m, { root, cfg, registry, geometry, failAt });
 
   if (cmd === 'lint') {
     if (a.json) { console.log(JSON.stringify(lint, null, 2)); process.exit(Object.values(lint.variants).every((x) => x.ok) ? 0 : 1); }
-    console.log(`Hoje: ${lint.current.findings.length} achado(s) nos frames · detectores: texto, tela, estados${lint.layout ? ', layout' : ''}`);
+    console.log(`Today: ${lint.current.findings.length} finding(s) in the frames · detectors: text, screen, states${lint.layout ? ', layout' : ''}`);
     for (const r of rowsOf(m).slice(1)) {
       const x = lint.variants[r.id];
       console.log(`\n${x.ok ? '✓' : '✗'} ${r.id} · ${r.name}`);
-      for (const s of x.resolves) console.log(`   ${STATUS_PT[s.status].padEnd(15)} ${s.id} ${s.rule ?? ''} · ${s.reason}`);
-      for (const n of x.new) console.log(`   ${n.severity >= failAt ? 'BLOQUEIA' : 'novo    '} ${n.rule} sev ${n.severity} · ${String(n.message).slice(0, 110)} (${n.frames.join(', ')})`);
-      if (!x.new.length) console.log('   nenhum achado novo de severidade ≥ 2');
+      for (const s of x.resolves) console.log(`   ${STATUS_LABEL[s.status].padEnd(15)} ${s.id} ${s.rule ?? ''} · ${s.reason}`);
+      for (const n of x.new) console.log(`   ${n.severity >= failAt ? 'BLOCKS' : 'new   '} ${n.rule} sev ${n.severity} · ${String(n.message).slice(0, 110)} (${n.frames.join(', ')})`);
+      if (!x.new.length) console.log('   no new finding of severity ≥ 2');
     }
     process.exit(Object.values(lint.variants).every((x) => x.ok) ? 0 : 1);
   }
 
   // page
-  if (typeof a.out !== 'string') { console.error('Diga a saída: --out <pagina.html>'); process.exit(2); }
+  if (typeof a.out !== 'string') { console.error('Give the output: --out <page.html>'); process.exit(2); }
+  const lang = pageLang(a.lang === true ? '' : a.lang);
+  if (!lang) { console.error(`Unknown --lang ${JSON.stringify(a.lang)}: use en or pt-BR`); process.exit(2); }
   const out = resolve(a.out);
   const flowDir = dirname(ctx.file);
   const shotsDir = typeof a.shots === 'string' ? resolve(a.shots) : join(flowDir, 'shots');
   const captures = [...new Set(rowsOf(m).flatMap((r) => (r.frames ?? []).map((f) => f.capture)))];
   let shots = new Map();
   if (!a['no-shots']) {
-    if (!playwright) console.error(`${PLAYWRIGHT_MISSING}\nA página sai sem imagens.`);
+    if (!playwright) console.error(`${PLAYWRIGHT_MISSING}\nThe page comes out without images.`);
     const regions = cfg.verification.selectors.regions ?? [];
     const content = regions.includes('main') ? 'main' : regions.find((r) => !/^(header|nav|aside)\b|role=(banner|navigation|complementary)|dialog/.test(r)) ?? 'main';
     shots = await shootCaptures(captures, { root, shotsDir, playwright, contentSelector: content, dialogSelector: cfg.verification.selectors.dialog || '[role=dialog]', log: a.verbose ? console.log : () => {} });
   }
-  const diffs = shots.size ? await diffShots(behaviorPairs(m, shots), { shotsDir, playwright }).catch((e) => { console.error(`diferença antes/depois não calculada: ${String(e.message).split('\n')[0]}`); return new Map(); }) : new Map();
+  const diffs = shots.size ? await diffShots(behaviorPairs(m, shots), { shotsDir, playwright }).catch((e) => { console.error(`before/after difference not computed: ${String(e.message).split('\n')[0]}`); return new Map(); }) : new Map();
   const measured = Object.fromEntries(rowsOf(m).map((r) => { const x = measureRow(r, { root, cfg }); return [r.id, { metrics: x.metrics, divergences: divergences(r.metrics, x.metrics), frames: x.frames }]; }));
   const pages = renderVariationsPages(m, {
     lint, measured, registry, shots, diffs, shotsDir, catalogs, file: basename(out), product: typeof a.product === 'string' ? a.product : '', fragment: !!a.fragment,
     findings_page: typeof a['findings-page'] === 'string' ? a['findings-page'] : null, warnings: v.warnings,
-    maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1024 * 1024 : PAGE_MAX_BYTES, dsx_rel: relative(root, DSX) || '.',
+    maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1024 * 1024 : PAGE_MAX_BYTES, dsx_rel: relative(root, DSX) || '.', lang,
   });
   mkdirSync(dirname(out), { recursive: true });
   for (const p of pages) writeFileSync(join(dirname(out), p.file), p.html);
   console.log(`${pages.map((p) => `${join(dirname(out), p.file)} (${(p.bytes / 1048576).toFixed(1)} MB)`).join('\n')}`);
-  console.log(`${(m.variants ?? []).length} variante(s) · ${shots.size} de ${captures.length} captura(s) com imagem${lint.layout ? '' : ' · lint sem layout'}`);
+  console.log(`${(m.variants ?? []).length} variant(s) · ${shots.size} of ${captures.length} capture(s) with an image${lint.layout ? '' : ' · lint without layout'}`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();

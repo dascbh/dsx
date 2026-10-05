@@ -1,6 +1,6 @@
 ---
 id: helpful-error-message
-title: Como escrever mensagens de erro úteis?
+title: How do you write helpful error messages?
 category: ux-writing
 components: [error-message, text-field, error-summary]
 type: recommendation
@@ -11,98 +11,98 @@ wcag: ["3.3.1", "3.3.3", "1.4.1", "4.1.3"]
 related: [form-errors, field-error-position, error-placement, preserve-data-after-error, technical-error-code]
 ---
 
-# Como escrever mensagens de erro úteis?
+# How do you write helpful error messages?
 
-> **Regra:** Toda mensagem de erro deve nomear o campo, descrever o problema em texto simples e indicar a correção (formato, limite ou valor esperado), sem culpar a pessoa.
+> **Rule:** Every error message must name the field, describe the problem in plain text and state the fix (format, limit or expected value), without blaming the person.
 
-## Contexto
+## Context
 
-"Ocorreu um erro" não diz o que houve nem como continuar. Uma mensagem útil transforma a falha em orientação: identifica o campo, descreve o problema e aponta a correção.
+"An error occurred" says neither what happened nor how to continue. A helpful message turns the failure into guidance: it identifies the field, describes the problem and points to the fix.
 
-Mensagens vagas aumentam a incerteza e empurram a pessoa para tentativa e erro. Mensagens específicas reduzem o esforço de recuperação e evitam que ela abandone o formulário ou preencha tudo de novo.
+Vague messages increase uncertainty and push the person into trial and error. Specific messages reduce the recovery effort and keep them from abandoning the form or filling everything in again.
 
-Quando existem campo e resumo de erros, o texto precisa ser o mesmo nos dois.
+When there is both a field message and an error summary, the text must be the same in both.
 
-## Decisão
+## Decision
 
-- **SE** o erro é de entrada **ENTÃO** nomeie o campo afetado e descreva a regra em linguagem simples.
-- **SE** a correção é conhecida **ENTÃO** diga o formato, o limite ou o valor esperado.
-- **SE** o campo obrigatório está vazio **ENTÃO** peça o dado ("Informe seu e-mail"), não declare "campo inválido".
-- **SE** o valor está fora de limite **ENTÃO** cite o limite e o valor encontrado, quando útil.
-- **SE** o dado é incompatível com outro **ENTÃO** nomeie os dois campos envolvidos.
-- **SE** há campo e resumo de erros **ENTÃO** use o mesmo texto nos dois.
-- **SE** a dica de correção comprometeria a segurança **ENTÃO** use mensagem neutra (por exemplo, no login).
-- **SE** o problema é do serviço **ENTÃO** não use esta mensagem; use o padrão de falha temporária.
-- **SENÃO** preserve o que foi digitado e mantenha o campo editável.
+- **IF** it is an input error **THEN** name the affected field and describe the rule in plain language.
+- **IF** the fix is known **THEN** state the format, the limit or the expected value.
+- **IF** a required field is empty **THEN** ask for the data ("Enter your email"), do not declare "invalid field".
+- **IF** the value is out of bounds **THEN** quote the limit and, when useful, the value found.
+- **IF** the data is incompatible with another field **THEN** name both fields involved.
+- **IF** there is a field message and an error summary **THEN** use the same text in both.
+- **IF** the fix hint would compromise security **THEN** use a neutral message (for example, at sign-in).
+- **IF** the problem is on the service side **THEN** do not use this message; use the temporary failure pattern.
+- **ELSE** preserve what was typed and keep the field editable.
 
-## Quando usar
+## When to use
 
-- Campo obrigatório vazio.
-- Formato ou valor incorreto.
-- Texto acima ou abaixo do limite.
-- Dado incompatível com outro.
-- Erro detectado após o envio e que a pessoa pode corrigir.
+- An empty required field.
+- A wrong format or value.
+- Text above or below the limit.
+- Data incompatible with another field.
+- An error detected after submitting that the person can fix.
 
-## Quando evitar
+## When to avoid
 
-- Falha exclusiva do serviço → **use em vez disso:** mensagem de falha temporária.
-- Mensagem que só diz "inválido" → **use em vez disso:** regra mais correção.
-- Texto que culpa a pessoa → **use em vez disso:** frase neutra sobre o dado.
-- Código técnico sem ajuda → **use em vez disso:** linguagem de tarefa.
-- Repetir instrução já visível → **use em vez disso:** só o que falta corrigir.
+- A failure that is purely the service's → **use instead:** a temporary failure message.
+- A message that only says "invalid" → **use instead:** the rule plus the fix.
+- Text that blames the person → **use instead:** a neutral sentence about the data.
+- A technical code with no help → **use instead:** task language.
+- Repeating an instruction already visible → **use instead:** only what remains to be fixed.
 
-## Faça
+## Do
 
-- Identifique o campo.
-- Descreva o problema.
-- Indique a correção.
-- Use linguagem simples e consistente.
-- Preserve os dados digitados.
+- Identify the field.
+- Describe the problem.
+- State the fix.
+- Use plain, consistent language.
+- Preserve the typed data.
 
-## Evite
+## Avoid
 
-- "Ocorreu um erro".
-- "Campo inválido".
-- Culpar a pessoa ("Você digitou errado").
-- Códigos técnicos.
-- Instruções vagas.
-- Repetição desnecessária.
+- "An error occurred".
+- "Invalid field".
+- Blaming the person ("You typed it wrong").
+- Technical codes.
+- Vague instructions.
+- Unnecessary repetition.
 
-## Acessibilidade
+## Accessibility
 
-- Erro de entrada detectado automaticamente identifica o item e descreve o problema em texto (3.3.1).
-- Ofereça sugestão de correção quando conhecida, salvo se comprometer segurança ou finalidade (3.3.3).
-- Associe a mensagem ao campo por meio programático; resumo navegável quando houver vários erros.
-- Não dependa só de cor, ícone ou posição (1.4.1); anuncie sem roubar o foco quando dinâmico (4.1.3).
-- Teste que campo, erro e orientação são lidos em ordem compreensível com teclado, zoom e leitor de tela.
+- An automatically detected input error identifies the item and describes the problem in text (3.3.1).
+- Offer a fix suggestion when known, unless it would compromise security or purpose (3.3.3).
+- Associate the message with the field programmatically; a navigable summary when there are several errors.
+- Do not rely only on color, icon or position (1.4.1); announce without stealing focus when dynamic (4.1.3).
+- Test that field, error and guidance are read in an understandable order with keyboard, zoom and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Vazio | "Informe seu e-mail." |
-| Formato | "O CPF deve ter 11 números. Exemplo: 123.456.789-09." |
-| Limite | "A senha precisa ter pelo menos 8 caracteres." |
-| Incompatível | "A data final deve ser depois da data inicial." |
-| Evitar | "Campo inválido." |
+| Empty | "Enter your email." |
+| Format | "The tax ID must have 11 digits. Example: 123.456.789-09." |
+| Limit | "The password needs at least 8 characters." |
+| Incompatible | "The end date must be after the start date." |
+| Avoid | "Invalid field." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem identifica o campo.
-- [ ] O problema está descrito com clareza.
-- [ ] A mensagem indica como corrigir.
-- [ ] O texto usa linguagem simples e não culpa a pessoa.
-- [ ] Os dados preenchidos foram preservados.
-- [ ] A mensagem está associada ao campo programaticamente.
-- [ ] O texto é idêntico no campo e no resumo.
-- [ ] Foi testado com teclado e leitor de tela.
+- [ ] The message identifies the field.
+- [ ] The problem is described clearly.
+- [ ] The message says how to fix it.
+- [ ] The text uses plain language and does not blame the person.
+- [ ] The entered data was preserved.
+- [ ] The message is associated with the field programmatically.
+- [ ] The text is identical in the field and in the summary.
+- [ ] Tested with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 3.3.1 (Error Identification): identificar o item e descrever o problema em texto.
-- WCAG 2.2, critério 3.3.3 (Error Suggestion): sugerir correção quando conhecida.
-- Nielsen Norman Group (diretrizes de mensagens de erro): mensagens próximas, específicas, construtivas, sem jargão e sem culpa.
-- GOV.UK Design System (mensagem de erro): explicar o que ocorreu e como corrigir, alinhar com o rótulo e preservar dados.
-- Padrão Digital de Governo (GOV.BR), Message: linguagem clara e feedback acessível.
-- AMAWeb (manual de acessibilidade digital): comunicação acessível de erros em formulários.
-- Adobe Spectrum (escrita de erros): mensagens específicas e ação seguinte.
+- WCAG 2.2, criterion 3.3.1 (Error Identification): identify the item and describe the problem in text.
+- WCAG 2.2, criterion 3.3.3 (Error Suggestion): suggest a fix when known.
+- Nielsen Norman Group (error message guidelines): nearby, specific, constructive messages, with no jargon and no blame.
+- GOV.UK Design System (error message): explain what happened and how to fix it, align with the label and preserve data.
+- Brazilian Government Digital Standard (GOV.BR), Message: clear language and accessible feedback.
+- AMAWeb (digital accessibility manual): accessible communication of form errors.
+- Adobe Spectrum (writing for errors): specific messages and the next action.

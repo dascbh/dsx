@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Guarda da vez (turn-guard) — transforma a doutrina do ciclo Figma↔código em regra que se cumpre sozinha.
+Turn guard (turn-guard) — turns the Figma↔code cycle doctrine into a rule that enforces itself.
 
-A skill `figma-ciclo` PEDE que ninguém reespelhe enquanto a vez é do design. Pedir não impede nada:
-basta um "pode reespelhar" distraído para o script sobrescrever horas de refino. Este hook impede.
+The `figma-cycle` skill ASKS that nobody re-mirror while it is design's turn. Asking prevents nothing:
+one distracted "go ahead and re-mirror" is enough for the script to overwrite hours of refinement. This hook prevents it.
 
-PreToolUse em `use_figma`:
-  · lê `turn:` (ou o legado `vez:`) do registro de sincronia do projeto;
-  · se a vez é `design` E o script vai ESCREVER no arquivo -> nega, com motivo;
-  · leitura (snapshot, inventário, diff) passa sempre — é ela que congela o "antes"
-    e, sem ela, o ciclo não fecha;
-  · projeto sem registro -> não interfere.
+PreToolUse on `use_figma`:
+  · reads `turn:` (or the legacy `vez:`) from the project's sync registry;
+  · if the turn is `design` AND the script will WRITE to the file -> denies, with a reason;
+  · reading (snapshot, inventory, diff) always passes — it is what freezes the "before"
+    and, without it, the cycle does not close;
+  · project without a registry -> does not interfere.
 
-SessionStart: anuncia de quem é a vez, para o modelo não descobrir tarde demais; se o registro
-ainda usa o nome antigo `vez:` ou valores em português, avisa para renomear.
+SessionStart: announces whose turn it is, so the model does not find out too late; if the registry
+still uses the old name `vez:` or Portuguese values, warns to rename them.
 
-Valores: `design | code | applying`. Legados aceitos: `codigo`, `código`, `aplicando`.
+Values: `design | code | applying`. Accepted legacy values: `codigo`, `código`, `aplicando`.
 """
 import json
 import os
@@ -28,15 +28,15 @@ REGISTRY_PATHS = (
     ".figma-sync.md",
 )
 
-# Valores legados (em português) -> valores atuais.
+# Legacy (Portuguese) values -> current values.
 NORMALIZE = {"codigo": "code", "código": "code", "aplicando": "applying", "code": "code", "applying": "applying", "design": "design"}
 
-# Chamadas que criam, alteram ou removem nó — mais atribuição direta a propriedade de nó/paint
-# (`chip.strokes = [...]`, `label.fills = [...]`, `t.characters = ...`). Um script que só mexe em
-# propriedades de um nó EXISTENTE nunca chama create/append/remove, então a metade de atribuição
-# do padrão não é opcional: sem ela, um script de "ajustar o fill deste nó" passaria como leitura
-# mesmo com `turn: design`. Leitura pura não aparece em nenhuma das metades: ler (`n.opacity`)
-# não tem `=` depois.
+# Calls that create, change or remove a node — plus direct assignment to a node/paint property
+# (`chip.strokes = [...]`, `label.fills = [...]`, `t.characters = ...`). A script that only touches
+# properties of an EXISTING node never calls create/append/remove, so the assignment half of the
+# pattern is not optional: without it, an "adjust this node's fill" script would pass as a read
+# even with `turn: design`. Pure reads match neither half: reading (`n.opacity`)
+# has no `=` after it.
 WRITE_CALL = re.compile(
     r"\b(create(Frame|Text|Component|Page|Ellipse|Rectangle|Vector|Polygon|Line|Instance|AutoLayout|TextStyle|Variable\w*)"
     r"|appendChild|insertChild|\.remove\(\)|setValueForMode|createVariableCollection"
@@ -61,7 +61,7 @@ def find_registry(cwd):
 
 
 def read_turn(path):
-    """Devolve (valor normalizado, lista de nomes antigos encontrados) ou (None, [])."""
+    """Returns (normalized value, list of old names found) or (None, [])."""
     try:
         with open(path, encoding="utf-8") as fh:
             for line in fh:
@@ -70,10 +70,10 @@ def read_turn(path):
                     key, raw = m.group(1), m.group(2).strip().lower()
                     legacy = []
                     if key == "vez":
-                        legacy.append("`vez:` (nome antigo, renomeie para `turn:`)")
+                        legacy.append("`vez:` (old name, rename to `turn:`)")
                     value = NORMALIZE.get(raw, raw)
                     if raw != value:
-                        legacy.append(f"`{raw}` (valor antigo, renomeie para `{value}`)")
+                        legacy.append(f"`{raw}` (old value, rename to `{value}`)")
                     return value, legacy
     except OSError:
         pass
@@ -89,7 +89,7 @@ def main():
     try:
         payload = json.load(sys.stdin)
     except Exception:
-        sys.exit(0)  # entrada inesperada: não atrapalhe
+        sys.exit(0)  # unexpected input: stay out of the way
 
     event = payload.get("hook_event_name") or payload.get("hookEventName") or ""
     cwd = payload.get("cwd") or os.getcwd()
@@ -102,16 +102,16 @@ def main():
 
     if event == "SessionStart":
         msg = {
-            "design": "vez do DESIGN — refino em andamento no Figma. Não reespelhe; ler e fazer diff é permitido.",
-            "code": "vez do CÓDIGO — o Figma é espelho. Refino feito lá agora será sobrescrito.",
-            "applying": "vez APLICANDO — propostas estão virando código. Evite mexer nos mesmos arquivos por fora.",
+            "design": "DESIGN's turn — refinement in progress in Figma. Do not re-mirror; reading and diffing are allowed.",
+            "code": "CODE's turn — Figma is a mirror. Refinement done there now will be overwritten.",
+            "applying": "APPLYING turn — proposals are becoming code. Avoid touching the same files from outside.",
         }.get(turn, f"turn: {turn}")
         if legacy:
-            msg += f" Aviso: {registry} usa " + "; ".join(legacy) + "."
+            msg += f" Warning: {registry} uses " + "; ".join(legacy) + "."
         respond({
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",
-                "additionalContext": f"Ciclo Figma↔código do DSX ({registry}): {msg}",
+                "additionalContext": f"DSX Figma↔code cycle ({registry}): {msg}",
             }
         })
 
@@ -123,13 +123,13 @@ def main():
 
     script = (payload.get("tool_input") or {}).get("code", "") or ""
     if not WRITE_CALL.search(script):
-        sys.exit(0)  # leitura: permitida mesmo na vez do design
+        sys.exit(0)  # read: allowed even on design's turn
 
     reason = (
-        f"Bloqueado pelo ciclo Figma↔código do DSX: `{registry}` diz `turn: design` — há refino em "
-        "andamento no arquivo e escrever agora sobrescreveria o trabalho do design.\n\n"
-        "Se a intenção era ler (snapshot, inventário, diff), reescreva o script para não criar/alterar nós. "
-        "Se a rodada de design acabou mesmo, feche-a (/dsx:figma-vez code) e só então reespelhe."
+        f"Blocked by the DSX Figma↔code cycle: `{registry}` says `turn: design` — refinement is in "
+        "progress in the file and writing now would overwrite the design work.\n\n"
+        "If the intent was to read (snapshot, inventory, diff), rewrite the script so it does not create/change nodes. "
+        "If the design round really is over, close it (/dsx:figma-turn code) and only then re-mirror."
     )
     respond({
         "hookSpecificOutput": {

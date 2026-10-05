@@ -1,6 +1,6 @@
 ---
 id: disabled-button
-title: Esconder ou desabilitar uma ação indisponível?
+title: Hide or disable an unavailable action?
 category: actions
 components: [button, disabled-button, tooltip]
 type: contextual-decision
@@ -11,101 +11,101 @@ wcag: ["4.1.2", "2.1.1", "1.4.1", "1.4.3", "2.4.7"]
 related: [button-hierarchy, double-submit, helpful-error-message, required-fields]
 ---
 
-# Esconder ou desabilitar uma ação indisponível?
+# Hide or disable an unavailable action?
 
-> **Regra:** Esconda a ação irrelevante; mantenha visível e explicada a ação central que está temporariamente bloqueada; nunca desabilite sem dizer por quê.
+> **Rule:** Hide the irrelevant action; keep the central action that is temporarily blocked visible and explained; never disable without saying why.
 
-## Contexto
+## Context
 
-Uma ação fica indisponível quando falta um pré-requisito, quando não cabe no contexto, quando a pessoa não tem permissão ou quando há falha do sistema. É preciso escolher entre retirar o controle da tela e deixá-lo bloqueado.
+An action becomes unavailable when a prerequisite is missing, when it does not fit the context, when the person lacks permission or when the system fails. You have to choose between removing the control from the screen and leaving it blocked.
 
-Esconder e desabilitar passam mensagens distintas. Esconder diminui o ruído; desabilitar mantém a ação visível e no mesmo lugar, mas barra o uso. Botão com aparência ativa que não reage deixa dúvida; botão oculto pode sugerir que o recurso nem existe.
+Hiding and disabling send different messages. Hiding reduces noise; disabling keeps the action visible and in place but prevents use. A button that looks active but does not respond leaves doubt; a hidden button may suggest the feature does not even exist.
 
-O atributo nativo disabled costuma retirar o controle da ordem de tabulação, o que reduz a descoberta por teclado e leitor de tela. Por isso a escolha afeta clareza, prevenção de erro e acessibilidade.
+The native disabled attribute usually removes the control from the tab order, which reduces discovery by keyboard and screen reader. So the choice affects clarity, error prevention and accessibility.
 
-## Decisão
+## Decision
 
-- **SE** a ação é irrelevante para o contexto e sua ausência não desorienta **ENTÃO** esconda.
-- **SE** a ação é permanentemente indisponível para a pessoa e não há caminho de solicitação ou upgrade **ENTÃO** esconda.
-- **SE** a ação é central ao fluxo e falta uma condição clara e temporária **ENTÃO** mantenha visível, desabilitada e com o requisito em texto persistente ao lado.
-- **SE** a pessoa precisa consultar o motivo ao focar ou acionar o controle **ENTÃO** use estado inativo focável que responde com a explicação; não marque aria-disabled="true" se ele ainda puder ser acionado.
-- **SE** o controle não pode ser acionado mas deve continuar descoberto por teclado **ENTÃO** use aria-disabled="true" e bloqueie a operação no código.
-- **SE** a disponibilidade ainda está sendo carregada **ENTÃO** mostre estado de carregamento, não esconda nem desabilite sem contexto.
-- **SE** o bloqueio vem de falha, permissão ou limitação da plataforma **ENTÃO** ofereça explicação persistente, alternativa ou caminho de recuperação.
-- **SE** o conteúdo deve ser consultado mas não editado **ENTÃO** use somente leitura, não desabilitado.
-- **SE** validar no clique e explicar o que falta é viável **ENTÃO** prefira isso a desabilitar.
-- **SE** o botão evita novo envio durante o processamento **ENTÃO** desabilite e comunique o carregamento.
+- **IF** the action is irrelevant to the context and its absence does not disorient **THEN** hide it.
+- **IF** the action is permanently unavailable to the person and there is no request or upgrade path **THEN** hide it.
+- **IF** the action is central to the flow and a clear, temporary condition is missing **THEN** keep it visible, disabled and with the requirement in persistent text next to it.
+- **IF** the person needs to find out the reason when focusing or activating the control **THEN** use a focusable inactive state that responds with the explanation; do not set aria-disabled="true" if it can still be activated.
+- **IF** the control cannot be activated but must stay discoverable by keyboard **THEN** use aria-disabled="true" and block the operation in code.
+- **IF** availability is still loading **THEN** show a loading state; do not hide or disable without context.
+- **IF** the block comes from a failure, permission or platform limitation **THEN** offer a persistent explanation, an alternative or a recovery path.
+- **IF** the content must be viewable but not editable **THEN** use read-only, not disabled.
+- **IF** validating on click and explaining what is missing is feasible **THEN** prefer it to disabling.
+- **IF** the button prevents a second submission during processing **THEN** disable it and communicate the loading.
 
-## Quando usar
+## When to use
 
-- Esconder: ação sem sentido no contexto ou sem possibilidade de acesso para a pessoa.
-- Desabilitar: pré-requisito claro e temporário, posição que ajuda a entender o fluxo, ação central da tarefa.
-- Inativo focável: a explicação depende de foco ou acionamento.
+- Hide: an action that makes no sense in the context or that the person can never access.
+- Disable: a clear, temporary prerequisite, a position that helps people understand the flow, a central action of the task.
+- Focusable inactive: the explanation depends on focus or activation.
 
-## Quando evitar
+## When to avoid
 
-- Esconder ação central só porque está temporariamente indisponível → **use em vez disso:** mantê-la visível com explicação.
-- Desabilitar sem explicar → **use em vez disso:** texto de requisito persistente próximo.
-- Tooltip como única explicação de controle nativo disabled → **use em vez disso:** texto visível ou estado inativo focável.
-- Apenas pointer-events: none → **use em vez disso:** bloqueio real no código.
-- aria-hidden="true" em ação focável → **use em vez disso:** remover do DOM ou do foco.
+- Hiding a central action just because it is temporarily unavailable → **use instead:** keep it visible with an explanation.
+- Disabling without explaining → **use instead:** persistent requirement text nearby.
+- A tooltip as the only explanation of a native disabled control → **use instead:** visible text or a focusable inactive state.
+- Only pointer-events: none → **use instead:** a real block in code.
+- aria-hidden="true" on a focusable action → **use instead:** remove it from the DOM or from focus.
 
-## Faça
+## Do
 
-- Classifique a causa: irrelevante, pré-requisito, carregamento, permissão ou falha.
-- Mostre o requisito perto do controle.
-- Preserve rótulo e posição da ação principal.
-- Reative o controle assim que a condição for atendida.
-- Comunique a reativação quando for importante.
-- Teste teclado, leitor de tela, zoom e alto contraste.
+- Classify the cause: irrelevant, prerequisite, loading, permission or failure.
+- Show the requirement near the control.
+- Keep the label and position of the main action.
+- Re-enable the control as soon as the condition is met.
+- Announce the re-enabling when it matters.
+- Test keyboard, screen reader, zoom and high contrast.
 
-## Evite
+## Avoid
 
-- Esconder a ação principal sem dizer como concluir a tarefa.
-- Deixar o controle desabilitado após a condição ser atendida.
-- Usar só cinza, opacidade ou baixo contraste como sinal.
-- Aplicar aria-disabled="true" e deixar a operação ainda executável.
-- Manter permanentemente desabilitado um controle sem razão para existir.
-- Remover ação importante durante falha temporária.
+- Hiding the main action without saying how to finish the task.
+- Leaving the control disabled after the condition is met.
+- Using only gray, opacity or low contrast as the cue.
+- Applying aria-disabled="true" while the operation is still executable.
+- Keeping a control permanently disabled when it has no reason to exist.
+- Removing an important action during a temporary failure.
 
-## Acessibilidade
+## Accessibility
 
-- O atributo disabled remove o controle da tabulação e da operação; use quando a pessoa não precisa descobrir a ação naquele estado (4.1.2).
-- Para manter a descoberta, use aria-disabled="true" com foco permitido, bloqueio no código e explicação acessível.
-- Não use aria-hidden="true" em elemento focável.
-- Não dependa de cor, opacidade ou baixo contraste para indicar o estado (1.4.1, 1.4.3).
-- Preserve nome acessível, foco visível (2.4.7) e o motivo perto do controle, alcançável por teclado (2.1.1).
-- Teste ordem de foco, zoom, alto contraste e a reativação.
+- The disabled attribute removes the control from tabbing and operation; use it when the person does not need to discover the action in that state (4.1.2).
+- To keep it discoverable, use aria-disabled="true" with focus allowed, a block in code and an accessible explanation.
+- Do not use aria-hidden="true" on a focusable element.
+- Do not rely on color, opacity or low contrast to indicate the state (1.4.1, 1.4.3).
+- Keep the accessible name, visible focus (2.4.7) and the reason near the control, reachable by keyboard (2.1.1).
+- Test focus order, zoom, high contrast and re-enabling.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Pré-requisito | "Preencha o CPF para continuar." |
-| Permissão | "Somente administradores podem convidar pessoas." |
-| Disponível só no desktop | "Disponível apenas na versão para computador." |
-| Carregando | "Verificando disponibilidade..." |
-| Manutenção temporária | "Criar novo estará disponível a partir de 12/11." |
+| Prerequisite | "Enter your tax ID to continue." |
+| Permission | "Only administrators can invite people." |
+| Desktop only | "Available only in the desktop version." |
+| Loading | "Checking availability..." |
+| Temporary maintenance | "Create new will be available from Nov 12." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A causa da indisponibilidade está classificada.
-- [ ] Ação irrelevante ou sem caminho de acesso foi removida, não desabilitada.
-- [ ] Todo controle desabilitado tem o motivo em texto visível e persistente.
-- [ ] O motivo não depende apenas de tooltip.
-- [ ] O estado não depende só de cor ou opacidade.
-- [ ] Com aria-disabled, a operação é bloqueada no código.
-- [ ] Nenhum elemento focável usa aria-hidden.
-- [ ] O controle volta ao estado ativo quando a condição muda.
-- [ ] Teclado e leitor de tela encontram o motivo.
+- [ ] The cause of unavailability is classified.
+- [ ] An irrelevant action, or one with no access path, was removed, not disabled.
+- [ ] Every disabled control has its reason in visible, persistent text.
+- [ ] The reason does not depend on a tooltip alone.
+- [ ] The state does not depend on color or opacity alone.
+- [ ] With aria-disabled, the operation is blocked in code.
+- [ ] No focusable element uses aria-hidden.
+- [ ] The control returns to the active state when the condition changes.
+- [ ] Keyboard and screen reader users can find the reason.
 
-## Fundamentação
+## Rationale
 
-- W3C WAI-ARIA Authoring Practices: interface de teclado e tratamento de controles desabilitados.
-- MDN, aria-disabled e aria-hidden: aria-disabled comunica o estado sem bloquear o comportamento; aria-hidden não deve ser usado em focáveis.
-- GitHub Primer, experiências degradadas, criação e botões: remover ações não essenciais, esconder criação sem permissão, diferenciar botão inativo de desabilitado.
-- Microsoft Fluent 2, botão: explicar o que está indisponível e por quê.
-- IBM Carbon, estados somente leitura: distinguir desabilitado temporário de somente leitura.
-- Material Design 3, estados: desabilitado indica componente inoperável.
-- Nielsen Norman Group, botões desabilitados: risco de não responder sem explicar.
-- WCAG 2.2, critérios 4.1.2, 1.4.1 e 2.1.1.
+- W3C WAI-ARIA Authoring Practices: keyboard interface and handling of disabled controls.
+- MDN, aria-disabled and aria-hidden: aria-disabled communicates the state without blocking behavior; aria-hidden must not be used on focusable elements.
+- GitHub Primer, degraded experiences, creation and buttons: remove non-essential actions, hide creation without permission, distinguish an inactive button from a disabled one.
+- Microsoft Fluent 2, button: explain what is unavailable and why.
+- IBM Carbon, read-only states: distinguish temporary disabled from read-only.
+- Material Design 3, states: disabled indicates an inoperable component.
+- Nielsen Norman Group, disabled buttons: the risk of not responding without explaining.
+- WCAG 2.2, criteria 4.1.2, 1.4.1 and 2.1.1.

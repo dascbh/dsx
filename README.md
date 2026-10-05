@@ -1,83 +1,83 @@
-# DSX — Design System eXperience para agentes de IA
+# DSX — Design System eXperience for AI agents
 
-Framework aberto de **design system, UI e UX feito para ser usado por agentes de IA**: em vez de documentação para pessoas lerem, ele traz procedimentos que agentes executam (skills), decisões que agentes consultam (padrões), referência que agentes carregam sob demanda (conhecimento) e **ferramentas que verificam** o que foi feito (tokens, contraste, DESIGN.md, UX.md, drift).
+An open **design system, UI and UX framework built to be used by AI agents**: instead of documentation for people to read, it brings procedures agents execute (skills), decisions agents look up (patterns), reference agents load on demand (knowledge) and **tools that verify** what was done (tokens, contrast, DESIGN.md, UX.md, drift).
 
-A premissa: gerar interface ficou barato; **julgar e manter coerência** ficou caro. O DSX dá ao agente o critério que falta — e a quem revisa, uma forma de checar.
+The premise: generating interfaces became cheap; **judging and keeping coherence** became expensive. DSX gives the agent the missing criteria — and gives reviewers a way to check.
 
-## O que tem aqui
+## What is here
 
-| Pasta | Conteúdo |
+| Folder | Contents |
 |---|---|
-| [`skills/`](skills) | 34 skills. **Núcleo:** `iniciar`, `design-md`, `ux-md`, `tokens`, `construir-ui`, `arranjar-tela`, `repensar-ux`, `padroes`, `revisar-ux`, `auditar-ux`, `acessibilidade`, `ux-writing`, `ux-ia`, `pesquisa`, `discovery`, `auditar-ds`, `evals`. **Mapeamento:** `mapear`, `confirmar-mapas`. **Captura pelo código:** `capture-from-code`. **Stitch:** `stitch`. **Figma:** `figma-iniciar`, `figma-levar`, `figma-fundacoes`, `figma-espelhar`, `figma-propostas`, `figma-diff`, `figma-trazer`, `figma-primeiro`, `figma-vez`, `figma-ciclo`, `figma-cobertura`, `figma-convencoes` |
-| [`agents/`](agents) | 11 subagentes: `revisor-ux`, `extrator-design-system`, `juiz-de-evals`, `leitor-figma`, `analisador-specs` e os mapeadores de projeto, UI, fluxos, tarefas, jornada e domínio |
-| [`hooks/`](hooks) | `turn-guard`: impede reespelhar o Figma por cima do refino do design |
-| [`patterns/`](patterns) | 77 padrões de interação — formulários, feedback, ações, navegação, dados, modais, autenticação, acessibilidade, UX writing, IA, e-commerce — cada um com regra, árvore de decisão SE→ENTÃO, acessibilidade, microcópia e checklist |
-| [`knowledge/`](knowledge) | ~40 documentos de referência em 4 áreas: [fundamentos](knowledge/fundamentos), [design system](knowledge/design-system), [pesquisa](knowledge/pesquisa), [IA](knowledge/ia) |
-| [`tokens/`](tokens) | Tokens W3C DTCG em 3 camadas (primitivo → semântico → componente), temas claro/escuro, pares de contraste verificados |
-| [`tools/`](tools) | Ferramentas Node sem dependências: build de tokens, contraste, paleta OKLCH, escalas tipográfica e de espaçamento, linters de DESIGN.md e de UX.md (com nota de 100 pontos), de valores crus, de padrões e de arquétipos; em [`tools/ux-lint/`](tools/ux-lint) os verificadores de UX (texto, tela, fluxo, layout, estados, consistência), o drift UX.md × produto e o registro de achados; em [`tools/figma/`](tools/figma) snapshot e diff do arquivo, prelúdio de helpers e as pontes tokens DTCG ↔ variáveis do Figma |
-| [`templates/`](templates) | DESIGN.md, UX.md, padrão, componente, brief, plano/roteiro/relatório de pesquisa, persona, JTBD, OST, mapa de suposições, relatório heurístico |
-| [`evals/`](evals) | Rubricas (UI gerada, DESIGN.md, UX.md, feature de IA) e casos de teste |
-| [`examples/`](examples) | DESIGN.md e UX.md de referência, aprovados nos linters |
+| [`skills/`](skills) | 34 skills. **Core:** `init`, `design-md`, `ux-md`, `tokens`, `build-ui`, `arrange-screen`, `rethink-ux`, `patterns`, `review-ux`, `audit-ux`, `accessibility`, `ux-writing`, `ux-ia`, `research`, `discovery`, `audit-ds`, `evals`. **Mapping:** `map-ux`, `confirm-maps`. **Capture from code:** `capture-from-code`. **Stitch:** `stitch`. **Figma:** `figma-init`, `figma-push`, `figma-foundations`, `figma-mirror`, `figma-proposals`, `figma-diff`, `figma-pull`, `figma-first`, `figma-turn`, `figma-cycle`, `figma-coverage`, `figma-conventions`. The old Portuguese skill names remain as deprecated alias stubs (`docs/renames-2026-10.md`) |
+| [`agents/`](agents) | 11 subagents: `ux-reviewer`, `design-system-extractor`, `eval-judge`, `figma-reader`, `spec-analyzer` and the project, UI, flow, task, journey and domain mappers. The old names remain as deprecated alias stubs |
+| [`hooks/`](hooks) | `turn-guard`: prevents re-mirroring Figma over the design's refinement |
+| [`patterns/`](patterns) | 77 interaction patterns — forms, feedback, actions, navigation, data, modals, authentication, accessibility, UX writing, AI, e-commerce — each with a rule, an IF→THEN decision tree, accessibility, microcopy and a checklist |
+| [`knowledge/`](knowledge) | ~40 reference documents in 4 areas: [foundations](knowledge/foundations), [design system](knowledge/design-system), [research](knowledge/research), [AI](knowledge/ia) |
+| [`tokens/`](tokens) | W3C DTCG tokens in 3 layers (primitive → semantic → component), light/dark themes, verified contrast pairs |
+| [`tools/`](tools) | Dependency-free Node tools: token build, contrast, OKLCH palette, type and spacing scales, linters for DESIGN.md and UX.md (with a 100-point score), raw values, patterns and archetypes; in [`tools/ux-lint/`](tools/ux-lint) the UX checkers (text, screen, flow, layout, states, consistency), UX.md × product drift and the findings registry; in [`tools/figma/`](tools/figma) file snapshot and diff, helper prelude and the DTCG tokens ↔ Figma variables bridges |
+| [`templates/`](templates) | DESIGN.md, UX.md, pattern, component, brief, research plan/script/report, persona, JTBD, OST, assumptions map, heuristic report |
+| [`evals/`](evals) | Rubrics (generated UI, DESIGN.md, UX.md, AI feature) and test cases |
+| [`examples/`](examples) | Reference DESIGN.md and UX.md, passing the linters |
 
-## Começando
+## Getting started
 
 **Claude Code (plugin):**
 ```bash
-/plugin marketplace add <caminho-ou-url-deste-repositório>
+/plugin marketplace add <path-or-url-of-this-repository>
 /plugin install dsx@headlabs-dsx
 ```
-Depois, no seu projeto: `/dsx:iniciar`.
+Then, in your project: `/dsx:init`.
 
-**Outros agentes (Cursor, Copilot, Codex, Gemini CLI…):** veja [`docs/integracoes.md`](docs/integracoes.md). O ponto de entrada universal é o [`AGENTS.md`](AGENTS.md).
+**Other agents (Cursor, Copilot, Codex, Gemini CLI…):** see [`docs/integrations.md`](docs/integrations.md). The universal entry point is [`AGENTS.md`](AGENTS.md).
 
-**Ferramentas (Node ≥ 20, sem `npm install`):**
+**Tools (Node ≥ 20, no `npm install`):**
 ```bash
-npm run build:tokens                         # compila tokens/build/tokens.css e verifica contraste
-node tools/palette.mjs "#3d5afe"             # rampa de cor com contraste por passo
-node tools/lint-design-md.mjs DESIGN.md      # valida o DESIGN.md do seu projeto
-node tools/lint-ux-md.mjs UX.md --score      # valida e pontua o UX.md (nota de 100 e gates)
-node tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .   # o UX.md ainda descreve as telas?
-node tools/lint-raw-values.mjs src           # encontra valores crus (drift do design system)
-npm run check                                # verificação completa do framework
+npm run build:tokens                         # builds tokens/build/tokens.css and checks contrast
+node tools/palette.mjs "#3d5afe"             # color ramp with contrast per step
+node tools/lint-design-md.mjs DESIGN.md      # validates your project's DESIGN.md
+node tools/lint-ux-md.mjs UX.md --score      # validates and scores the UX.md (100-point score and gates)
+node tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .   # does the UX.md still describe the screens?
+node tools/lint-raw-values.mjs src           # finds raw values (design system drift)
+npm run check                                # full framework check
 ```
 
-## Como as peças se encaixam
+## How the pieces fit
 
 ```
-               ┌──────────── fonte de verdade do projeto ────────────┐
-               │  DESIGN.md (como parece) + UX.md (como se comporta)  │
-               │       + tokens (DTCG) + componentes + archetypes/    │
+               ┌───────────── project source of truth ───────────────┐
+               │  DESIGN.md (how it looks) + UX.md (how it behaves)   │
+               │       + tokens (DTCG) + components + archetypes/     │
                └───────────────▲───────────────────────┬─────────────┘
-                               │ cria/avalia/drift     │ lê
- iniciar · design-md · ux-md · │                       ▼
+                               │ create/evaluate/drift │ reads
+ init · design-md · ux-md ·    │                       ▼
  tokens                        │
-                               │            construir-ui ──consulta──► patterns/
-   auditar-ds · auditar-ux ────┘                 │                    knowledge/
+                               │            build-ui ──looks up──► patterns/
+   audit-ds · audit-ux ────────┘                 │                 knowledge/
                                                  ▼
-                         revisar-ux · acessibilidade · ux-writing · ux-ia
+                         review-ux · accessibility · ux-writing · ux-ia
                                                  │
                                                  ▼
-                       tools/ (gates objetivos) + evals/ (gates e notas)
+                       tools/ (objective gates) + evals/ (gates and scores)
 ```
 
-Antes de construir, `discovery` e `pesquisa` garantem que o problema é o certo; depois, `pesquisa` valida com pessoas reais.
+Before building, `discovery` and `research` make sure the problem is the right one; afterwards, `research` validates with real people.
 
 In Forward projects, the DSX plugs into the unified product pipeline without a parallel workflow: UI quality (5 metrics), UX quality (5 dimensions) and design-system adherence as separate verdicts against criteria declared in the cycle plan (`tools/ux-lint/criteria.mjs`, `audit.mjs --criteria`), the UX blueprint per objective (`templates/ux-blueprint.md`, `tools/ux-lint/blueprint.mjs`), falsifiable hypotheses in variation manifests and provenance on generated artifacts. See `knowledge/foundations/product-pipeline-ux.md`.
 
-## Stitch: gerar e iterar telas sem edição manual
+## Stitch: generate and iterate screens without manual editing
 
-Com o MCP do Google Stitch e as skills oficiais instaladas, a skill `stitch` fecha o loop **gerar → criticar → iterar → trazer** só com agentes. Ela sincroniza o DESIGN.md do projeto com o Stitch e confere o que ele preservou (`tools/stitch/design-system.mjs`), gera telas e variantes a partir do problema e dos padrões do catálogo, critica cada tela com os gates do DSX (`tools/stitch/analyze-html.mjs`: papéis de cor, contraste, acessibilidade) e as lentes de UX, aplica só as críticas que você aceitou e traz a escolhida para o código com os tokens e componentes reais do projeto.
+With the Google Stitch MCP and the official skills installed, the `stitch` skill closes the **generate → critique → iterate → bring in** loop with agents only. It syncs the project's DESIGN.md with Stitch and checks what it preserved (`tools/stitch/design-system.mjs`), generates screens and variants from the problem and the catalog patterns, critiques each screen with the DSX gates (`tools/stitch/analyze-html.mjs`: color roles, contrast, accessibility) and the UX lenses, applies only the critiques you accepted and brings the chosen one into code with the project's real tokens and components.
 
-## Figma: levar, explorar, trazer
+## Figma: push, explore, pull
 
-O DSX mantém um **ciclo contínuo entre código e Figma**: leva o projeto ao Figma (tokens viram variáveis em 3 coleções com modos Claro/Escuro, uma tela por rota, diálogos e estados), deixa você explorar e refinar lá — inclusive pedindo alternativas ao agente na página `09 · Propostas` — e traz de volta para o código **na camada certa** (token → componente → tela), passando pelos mesmos gates de contraste, padrões, acessibilidade e texto. Um diff versionado no git diz exatamente o que mudou, e um hook impede que alguém reespelhe por cima do refino do design.
+DSX keeps a **continuous cycle between code and Figma**: it pushes the project to Figma (tokens become variables in 3 collections with Light/Dark modes, one screen per route, dialogs and states), lets you explore and refine there — including asking the agent for alternatives on the `09 · Propostas` page — and pulls back into code **at the right layer** (token → component → screen), through the same contrast, pattern, accessibility and text gates. A diff versioned in git says exactly what changed, and a hook prevents anyone from re-mirroring over the design's refinement.
 
-Guia completo: [`docs/fluxo-figma.md`](docs/fluxo-figma.md). Requer o MCP oficial do Figma.
+Full guide: [`docs/figma-flow.md`](docs/figma-flow.md). Requires the official Figma MCP.
 
-## Princípios
+## Principles
 
-Resumo de [`docs/principios.md`](docs/principios.md): pessoas antes de pixels · interface honesta, sem dark patterns · evidência rotulada (sintético = hipótese) · uma fonte de verdade · sistema antes de improviso · todos os estados, sempre · reversibilidade proporcional ao risco · verificar, não presumir · julgamento humano onde importa · menos, porém claro.
+Summary of [`docs/principles.md`](docs/principles.md): people before pixels · honest interface, no dark patterns · labeled evidence (synthetic = hypothesis) · one source of truth · system before improvisation · every state, always · reversibility proportional to risk · verify, don't assume · human judgment where it matters · less, but clear.
 
-## Contribuindo
+## Contributing
 
-Veja a seção "Mantendo o framework" do [`AGENTS.md`](AGENTS.md). Todo conteúdo é escrito com redação própria; padrões citam fontes públicas pelo nome (WCAG, WAI-ARIA APG, Nielsen Norman Group, Baymard, Material, Carbon, GOV.BR, GOV.UK), nunca por cópia.
+See the "Maintaining the framework" section of [`AGENTS.md`](AGENTS.md). All content is written in our own words; patterns cite public sources by name (WCAG, WAI-ARIA APG, Nielsen Norman Group, Baymard, Material, Carbon, GOV.BR, GOV.UK), never by copying.

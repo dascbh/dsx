@@ -10,7 +10,7 @@ const dsxColors = () => {
   for (const m of DESIGN.split('---')[1].matchAll(/^ {2}([a-z-]+): "(#[0-9a-f]{6})"/gm)) out[m[1].replace(/-/g, '_')] = m[2];
   return out;
 };
-/** Resposta de list_design_systems no formato observado no Stitch real. */
+/** list_design_systems response in the shape observed on the real Stitch. */
 const list = (theme) => JSON.stringify({ designSystems: [{ name: 'assets/abc', designSystem: { displayName: 'DSX Base', theme } }] });
 
 test('export declares DEFAULT = control radius without touching the rest', () => {
@@ -49,13 +49,13 @@ test('check: imported without DEFAULT → 4px radius fails', () => {
 test('check: after update_design_system the DSX colors vanish → fails', () => {
   const r = checkDesignSystem(DESIGN, readStitchList(list({ roundness: 'ROUND_EIGHT', namedColors: { primary: '#3d37d4', surface: '#f8f9ff', primary_container: '#5754ed' } })));
   assert.equal(r.ok, false);
-  assert.ok(r.problems.some((p) => p.includes('sumiram')));
+  assert.ok(r.problems.some((p) => p.includes('disappeared')));
 });
 
 test('check: palette not processed yet → fails asking to list again', () => {
   const r = checkDesignSystem(DESIGN, readStitchList(list({ roundness: 'ROUND_EIGHT' })));
   assert.equal(r.ok, false);
-  assert.ok(r.problems[0].includes('assíncrona'));
+  assert.ok(r.problems[0].includes('asynchronously'));
 });
 
 const HTML = (body) => `<!DOCTYPE html><html lang="pt-BR"><head>
@@ -80,10 +80,10 @@ test('analyze: fails poor contrast, unnamed button, clickable without keyboard a
     <input type="text" placeholder="Buscar">`), { dsxRoles: ROLES });
   assert.equal(r.ok, false);
   const rules = r.failures.join(' | ');
-  assert.match(rules, /contraste/);
-  assert.match(rules, /botão sem nome/);
-  assert.match(rules, /clicável sem acesso por teclado/);
-  assert.match(rules, /campo sem rótulo/);
+  assert.match(rules, /contrast/);
+  assert.match(rules, /button without an accessible name/);
+  assert.match(rules, /clickable element without keyboard access/);
+  assert.match(rules, /field without an associated label/);
 });
 
 test('analyze: what is right passes — aria-label, label for, row with tabindex', () => {
@@ -105,5 +105,5 @@ test('CLI: old subcommand "exportar" runs export and warns with the new name', a
   const r = spawnSync(process.execPath, ['tools/stitch/design-system.mjs', 'exportar', 'examples/DESIGN.md'], { encoding: 'utf8' });
   assert.equal(r.status, 0);
   assert.match(r.stdout, /DEFAULT/);
-  assert.match(r.stderr, /"exportar" é nome antigo, use "export"/);
+  assert.match(r.stderr, /"exportar" is an old name, use "export"/);
 });

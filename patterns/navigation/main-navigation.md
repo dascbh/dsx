@@ -1,6 +1,6 @@
 ---
 id: main-navigation
-title: Como criar uma navegação principal clara?
+title: How do you build clear main navigation?
 category: navigation
 components: [header, nav, menu, submenu, mobile-menu]
 type: recommendation
@@ -11,96 +11,96 @@ wcag: ["2.4.1", "2.4.7", "1.3.1", "2.1.1", "1.4.4", "1.4.10", "3.2.3"]
 related: [breadcrumbs, tabs, link-in-new-tab, pagination-vs-scroll]
 ---
 
-# Como criar uma navegação principal clara?
+# How do you build clear main navigation?
 
-> **Regra:** Mostre poucos destinos no primeiro nível, com rótulos na linguagem do público, separados de ações, em posição consistente, com a seção atual indicada e operação sem depender de hover.
+> **Rule:** Show few destinations at the first level, with labels in the audience's language, separated from actions, in a consistent position, with the current section indicated and operation that does not depend on hover.
 
-## Contexto
+## Context
 
-A navegação principal é o grupo fixo de links para as áreas mais relevantes. Ela converte a arquitetura de informação em uma estrutura que a pessoa reconhece, percorre com o olhar e reaproveita de página em página.
+Main navigation is the fixed group of links to the most relevant areas. It turns the information architecture into a structure the person recognizes, scans and reuses from page to page.
 
-Ser claro não significa expor tudo no mesmo nível. Significa ordenar por importância e pela linguagem de quem usa, separar navegação de ações e dar um caminho previsível às áreas que sustentam as tarefas centrais.
+Being clear does not mean exposing everything at the same level. It means ordering by importance and by the users' language, separating navigation from actions and giving a predictable path to the areas behind the core tasks.
 
-Rótulos vagos, excesso de opções e hierarquia profunda aumentam o esforço e dificultam prever destinos. Menu que só funciona com hover, esconde o foco ou fecha ao menor movimento exclui pessoas.
+Vague labels, too many options and deep hierarchy increase effort and make destinations hard to predict. A menu that only works on hover, hides focus or closes at the slightest movement excludes people.
 
-## Decisão
+## Decision
 
-- **SE** definir os itens **ENTÃO** parta das tarefas e áreas mais usadas, não do organograma.
-- **SE** o primeiro nível tem muitos itens **ENTÃO** agrupe ou rebaixe: mantenha poucos destinos relevantes (teste para confirmar o limite do seu contexto).
-- **SE** um item é ação (criar, entrar, sair, buscar) **ENTÃO** tire-o do grupo de destinos e trate como botão ou controle próprio.
-- **SE** itens têm relação clara **ENTÃO** use submenu e mantenha a hierarquia curta o bastante para prever o destino.
-- **SE** a página pertence a uma seção **ENTÃO** marque-a como atual, por texto e estrutura.
-- **SE** a tela é pequena **ENTÃO** preserve os destinos essenciais e garanta abrir, percorrer e fechar o menu por toque e teclado.
-- **SE** a estrutura é vasta **ENTÃO** reforce com busca, breadcrumbs, links contextuais ou páginas de índice.
-- **SE** o item exige "Mais" ou ícone sem texto para um destino essencial **ENTÃO** mostre-o com texto.
-- **SENÃO** mantenha posição, nomes e comportamento idênticos em todas as páginas.
+- **IF** you are defining the items **THEN** start from the most used tasks and areas, not from the org chart.
+- **IF** the first level has many items **THEN** group or demote: keep few relevant destinations (test to confirm the limit for your context).
+- **IF** an item is an action (create, sign in, sign out, search) **THEN** take it out of the destinations group and treat it as a button or its own control.
+- **IF** items are clearly related **THEN** use a submenu and keep the hierarchy short enough to predict the destination.
+- **IF** the page belongs to a section **THEN** mark it as current, through text and structure.
+- **IF** the screen is small **THEN** keep the essential destinations and make sure the menu can be opened, browsed and closed by touch and keyboard.
+- **IF** the structure is vast **THEN** reinforce it with search, breadcrumbs, contextual links or index pages.
+- **IF** an essential destination would need "More" or an icon without text **THEN** show it with text.
+- **ELSE** keep position, names and behavior identical on every page.
 
-## Quando usar
+## When to use
 
-- Sites com várias áreas recorrentes.
-- Produtos com tarefas em módulos distintos.
-- Portais, intranets e catálogos extensos.
-- Navegação global e local bem diferenciadas.
+- Sites with several recurring areas.
+- Products with tasks in distinct modules.
+- Portals, intranets and large catalogs.
+- Clearly distinct global and local navigation.
 
-## Quando evitar
+## When to avoid
 
-- Navegação principal para todas as ações → **use em vez disso:** botões e menus de ação dedicados.
-- Páginas isoladas no mesmo nível das áreas → **use em vez disso:** agrupar ou usar links contextuais.
-- Categorias essenciais sob "Mais" → **use em vez disso:** exibi-las com nome próprio.
-- Menus profundos sem teste → **use em vez disso:** hierarquia curta e breadcrumbs.
-- Dependência de hover → **use em vez disso:** abertura por clique, toque e teclado.
+- Main navigation for every action → **use instead:** dedicated buttons and action menus.
+- Isolated pages at the same level as areas → **use instead:** grouping or contextual links.
+- Essential categories under "More" → **use instead:** showing them with their own name.
+- Deep, untested menus → **use instead:** a short hierarchy and breadcrumbs.
+- Dependence on hover → **use instead:** opening by click, touch and keyboard.
 
-## Faça
+## Do
 
-- Use rótulos curtos e familiares.
-- Indique a seção atual.
-- Preserve foco e estado ao navegar.
-- Teste caminhos com tarefas reais em desktop e mobile.
+- Use short, familiar labels.
+- Indicate the current section.
+- Preserve focus and state when navigating.
+- Test paths with real tasks on desktop and mobile.
 
-## Evite
+## Avoid
 
-- Jargão interno.
-- Encher o primeiro nível.
-- Ícones sem texto para destinos importantes.
-- Mudar rótulos de uma página para outra.
-- Tratar o menu como decoração.
+- Internal jargon.
+- Crowding the first level.
+- Icons without text for important destinations.
+- Changing labels from one page to another.
+- Treating the menu as decoration.
 
-## Acessibilidade
+## Accessibility
 
-- Use `<header>` e `<nav aria-label="Navegação principal">`, com links em lista e mecanismo para pular blocos repetidos (2.4.1).
-- Várias regiões de navegação recebem nomes acessíveis distintos.
-- Links para destinos, botões para abrir submenus com `aria-expanded`; seção atual com `aria-current="page"`.
-- Não aplique `role="menubar"`, `menu` e `menuitem` a navegação comum de site; isso exige comportamento de aplicativo.
-- Foco visível, ordem lógica, contraste, zoom de 200% e reflow a 400% (2.4.7, 1.4.4, 1.4.10), teclado e leitor de tela.
-- Navegação consistente entre páginas (3.2.3).
+- Use `<header>` and `<nav aria-label="Main navigation">`, with links in a list and a mechanism to skip repeated blocks (2.4.1).
+- Several navigation regions get distinct accessible names.
+- Links for destinations, buttons to open submenus with `aria-expanded`; current section with `aria-current="page"`.
+- Do not apply `role="menubar"`, `menu` and `menuitem` to ordinary site navigation; those require application behavior.
+- Visible focus, logical order, contrast, 200% zoom and reflow at 400% (2.4.7, 1.4.4, 1.4.10), keyboard and screen reader.
+- Consistent navigation across pages (3.2.3).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulo de região | "Navegação principal" |
-| Item atual | "Pedidos" (com estado atual) |
-| Abrir submenu | "Abrir submenu de Produtos" |
-| Menu mobile | "Abrir menu" / "Fechar menu" |
+| Region label | "Main navigation" |
+| Current item | "Orders" (with current state) |
+| Open submenu | "Open Products submenu" |
+| Mobile menu | "Open menu" / "Close menu" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Os itens principais representam tarefas e áreas importantes.
-- [ ] Os rótulos usam linguagem familiar ao público.
-- [ ] Navegação e ações estão separadas.
-- [ ] A hierarquia tem poucos níveis compreensíveis.
-- [ ] A seção atual está identificada.
-- [ ] Submenus funcionam sem depender de hover.
-- [ ] A navegação funciona com teclado e toque.
-- [ ] O menu móvel mantém os destinos essenciais.
-- [ ] Existe busca ou rota complementar quando a estrutura é extensa.
-- [ ] A arquitetura foi testada com tarefas reais.
+- [ ] The main items represent important tasks and areas.
+- [ ] The labels use language familiar to the audience.
+- [ ] Navigation and actions are separate.
+- [ ] The hierarchy has few, understandable levels.
+- [ ] The current section is identified.
+- [ ] Submenus work without depending on hover.
+- [ ] Navigation works with keyboard and touch.
+- [ ] The mobile menu keeps the essential destinations.
+- [ ] There is search or a complementary route when the structure is large.
+- [ ] The architecture was tested with real tasks.
 
-## Fundamentação
+## Rationale
 
-- U.S. Web Design System (Header): seções principais como links, rótulos curtos, sem jargão.
-- W3C WAI (tutorial de menus e design de navegação): semântica, estados, teclado, ponteiro, toque e consistência.
-- W3C WAI, técnica H101 e landmark de navegação: regiões nomeadas para tecnologia assistiva.
-- Baymard Institute (categorias como navegação principal no mobile): categorias escondidas sob item genérico geram problemas; achado de e-commerce.
-- Nielsen Norman Group (checklist de design de menus): visibilidade, rótulos familiares, consistência e localização da área atual.
-- Padrão Digital de Governo (GOV.BR), Menu: variações de menu em diferentes resoluções.
+- U.S. Web Design System (Header): main sections as links, short labels, no jargon.
+- W3C WAI (menus tutorial and navigation design): semantics, states, keyboard, pointer, touch and consistency.
+- W3C WAI, technique H101 and the navigation landmark: named regions for assistive technology.
+- Baymard Institute (categories as main navigation on mobile): categories hidden under a generic item cause problems; an e-commerce finding.
+- Nielsen Norman Group (menu design checklist): visibility, familiar labels, consistency and showing the current area.
+- Brazilian Government Digital Standard (GOV.BR), Menu: menu variations at different resolutions.

@@ -11,7 +11,7 @@ import { configFrom } from '../ux-lint/lib/config.mjs';
 import { fromLayout, stableId } from '../ux-lint/findings.mjs';
 import { resolvePlaywright, measure } from '../ux-lint/measure.mjs';
 
-// ---------- fixtures de geometria (escritas à mão, sem navegador) ----------
+// ---------- geometry fixtures (hand-written, no browser) ----------
 
 let seq = 0;
 const el = (o = {}) => ({
@@ -32,7 +32,7 @@ test('geometry: utilities (cluster, distance, color, screen id, normalize)', () 
   assert.equal(boxDistance({ x: 0, y: 0, width: 10, height: 10 }, { x: 5, y: 5, width: 10, height: 10 }), 0);
   assert.deepEqual(parseColor('rgba(1, 2, 3, 0.5)'), { r: 1, g: 2, b: 3, a: 0.5 });
   assert.deepEqual(parseColor('#fff'), { r: 255, g: 255, b: 255, a: 1 });
-  assert.equal(isSaturated('rgb(43, 89, 195)'), true); // azul de marca
+  assert.equal(isSaturated('rgb(43, 89, 195)'), true); // brand blue
   assert.equal(isSaturated('rgb(227, 242, 253)'), false); // azul pastel
   assert.equal(isSaturated('rgb(128, 128, 128)'), false); // cinza
   assert.equal(isSaturated('rgba(43, 89, 195, 0.1)'), false);
@@ -50,26 +50,27 @@ test('L1: primary at top-right passes; at the bottom-left fails (archetype wins 
   const bad = analyzeLayout(geom([main(), h1(), primary('Salvar', { x: 244, y: 700 })]), { archetype: arch('library', 'top-right'), primary_position: 'bottom-right' });
   const [f] = rules(bad, 'L1');
   assert.equal(f.severity, 2);
-  assert.match(f.message, /top-right, arquétipo library/);
-  assert.equal(f.anchor, 'primária "Salvar"');
+  assert.match(f.message, /top-right, archetype library/);
+  assert.equal(f.anchor, 'primary "Salvar"');
   assert.ok(f.evidence.includes('02-tela.html › '));
-  // sem arquétipo, vale actions.primary-position do UX.md
+  // without an archetype, actions.primary-position from the UX.md applies
   const ux = analyzeLayout(geom([main(), h1(), primary('Salvar', { x: 244, y: 700 })]), { primary_position: 'top-right' });
   assert.equal(rules(ux, 'L1').length, 1);
   assert.match(rules(ux, 'L1')[0].message, /UX\.md/);
-  // inline não tem posição a cobrar
+  // inline has no position to enforce
   assert.equal(rules(analyzeLayout(geom([main(), primary('X', { x: 244, y: 700 })]), { archetype: arch('public-decision-page', 'inline') }), 'L1').length, 0);
 });
 
 test('L1: a primary on the same row as a field of its form, or beside its section title, is a row action (not flagged)', () => {
   const dlg = { dialog_open: true };
+  // Legacy region label (`diálogo`, geometry measured before the round-4 rename) is still a dialog.
   const box = el({ id: 'dlg', tag: 'div', kind: 'region', role: 'dialog', region: 'diálogo "Categorias"', box: { x: 420, y: 100, width: 600, height: 700 } });
   const form = 'dlg > div > form';
   const add = primary('Adicionar', { x: 910, y: 160 }, { region: 'diálogo "Categorias"', parent: form, id: `${form} > button` });
   const field = el({ id: `${form} > div > input`, kind: 'field', tag: 'input', region: 'diálogo "Categorias"', form_group: form, box: { x: 440, y: 160, width: 460, height: 38 } });
   assert.equal(inlinePrimary(add, [box, add, field]), true);
   assert.equal(rules(analyzeLayout(geom([box, field, add], dlg), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') }), 'L1').length, 0);
-  // sem o campo na linha, a mesma primária volta a ser medida
+  // without the field on the row, the same primary is measured again
   assert.equal(rules(analyzeLayout(geom([box, add], dlg), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') }), 'L1').length, 1);
   const sec = 'main > section:nth-of-type(2) > div';
   const novo = primary('Novo signatário', { x: 1250, y: 440 }, { parent: sec });
@@ -79,13 +80,13 @@ test('L1: a primary on the same row as a field of its form, or beside its sectio
 });
 
 test('L1: in a dialog, bottom-right is relative to the dialog box; side-panel primary does not count for page-header', () => {
-  const dlg = el({ id: 'dlg', kind: 'region', region: 'diálogo "Nova"', box: { x: 420, y: 200, width: 600, height: 400 } });
-  const inDlg = (o) => ({ ...o, region: 'diálogo "Nova"' });
+  const dlg = el({ id: 'dlg', kind: 'region', region: 'dialog "Nova"', box: { x: 420, y: 200, width: 600, height: 400 } });
+  const inDlg = (o) => ({ ...o, region: 'dialog "Nova"' });
   const ok = analyzeLayout(geom([dlg, inDlg(primary('Criar', { x: 880, y: 540 }))], { dialog_open: true }), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') });
   assert.equal(rules(ok, 'L1').length, 0);
   const bad = analyzeLayout(geom([dlg, inDlg(primary('Adicionar', { x: 880, y: 240 }))], { dialog_open: true }), { archetype: arch('form-dialog', 'bottom-right', [], 'dialog-footer') });
   assert.equal(rules(bad, 'L1').length, 1);
-  assert.match(rules(bad, 'L1')[0].message, /altura do diálogo/);
+  assert.match(rules(bad, 'L1')[0].message, /of the dialog height/);
   const panel = el({ kind: 'card', box: { x: 1036, y: 240, width: 380, height: 700 } });
   const r = analyzeLayout(geom([main(), h1(), panel, primary('Pedir aprovação', { x: 1050, y: 600 })]), { archetype: arch('editor-with-panel', 'top-right') });
   assert.equal(rules(r, 'L1').length, 0);
@@ -100,16 +101,16 @@ test('L2: more than N heavy elements in the first fold fails; nested and adjacen
   ];
   const [f] = rules(analyzeLayout(geom([main(), ...heavy])), 'L2');
   assert.equal(f.measure.count, 5);
-  assert.match(f.message, /botão cheio/);
-  assert.match(f.message, /bloco de cor saturada/);
-  // abaixo da dobra não conta
+  assert.match(f.message, /filled button/);
+  assert.match(f.message, /saturated color block/);
+  // below the fold does not count
   const below = heavy.map((e, i) => (i >= 3 ? { ...e, box: { ...e.box, y: 1200 } } : e));
   assert.equal(rules(analyzeLayout(geom([main(), ...below])), 'L2').length, 0);
-  // células de um cabeçalho de tabela (blocos saturados encostados) contam uma vez; texto dentro do bloco também
+  // cells of a table header (adjacent saturated blocks) count once; so does text inside the block
   const cells = [0, 1, 2, 3, 4, 5].map((i) => el({ tag: 'th', style: { background_color: 'rgb(43, 89, 195)' }, box: { x: 244 + i * 150, y: 300, width: 150, height: 36 } }));
   const inside = el({ text: 'Documento', style: { font_size: 20, font_weight: 700 }, box: { x: 250, y: 304, width: 100, height: 24 } });
   assert.equal(rules(analyzeLayout(geom([main(), h1(), ...cells, inside])), 'L2').length, 0);
-  // limite vem do UX.md (layout.max-emphasis)
+  // the limit comes from the UX.md (layout.max-emphasis)
   assert.equal(rules(analyzeLayout(geom([main(), h1(), primary('A', { x: 900, y: 90 })]), { limits: { 'max-emphasis': 1 } }), 'L2').length, 1);
 });
 
@@ -117,13 +118,13 @@ test('L3: h1 not the largest text, or lower level larger than upper, fails; numb
   const ok = analyzeLayout(geom([main(), h1(), el({ tag: 'h2', kind: 'heading', heading_level: 2, text: 'Seção', style: { font_size: 18 } }), el({ text: 'R$ 1.200,00', style: { font_size: 32 } })]));
   assert.equal(rules(ok, 'L3').length, 0);
   const big = analyzeLayout(geom([main(), h1(), el({ kind: 'text', text: 'Destaque enorme', style: { font_size: 30 } })]));
-  assert.match(rules(big, 'L3')[0].message, /não é o maior texto/);
+  assert.match(rules(big, 'L3')[0].message, /is not the largest text/);
   const inv = analyzeLayout(geom([main(), h1(),
     el({ tag: 'h3', kind: 'heading', heading_level: 3, text: 'OBJETO', style: { font_size: 12 } }),
     el({ tag: 'h4', kind: 'heading', heading_level: 4, text: 'Item', style: { font_size: 14 } })]));
   const [f] = rules(inv, 'L3');
-  assert.match(f.message, /h4 "Item" \(14 px\) maior que h3 "OBJETO" \(12 px\)/);
-  assert.equal(f.anchor, 'h4 maior que h3');
+  assert.match(f.message, /h4 "Item" \(14 px\) larger than h3 "OBJETO" \(12 px\)/);
+  assert.equal(f.anchor, 'h4 larger than h3');
 });
 
 test('L4: form fields in more than 2 left positions fail; aligned columns and floating labels pass', () => {
@@ -134,11 +135,11 @@ test('L4: form fields in more than 2 left positions fail; aligned columns and fl
   const [f] = rules(bad, 'L4');
   assert.equal(f.severity, 1);
   assert.deepEqual(f.measure.edges, [244, 252, 262]);
-  // rótulo flutuante dentro da caixa do campo não é borda própria
+  // a floating label inside the field box is not an edge of its own
   const floating = el({ kind: 'label', label_for: 'f1', box: { x: 258, y: 210, width: 80, height: 16 } });
   const f1 = { ...field(244, 200), id: 'f1' };
   assert.equal(rules(analyzeLayout(geom([main(), f1, floating, field(244, 260), field(244, 320)])), 'L4').length, 0);
-  // cartões irmãos em grade de 3 colunas alinhadas passam; um fora do eixo reprova
+  // sibling cards in an aligned 3-column grid pass; one off the axis fails
   const card = (x, y) => el({ kind: 'card', parent: 'main > grid', box: { x, y, width: 300, height: 120 } });
   assert.equal(rules(analyzeLayout(geom([main(), card(244, 200), card(560, 200), card(876, 200), card(244, 340), card(560, 340), card(876, 340)])), 'L4').length, 0);
   assert.equal(rules(analyzeLayout(geom([main(), card(244, 200), card(260, 340), card(280, 480)])), 'L4').length, 1);
@@ -150,24 +151,24 @@ test('L5: label far from field, actions too far apart, action closer to neighbou
   assert.equal(rules(analyzeLayout(geom([main(), f, near])), 'L5').length, 0);
   const far = { ...near, box: { x: 244, y: 180, width: 60, height: 18 } };
   const [r1] = rules(analyzeLayout(geom([main(), f, far])), 'L5');
-  assert.match(r1.message, /a 32 px do seu campo/);
-  // ações do mesmo grupo
+  assert.match(r1.message, /32 px from its field/);
+  // actions of the same group
   const a = btn('Salvar', { x: 900, y: 600 }), b = btn('Cancelar', { x: 1100, y: 600 });
-  assert.match(rules(analyzeLayout(geom([main(), a, b])), 'L5')[0].message, /separadas por 80 px/);
-  // conteúdo entre as duas (paginação) e destrutiva afastada não reprovam
+  assert.match(rules(analyzeLayout(geom([main(), a, b])), 'L5')[0].message, /80 px apart/);
+  // content between them (pagination) and a destructive action kept apart do not fail
   const mid = el({ kind: 'text', text: 'pág. 1 de 3', box: { x: 1030, y: 610, width: 60, height: 16 } });
   assert.equal(rules(analyzeLayout(geom([main(), a, b, mid])), 'L5').length, 0);
   assert.equal(rules(analyzeLayout(geom([main(), a, { ...b, is_destructive: true }])), 'L5').length, 0);
-  // links não formam grupo de ações
+  // links do not form an action group
   assert.equal(rules(analyzeLayout(geom([main(), { ...a, tag: 'a' }, { ...b, tag: 'a' }])), 'L5').length, 0);
-  // botão encostado num grupo vizinho e longe do próprio
+  // button touching a neighboring group and far from its own
   const g1a = btn('Editar', { x: 600, y: 600, width: 30, height: 30 }, { parent: 'g1' });
   const g1b = btn('Excluir', { x: 670, y: 600, width: 30, height: 30 }, { parent: 'g1' });
   const g2 = btn('Subir', { x: 560, y: 600, width: 30, height: 30 }, { parent: 'g2' });
   const res = rules(analyzeLayout(geom([main(), g1a, g1b, g2])), 'L5');
   assert.equal(res.length, 1);
-  assert.match(res[0].message, /mais perto de "Subir"/);
-  // invólucro (pai diferente) encostado funde no mesmo grupo: sem achado
+  assert.match(res[0].message, /closer to "Subir"/);
+  // a touching wrapper (different parent) merges into the same group: no finding
   const t1 = btn('Subir', { x: 632, y: 600, width: 30, height: 30 }, { parent: 'span1' });
   assert.equal(rules(analyzeLayout(geom([main(), g1a, t1, { ...g1b, box: { ...g1b.box, x: 664 } }])), 'L5').length, 0);
 });
@@ -176,12 +177,12 @@ test('L6: title and primary below the fold fail; dialog counts from its top and 
   assert.equal(rules(analyzeLayout(geom([main(), h1(), primary('Avançar', { x: 244, y: 700 })])), 'L6').length, 0);
   const r = analyzeLayout(geom([main(2000), h1({ box: { x: 244, y: 950, width: 300, height: 32 } }), primary('Avançar', { x: 244, y: 1180 })]));
   assert.equal(rules(r, 'L6').length, 2);
-  const dlg = el({ id: 'dlg', kind: 'region', region: 'diálogo "Excluir"', box: { x: 420, y: 1000, width: 600, height: 300 } });
-  const d = (o) => ({ ...o, region: 'diálogo "Excluir"' });
+  const dlg = el({ id: 'dlg', kind: 'region', region: 'dialog "Excluir"', box: { x: 420, y: 1000, width: 600, height: 300 } });
+  const d = (o) => ({ ...o, region: 'dialog "Excluir"' });
   const title = d(el({ kind: 'heading', heading_level: 2, text: 'Excluir', box: { x: 440, y: 1010, width: 200, height: 30 } }));
-  // diálogo deslocado pela captura, mas tudo dentro de 900 px do topo dele: passa
+  // dialog shifted by the capture, but everything within 900 px of its top: passes
   assert.equal(rules(analyzeLayout(geom([dlg, title, d(primary('Excluir', { x: 880, y: 1250 }))], { dialog_open: true })), 'L6').length, 0);
-  // diálogo mais alto que a janela: primária no corpo, abaixo da dobra, reprova; no rodapé fixo, passa
+  // dialog taller than the window: primary in the body, below the fold, fails; in the fixed footer, passes
   const tall = { ...dlg, box: { ...dlg.box, height: 1400 } };
   const p = d(primary('Salvar', { x: 880, y: 2300 }));
   assert.equal(rules(analyzeLayout(geom([tall, title, p], { dialog_open: true })), 'L6').length, 1);
@@ -194,13 +195,13 @@ test('L7: running text over 90 characters per line fails; short or narrow text p
   const [f] = rules(analyzeLayout(geom([main(), t(400, 1100, 63)])), 'L7'); // 3 linhas → ~133 por linha
   assert.equal(f.measure.chars_per_line, 133);
   assert.equal(rules(analyzeLayout(geom([main(), t(400, 560, 126)])), 'L7').length, 0); // 6 linhas → ~67
-  assert.equal(rules(analyzeLayout(geom([main(), t(100, 1100, 21)])), 'L7').length, 0); // uma linha de 100: frase, não texto corrido
-  assert.equal(rules(analyzeLayout(geom([main(), t(140, 1100, 21)])), 'L7').length, 1); // uma linha de 140
+  assert.equal(rules(analyzeLayout(geom([main(), t(100, 1100, 21)])), 'L7').length, 0); // one line of 100: a sentence, not running text
+  assert.equal(rules(analyzeLayout(geom([main(), t(140, 1100, 21)])), 'L7').length, 1); // one line of 140
 });
 
 test('L8: target under 24×24 fails only without free space; inline links are exempt; repeated targets collapse', () => {
   const icon = (x, o = {}) => btn('Excluir', { x, y: 300, width: 18, height: 18 }, o);
-  assert.equal(rules(analyzeLayout(geom([main(), icon(600)])), 'L8').length, 0); // isolado: exceção de espaçamento
+  assert.equal(rules(analyzeLayout(geom([main(), icon(600)])), 'L8').length, 0); // isolated: spacing exception
   const crowded = analyzeLayout(geom([main(), icon(600), icon(620, { text: 'Editar' })]));
   assert.equal(rules(crowded, 'L8').length, 2);
   assert.equal(rules(crowded, 'L8')[0].severity, 2);
@@ -221,13 +222,13 @@ test('L9: missing archetype region fails; declared region, heuristics and condit
   assert.equal(rules(analyzeLayout(geom([main(), h1(), editor, panel]), { archetype: a }), 'L9').length, 0);
   const [f] = rules(analyzeLayout(geom([main(), h1(), editor]), { archetype: a }), 'L9');
   assert.match(f.message, /"side-panel"/);
-  assert.equal(f.anchor, 'região side-panel ausente');
-  // marcação declarada (data-region / archetype-regions) vale mesmo sem a geometria típica
+  assert.equal(f.anchor, 'region side-panel missing');
+  // declared markup (data-region / archetype-regions) counts even without the typical geometry
   const declared = el({ archetype_region: 'side-panel', box: { x: 244, y: 900, width: 100, height: 40 } });
   assert.equal(rules(analyzeLayout(geom([main(), h1(), editor, declared]), { archetype: a }), 'L9').length, 0);
-  // diálogo: cabeçalho, corpo e rodapé pela posição
-  const dlg = el({ id: 'dlg', kind: 'region', region: 'diálogo "X"', box: { x: 420, y: 200, width: 600, height: 400 } });
-  const d = (o) => ({ ...o, region: 'diálogo "X"' });
+  // dialog: header, body and footer by position
+  const dlg = el({ id: 'dlg', kind: 'region', region: 'dialog "X"', box: { x: 420, y: 200, width: 600, height: 400 } });
+  const d = (o) => ({ ...o, region: 'dialog "X"' });
   const parts = [d(el({ kind: 'heading', heading_level: 2, text: 'X', box: { x: 440, y: 220, width: 100, height: 30 } })),
     d(el({ kind: 'text', text: 'Corpo', box: { x: 440, y: 280, width: 560, height: 80 } })), d(btn('Cancelar', { x: 760, y: 540 })), d(primary('Criar', { x: 880, y: 540 }))];
   const fa = arch('form-dialog', 'bottom-right', ['dialog-header', 'dialog-body', 'dialog-footer'], 'dialog-footer');
@@ -259,7 +260,7 @@ test('layout.mjs: archetype by screen id or route, state suffix skips L9, limits
 
 test('findings: layout family, stable id without coordinates', () => {
   const run = (y) => ({ screens: [{ file: '02-tela.html', screen: '02-tela', findings: [
-    { rule: 'L6', severity: 2, region: 'main', message: `ação primária "Avançar" fora da primeira dobra (termina a ${y} px)`, anchor: 'primária "Avançar" abaixo da dobra' },
+    { rule: 'L6', severity: 2, region: 'main', message: `primary action "Avançar" outside the first fold (ends ${y} px)`, anchor: 'primary "Avançar" below the fold' },
   ] }] });
   const [a] = fromLayout(run(1208)), [b] = fromLayout(run(1300));
   assert.equal(a.family, 'layout');
@@ -272,10 +273,10 @@ test('findings: layout family, stable id without coordinates', () => {
   assert.notEqual(stableId(c), ida);
 });
 
-// ---------- medida (só com Playwright disponível) ----------
+// ---------- measurement (only with Playwright available) ----------
 
 const pw = resolvePlaywright(process.env.DSX_PLAYWRIGHT_CWD ?? process.cwd());
-test('measure: real geometry from a static HTML (skipped without Playwright)', { skip: pw ? false : 'Playwright não encontrado (defina DSX_PLAYWRIGHT_CWD para uma pasta que o tenha)' }, async () => {
+test('measure: real geometry from a static HTML (skipped without Playwright)', { skip: pw ? false : 'Playwright not found (set DSX_PLAYWRIGHT_CWD to a folder that has it)' }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'dsx-geom-'));
   try {
     const html = `<!doctype html><html><head><title>/pedidos</title><style>body{margin:0;font:15px sans-serif}

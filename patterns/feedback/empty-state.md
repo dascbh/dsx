@@ -1,6 +1,6 @@
 ---
 id: empty-state
-title: Como criar bons estados vazios?
+title: How do you design good empty states?
 category: feedback
 components: [empty-state, illustration, button, list, table]
 type: recommendation
@@ -11,94 +11,94 @@ wcag: ["1.1.1", "1.3.1", "2.1.1", "2.4.7", "1.4.3"]
 related: [no-search-results, active-filters, temporary-failure, skeleton-vs-spinner, retry]
 ---
 
-# Como criar bons estados vazios?
+# How do you design good empty states?
 
-> **Regra:** Identifique a causa do vazio, explique-a em título curto mais uma frase de contexto e ofereça uma única ação principal coerente com essa causa.
+> **Rule:** Identify why the area is empty, explain it in a short title plus one sentence of context, and offer a single primary action consistent with that cause.
 
-## Contexto
+## Context
 
-Um estado vazio aparece quando uma área ainda não tem conteúdo: primeiro uso, busca sem resultado, tarefa concluída, falta de permissão ou falha temporária. Cada causa pede um próximo passo diferente, então a mesma mensagem não serve para todas.
+An empty state appears when an area has no content yet: first use, a search with no results, a completed task, missing permission or a temporary failure. Each cause calls for a different next step, so one message does not fit them all.
 
-"Nenhum item" pode significar ausência de dados, filtro restritivo, erro, bloqueio por permissão ou trabalho concluído. Uma tela vazia sem explicação parece quebrada ou sem saída.
+"No items" can mean no data, a restrictive filter, an error, a permission block or finished work. An empty screen with no explanation looks broken or like a dead end.
 
-A mensagem deve informar o que a pessoa vê, o que isso quer dizer e o que fazer em seguida. Não há layout único; a escolha varia com a causa, a tarefa e o contexto do produto.
+The message should say what the person sees, what it means and what to do next. There is no single layout; the choice varies with the cause, the task and the product context.
 
-## Decisão
+## Decision
 
-- **SE** é o primeiro uso **ENTÃO** explique para que serve a área e convide a começar ("Criar primeiro item").
-- **SE** a busca ou os filtros zeraram o resultado **ENTÃO** preserve a consulta e ofereça editar termos ou "Limpar filtros".
-- **SE** ainda não há dados mas virão depois de uma ação ou integração **ENTÃO** descreva o que aparecerá e quando, sem sugerir erro.
-- **SE** houve erro ou indisponibilidade **ENTÃO** use mensagem de falha com "Tentar novamente"; não apresente como coleção vazia.
-- **SE** a pessoa não tem permissão **ENTÃO** explique a restrição sem expor dados e indique como pedir acesso.
-- **SE** a tarefa foi concluída ou a área foi limpa **ENTÃO** confirme o resultado e só sugira próximo passo se for relevante.
-- **SE** o conteúdo está apenas carregando **ENTÃO** use estado de carregamento, não vazio.
-- **SE** há várias ações possíveis **ENTÃO** destaque uma principal e rebaixe as demais.
-- **SENÃO** escreva título específico e texto que acrescente contexto, sem repeti-lo.
+- **IF** it is the first use **THEN** explain what the area is for and invite the person to start ("Create first item").
+- **IF** search or filters brought the result to zero **THEN** preserve the query and offer to edit the terms or "Clear filters".
+- **IF** there is no data yet but it will come after an action or integration **THEN** describe what will appear and when, without suggesting an error.
+- **IF** there was an error or unavailability **THEN** use a failure message with "Try again"; do not present it as an empty collection.
+- **IF** the person has no permission **THEN** explain the restriction without exposing data and say how to request access.
+- **IF** the task was completed or the area was cleared **THEN** confirm the result and suggest a next step only if relevant.
+- **IF** the content is just loading **THEN** use a loading state, not an empty one.
+- **IF** there are several possible actions **THEN** highlight one primary action and demote the others.
+- **ELSE** write a specific title and text that adds context without repeating it.
 
-## Quando usar
+## When to use
 
-- Área sem dados ou conteúdo.
-- Busca ou filtros sem resultados.
-- Tarefa concluída ou área limpa.
-- Conteúdo indisponível por erro, permissão ou configuração.
-- Primeiro uso que precisa de orientação.
+- An area with no data or content.
+- Search or filters with no results.
+- A completed task or a cleared area.
+- Content unavailable because of an error, permission or configuration.
+- A first use that needs guidance.
 
-## Quando evitar
+## When to avoid
 
-- Conteúdo existe e está carregando → **use em vez disso:** skeleton ou spinner.
-- Ocorreu falha → **use em vez disso:** mensagem de erro com recuperação.
-- Mensagem só "Nada encontrado" → **use em vez disso:** causa mais próximo passo.
-- Ações concorrentes sem prioridade → **use em vez disso:** uma ação principal.
-- Ilustração como única explicação → **use em vez disso:** texto como portador da informação.
+- Content exists and is loading → **use instead:** a skeleton or spinner.
+- A failure occurred → **use instead:** an error message with recovery.
+- A message that only says "Nothing found" → **use instead:** the cause plus a next step.
+- Competing actions with no priority → **use instead:** one primary action.
+- An illustration as the only explanation → **use instead:** text as the carrier of the information.
 
-## Faça
+## Do
 
-- Nomeie o estado com título curto e específico.
-- Relacione a ação à causa.
-- Preserve busca e filtros.
-- Trate imagens decorativas como decorativas.
+- Name the state with a short, specific title.
+- Tie the action to the cause.
+- Preserve search and filters.
+- Treat decorative images as decorative.
 
-## Evite
+## Avoid
 
-- Escrever só "Sem dados".
-- Culpar a pessoa.
-- Confundir erro com ausência de dados.
-- Links genéricos sem relação com a intenção.
-- Repetir ações concorrentes.
+- Writing only "No data".
+- Blaming the person.
+- Confusing an error with absence of data.
+- Generic links unrelated to the intent.
+- Repeating competing actions.
 
-## Acessibilidade
+## Accessibility
 
-- Título como cabeçalho, texto associado e ação com rótulo claro (1.3.1); a explicação vem antes de qualquer tabela ou lista vazia.
-- Imagem decorativa com alternativa vazia; imagem informativa com alternativa equivalente (1.1.1).
-- Contraste suficiente (1.4.3), foco visível (2.4.7) e operação completa por teclado (2.1.1).
-- Teste com zoom e leitor de tela nos casos de erro, sem resultados e sem permissão.
+- The title as a heading, associated text and an action with a clear label (1.3.1); the explanation comes before any empty table or list.
+- A decorative image with an empty alternative; an informative image with an equivalent alternative (1.1.1).
+- Sufficient contrast (1.4.3), visible focus (2.4.7) and full keyboard operation (2.1.1).
+- Test with zoom and a screen reader in the error, no-results and no-permission cases.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Primeiro uso | "Você ainda não tem projetos. Crie o primeiro para organizar suas tarefas." |
-| Filtros | "Nenhum resultado com estes filtros." + "Limpar filtros" |
-| Sem permissão | "Você não tem acesso a esta área. Peça acesso ao administrador." |
-| Erro | "Não foi possível carregar a lista. Tentar novamente" |
-| Concluído | "Tudo em dia. Nenhuma pendência." |
+| First use | "You don't have any projects yet. Create the first one to organize your tasks." |
+| Filters | "No results with these filters." + "Clear filters" |
+| No permission | "You don't have access to this area. Ask your administrator for access." |
+| Error | "We couldn't load the list. Try again" |
+| Done | "All caught up. Nothing pending." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O motivo do vazio está claro.
-- [ ] O texto explica o que deveria aparecer.
-- [ ] Existe uma ação principal relevante, com verbo claro.
-- [ ] Erro está separado de "sem dados".
-- [ ] Busca e filtros oferecem recuperação.
-- [ ] A imagem é decorativa ou tem alternativa adequada.
-- [ ] A explicação vem antes de conteúdo irrelevante na ordem de leitura.
-- [ ] Passou por teste com leitor de tela, teclado e zoom.
+- [ ] The reason for the empty state is clear.
+- [ ] The text explains what should appear.
+- [ ] There is one relevant primary action, with a clear verb.
+- [ ] Error is separate from "no data".
+- [ ] Search and filters offer recovery.
+- [ ] The image is decorative or has an adequate alternative.
+- [ ] The explanation comes before irrelevant content in reading order.
+- [ ] It was tested with screen reader, keyboard and zoom.
 
-## Fundamentação
+## Rationale
 
-- IBM Carbon (estados vazios): classifica por causa e orienta explicar o quê, por quê e qual ação seguir.
-- Baymard Institute (páginas sem resultados): busca sem alternativa vira beco sem saída; contexto de busca e comércio.
-- Nielsen Norman Group (diretrizes de mensagens de erro): linguagem compreensível e orientação de recuperação.
-- Shopify Polaris e GitHub Primer (estado vazio): primeiro uso, ausência e erro com texto específico e ação principal.
-- Material Design (legado) e Padrão Digital de Governo (GOV.BR): finalidade do estado vazio e orientação de próxima ação.
-- WCAG 2.2 (W3C WAI): estrutura, teclado e alternativas para conteúdo não textual.
+- IBM Carbon (empty states): classifies them by cause and recommends explaining what, why and which action to take.
+- Baymard Institute (no-results pages): a search with no alternative becomes a dead end; search and commerce context.
+- Nielsen Norman Group (error message guidelines): understandable language and recovery guidance.
+- Shopify Polaris and GitHub Primer (empty state): first use, absence and error with specific text and a primary action.
+- Material Design (legacy) and the Brazilian Government Digital Standard (GOV.BR): the purpose of the empty state and guidance on the next action.
+- WCAG 2.2 (W3C WAI): structure, keyboard and alternatives for non-text content.

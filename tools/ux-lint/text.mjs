@@ -1,44 +1,42 @@
 #!/usr/bin/env node
-// ux-lint, nível texto: higiene do texto de interface nas capturas HTML. Procura as marcas que fazem
-// um texto parecer gerado por IA ou burocrático (travessão, título composto, descrição que repete o
-// título, abertura vazia, caixa de título, termo técnico...) e textos desnecessários. Não julga
-// arquitetura de tela (isso é o screen.mjs). Catálogo: knowledge/fundamentos/marcas-de-texto-gerado.md.
-// Sem dependências.
+// ux-lint, text level: hygiene of interface text in the HTML captures. Looks for the marks that make a
+// text read as AI-generated or bureaucratic (dash, compound title, helper text that repeats the title,
+// empty opening, title case, technical term...) and for unnecessary text. Does not judge screen
+// architecture (that is screen.mjs). Catalog: knowledge/foundations/generated-text-marks.md.
+// The product-text vocabulary comes from a language pack (lib/lang/, UX.md `content.language`, default pt-BR).
+// No dependencies.
 //
-// Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md]
-//                                  [--module <m>] [--ignore <nomes...>] [--json]
-// --module escolhe o glossário do módulo (`content.glossary` por módulo): os termos canônicos com maiúscula no
-// meio ("Nota Fiscal", "Ordem de Compra") valem como nomes próprios no X10, junto de `content.proper-nouns`.
-// --code procura cada texto apontado nas fontes (.ts/.tsx/.js/.jsx/.mjs/.py/.json) e devolve
-// arquivo:linha, para corrigir onde o texto nasce.
+// Usage: node tools/ux-lint/text.mjs --screens <folder-or-html...> [--code <folders...>] [--ux UX.md]
+//                                  [--module <m>] [--ignore <names...>] [--json]
+// --module picks the module glossary (`content.glossary` per module): canonical terms with a capital letter in
+// the middle ("Nota Fiscal", "Purchase Order") count as proper nouns for X10, together with `content.proper-nouns`.
+// --code looks up each flagged text in the sources (.ts/.tsx/.js/.jsx/.mjs/.py/.json) and returns
+// file:line, so the fix lands where the text is born.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadConfig, configFrom } from './lib/config.mjs';
 import { loadGlossary, glossarySource } from './lib/glossary.mjs';
 import { normalizeArgv } from '../lib/legacy-cli.mjs';
+import { langPack } from './lib/lang/index.mjs';
 import { parseHtml, querySelectorAll, matches, closest, isHidden, getById, walk, contains, decodeEntities } from './lib/html.mjs';
 
 export const SEVERITY = { X1: 2, X1b: 1, X2: 2, X3: 1, X4: 2, X5: 1, X6: 1, X7: 1, X8: 1, X9: 1, X10: 1, X11: 2 };
 export const TYPES = ['title', 'button', 'tab', 'label', 'placeholder', 'helper', 'alert', 'accessible-name', 'tooltip', 'empty-value'];
-/** Nome do tipo de elemento nas mensagens (as mensagens continuam em pt-BR). */
+/** Element type name used in messages (messages are English; the product-text vocabulary comes from the language pack). */
 export const TYPE_LABEL = {
-  title: 'título', button: 'botão', tab: 'aba', label: 'rótulo', placeholder: 'placeholder', helper: 'texto de apoio', alert: 'alerta',
-  'accessible-name': 'nome acessível', tooltip: 'tooltip', 'empty-value': 'valor vazio',
+  title: 'title', button: 'button', tab: 'tab', label: 'label', placeholder: 'placeholder', helper: 'helper text', alert: 'alert',
+  'accessible-name': 'accessible name', tooltip: 'tooltip', 'empty-value': 'empty value',
 };
-export const LABELS_WITHOUT_VERB = ['ok', 'sim', 'não', 'nao', 'confirmar', 'enviar'];
+/** Default (pt-BR) lists, kept as exports for compatibility; the detectors read the pack of `content.language`. */
+export const LABELS_WITHOUT_VERB = langPack().labelsWithoutVerb;
 export const TECHNICAL_TERMS = ['sha256', 'sha-256', 'hash', 'id', 'token', 'payload', 'SES', 'API', 'JSON', 'endpoint', 'webhook', 'UUID'];
-const EMPTY_OPENINGS = [
-  /^aqui (você|voce) (pode|encontra|vê|ve)\b/i,
-  /^nest[ae] (tela|seção|secao|página|pagina|área|area|aba)\b/i,
-  /^est[ae] (página|pagina|tela|seção|secao|área|area)\b/i,
-  /^use (este|esta|estes|estas|o|a)\b.*\bpara\b/i,
-  /^veja abaixo\b/i,
-  /^clique aqui\b/i,
-  /^abaixo (você|voce|estão|estao|está|esta)\b/i,
-];
-const STOP_WORDS = new Set('de da do das dos e a o as os em no na nos nas para pra por com sem ao aos à às um uma uns umas ou que se seu sua seus suas este esta esse essa isso aqui já mais deste desta neste nesta desse dessa nesse nessa'.split(' '));
-const COMPANY_NAME = /\b(ltda|s\.?\s?a\.?|s\/a|eireli|me|epp)\b\.?/i;
+/** Language-pack derived helpers, cached per pack. */
+const PACK_CACHE = new Map();
+function packTools(pack) {
+  if (!PACK_CACHE.has(pack)) PACK_CACHE.set(pack, { pack, stop: new Set(pack.stopWords) });
+  return PACK_CACHE.get(pack);
+}
 
 const ZW = /[​-‍﻿]/g;
 const clean = (s) => (s || '').replace(ZW, '').replace(/\s+/g, ' ').trim();
@@ -46,7 +44,6 @@ const norm = (s) => clean(s).toLowerCase().replace(/[.!?:…]+$/, '').trim();
 const words = (s) => clean(s).split(' ').filter((w) => /[\p{L}\p{N}]/u.test(w));
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const stem = (w) => w.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '').slice(0, 5);
-const contentWords = (s) => words(s).map((w) => w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')).filter((w) => w.length > 2 && !STOP_WORDS.has(w));
 
 const BLOCK_SEL = 'p, .MuiTypography-body1, .MuiTypography-body2, .MuiTypography-caption, .MuiTypography-subtitle1, .MuiTypography-subtitle2, .MuiDialogContentText-root';
 
@@ -80,7 +77,7 @@ function fieldLabel(root, f) {
 const withoutAsterisk = (s) => clean(s).replace(/\s*\*$/, '').trim();
 
 const INLINE = /^(b|strong|em|i|u|mark|small|sub|sup|code|abbr|s)$/;
-/** Texto visível com espaço em toda fronteira de elemento (o textOf cola "Título" + "Chip" em "TítuloChip"). */
+/** Visible text with a space at every element boundary (textOf glues "Title" + "Chip" into "TitleChip"). */
 export function visibleText(node, ignore = null) {
   if (!node || (node.type === 'element' && isHidden(node))) return '';
   const parts = [];
@@ -99,7 +96,7 @@ export function visibleText(node, ignore = null) {
 }
 
 const PIECE_SEL = 'p, div, li, h1, h2, h3, h4, h5, h6, .MuiTypography-root, .MuiChip-root, .MuiListItemText-primary, .MuiListItemText-secondary';
-/** Blocos de texto distintos dentro de um controle (cartão clicável = título + resumo + chip). */
+/** Distinct text blocks inside a control (clickable card = title + summary + chip). */
 function piecesOf(b) {
   const pieces = [];
   for (const n of walk(b)) {
@@ -112,7 +109,7 @@ function piecesOf(b) {
 }
 
 /**
- * Inventário de textos de uma tela. Com diálogo aberto, só o diálogo.
+ * Text inventory of a screen. With a dialog open, only the dialog.
  * Devolve [{ tipo, texto, variante?, titulo?, rotulo?, visivel?, linha, col, no }].
  */
 export function takeInventory(html, cfg = configFrom({})) {
@@ -134,17 +131,17 @@ export function takeInventory(html, cfg = configFrom({})) {
   };
   const is = (n, s) => n.type === 'element' && matches(n, s);
 
-  // Títulos (inclui título de diálogo e resumo de acordeão, que também é botão: conta como título).
+  // Titles (includes dialog titles and accordion summaries, which are also buttons: they count as titles).
   const headings = querySelectorAll(root, 'h1, h2, h3, h4, h5, h6, [role=heading], .MuiDialogTitle-root, .MuiAccordionSummary-root');
   for (const h of headings) {
     const variant = is(h, '.MuiAccordionSummary-root') ? 'accordion' : is(h, '.MuiDialogTitle-root') || closest(h, sel.dialog) ? 'dialog' : h.tag;
-    // Chip de status dentro do título (ex.: "Preenchidos") é selo, não título.
+    // A status chip inside the title (e.g. "Filled") is a badge, not the title.
     const pieces = variant === 'accordion' ? piecesOf(h) : [];
     add(h, 'title', pieces.length >= 2 ? visibleText(pieces[0], '.MuiChip-root') : visibleText(h, '.MuiChip-root'), { variant });
   }
-  // Abas.
+  // Tabs.
   for (const t of querySelectorAll(root, '.MuiTab-root, [role=tab]')) add(t, 'tab', visibleText(t) || t.attrs['aria-label']);
-  // Botões (texto visível ou aria-label), fora abas e resumo de acordeão.
+  // Buttons (visible text or aria-label), except tabs and accordion summaries.
   for (const b of querySelectorAll(root, 'button, [role=button], a.MuiButton-root, [role=menuitem]')) {
     if (is(b, '.MuiTab-root, [role=tab], .MuiAccordionSummary-root') || b.attrs.role === 'combobox') continue;
     const visible = visibleText(b);
@@ -152,13 +149,13 @@ export function takeInventory(html, cfg = configFrom({})) {
     if (pieces.length >= 2) add(b, 'button', visibleText(pieces[0]) || visible, { variant: 'composite', full: visible });
     else add(b, 'button', visible || b.attrs['aria-label'] || b.attrs.title, { variant: buttonVariant(b), from_aria_label: !visible });
   }
-  // Rótulos.
+  // Labels.
   for (const l of querySelectorAll(root, 'label, legend')) add(l, 'label', withoutAsterisk(visibleText(l)));
   // Placeholders.
   for (const f of querySelectorAll(root, 'input[placeholder], textarea[placeholder]')) {
     add(f, 'placeholder', f.attrs.placeholder, { label: withoutAsterisk(fieldLabel(root, f)) });
   }
-  // Texto de apoio: ajuda de campo, legendas e o parágrafo curto logo depois de um título.
+  // Helper text: field help, captions and the short paragraph right after a title.
   for (const n of querySelectorAll(root, '.MuiFormHelperText-root, .MuiTypography-caption')) add(n, 'helper', visibleText(n));
   const texts = [];
   for (const n of walk(root)) if (n.type === 'text' && clean(n.text)) texts.push(n);
@@ -176,9 +173,9 @@ export function takeInventory(html, cfg = configFrom({})) {
     if (existing) existing.title = visibleText(h);
     else add(block, 'helper', t, { title: visibleText(h) });
   }
-  // Alertas.
+  // Alerts.
   for (const a of querySelectorAll(root, '.MuiAlert-message')) add(a, 'alert', visibleText(a));
-  // Nome acessível (aria-label). Botão sem texto visível já entrou como botão pelo próprio aria-label.
+  // Accessible name (aria-label). A button with no visible text already entered as a button through its aria-label.
   for (const n of querySelectorAll(root, '[aria-label]')) {
     const visible = visibleText(n);
     const alreadyButton = (byNode.get(n) || []).some((i) => i.type === 'button' && i.from_aria_label);
@@ -186,22 +183,22 @@ export function takeInventory(html, cfg = configFrom({})) {
     const control = is(n, 'button, [role=button], a, [role=tab], [role=menuitem]');
     add(n, 'accessible-name', n.attrs['aria-label'], { visible, control });
   }
-  // Tooltip (atributo title).
+  // Tooltip (title attribute).
   for (const n of querySelectorAll(root, '[title]')) {
     if (/^(html|head|link|style|meta|iframe|abbr)$/.test(n.tag)) continue;
     const control = is(n, 'button, [role=button], a, [role=tab], input, select, textarea') || !!closest(n, 'button, [role=button]');
     const truncatable = /MuiTypography-noWrap|ellipsis/.test(`${n.attrs.class || ''} ${n.attrs.style || ''}`) || querySelectorAll(n, '.MuiTypography-noWrap').length > 0;
     add(n, 'tooltip', n.attrs.title, { visible: visibleText(n), control, truncatable });
   }
-  // Valor vazio: travessão sozinho em célula ou em texto de valor.
+  // Empty value: a lone dash in a cell or in a value text.
   for (const n of walk(root)) {
     if (n.type !== 'element' || !n.children.length || !n.children.every((c) => c.type === 'text')) continue;
     const t = clean(n.children.map((c) => c.text).join(''));
     if (/^[—–-]$/.test(t)) add(closest(n, 'td, th') || n, 'empty-value', t);
   }
 
-  // Composto × específico: o mesmo texto contado em dois elementos aninhados conta uma vez — como título
-  // quando um deles é título (acordeão, disclosure); senão, no descendente, que é o mais específico.
+  // Compound vs specific: the same text found on two nested elements counts once: as a title when one of
+  // them is a title (accordion, disclosure); otherwise on the descendant, the more specific one.
   const excluded = new Set();
   const isSide = (i) => i.type === 'accessible-name' || i.type === 'tooltip' || i.type === 'placeholder';
   for (const a of items) {
@@ -214,7 +211,7 @@ export function takeInventory(html, cfg = configFrom({})) {
       else { excluded.add(a); break; }
     }
   }
-  // Mesmo nó, mesmo tipo, mesmo texto (ex.: diálogo h2 + .MuiDialogTitle-root): uma vez.
+  // Same node, same type, same text (e.g. dialog h2 + .MuiDialogTitle-root): once.
   const seen = new Set();
   return items.filter((i) => {
     if (excluded.has(i)) return false;
@@ -225,20 +222,16 @@ export function takeInventory(html, cfg = configFrom({})) {
   });
 }
 
-// ---------- regras ----------
+// ---------- rules ----------
 
 const isAcronym = (w) => /^[A-ZÀ-Ý0-9]{2,}[A-ZÀ-Ý0-9-]*s?$/.test(w.replace(/[^\p{L}\p{N}-]/gu, ''));
-const looksLikeVerb = (w) => {
-  const x = w.toLowerCase().replace(/[^\p{L}-]/gu, '');
-  return /(ar|er|ir|or|ôr)(-se)?$/.test(x);
-};
 
-function titleCaseWords(text, properNouns) {
-  if (COMPANY_NAME.test(text)) return null;
+function titleCaseWords(text, properNouns, P) {
+  if (P.pack.companyName.test(text)) return null;
   let t = text;
   for (const n of properNouns) t = t.replace(new RegExp(escRe(n), 'gi'), ' ');
   const ws = t.split(/\s+/).map((w) => w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '')).filter(Boolean);
-  const rest = ws.slice(1).filter((w) => /^\p{L}/u.test(w) && w.length >= 3 && !STOP_WORDS.has(w.toLowerCase()) && !isAcronym(w));
+  const rest = ws.slice(1).filter((w) => /^\p{L}/u.test(w) && w.length >= 3 && !P.stop.has(w.toLowerCase()) && !isAcronym(w));
   return rest.length > 0 && rest.every((w) => /^\p{Lu}/u.test(w) && /\p{Ll}/u.test(w)) ? rest : null;
 }
 
@@ -248,40 +241,48 @@ const toSentenceCase = (text, properNouns) => {
 };
 
 function dashes(text) {
-  // Meia-risca entre números/datas (1–8, 2024–2026, 10/09–12/09) não conta.
+  // An en dash between numbers/dates (1–8, 2024–2026, 10/09–12/09) does not count.
   return text.replace(/(\d)\s?–\s?(?=\d)/g, '$1~').match(/[—–]/g) || [];
 }
 
 const SEPARATOR = /\s[—–|·]\s|\s-\s|:\s/;
 
-/** Aplica X1–X11 a um item do inventário. Devolve [{ regra, severidade, mensagem, sugestao? }]. */
+/**
+ * Applies X1–X11 to one inventory item. Returns [{ rule, severity, message, suggestion? }].
+ * The product-text vocabulary comes from the language pack of `cfg.content.language` (default pt-BR);
+ * `extras.pack` overrides it.
+ */
 export function rulesForItem(it, cfg = configFrom({}), extras = {}) {
   const out = [];
-  // `piece`: o pedaço que a regra acusa; com --code, se ele não está na linha de origem, veio do dado.
+  // `piece`: the part the rule flags; with --code, when it is not on the source line, it came from data.
   const add = (rule, message, suggestion, piece) => out.push({ rule, severity: SEVERITY[rule], message, ...(suggestion ? { suggestion } : {}), ...(piece ? { piece } : {}) });
+  const P = packTools(extras.pack ?? langPack(cfg));
+  const L = P.pack;
+  const contentWords = (s) => words(s).map((w) => w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')).filter((w) => w.length > 2 && !P.stop.has(w));
   const t = it.text;
   const properNouns = [...(cfg.content['proper-nouns'] || []).map(String), ...(extras.properNouns ?? [])];
   const structural = ['title', 'button', 'tab'].includes(it.type);
+  const typeName = TYPE_LABEL[it.type] ?? it.type;
 
   // X1 / X1b
-  if (it.type === 'empty-value') add('X1b', 'travessão no lugar de valor vazio', 'Não informado (ou deixe a célula vazia)');
-  else if (dashes(t).length) {
-    add('X1', 'travessão ou meia-risca no texto', t.replace(/\s*[—–]\s*(?!\d)/g, ', ').replace(/,\s*,/g, ',').replace(/,\s*$/, ''), dashes(t)[0]);
+  if (it.type === 'empty-value') add('X1b', 'dash used as an empty value', `${L.examples.emptyValue} (or leave the cell empty)`);
+  else if (L.flagDashes && dashes(t).length) {
+    add('X1', 'em or en dash in the text', t.replace(/\s*[—–]\s*(?!\d)/g, ', ').replace(/,\s*,/g, ',').replace(/,\s*$/, ''), dashes(t)[0]);
   }
 
-  // X2 — título/aba/botão composto.
-  // Botão só com ícone: o aria-label é o lugar certo do nome do objeto; não é X2.
+  // X2: compound title/tab/button.
+  // Icon-only button: the aria-label is the right place for the object's name; not X2.
   if (structural && !it.from_aria_label && SEPARATOR.test(t)) {
     const parts = t.split(SEPARATOR).map((s) => s.trim()).filter(Boolean);
     const sep = t.match(SEPARATOR)[0].trim();
     const numeric = /^\d/.test(parts[1] || '') && /\d$/.test(parts[0] || '');
     if (parts.length >= 2 && !numeric) {
-      if (it.type === 'button') add('X2', 'botão composto: o nome do objeto vai no nome acessível, não no texto', `texto "${parts[0]}"; aria-label "${parts[0]} ${parts.slice(1).join(' ')}"`, sep);
-      else add('X2', `${TYPE_LABEL[it.type] ?? it.type} composto por dois blocos unidos por separador`, parts[0], sep);
+      if (it.type === 'button') add('X2', "compound button: the object's name goes in the accessible name, not in the text", `text "${parts[0]}"; aria-label "${parts[0]} ${parts.slice(1).join(' ')}"`, sep);
+      else add('X2', `${typeName} made of two blocks joined by a separator`, parts[0], sep);
     }
   }
 
-  // X3 — descrição que repete o título: quase nada além das palavras dele, ou a 1ª frase só o reformula.
+  // X3: helper text that repeats the title: almost nothing beyond its words, or the 1st sentence only rephrases it.
   if (it.type === 'helper' && it.title && words(t).length >= 3 && !/\d/.test(t)) {
     const tw = [...new Set(contentWords(it.title).map(stem))];
     const leftover = (txt) => [...new Set(contentWords(txt).map(stem))].filter((w) => !tw.includes(w)).length;
@@ -289,73 +290,73 @@ export function rulesForItem(it, cfg = configFrom({}), extras = {}) {
     const firstSentence = t.split(/(?<=[.!?])\s+/)[0];
     const rest = t.slice(firstSentence.length).trim();
     if (tw.length && rest && covers(firstSentence) >= 0.6 && leftover(firstSentence) <= 2) {
-      add('X3', `a primeira frase repete o título "${it.title}"`, rest);
+      add('X3', `the first sentence repeats the title "${it.title}"`, rest);
     } else if (tw.length && covers(t) >= 0.6 && leftover(t) <= (tw.length >= 2 ? 3 : 1)) {
-      add('X3', `texto de apoio só repete o título "${it.title}"`, 'remova, ou diga o que o título não diz (consequência, prazo, quem vê)');
+      add('X3', `helper text only repeats the title "${it.title}"`, 'remove it, or say what the title does not (consequence, deadline, who sees it)');
     }
   }
 
-  // X4 — abertura vazia.
+  // X4: empty opening.
   if (['helper', 'alert', 'tooltip', 'placeholder', 'title'].includes(it.type)) {
-    const m = EMPTY_OPENINGS.find((re) => re.test(t));
-    if (m) add('X4', `abertura vazia ("${t.match(m)[0]}")`, 'comece pelo que a pessoa faz ou ganha; corte a abertura');
+    const m = L.emptyOpenings.find((re) => re.test(t));
+    if (m) add('X4', `empty opening ("${t.match(m)[0]}")`, 'start with what the person does or gets; cut the opening');
   }
 
-  // X5 — pontuação final.
-  if (it.type === 'label' && /[:.]$/.test(t) && !/\.\.\.$|…$/.test(t)) add('X5', `rótulo termina com "${t.at(-1)}"`, t.replace(/[:.]+$/, ''));
-  if (structural && /[^.]\.$/.test(t) && !COMPANY_NAME.test(t)) add('X5', `${TYPE_LABEL[it.type] ?? it.type} termina com ponto final`, t.replace(/\.$/, ''));
+  // X5: final punctuation.
+  if (it.type === 'label' && /[:.]$/.test(t) && !/\.\.\.$|…$/.test(t)) add('X5', `label ends with "${t.at(-1)}"`, t.replace(/[:.]+$/, ''));
+  if (structural && /[^.]\.$/.test(t) && !L.companyName.test(t)) add('X5', `${typeName} ends with a period`, t.replace(/\.$/, ''));
 
-  // X6 — botão longo ou sem verbo.
-  if (it.type === 'button' && !it.from_aria_label && !COMPANY_NAME.test(t) && !['list-item', 'sort', 'chip', 'menu-item', 'toggle', 'composite'].includes(it.variant)) {
+  // X6: long button, or no verb.
+  if (it.type === 'button' && !it.from_aria_label && !L.companyName.test(t) && !['list-item', 'sort', 'chip', 'menu-item', 'toggle', 'composite'].includes(it.variant)) {
     const ws = words(t);
-    if (ws.length > 4) add('X6', `botão com ${ws.length} palavras (máx. 4)`);
-    else if (LABELS_WITHOUT_VERB.includes(norm(t))) add('X6', `botão "${t}" sem objeto`, `${t} <objeto> (ex.: "Enviar pedido")`);
-    else if (cfg.content.buttons === 'verb-object' && ['contained', 'outlined', 'text'].includes(it.variant) && ws.length && !looksLikeVerb(ws[0])) {
-      add('X6', 'botão não começa por verbo', 'verbo no infinitivo + objeto (ex.: "Criar pedido")');
+    if (ws.length > 4) add('X6', `button with ${ws.length} words (max. 4)`);
+    else if (L.labelsWithoutVerb.includes(norm(t))) add('X6', `button "${t}" without an object`, `${t} <${L.examples.object}> (e.g. "${L.examples.buttonWithObject}")`);
+    else if (cfg.content.buttons === 'verb-object' && ['contained', 'outlined', 'text'].includes(it.variant) && ws.length && !L.isVerb(ws[0])) {
+      add('X6', 'button does not start with a verb', `verb + object (e.g. "${L.examples.verbObject}")`);
     }
   }
 
-  // X7 — tooltip/aria-label redundante ou longo.
-  // Tooltip igual ao texto num elemento que trunca (noWrap/ellipsis, ou texto ≥ 30 caracteres) é o texto inteiro: não conta.
+  // X7: redundant or long tooltip/aria-label.
+  // A tooltip equal to the text on an element that truncates (noWrap/ellipsis, or text ≥ 30 characters) is the full text: does not count.
   const truncated = it.type === 'tooltip' && (it.truncatable || clean(it.visible || '').length >= 30);
   if ((it.type === 'tooltip' || it.type === 'accessible-name') && it.visible && !truncated && norm(it.visible) === norm(t)) {
-    add('X7', `${it.type === 'tooltip' ? 'tooltip' : 'aria-label'} repete o texto visível`, `remova o atributo ${it.type === 'tooltip' ? 'title' : 'aria-label'}`);
+    add('X7', `${it.type === 'tooltip' ? 'tooltip' : 'aria-label'} repeats the visible text`, `remove the ${it.type === 'tooltip' ? 'title' : 'aria-label'} attribute`);
   }
   if ((it.type === 'tooltip' || (it.type === 'accessible-name' && it.control && !it.visible)) && it.control && words(t).length > 12) {
-    add('X7', `dica com ${words(t).length} palavras num controle (máx. 12)`, 'leve a explicação para texto de apoio visível; deixe na dica só o nome da ação');
+    add('X7', `hint with ${words(t).length} words on a control (max. 12)`, 'move the explanation to visible helper text; keep only the action name in the hint');
   }
 
-  // X8 — placeholder que repete o rótulo.
+  // X8: placeholder that repeats the label.
   if (it.type === 'placeholder' && it.label) {
     const p = norm(t), r = norm(it.label);
     const rep = p === r || (r.length >= 3 && p.includes(r) && words(p).length <= words(r).length + 2);
-    if (rep) add('X8', `placeholder repete o rótulo "${it.label}"`, 'remova, ou mostre um exemplo do formato esperado');
+    if (rep) add('X8', `placeholder repeats the label "${it.label}"`, 'remove it, or show an example of the expected format');
   }
 
-  // X9 — parêntese explicativo.
+  // X9: explanatory parenthesis.
   if ((structural || it.type === 'label')) {
     const m = t.match(/\(([^)]*)\)/);
-    if (m && /\p{Ll}{3,}/u.test(m[1]) && !/^(opcional|obrigatório|obrigatorio)$/i.test(m[1].trim())) {
-      add('X9', `parêntese explicativo em ${TYPE_LABEL[it.type] ?? it.type} ("(${m[1]})")`, t.replace(/\s*\([^)]*\)/, '').trim(), m[1].trim());
+    if (m && /\p{Ll}{3,}/u.test(m[1]) && !L.optionalMarker.test(m[1].trim())) {
+      add('X9', `explanatory parenthesis in ${typeName} ("(${m[1]})")`, t.replace(/\s*\([^)]*\)/, '').trim(), m[1].trim());
     }
   }
 
-  // X10 — Caixa De Título.
-  const capitalized = structural ? titleCaseWords(t, properNouns) : null;
-  if (capitalized) add('X10', `caixa de título em ${TYPE_LABEL[it.type] ?? it.type}`, toSentenceCase(t, properNouns), capitalized[0]);
+  // X10: Title Case.
+  const capitalized = structural ? titleCaseWords(t, properNouns, P) : null;
+  if (capitalized) add('X10', `title case in ${typeName}`, toSentenceCase(t, properNouns), capitalized[0]);
 
-  // X11 — termo de implementação.
+  // X11: implementation term.
   const terms = extras.terms || termsFrom(cfg);
   for (const [term, re] of terms) {
     if (!re.test(t)) continue;
-    if (/^ocr$/i.test(term) && /reconhec/i.test(t)) continue;
-    add('X11', `termo de implementação "${term}"`, 'troque pela palavra do domínio da pessoa', t.match(re)[0]);
+    if (/^ocr$/i.test(term) && L.ocrExplained.test(t)) continue;
+    add('X11', `implementation term "${term}"`, "use the word from the person's domain", t.match(re)[0]);
     break;
   }
   return out;
 }
 
-/** Termos canônicos do glossário com maiúscula depois da primeira letra viram nomes próprios do X10. */
+/** Canonical glossary terms with a capital after the first letter become X10 proper nouns. */
 export function glossaryProperNouns(glossary = []) {
   const terms = glossary.flatMap((g) => clean(g.term).replace(/\([^)]*\)/g, ' ').split(/\s+\/\s+/)).map(clean);
   return [...new Set(terms.filter((t) => t.length > 1 && /\p{Lu}/u.test(t.slice(1))))];
@@ -369,7 +370,7 @@ export function termsFrom(cfg) {
     const k = term.toLowerCase();
     if (!term || seen.has(k)) continue;
     seen.add(k);
-    // Siglas de 2–4 letras em maiúsculas casam só em maiúsculas (evita "api" dentro de palavra comum).
+    // Uppercase acronyms of 2–4 letters match only in uppercase (avoids "api" inside a common word).
     const caseSensitive = /^[A-Z]{2,4}$/.test(term);
     out.push([term, new RegExp(`(?<![\\p{L}\\p{N}_])${escRe(term)}(?![\\p{L}\\p{N}_])`, caseSensitive ? 'u' : 'iu')]);
   }
@@ -377,7 +378,7 @@ export function termsFrom(cfg) {
   return out;
 }
 
-/** Inventário + achados de uma tela. */
+/** Inventory + findings of one screen. */
 export function analyzeText(html, cfg = configFrom({}), file = 'tela.html', { properNouns = [] } = {}) {
   const terms = termsFrom(cfg);
   const inventory = takeInventory(html, cfg);
@@ -390,13 +391,13 @@ export function analyzeText(html, cfg = configFrom({}), file = 'tela.html', { pr
   return { file, inventory: inventory.map(({ node, ...r }) => r), findings };
 }
 
-// ---------- origem no código ----------
+// ---------- source in the code ----------
 
 const EXTS = /\.(tsx?|jsx?|mjs|cjs|py|json)$/;
 const SKIP_DIRS = /^(node_modules|dist|build|coverage|\.git|__pycache__|\.venv|venv|\.next|\.turbo)$/;
 const TEST_PATH = /(^|[/\\])(tests?|__tests__|__mocks__|fixtures?|mocks?)([/\\]|$)|\.(test|spec)\.[a-z]+$/;
 
-/** Lê as fontes e normaliza (escapes decodificados, espaços colapsados, minúsculas) guardando o mapa de linhas. */
+/** Reads the sources and normalizes them (escapes decoded, whitespace collapsed, lowercase), keeping the line map. */
 export function indexCode(folders) {
   const files = [];
   const rec = (p) => {
@@ -412,8 +413,8 @@ export function indexCode(folders) {
 }
 
 /**
- * Apaga comentários (e docstrings, em Python) trocando por espaços, sem mexer nas quebras de linha:
- * texto em comentário não é texto da interface e confundiria a origem.
+ * Blanks out comments (and Python docstrings) with spaces, keeping line breaks:
+ * text in a comment is not interface text and would mislead the source lookup.
  */
 export function stripComments(src, py = false) {
   const out = src.split('');
@@ -496,8 +497,8 @@ function lineAt(lineStarts, pos) {
 const LETTER = /[\p{L}\p{N}]/u;
 const DELIM = /["'`<>]/;
 /**
- * O literal (string, template ou texto JSX) em volta do trecho, até o delimitador mais próximo (no máximo
- * 80 caracteres), com folga de 12 além dele: pega `${t("x", "Rótulo")} — ${nome}` sem alcançar a linha vizinha.
+ * The literal (string, template or JSX text) around the snippet, up to the nearest delimiter (at most
+ * 80 characters), with 12 of slack beyond it: catches `${t("x", "Label")} — ${name}` without reaching the next line.
  */
 function sameLiteral(txt, pos, end) {
   let a = pos, b = end;
@@ -523,8 +524,8 @@ function search(index, needle, minLength = 4) {
 }
 
 /**
- * Trechos candidatos (na caixa original): o texto inteiro, depois os pedaços entre partes dinâmicas
- * (números, datas, e-mails, aspas, separadores), na ordem em que aparecem.
+ * Candidate snippets (original case): the whole text, then the pieces between dynamic parts
+ * (numbers, dates, e-mails, quotes, separators), in order of appearance.
  */
 export function snippets(text) {
   const t = clean(text);
@@ -533,7 +534,7 @@ export function snippets(text) {
   const dynamic = /\S+@\S+|R\$\s?[\d.,]+|\d+[\d.,/:hº°ª%-]*|["“”«»'‘’][^"“”«»'‘’]*["“”«»'‘’]|\s[—–|·×]\s|\s-\s|[:;()?!]/g;
   const parts = t.split(dynamic).map((s) => s.trim().replace(/^[,.\s—–-]+|[,.\s—–-]+$/g, '')).filter((s) => s.length >= 5 || words(s).length >= 2);
   for (const p of parts) if (!out.includes(p)) out.push(p);
-  // Por último, janelas do começo e do fim (o texto fixo de um template costuma abrir a frase).
+  // Last, windows from the start and the end (the fixed text of a template usually opens the sentence).
   const ws = t.split(' ');
   const windows = ws.length > 6 ? [ws.slice(0, 5), ws.slice(-5)] : ws.length >= 3 ? [ws.slice(0, 3), ws.slice(0, 2)] : [];
   for (const j of windows.map((x) => x.join(' ').replace(/[,.;:]+$/, ''))) if (j.length >= 5 && !out.includes(j)) out.push(j);
@@ -541,11 +542,11 @@ export function snippets(text) {
 }
 
 /**
- * Onde o texto nasce. Primeiro o texto inteiro como está; se não houver, cada trecho, e vence a
- * ocorrência com mais indícios: outros trechos do texto por perto, a `peca` acusada colada nele,
- * mesma caixa, cara de literal, ser o primeiro trecho (a parte fixa de um template) e não ser teste.
- * Devolve { trecho, total, local: 'codigo' | 'dado', ocorrencias: [{ arquivo, linha, teste? }] } ou null.
- * `local: 'dado'` = só aparece em teste/fixture, ou a peça acusada não está junto do trecho (veio interpolada).
+ * Where the text is born. First the whole text as is; if absent, each snippet, and the occurrence with the
+ * most evidence wins: other snippets of the text nearby, the flagged `piece` attached to it, same case,
+ * looks like a literal, being the first snippet (the fixed part of a template) and not being a test.
+ * Returns { snippet, total, location: 'code' | 'data', occurrences: [{ file, line, test? }] } or null.
+ * `location: 'data'` = only appears in tests/fixtures, or the flagged piece is not next to the snippet (it was interpolated).
  */
 export function sourceOf(index, text, piece = null, max = 5) {
   const cands = snippets(text);
@@ -579,7 +580,7 @@ export function sourceOf(index, text, piece = null, max = 5) {
   return { snippet: cands[top.ci], total: occurrences.length, location, occurrences: occurrences.slice(0, max) };
 }
 
-// ---------- agregação ----------
+// ---------- aggregation ----------
 
 export function group(results, index = null) {
   const groups = new Map();
@@ -598,7 +599,7 @@ export function group(results, index = null) {
       const k = `${g.text}|${piece || ''}`;
       if (!cache.has(k)) cache.set(k, sourceOf(index, g.text, piece));
       out.source = cache.get(k);
-      // Sem origem no código, ou com a peça acusada vinda de fora da linha de origem: é dado, não texto da interface.
+      // No source in the code, or the flagged piece comes from outside the source line: it is data, not interface text.
       if (!out.source || out.source.location === 'data') {
         out.probable_data = true;
         out.original_severity = out.severity;
@@ -611,7 +612,7 @@ export function group(results, index = null) {
   return list.sort((a, b) => b.severity - a.severity || b.screens.length - a.screens.length || a.rule.localeCompare(b.rule, 'pt', { numeric: true }) || a.text.localeCompare(b.text));
 }
 
-/** Mesma regra nascida na mesma linha (template com dado interpolado) = um achado, com as variantes. */
+/** Same rule born on the same line (template with interpolated data) = one finding, with its variants. */
 function mergeBySource(list) {
   const out = [];
   const byLine = new Map();
@@ -631,7 +632,7 @@ function mergeBySource(list) {
   return out;
 }
 
-/** Textos mais problemáticos: soma de severidade × telas em todas as regras. */
+/** Most problematic texts: sum of severity × screens across all rules. */
 export function ranking(groups, n = 10) {
   const byText = new Map();
   for (const g of groups) {
@@ -670,14 +671,14 @@ export function summarize(results, groups) {
 
 // ---------- CLI ----------
 
-/** Interpreta os argumentos; flags antigas (--telas, --codigo, --ignorar) viram as novas com aviso (tools/lib/legacy-cli.mjs). */
+/** Parses the arguments; old flags (--telas, --codigo, --ignorar) become the new ones with a warning (tools/lib/legacy-cli.mjs). */
 export function parseTextArgs(argv, warn) {
   argv = normalizeArgv('ux-lint/text.mjs', argv, warn);
   const out = { screens: [], code: [], ignore: [], ux: null, module: null, json: false };
   let current = 'screens';
   for (const a of argv) {
     if (a === '--json') { out.json = true; continue; }
-    if (a.startsWith('--')) { current = a.slice(2); if (!(current in out)) throw new Error(`opção desconhecida: ${a}`); continue; }
+    if (a.startsWith('--')) { current = a.slice(2); if (!(current in out)) throw new Error(`unknown option: ${a}`); continue; }
     if (current === 'ux') { out.ux = a; current = 'screens'; continue; }
     if (current === 'module') { out.module = a; current = 'screens'; continue; }
     out[current].push(a);
@@ -700,7 +701,7 @@ function main() {
   let args;
   try { args = parseTextArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
   if (!args.screens.length) {
-    console.error('Uso: node tools/ux-lint/text.mjs --screens <pasta-ou-html...> [--code <pastas...>] [--ux UX.md] [--module <m>] [--ignore <nomes...>] [--json]');
+    console.error('Usage: node tools/ux-lint/text.mjs --screens <folder-or-html...> [--code <folders...>] [--ux UX.md] [--module <m>] [--ignore <names...>] [--json]');
     process.exit(2);
   }
   const cfg = loadConfig(args.ux);
@@ -715,28 +716,28 @@ function main() {
     console.log(JSON.stringify({ summary, ranking: top, findings: groups, screens: results, ...(cfg.legacyWarnings.length ? { warnings: cfg.legacyWarnings } : {}) }, null, 2));
     return;
   }
-  console.log(`Higiene de texto: ${summary.screens} telas, ${summary.texts} textos, ${summary.findings} achados (${summary.occurrences} ocorrências)${index ? `; ${summary.probable_data} descartados como provável dado` : ''}\n`);
-  console.log(`Por regra (achados / ocorrências${index ? ' / provável dado' : ''}):`);
+  console.log(`Text hygiene: ${summary.screens} screens, ${summary.texts} texts, ${summary.findings} findings (${summary.occurrences} occurrences)${index ? `; ${summary.probable_data} set aside as probable data` : ''}\n`);
+  console.log(`By rule (findings / occurrences${index ? ' / probable data' : ''}):`);
   for (const r of Object.keys(SEVERITY)) {
     const x = summary.by_rule[r];
     if (x) console.log(`  ${r.padEnd(4)} sev ${SEVERITY[r]}  ${String(x.findings).padStart(4)} / ${String(x.occurrences).padStart(4)}${index ? ` / ${x.probable_data}` : ''}`);
   }
-  console.log('\nPor tipo de elemento (textos inventariados / ocorrências com achado, antes do filtro de dado):');
+  console.log('\nBy element type (texts inventoried / occurrences with a finding, before the data filter):');
   for (const t of TYPES) if (summary.inventory_by_type[t]) console.log(`  ${t.padEnd(16)} ${String(summary.inventory_by_type[t]).padStart(5)} / ${summary.by_type[t] || 0}`);
-  const source = (o) => (o ? `${o.occurrences.map((x) => `${short(x.file)}:${x.line}${x.test ? ' (teste)' : ''}`).join(', ')}${o.total > o.occurrences.length ? ` (+${o.total - o.occurrences.length})` : ''}` : 'não encontrado no código');
-  console.log('\nTextos mais problemáticos:');
-  for (const t of top) console.log(`  ${String(t.points).padStart(3)}  "${t.text.slice(0, 90)}" [${[...new Set(t.rules)].join(' ')}] ${t.screens.length} tela(s)${index ? `\n       ${source(t.source)}` : ''}`);
-  console.log('\nAchados:');
+  const source = (o) => (o ? `${o.occurrences.map((x) => `${short(x.file)}:${x.line}${x.test ? ' (test)' : ''}`).join(', ')}${o.total > o.occurrences.length ? ` (+${o.total - o.occurrences.length})` : ''}` : 'not found in the code');
+  console.log('\nMost problematic texts:');
+  for (const t of top) console.log(`  ${String(t.points).padStart(3)}  "${t.text.slice(0, 90)}" [${[...new Set(t.rules)].join(' ')}] ${t.screens.length} screen(s)${index ? `\n       ${source(t.source)}` : ''}`);
+  console.log('\nFindings:');
   for (const g of groups.filter((x) => !x.probable_data)) {
-    console.log(`\n${g.rule} sev ${g.severity} | ${g.types.join(', ')} | "${g.text.slice(0, 120)}"${g.variants ? ` (+${g.variants.length - 1} variantes do mesmo template)` : ''}`);
-    console.log(`   ${g.message}${g.suggestion ? `\n   sugestão: ${g.suggestion}` : ''}`);
-    console.log(`   telas (${g.screens.length}): ${g.screens.slice(0, 8).join(', ')}${g.screens.length > 8 ? ', …' : ''}`);
-    if (index) console.log(`   origem${g.source && g.source.snippet !== clean(g.text) ? ` (trecho "${g.source.snippet}")` : ''}: ${source(g.source)}`);
+    console.log(`\n${g.rule} sev ${g.severity} | ${g.types.join(', ')} | "${g.text.slice(0, 120)}"${g.variants ? ` (+${g.variants.length - 1} variants of the same template)` : ''}`);
+    console.log(`   ${g.message}${g.suggestion ? `\n   suggestion: ${g.suggestion}` : ''}`);
+    console.log(`   screens (${g.screens.length}): ${g.screens.slice(0, 8).join(', ')}${g.screens.length > 8 ? ', …' : ''}`);
+    if (index) console.log(`   source${g.source && g.source.snippet !== clean(g.text) ? ` (snippet "${g.source.snippet}")` : ''}: ${source(g.source)}`);
   }
   const dataGroups = groups.filter((x) => x.probable_data);
   if (dataGroups.length) {
-    console.log(`\nProvável dado (a peça acusada não está no código; não é texto da interface): ${dataGroups.length}`);
-    for (const g of dataGroups) console.log(`   ${g.rule} "${g.text.slice(0, 90)}"${g.variants ? ` (+${g.variants.length - 1})` : ''}${g.source ? ` · template em ${short(g.source.occurrences[0].file)}:${g.source.occurrences[0].line}` : ''}`);
+    console.log(`\nProbable data (the flagged piece is not in the code; not interface text): ${dataGroups.length}`);
+    for (const g of dataGroups) console.log(`   ${g.rule} "${g.text.slice(0, 90)}"${g.variants ? ` (+${g.variants.length - 1})` : ''}${g.source ? ` · template in ${short(g.source.occurrences[0].file)}:${g.source.occurrences[0].line}` : ''}`);
   }
 }
 

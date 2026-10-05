@@ -1,5 +1,5 @@
 {
-  "$description": "Camada 2 — semânticos (tema escuro). Mesmas chaves do tema claro; só os valores mudam. Chaves ausentes herdam do claro.",
+  "$description": "Layer 2 — semantic (dark theme). Same keys as the light theme; only the values change. Missing keys inherit from light.",
   "color": {
     "bg": {
       "canvas":  { "$type": "color", "$value": "{color.neutral.950}" },

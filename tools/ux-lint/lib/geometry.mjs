@@ -1,70 +1,75 @@
-// Geometria de tela para as regras de layout e hierarquia (L1–L9). Sem dependências.
+// Screen geometry for the layout and hierarchy rules (L1–L9). No dependencies.
 //
-// O jsdom e o parser de lib/html.mjs não calculam layout. A geometria vem de fora: tools/ux-lint/measure.mjs
-// abre a captura HTML estática num navegador headless, mede os elementos e grava um arquivo
-// `<nome>.geometry.json` neste formato. Tudo o que está abaixo do formato é análise pura sobre ele
-// (sem navegador), o que permite testar as regras com geometria escrita à mão.
+// jsdom and the lib/html.mjs parser do not compute layout. The geometry comes from outside: tools/ux-lint/measure.mjs
+// opens the static HTML capture in a headless browser, measures the elements and writes a
+// `<name>.geometry.json` file in this format. Everything below the format is pure analysis over it
+// (no browser), which lets the rules be tested with hand-written geometry.
 //
-// ---------------------------------------------------------------- formato `geometry` (versão 1)
+// ---------------------------------------------------------------- `geometry` format (version 1)
 //
 // {
 //   "format": "dsx-geometry", "version": 1,
-//   "screen": "04-order-editor",             // nome da captura sem .html (convenção <nn>-<screen-id>[.<state>])
-//   "file": "04-order-editor.html",          // captura de origem (como foi passada ao measure)
-//   "title": "/orders/:orderId/edit",       // <title> da captura (a skill de captura põe a rota)
+//   "screen": "04-order-editor",             // capture name without .html (convention <nn>-<screen-id>[.<state>])
+//   "file": "04-order-editor.html",          // source capture (as passed to measure)
+//   "title": "/orders/:orderId/edit",       // capture <title> (the capture skill puts the route there)
 //   "viewport": { "width": 1440, "height": 900 },
-//   "page_height": 2140,                     // altura total do documento (scrollHeight)
-//   "body_font_size": 15,                    // corpo de texto (px), lido do <body>
-//   "dialog_open": false,                    // há [role=dialog] visível (seletor do UX.md)
+//   "page_height": 2140,                     // full document height (scrollHeight)
+//   "body_font_size": 15,                    // body text size (px), read from <body>
+//   "dialog_open": false,                    // a visible [role=dialog] exists (UX.md selector)
 //   "elements": [{
-//     "id": "main > div:nth-of-type(2) > button:nth-of-type(1)", // caminho estável (âncora em #id estável)
+//     "id": "main > div:nth-of-type(2) > button:nth-of-type(1)", // stable path (anchored on a stable #id)
 //     "tag": "button", "role": null, "classes": ["MuiButton-root", "MuiButton-contained"],
 //     "kind": "interactive",                 // interactive | heading | label | field | text | region | card | block | graphic
-//     "text": "Baixar PDF",                  // nome acessível ou texto, até 80 caracteres
-//     "text_length": 10,                     // tamanho do texto completo (para comprimento de linha)
-//     "box": { "x": 1290, "y": 72, "width": 120, "height": 36 },  // getBoundingClientRect com rolagem 0
+//     "text": "Baixar PDF",                  // accessible name or text, up to 80 characters
+//     "text_length": 10,                     // length of the full text (for line length)
+//     "box": { "x": 1290, "y": 72, "width": 120, "height": 36 },  // getBoundingClientRect at scroll 0
 //     "style": { "font_size": 14, "font_weight": 600, "line_height": 24.5, "color": "rgb(255, 255, 255)",
 //                "background_color": "rgb(43, 89, 195)", "display": "inline-flex", "visibility": "visible" },
 //     "is_interactive": true, "is_primary": true, "is_destructive": false, "is_inline": false, "disabled": false,
-//     "label_for": null,                     // em rótulos: id (caminho) do campo que o rótulo nomeia
-//     "region": "main",                      // região pelo seletor do UX.md; diálogo = `diálogo "Título"`
-//     "heading_level": null,                 // 1–6 em títulos (h1–h6 ou role=heading + aria-level)
-//     "parent": "main > div:nth-of-type(2)", // caminho do pai no DOM (grupos de ações)
-//     "form_group": "main > form",           // caminho do formulário/fieldset/diálogo/painel que agrupa o campo
-//     "archetype_region": null,              // região de arquétipo declarada (data-region ou
-//                                            // verification.selectors.archetype-regions do UX.md)
-//     "selected": false                      // aria-selected/aria-pressed/aria-current (aba, botão alternado)
+//     "label_for": null,                     // on labels: id (path) of the field the label names
+//     "region": "main",                      // region by the UX.md selector; dialog = `dialog "Title"` (older files: `diálogo "…"`)
+//     "heading_level": null,                 // 1–6 on headings (h1–h6 or role=heading + aria-level)
+//     "parent": "main > div:nth-of-type(2)", // DOM path of the parent (action groups)
+//     "form_group": "main > form",           // path of the form/fieldset/dialog/panel that groups the field
+//     "archetype_region": null,              // declared archetype region (data-region or
+//                                            // verification.selectors.archetype-regions in the UX.md)
+//     "selected": false                      // aria-selected/aria-pressed/aria-current (tab, toggle button)
 //   }]
 // }
 //
-// Chaves extras são toleradas; chaves ausentes valem null/false. Coordenadas em px CSS, relativas ao topo da
-// página (rolagem 0), então "y > 900" quer dizer "abaixo da primeira dobra" numa janela de 900 px.
+// Extra keys are tolerated; missing keys default to null/false. Coordinates in CSS px, relative to the top of
+// the page (scroll 0), so "y > 900" means "below the first fold" in a 900 px window.
+
+import { unionList } from './lang/index.mjs';
+
+/** Wizard step words of every language pack ("Passo 2", "Step 2"). */
+const STEP_WORD = new RegExp(`^(${unionList('stepWords').join('|')})\\b`, 'i');
 
 export const GEOMETRY_FORMAT = 'dsx-geometry';
 export const GEOMETRY_VERSION = 1;
 
-/** Limites das regras L (sobrescrevíveis pela chave `layout` do front matter do UX.md, em kebab-case). */
+/** Thresholds of the L rules (overridable by the `layout` key of the UX.md front matter, in kebab-case). */
 export const LAYOUT_DEFAULTS = Object.freeze({
-  fold: 900, // L6 e L2: altura da primeira dobra
-  'max-emphasis': 3, // L2: elementos de peso alto tolerados na primeira dobra
+  fold: 900, // L6 and L2: height of the first fold
+  'max-emphasis': 3, // L2: high-weight elements tolerated in the first fold
   'emphasis-ratio': 1.25, // L2: texto ≥ 1,25× o corpo...
-  'emphasis-weight': 600, // ...e em negrito conta como ênfase
-  'saturated-min-area': 2500, // L2: bloco de cor saturada a partir desta área (px²)
-  'align-tolerance': 4, // L4: bordas esquerdas a até 4 px contam como a mesma
-  'max-left-edges': 2, // L4: posições distintas toleradas (ou o nº de colunas, se maior)
-  'label-gap': 16, // L5: distância máxima rótulo × campo
-  'action-gap': 48, // L5: distância máxima entre ações do mesmo grupo
-  'max-line-chars': 90, // L7: caracteres por linha em texto corrido
-  'min-target': 24, // L8: alvo mínimo (WCAG 2.5.8)
-  'top-band': 240, // L1: faixa do topo da página (px abaixo do topo do conteúdo)
+  'emphasis-weight': 600, // ...and bold counts as emphasis
+  'saturated-min-area': 2500, // L2: saturated color block from this area on (px²)
+  'align-tolerance': 4, // L4: left edges within 4 px count as the same
+  'max-left-edges': 2, // L4: distinct positions tolerated (or the number of columns, if larger)
+  'label-gap': 16, // L5: maximum label-to-field distance
+  'action-gap': 48, // L5: maximum distance between actions of the same group
+  'max-line-chars': 90, // L7: characters per line in running text
+  'min-target': 24, // L8: minimum target (WCAG 2.5.8)
+  'top-band': 240, // L1: top band of the page (px below the top of the content)
 });
 
 export const LAYOUT_SEVERITY = Object.freeze({ L1: 2, L2: 2, L3: 2, L4: 1, L5: 1, L6: 2, L7: 1, L8: 2, L9: 1 });
 
-/** Regiões de arquétipo que só existem em certas condições (seleção, ação perigosa): ausência não é achado. */
+/** Archetype regions that exist only under some conditions (selection, dangerous action): absence is not a finding. */
 export const CONDITIONAL_REGIONS = new Set(['bulk-actions-bar', 'danger-zone', 'quick-view']);
 
-// ---------------------------------------------------------------- utilidades geométricas
+// ---------------------------------------------------------------- geometry utilities
 
 export const right = (b) => b.x + b.width;
 export const bottom = (b) => b.y + b.height;
@@ -72,19 +77,19 @@ export const centerX = (b) => b.x + b.width / 2;
 export const centerY = (b) => b.y + b.height / 2;
 export const area = (b) => Math.max(0, b.width) * Math.max(0, b.height);
 
-/** `a` contém `b` (com folga de `tol` px). */
+/** `a` contains `b` (with `tol` px of slack). */
 export function containsBox(a, b, tol = 1) {
   return b.x >= a.x - tol && b.y >= a.y - tol && right(b) <= right(a) + tol && bottom(b) <= bottom(a) + tol;
 }
 
-/** Distância entre retângulos (0 quando se tocam ou se sobrepõem). */
+/** Distance between rectangles (0 when they touch or overlap). */
 export function boxDistance(a, b) {
   const dx = Math.max(0, a.x - right(b), b.x - right(a));
   const dy = Math.max(0, a.y - bottom(b), b.y - bottom(a));
   return Math.hypot(dx, dy);
 }
 
-/** Agrupa valores próximos (diferença ≤ tol do primeiro do grupo). Devolve os representantes. */
+/** Clusters close values (difference ≤ tol from the first of the group). Returns the representatives. */
 export function clusterValues(values, tol = 4) {
   const sorted = [...values].sort((a, b) => a - b);
   const out = [];
@@ -92,7 +97,7 @@ export function clusterValues(values, tol = 4) {
   return out.map((c) => c.values[0]);
 }
 
-/** Lê cor CSS calculada (rgb/rgba/#hex) → { r, g, b, a } ou null. */
+/** Reads a computed CSS color (rgb/rgba/#hex) → { r, g, b, a } or null. */
 export function parseColor(s) {
   if (!s || typeof s !== 'string') return null;
   const t = s.trim().toLowerCase();
@@ -112,7 +117,7 @@ export function parseColor(s) {
   return null;
 }
 
-/** HSL de uma cor (s e l de 0 a 1). */
+/** HSL of a color (s and l from 0 to 1). */
 export function toHsl({ r, g, b }) {
   const [R, G, B] = [r / 255, g / 255, b / 255];
   const max = Math.max(R, G, B), min = Math.min(R, G, B);
@@ -122,7 +127,7 @@ export function toHsl({ r, g, b }) {
   return { s, l };
 }
 
-/** Cor saturada o bastante para atrair o olho (fundo cheio, não tom pastel nem cinza). */
+/** A color saturated enough to draw the eye (solid fill, not a pastel tint or gray). */
 export function isSaturated(color) {
   const c = typeof color === 'string' ? parseColor(color) : color;
   if (!c || c.a < 0.5) return false;
@@ -130,24 +135,24 @@ export function isSaturated(color) {
   return s >= 0.45 && l >= 0.2 && l <= 0.7;
 }
 
-/** Id da tela a partir do nome da captura: `04-order-editor.empty` → `order-editor`. */
+/** Screen id from the capture name: `04-order-editor.empty` → `order-editor`. */
 export function screenIdOf(name) {
   return String(name).replace(/^.*[\\/]/, '').replace(/\.geometry\.json$|\.html?$/, '').replace(/^\d+[-_]/, '').replace(/\..*$/, '');
 }
 
-// ---------------------------------------------------------------- leitura da geometria
+// ---------------------------------------------------------------- reading the geometry
 
 const EL_DEFAULTS = {
   tag: 'div', role: null, classes: [], kind: 'block', text: '', text_length: 0, is_interactive: false, is_primary: false,
-  is_destructive: false, is_inline: false, label_for: null, region: '(fora de região)', heading_level: null, parent: null,
+  is_destructive: false, is_inline: false, label_for: null, region: '(outside any region)', heading_level: null, parent: null,
   form_group: null, archetype_region: null, selected: false, disabled: false,
 };
 
-/** Completa a geometria com os padrões (chaves ausentes) e valida o mínimo. */
+/** Fills the geometry with defaults (missing keys) and validates the minimum. */
 export function normalizeGeometry(g) {
-  if (!g || typeof g !== 'object' || !Array.isArray(g.elements)) throw new Error('geometria inválida: falta "elements"');
+  if (!g || typeof g !== 'object' || !Array.isArray(g.elements)) throw new Error('invalid geometry: "elements" is missing');
   return {
-    format: g.format ?? GEOMETRY_FORMAT, version: g.version ?? GEOMETRY_VERSION, screen: g.screen ?? 'tela', file: g.file ?? `${g.screen ?? 'tela'}.html`,
+    format: g.format ?? GEOMETRY_FORMAT, version: g.version ?? GEOMETRY_VERSION, screen: g.screen ?? 'screen', file: g.file ?? `${g.screen ?? 'screen'}.html`,
     title: g.title ?? '', viewport: { width: 1440, height: 900, ...(g.viewport || {}) }, page_height: g.page_height ?? null,
     body_font_size: g.body_font_size ?? 16, dialog_open: !!g.dialog_open,
     elements: g.elements.map((e, i) => {
@@ -160,14 +165,15 @@ export function normalizeGeometry(g) {
   };
 }
 
-const isDialogRegion = (r) => /^diálogo/.test(String(r ?? ''));
-/** Região do shell (cabeçalho e menu do produto): fora das regras de conteúdo. */
+/** Dialog region label: `dialog "Title"` (and `diálogo "…"` in geometry measured before the round-4 rename, 2026-10). */
+const isDialogRegion = (r) => /^(dialog|diálogo)\b/.test(String(r ?? ''));
+/** Shell region (product header and menu): outside the content rules. */
 export const isShellRegion = (r) => /^(header|nav)(\b|#|\[)|\[role=(banner|navigation)\]/.test(String(r ?? ''));
 
 /**
- * Elementos em foco: com diálogo aberto, só o diálogo (é o que a pessoa vê); sem diálogo, tudo fora do
- * cabeçalho e do menu do produto. Devolve { elements, ref, regionLabel }: `ref` é a caixa de referência
- * (o diálogo ou a área de conteúdo).
+ * Elements in focus: with a dialog open, only the dialog (what the person sees); without one, everything outside
+ * the product header and menu. Returns { elements, ref, regionLabel }: `ref` is the reference box
+ * (the dialog or the content area).
  */
 export function focusScope(geom) {
   const els = geom.elements;
@@ -190,13 +196,13 @@ export function focusScope(geom) {
       : { x: 0, y: 0, width: geom.viewport.width, height: geom.viewport.height };
     if (xs.length) { ref.width = Math.max(...xs.map(right)) - ref.x; ref.height = Math.max(...xs.map(bottom)) - ref.y; }
   }
-  return { elements: content, ref, regionLabel: refEl?.region ?? content[0]?.region ?? '(tela)' };
+  return { elements: content, ref, regionLabel: refEl?.region ?? content[0]?.region ?? '(screen)' };
 }
 
 const label = (e) => (e.text ? `"${String(e.text).slice(0, 50)}"` : `<${e.tag}>`);
 const r1 = (n) => Math.round(n * 10) / 10;
 
-// ---------------------------------------------------------------- detecção de regiões de arquétipo
+// ---------------------------------------------------------------- archetype region detection
 
 const HEADER_REGIONS = new Set(['page-header', 'dialog-header', 'panel-header', 'public-header']);
 const BODY_REGIONS = new Set(['dialog-body', 'panel-body', 'editing-area', 'viewer', 'content', 'step-body', 'section-body', 'document-or-detail', 'request-summary']);
@@ -218,7 +224,7 @@ function sideColumns(els, ref, side) {
   });
 }
 
-/** Mesma linha: centros a até `tol` px ou sobreposição vertical de ao menos metade da menor altura. */
+/** Same row: centers within `tol` px or vertical overlap of at least half the smaller height. */
 export function sameRow(a, b, tol = 8) {
   if (Math.abs(centerY(a) - centerY(b)) <= tol) return true;
   const overlap = Math.min(bottom(a), bottom(b)) - Math.max(a.y, b.y);
@@ -235,8 +241,8 @@ function rows(items, tol = 8) {
 }
 
 /**
- * Há na tela a região de arquétipo `id`? Primeiro pela marcação declarada (`archetype_region`), depois por
- * heurística geométrica. Devolve { present, how } — `how`: 'declared' | 'heuristic' | 'conditional' | 'no-detector'.
+ * Does the screen have archetype region `id`? First by the declared markup (`archetype_region`), then by a
+ * geometric heuristic. Returns { present, how }; `how`: 'declared' | 'heuristic' | 'conditional' | 'no-detector'.
  */
 export function detectArchetypeRegion(id, scope, geom) {
   const { elements: els, ref } = scope;
@@ -251,14 +257,14 @@ export function detectArchetypeRegion(id, scope, geom) {
   let present = false;
   if (HEADER_REGIONS.has(id)) {
     present = heads.some((h) => h.box.y <= topLimit && (dialog || id === 'public-header' || id === 'panel-header' || h.heading_level <= 2))
-      // título editável no lugar (campo com texto grande) também é cabeçalho
+      // an in-place editable title (field with large text) is also a header
       || (!dialog && inRef.some((e) => e.box.y <= topLimit && e.text && e.style.font_size >= (geom.body_font_size || 16) * 1.25 && e.kind !== 'region'));
     if (!present && id === 'public-header') present = inRef.some((e) => e.kind === 'graphic' && e.box.y <= topLimit);
   } else if (BODY_REGIONS.has(id)) {
     const minH = dialog ? 32 : 120;
     present = inRef.some((e) => e.kind !== 'heading' && !e.is_interactive && e.box.width >= ref.width * 0.3 && e.box.height >= minH && e.box.y >= ref.y + 8);
     if (!present) {
-      // Corpo sem contêiner próprio: o conjunto de textos e campos abaixo do primeiro título, largo e alto o bastante.
+      // Body without its own container: the set of texts and fields below the first heading, wide and tall enough.
       const firstHead = Math.min(...heads.map((h) => h.box.y), Infinity);
       const parts = inRef.filter((e) => (e.kind === 'text' || e.kind === 'field' || e.kind === 'card' || e.kind === 'graphic') && e.box.y > (Number.isFinite(firstHead) ? firstHead : ref.y));
       if (parts.length >= 2) {
@@ -283,7 +289,7 @@ export function detectArchetypeRegion(id, scope, geom) {
       || rows(buttons.filter((b) => b.box.y <= ref.y + 400)).some((r) => r.length >= 2 && r.some((b) => b.selected));
   } else if (id === 'step-trail') {
     present = inRef.some((e) => /stepper/i.test((e.classes || []).join(' ')))
-      || rows(inRef.filter((e) => /^(passo|etapa|step)\b|^\d+\s*[.)–-]?\s*\S/i.test(e.text || '') && e.box.height <= 64)).some((r) => r.length >= 3);
+      || rows(inRef.filter((e) => (STEP_WORD.test(e.text || '') || /^\d+\s*[.)–-]?\s*\S/.test(e.text || '')) && e.box.height <= 64)).some((r) => r.length >= 3);
   } else if (id === 'kpi-strip') {
     present = rows(inRef.filter((e) => (e.kind === 'card' || e.kind === 'block') && e.box.width < ref.width * 0.4 && e.box.height >= 48), 12)
       .some((r) => r.length >= 3);
@@ -299,9 +305,9 @@ export function detectArchetypeRegion(id, scope, geom) {
   return { present, how: 'heuristic' };
 }
 
-// ---------------------------------------------------------------- regras
+// ---------------------------------------------------------------- rules
 
-/** Posição satisfeita? `pos`: top-right | bottom-right | top-left | bottom-left | inline (e combinações). */
+/** Is the position satisfied? `pos`: top-right | bottom-right | top-left | bottom-left | inline (and combinations). */
 export function positionOk(box, pos, ref, { dialog = false, contentBottom = null, topBand = 240 } = {}) {
   if (!pos || pos === 'inline') return true;
   const [v, h] = String(pos).split('-');
@@ -317,9 +323,9 @@ export function positionOk(box, pos, ref, { dialog = false, contentBottom = null
 }
 
 /**
- * Primária de linha, não da região (fora do L1): na mesma linha de um campo do próprio formulário ("Nova
- * categoria" + Adicionar) ou de um título no mesmo pai (cabeçalho de seção com "Novo signatário"). A posição dela
- * vale em relação à linha; o L1 mede a primária que conclui a região (rodapé do diálogo, topo da página).
+ * Row-level primary, not the region's (outside L1): on the same row as a field of its own form ("New
+ * category" + Add) or as a heading with the same parent (section header with "New signer"). Its position
+ * counts relative to the row; L1 measures the primary that concludes the region (dialog footer, page top).
  */
 export function inlinePrimary(p, els) {
   const sameRow = (e) => { const top = Math.max(e.box.y, p.box.y), bot = Math.min(bottom(e.box), bottom(p.box)); return bot - top >= Math.min(e.box.height, p.box.height) * 0.5; };
@@ -329,10 +335,10 @@ export function inlinePrimary(p, els) {
 }
 
 /**
- * Aplica L1–L9 a uma geometria. `ctx`:
+ * Applies L1–L9 to a geometry. `ctx`:
  *   { archetype: { id, regions: [], primary_action: { region, position } } | null,
- *     primary_position (do UX.md), limits (LAYOUT_DEFAULTS sobrescritos) }
- * Devolve { file, screen, archetype, dialog_open, findings: [{ rule, severity, region, message, anchor, evidence, elements, measure }] }.
+ *     primary_position (from the UX.md), limits (LAYOUT_DEFAULTS overridden) }
+ * Returns { file, screen, archetype, dialog_open, findings: [{ rule, severity, region, message, anchor, evidence, elements, measure }] }.
  */
 export function analyzeLayout(input, ctx = {}) {
   const geom = normalizeGeometry(input);
@@ -349,12 +355,12 @@ export function analyzeLayout(input, ctx = {}) {
   const body = geom.body_font_size || 16;
   const contentBottom = Math.max(ref.y, ...els.map((e) => bottom(e.box)));
   const fold = lim.fold;
-  // Diálogo é fixo na janela: a dobra conta a partir do topo do diálogo (e a captura estática pode tê-lo deslocado).
+  // A dialog is fixed to the window: the fold counts from the top of the dialog (the static capture may have shifted it).
   const foldTop = dialog ? ref.y : 0;
   const belowFold = (b) => bottom(b) - foldTop > fold;
 
-  // Primárias candidatas: em foco; com a primária esperada no cabeçalho da página, as primárias de um painel
-  // lateral (uma por bloco, declarado em vários UX.md) ficam de fora.
+  // Candidate primaries: in focus; with the primary expected in the page header, the primaries of a side panel
+  // (one per block, declared in several UX.md files) are left out.
   const primaries = els.filter((e) => e.is_primary && e.is_interactive !== false);
   const expectedRegion = arch?.primary_action?.region ?? null;
   const panels = sideColumns(els, ref, 'right');
@@ -363,7 +369,7 @@ export function analyzeLayout(input, ctx = {}) {
     ? regionLevel.filter((p) => !panels.some((pn) => containsBox(pn.box, p.box)))
     : regionLevel;
 
-  // L1 — posição da primária.
+  // L1: position of the primary action.
   const position = arch?.primary_action?.position ?? ctx.primary_position ?? null;
   if (position && position !== 'inline' && candidates.length) {
     const opts = { dialog, contentBottom, topBand: lim['top-band'] };
@@ -371,35 +377,35 @@ export function analyzeLayout(input, ctx = {}) {
       const p = candidates[0];
       const fx = Math.round(((centerX(p.box) - ref.x) / (ref.width || 1)) * 100);
       const fy = dialog ? Math.round(((centerY(p.box) - ref.y) / (ref.height || 1)) * 100) : Math.round(p.box.y - ref.y);
-      add('L1', p.region, `ação primária ${label(p)} fora da posição declarada (${position}${arch ? `, arquétipo ${arch.id}` : ', UX.md'}): centro a ${fx}% da largura${dialog ? ` e ${fy}% da altura do diálogo` : `, topo ${fy} px abaixo do início do conteúdo`}`,
-        `primária ${label(p)}`, [p], { position_expected: position, center_x_pct: fx, [dialog ? 'center_y_pct' : 'top_offset_px']: fy });
+      add('L1', p.region, `primary action ${label(p)} outside the declared position (${position}${arch ? `, archetype ${arch.id}` : ', UX.md'}): center at ${fx}% of the width${dialog ? ` and ${fy}% of the dialog height` : `, top ${fy} px below the start of the content`}`,
+        `primary ${label(p)}`, [p], { position_expected: position, center_x_pct: fx, [dialog ? 'center_y_pct' : 'top_offset_px']: fy });
     }
   }
 
-  // L2 — ênfases concorrentes na primeira dobra.
+  // L2: competing emphasis in the first fold.
   const heavy = [];
   for (const e of els) {
     if (e.box.y - foldTop >= fold || e.box.width <= 0) continue;
     const bg = e.style.background_color;
     let why = null;
-    if (e.is_interactive && (e.is_primary || isSaturated(bg))) why = 'botão cheio';
-    else if (!e.is_interactive && e.kind !== 'region' && e.style.font_size >= body * lim['emphasis-ratio'] && Number(e.style.font_weight) >= lim['emphasis-weight'] && e.text) why = `texto ${r1(e.style.font_size)} px em negrito`;
-    else if (!e.is_interactive && e.kind !== 'region' && isSaturated(bg) && area(e.box) >= lim['saturated-min-area']) why = 'bloco de cor saturada';
+    if (e.is_interactive && (e.is_primary || isSaturated(bg))) why = 'filled button';
+    else if (!e.is_interactive && e.kind !== 'region' && e.style.font_size >= body * lim['emphasis-ratio'] && Number(e.style.font_weight) >= lim['emphasis-weight'] && e.text) why = `bold text at ${r1(e.style.font_size)} px`;
+    else if (!e.is_interactive && e.kind !== 'region' && isSaturated(bg) && area(e.box) >= lim['saturated-min-area']) why = 'saturated color block';
     if (why) heavy.push({ e, why });
   }
-  // Funde o que está dentro de outro elemento já contado e blocos saturados vizinhos (ex.: células de um cabeçalho de tabela).
+  // Merges what sits inside an element already counted, and neighboring saturated blocks (e.g. cells of a table header).
   const merged = [];
   for (const h of heavy.sort((a, b) => area(b.e.box) - area(a.e.box))) {
-    const host = merged.find((m) => m.boxes.some((b) => containsBox(b, h.e.box)) || (h.why === 'bloco de cor saturada' && m.why === h.why && m.boxes.some((b) => boxDistance(b, h.e.box) <= 2)));
+    const host = merged.find((m) => m.boxes.some((b) => containsBox(b, h.e.box)) || (h.why === 'saturated color block' && m.why === h.why && m.boxes.some((b) => boxDistance(b, h.e.box) <= 2)));
     if (host) host.boxes.push(h.e.box); else merged.push({ ...h, boxes: [h.e.box] });
   }
   if (merged.length > lim['max-emphasis']) {
     const top = merged.sort((a, b) => a.e.box.y - b.e.box.y || a.e.box.x - b.e.box.x);
-    add('L2', scope.regionLabel, `${merged.length} elementos de peso visual alto na primeira dobra (máx. ${lim['max-emphasis']}): ${top.map((h) => `${label(h.e)} (${h.why})`).join(', ')}`,
-      `ênfases na primeira dobra`, top.map((h) => h.e), { count: merged.length, max: lim['max-emphasis'] });
+    add('L2', scope.regionLabel, `${merged.length} elements of high visual weight in the first fold (max. ${lim['max-emphasis']}): ${top.map((h) => `${label(h.e)} (${h.why})`).join(', ')}`,
+      `emphasis in the first fold`, top.map((h) => h.e), { count: merged.length, max: lim['max-emphasis'] });
   }
 
-  // L3 — escala de títulos.
+  // L3: heading scale.
   const heads = els.filter((e) => e.kind === 'heading' && e.heading_level && e.style.font_size);
   const h1 = heads.filter((h) => h.heading_level === 1);
   if (h1.length) {
@@ -409,8 +415,8 @@ export function analyzeLayout(input, ctx = {}) {
       .sort((a, b) => b.style.font_size - a.style.font_size);
     if (bigger.length) {
       const b = bigger[0];
-      add('L3', b.region, `título principal ${label(h1[0])} (${r1(h1size)} px) não é o maior texto: ${label(b)} tem ${r1(b.style.font_size)} px${bigger.length > 1 ? ` (+${bigger.length - 1})` : ''}`,
-        `h1 menor que ${label(b)}`, [h1[0], b], { h1_px: r1(h1size), larger_px: r1(b.style.font_size) });
+      add('L3', b.region, `main title ${label(h1[0])} (${r1(h1size)} px) is not the largest text: ${label(b)} is ${r1(b.style.font_size)} px${bigger.length > 1 ? ` (+${bigger.length - 1})` : ''}`,
+        `h1 smaller than ${label(b)}`, [h1[0], b], { h1_px: r1(h1size), larger_px: r1(b.style.font_size) });
     }
   }
   const levels = [...new Set(heads.map((h) => h.heading_level))].sort();
@@ -421,12 +427,12 @@ export function analyzeLayout(input, ctx = {}) {
     const big = down.filter((h) => h.style.font_size > minUp + 0.5).sort((a, b) => b.style.font_size - a.style.font_size)[0];
     if (big) {
       const u = up.find((h) => h.style.font_size === minUp);
-      add('L3', big.region, `h${levels[j]} ${label(big)} (${r1(big.style.font_size)} px) maior que h${levels[i]} ${label(u)} (${r1(minUp)} px)`,
-        `h${levels[j]} maior que h${levels[i]}`, [u, big], { upper_level: levels[i], upper_px: r1(minUp), lower_level: levels[j], lower_px: r1(big.style.font_size) });
+      add('L3', big.region, `h${levels[j]} ${label(big)} (${r1(big.style.font_size)} px) larger than h${levels[i]} ${label(u)} (${r1(minUp)} px)`,
+        `h${levels[j]} larger than h${levels[i]}`, [u, big], { upper_level: levels[i], upper_px: r1(minUp), lower_level: levels[j], lower_px: r1(big.style.font_size) });
     }
   }
 
-  // L4 — alinhamento de campos/rótulos de um formulário e de cartões irmãos.
+  // L4: alignment of a form's fields/labels and of sibling cards.
   const tol = lim['align-tolerance'];
   const alignCheck = (items, what, groupKey) => {
     const groups = new Map();
@@ -437,16 +443,16 @@ export function analyzeLayout(input, ctx = {}) {
       const perRow = Math.max(...rows(g, 8).map((r) => clusterValues(r.map((e) => e.box.x), tol).length));
       const allowed = Math.max(lim['max-left-edges'], perRow);
       if (edges.length > allowed) {
-        add('L4', g[0].region, `${g.length} ${what} com bordas esquerdas em ${edges.length} posições distintas (tolerância ${tol} px; esperado até ${allowed}): x = ${edges.map(Math.round).join(', ')}`,
-          `${what} em ${k ?? '(sem grupo)'}`, g.slice(0, 8), { edges: edges.map(Math.round), allowed });
+        add('L4', g[0].region, `${g.length} ${what} with left edges at ${edges.length} distinct positions (tolerance ${tol} px; expected up to ${allowed}): x = ${edges.map(Math.round).join(', ')}`,
+          `${what} in ${k ?? '(no group)'}`, g.slice(0, 8), { edges: edges.map(Math.round), allowed });
       }
     }
   };
   const fieldLike = els.filter((e) => e.kind === 'field' || (e.kind === 'label' && !els.some((f) => f.kind === 'field' && f.id === e.label_for && containsBox(f.box, e.box, 2))));
-  // Rótulo flutuante (dentro da caixa do campo) não é uma borda própria.
+  // A floating label (inside the field box) is not an edge of its own.
   alignCheck(fieldLike.filter((e) => e.kind === 'field' || !els.some((f) => f.kind === 'field' && containsBox({ ...f.box, y: f.box.y - 12, height: f.box.height + 12 }, e.box, 2))),
-    'campos e rótulos', (e) => e.form_group ?? e.region);
-  alignCheck(els.filter((e) => e.kind === 'card'), 'cartões', (e) => e.parent ?? e.region);
+    'fields and labels', (e) => e.form_group ?? e.region);
+  alignCheck(els.filter((e) => e.kind === 'card'), 'cards', (e) => e.parent ?? e.region);
 
   // L5 — proximidade.
   const byId = new Map(geom.elements.map((e) => [e.id, e]));
@@ -456,21 +462,21 @@ export function analyzeLayout(input, ctx = {}) {
     if (!f) continue;
     const d = boxDistance(l.box, f.box);
     if (d > lim['label-gap']) {
-      add('L5', l.region, `rótulo ${label(l)} a ${Math.round(d)} px do seu campo (máx. ${lim['label-gap']} px)`, `rótulo ${label(l)} longe do campo`, [l, f], { distance_px: Math.round(d), max: lim['label-gap'] });
+      add('L5', l.region, `label ${label(l)} ${Math.round(d)} px from its field (max. ${lim['label-gap']} px)`, `label ${label(l)} far from its field`, [l, f], { distance_px: Math.round(d), max: lim['label-gap'] });
       continue;
     }
     const other = fields.filter((o) => o.id !== f.id).map((o) => ({ o, d: boxDistance(l.box, o.box) })).sort((a, b) => a.d - b.d)[0];
     if (other && other.d + 2 < d) {
-      add('L5', l.region, `rótulo ${label(l)} mais perto de outro campo (${Math.round(other.d)} px) que do seu (${Math.round(d)} px)`, `rótulo ${label(l)} perto do campo vizinho`, [l, f, other.o], { own_px: Math.round(d), other_px: Math.round(other.d) });
+      add('L5', l.region, `label ${label(l)} closer to another field (${Math.round(other.d)} px) than to its own (${Math.round(d)} px)`, `label ${label(l)} close to the neighboring field`, [l, f, other.o], { own_px: Math.round(d), other_px: Math.round(other.d) });
     }
   }
-  // Grupo de ações = botões irmãos (mesmo pai no DOM). Links são navegação, não entram.
+  // Action group = sibling buttons (same DOM parent). Links are navigation and do not count.
   const isButton = (e) => e.tag === 'button' || e.role === 'button';
   const actions = els.filter((e) => e.is_interactive && e.kind === 'interactive' && e.parent && !e.is_inline && isButton(e));
   const between = (a, b) => els.some((x) => x !== a && x !== b && !CONTAINER.has(x.kind) && x.box.x >= right(a.box) - 1 && right(x.box) <= b.box.x + 1
     && sameRow(x.box, a.box) && x.box.width > 0);
-  // Grupos pelo pai no DOM, fundidos quando os botões se encostam na mesma linha (invólucros como o de uma
-  // dica de ferramenta trocam o pai sem mudar o grupo visual).
+  // Groups by DOM parent, merged when the buttons touch on the same row (wrappers such as a tooltip's change
+  // the parent without changing the visual group).
   const root = new Map(actions.map((a) => [a.parent, a.parent]));
   const find = (k) => { while (root.get(k) !== k) k = root.get(k); return k; };
   for (const a of actions) for (const b of actions) {
@@ -488,17 +494,17 @@ export function analyzeLayout(input, ctx = {}) {
       const sorted = row.sort((a, b) => a.box.x - b.box.x);
       for (let i = 1; i < sorted.length; i++) {
         const [a, b] = [sorted[i - 1], sorted[i]];
-        if (a.is_destructive !== b.is_destructive) continue; // destrutiva afastada de propósito
-        if (between(a, b)) continue; // há conteúdo entre as duas (ex.: "pág. 1 de 3" entre anterior e próxima)
+        if (a.is_destructive !== b.is_destructive) continue; // destructive action kept apart on purpose
+        if (between(a, b)) continue; // there is content between them (e.g. "page 1 of 3" between previous and next)
         const gap = b.box.x - right(a.box);
         if (gap > lim['action-gap']) {
-          add('L5', a.region, `ações do mesmo grupo ${label(a)} e ${label(b)} separadas por ${Math.round(gap)} px (máx. ${lim['action-gap']} px)`, `ações ${label(a)} × ${label(b)} afastadas`, [a, b], { gap_px: Math.round(gap), max: lim['action-gap'] });
+          add('L5', a.region, `actions of the same group ${label(a)} and ${label(b)} ${Math.round(gap)} px apart (max. ${lim['action-gap']} px)`, `actions ${label(a)} × ${label(b)} far apart`, [a, b], { gap_px: Math.round(gap), max: lim['action-gap'] });
           reported = true;
         }
       }
     }
     if (reported) continue;
-    // Proximidade relativa só em grupo coeso: uma linha, vãos dentro do limite.
+    // Relative proximity only in a cohesive group: one row, gaps within the limit.
     if (rows(g, 8).length > 1) continue;
     const ordered = [...g].sort((a, b) => a.box.x - b.box.x);
     if (ordered.some((b, i) => i > 0 && b.box.x - right(ordered[i - 1].box) > lim['action-gap'])) continue;
@@ -506,43 +512,43 @@ export function analyzeLayout(input, ctx = {}) {
       const own = Math.min(...g.filter((x) => x !== a).map((x) => boxDistance(a.box, x.box)));
       const near = actions.filter((x) => groupOf(x) !== groupOf(a) && x.region === a.region).map((x) => ({ x, d: boxDistance(a.box, x.box) })).sort((p, q) => p.d - q.d)[0];
       if (near && near.d + 2 < own && own > 8) {
-        add('L5', a.region, `ação ${label(a)} mais perto de ${label(near.x)}, de outro grupo (${Math.round(near.d)} px), que do próprio grupo (${Math.round(own)} px)`, `ação ${label(a)} perto do grupo vizinho`, [a, near.x], { own_px: Math.round(own), other_px: Math.round(near.d) });
+        add('L5', a.region, `action ${label(a)} closer to ${label(near.x)}, of another group (${Math.round(near.d)} px), than to its own group (${Math.round(own)} px)`, `action ${label(a)} close to the neighboring group`, [a, near.x], { own_px: Math.round(own), other_px: Math.round(near.d) });
         break;
       }
     }
   }
 
-  // L6 — primeira dobra: título e ação primária.
+  // L6: first fold: title and primary action.
   const title = dialog ? els.find((e) => e.kind === 'heading') : els.find((e) => e.kind === 'heading' && e.heading_level === 1);
-  const where = dialog ? 'do topo do diálogo' : 'do topo da página';
-  // Num diálogo, título e rodapé ficam fixos e só o corpo rola; a captura estática não limita a altura do
-  // diálogo à janela, então elemento dentro de dialog-header/dialog-footer não reprova.
+  const where = dialog ? 'from the top of the dialog' : 'from the top of the page';
+  // In a dialog, title and footer are fixed and only the body scrolls; the static capture does not limit the
+  // dialog height to the window, so an element inside dialog-header/dialog-footer does not fail.
   const pinned = (e) => dialog && geom.elements.some((x) => (x.archetype_region === 'dialog-footer' || x.archetype_region === 'dialog-header') && containsBox(x.box, e.box, 1));
   if (title && belowFold(title.box) && !pinned(title)) {
     const y = Math.round(bottom(title.box) - foldTop);
-    add('L6', title.region, `título ${label(title)} fora da primeira dobra (termina a ${y} px ${where}; dobra em ${fold} px)`, `título ${label(title)} abaixo da dobra`, [title], { bottom_px: y, fold });
+    add('L6', title.region, `title ${label(title)} outside the first fold (ends ${y} px ${where}; fold at ${fold} px)`, `title ${label(title)} below the fold`, [title], { bottom_px: y, fold });
   }
   if (candidates.length && candidates.every((p) => belowFold(p.box) && !pinned(p))) {
     const p = candidates[0];
     const y = Math.round(bottom(p.box) - foldTop);
-    add('L6', p.region, `ação primária ${label(p)} fora da primeira dobra (termina a ${y} px ${where}; dobra em ${fold} px)`, `primária ${label(p)} abaixo da dobra`, [p], { bottom_px: y, fold });
+    add('L6', p.region, `primary action ${label(p)} outside the first fold (ends ${y} px ${where}; fold at ${fold} px)`, `primary ${label(p)} below the fold`, [p], { bottom_px: y, fold });
   }
 
-  // L7 — comprimento de linha em texto corrido.
+  // L7: line length in running text.
   for (const t of els.filter((e) => e.kind === 'text' && e.text_length > lim['max-line-chars'])) {
     const fs = t.style.font_size || body;
     const lh = t.style.line_height || fs * 1.4;
     const lines = Math.max(1, Math.round(t.box.height / lh));
     const cpl = lines > 1 ? t.text_length / lines : Math.min(t.text_length, t.box.width / (0.5 * fs));
-    // Texto corrido: duas linhas ou mais, ou uma linha bem acima do limite (frase curta que só passa raspando não conta).
+    // Running text: two lines or more, or one line well above the limit (a short sentence just over it does not count).
     if (lines === 1 && t.text_length < lim['max-line-chars'] * 1.33) continue;
     if (cpl > lim['max-line-chars']) {
-      add('L7', t.region, `texto corrido com ~${Math.round(cpl)} caracteres por linha (máx. ${lim['max-line-chars']}; largura ${Math.round(t.box.width)} px, ${r1(fs)} px, ${lines} linha(s))`,
-        `linha longa em ${label(t)}`, [t], { chars_per_line: Math.round(cpl), width_px: Math.round(t.box.width), lines, max: lim['max-line-chars'] });
+      add('L7', t.region, `running text with ~${Math.round(cpl)} characters per line (max. ${lim['max-line-chars']}; width ${Math.round(t.box.width)} px, ${r1(fs)} px, ${lines} line(s))`,
+        `long line in ${label(t)}`, [t], { chars_per_line: Math.round(cpl), width_px: Math.round(t.box.width), lines, max: lim['max-line-chars'] });
     }
   }
 
-  // L8 — alvo clicável menor que 24×24 (exceções: alvo em linha de texto e espaçamento suficiente, WCAG 2.5.8).
+  // L8: clickable target smaller than 24×24 (exceptions: inline target in text and enough spacing, WCAG 2.5.8).
   const min = lim['min-target'];
   const targets = els.filter((e) => e.is_interactive && !e.disabled && e.box.width > 0 && e.box.height > 0);
   const small = targets.filter((e) => (e.box.width < min || e.box.height < min) && !e.is_inline);
@@ -560,19 +566,19 @@ export function analyzeLayout(input, ctx = {}) {
   }
   for (const ts of byLabel.values()) {
     const t = ts[0];
-    add('L8', t.region, `alvo clicável ${label(t)} com ${Math.round(t.box.width)}×${Math.round(t.box.height)} px (mín. ${min}×${min}, sem espaço livre em volta)${ts.length > 1 ? ` (${ts.length}×)` : ''}`,
-      `alvo pequeno ${label(t)}`, ts.slice(0, 5), { width_px: Math.round(t.box.width), height_px: Math.round(t.box.height), count: ts.length, min });
+    add('L8', t.region, `clickable target ${label(t)} at ${Math.round(t.box.width)}×${Math.round(t.box.height)} px (min. ${min}×${min}, no free space around it)${ts.length > 1 ? ` (${ts.length}×)` : ''}`,
+      `small target ${label(t)}`, ts.slice(0, 5), { width_px: Math.round(t.box.width), height_px: Math.round(t.box.height), count: ts.length, min });
   }
 
-  // L9 — regiões do arquétipo declarado.
+  // L9: regions of the declared archetype.
   const unchecked = [];
   if (arch?.regions?.length) {
     for (const id of arch.regions) {
       const d = detectArchetypeRegion(id, scope, geom);
       if (d.how === 'no-detector') unchecked.push(id);
       if (!d.present) {
-        add('L9', scope.regionLabel, `região "${id}" do arquétipo ${arch.id} não encontrada na tela (marque-a com data-region="${id}" ou declare verification.selectors.archetype-regions)`,
-          `região ${id} ausente`, [], { archetype: arch.id, region: id });
+        add('L9', scope.regionLabel, `region "${id}" of archetype ${arch.id} not found on the screen (mark it with data-region="${id}" or declare verification.selectors.archetype-regions)`,
+          `region ${id} missing`, [], { archetype: arch.id, region: id });
       }
     }
   }

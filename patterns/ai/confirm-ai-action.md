@@ -1,6 +1,6 @@
 ---
 id: confirm-ai-action
-title: Quando pedir confirmação antes de uma ação executada pela IA?
+title: When should you ask for confirmation before an action executed by AI?
 category: ai
 components: [modal, button, action-summary]
 type: contextual-decision
@@ -11,93 +11,93 @@ wcag: ["3.3.4", "2.4.3", "4.1.3", "1.4.1"]
 related: [confirm-action, destructive-action, review-ai-output, ai-error-recovery, undo]
 ---
 
-# Quando pedir confirmação antes de uma ação executada pela IA?
+# When should you ask for confirmation before an action executed by AI?
 
-> **Regra:** A IA prepara a ação sem executá-la; peça confirmação explícita imediatamente antes de qualquer efeito relevante, externo, destrutivo, financeiro ou difícil de reverter, mostrando alvo, escopo e consequência.
+> **Rule:** The AI prepares the action without executing it; ask for explicit confirmation immediately before any relevant, external, destructive, financial or hard-to-reverse effect, showing the target, scope and consequence.
 
-## Contexto
+## Context
 
-Uma IA pode apenas sugerir, mas também enviar mensagens, publicar, apagar dados, alterar permissões, executar comandos ou comprar. Nesses casos, a intenção do sistema não equivale à autorização da pessoa.
+An AI may only suggest, but it may also send messages, publish, delete data, change permissions, run commands or buy things. In those cases, the system's intent is not the person's authorization.
 
-A confirmação devolve o controle no ponto em que a sugestão vira efeito no mundo. Ela reduz comandos equivocados, interpretações erradas e uso indevido de permissões, mas não torna a ação segura por si só: combine com escopo claro, permissões adequadas, registro e recuperação.
+Confirmation hands control back at the point where a suggestion becomes an effect in the world. It reduces mistaken commands, misinterpretations and misuse of permissions, but it does not make the action safe on its own: combine it with clear scope, appropriate permissions, logging and recovery.
 
-Tampouco deve interromper, a cada interação, tarefas de baixo risco.
+Nor should it interrupt low-risk tasks at every interaction.
 
-## Decisão
+## Decision
 
-- **SE** a ação envia algo a terceiros, publica, exclui, compra, altera permissões, roda comandos ou deploys **ENTÃO** exija confirmação antes do efeito.
-- **SE** a ação afeta outra pessoa ou sistema externo **ENTÃO** exija confirmação.
-- **SE** a saída é só informativa, rascunho não enviado, edição local reversível ou formatação de baixo risco **ENTÃO** não peça confirmação.
-- **SE** pede confirmação **ENTÃO** mostre resumo curto: alvo, escopo, conteúdo ou comando e consequência principal.
-- **SE** o botão confirma **ENTÃO** use verbo explícito ("Confirmar envio", "Publicar", "Executar comando"); nunca "Continuar".
-- **SE** revisar reduz o risco **ENTÃO** permita editar a proposta antes de confirmar.
-- **SE** o impacto é alto (destrutivo, financeiro, permissões, dados sensíveis) **ENTÃO** aumente a clareza e a fricção; **SENÃO** mantenha leve.
-- **SE** é lote autorizado explicitamente em automação segura **ENTÃO** dispense confirmação item a item.
-- **SE** a ação foi executada **ENTÃO** mostre o resultado e ofereça desfazer ou recuperar quando tecnicamente possível.
+- **IF** the action sends something to third parties, publishes, deletes, buys, changes permissions, runs commands or deploys **THEN** require confirmation before the effect.
+- **IF** the action affects another person or an external system **THEN** require confirmation.
+- **IF** the output is purely informational, an unsent draft, a reversible local edit or low-risk formatting **THEN** do not ask for confirmation.
+- **IF** you ask for confirmation **THEN** show a short summary: target, scope, content or command, and main consequence.
+- **IF** the button confirms **THEN** use an explicit verb ("Confirm send", "Publish", "Run command"); never "Continue".
+- **IF** reviewing reduces the risk **THEN** allow the proposal to be edited before confirming.
+- **IF** the impact is high (destructive, financial, permissions, sensitive data) **THEN** increase clarity and friction; **ELSE** keep it light.
+- **IF** it is a batch explicitly authorized in a safe automation **THEN** skip item-by-item confirmation.
+- **IF** the action was executed **THEN** show the result and offer undo or recovery when technically possible.
 
-## Quando usar
+## When to use
 
-- Mensagens, e-mails e convites a terceiros.
-- Publicação ou alteração de conteúdo público.
-- Exclusão ou alteração difícil de reverter.
-- Compras e transações.
-- Comandos, scripts, commits e deploys.
-- Permissões, configurações e dados sensíveis.
+- Messages, emails and invitations to third parties.
+- Publishing or changing public content.
+- Deletion or hard-to-reverse changes.
+- Purchases and transactions.
+- Commands, scripts, commits and deploys.
+- Permissions, settings and sensitive data.
 
-## Quando evitar
+## When to avoid
 
-- Respostas puramente informativas → **use em vez disso:** exibir direto.
-- Rascunho não enviado → **use em vez disso:** pré-visualização editável.
-- Modal para cada sugestão → **use em vez disso:** confirmar só no ponto de efeito.
+- Purely informational responses → **use instead:** show them directly.
+- Unsent draft → **use instead:** an editable preview.
+- A modal for every suggestion → **use instead:** confirm only at the point of effect.
 
-## Faça
+## Do
 
-- Mostre o verbo da ação no botão.
-- Separe visualmente prévia de execução.
-- Permita cancelar sem perder o trabalho.
-- Registre e exiba o resultado.
+- Put the action verb on the button.
+- Visually separate preview from execution.
+- Allow cancelling without losing the work.
+- Log and display the result.
 
-## Evite
+## Avoid
 
-- Executar antes da confirmação.
-- Pedir confirmação depois do efeito.
-- Pré-selecionar confirmação em ação de alto impacto.
-- Esconder o cancelar.
-- Repetir confirmações em fluxo de baixo risco.
+- Executing before confirmation.
+- Asking for confirmation after the effect.
+- Preselecting confirmation for a high-impact action.
+- Hiding cancel.
+- Repeating confirmations in a low-risk flow.
 
-## Acessibilidade
+## Accessibility
 
-- Modal com nome acessível; título e mensagem anunciados.
-- Foco entra no modal, vai à ação segura ou ao primeiro controle relevante, não escapa; Esc cancela; foco volta ao acionador (WCAG 2.4.3).
-- Informação crítica em texto, não só cor ou ícone (WCAG 1.4.1).
-- Anuncie estado de execução e resultado (WCAG 4.1.3).
-- Campos de edição e revisão acessíveis por teclado e leitor de tela.
+- Modal with an accessible name; title and message announced.
+- Focus enters the modal, goes to the safe action or the first relevant control, does not escape; Esc cancels; focus returns to the trigger (WCAG 2.4.3).
+- Critical information in text, not color or icon alone (WCAG 1.4.1).
+- Announce execution state and result (WCAG 4.1.3).
+- Edit and review fields accessible by keyboard and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Resumo | "Enviar e-mail para 3 clientes com o assunto 'Proposta revisada'." |
-| Botão | "Confirmar envio" |
-| Cancelar | "Voltar e editar" |
-| Resultado | "E-mail enviado. Desfazer" |
+| Summary | "Send an email to 3 customers with the subject 'Revised proposal'." |
+| Button | "Confirm send" |
+| Cancel | "Go back and edit" |
+| Result | "Email sent. Undo" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A IA mostra exatamente o que vai fazer?
-- [ ] Alvo, escopo e consequência estão claros?
-- [ ] A confirmação ocorre antes do efeito?
-- [ ] O botão traz verbo explícito?
-- [ ] É possível revisar ou editar a proposta?
-- [ ] Cancelar não destrói o trabalho?
-- [ ] A fricção varia com o impacto?
-- [ ] Resultado e opção de desfazer aparecem após executar?
-- [ ] O fluxo funciona com teclado e leitor de tela?
+- [ ] Does the AI show exactly what it will do?
+- [ ] Are target, scope and consequence clear?
+- [ ] Does confirmation happen before the effect?
+- [ ] Does the button carry an explicit verb?
+- [ ] Can the proposal be reviewed or edited?
+- [ ] Does cancelling keep the work?
+- [ ] Does friction vary with impact?
+- [ ] Do the result and an undo option appear after execution?
+- [ ] Does the flow work with keyboard and screen reader?
 
-## Fundamentação
+## Rationale
 
-- Microsoft Fluent 2 (Responsible AI): controle humano em ações da IA.
-- IBM Carbon for AI: padrões de IA responsável.
-- Documentação de agentes de código e assistentes (modo agente, comandos, segurança): aprovação antes de executar comandos com efeito externo.
-- Documentação pública de uso de computador por IA: aprovação humana em ações sensíveis.
-- WCAG 2.2, 3.3.4 (Error Prevention): reversão, conferência ou confirmação em dados controláveis.
+- Microsoft Fluent 2 (Responsible AI): human control over AI actions.
+- IBM Carbon for AI: responsible AI patterns.
+- Documentation of coding agents and assistants (agent mode, commands, security): approval before running commands with external effects.
+- Public documentation on AI computer use: human approval for sensitive actions.
+- WCAG 2.2, 3.3.4 (Error Prevention): reversal, checking or confirmation for controllable data.

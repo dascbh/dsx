@@ -1,9 +1,9 @@
-// Leitura compatível (transição de 2026-10, docs/renames-2026-10.md): nomes antigos em português
-// do front matter do UX.md, do mapa de fluxo e do casos.json. Uma tabela só, usada pelo lint-ux-md,
-// pela configuração do ux-lint, pelo flow.mjs e pelas páginas de escolha. Tudo o que é lido com nome
-// antigo é convertido para o novo e gera um aviso "nome antigo, renomeie para X". Nada aqui é escrito.
+// Compatible reading (2026-10 transition, docs/renames-2026-10.md): old Portuguese names in the UX.md front
+// matter, the flow map and casos.json. One table, used by lint-ux-md, the ux-lint configuration, flow.mjs and the
+// choice pages. Everything read under an old name is converted to the new one and produces a warning
+// "old name, rename to X". Nothing here is written. The Portuguese names below are compatibility data.
 
-/** Chaves do front matter do UX.md: caminho antigo (com o pai já novo) → nome novo. */
+/** UX.md front matter keys: old path (with the parent already renamed) → new name. */
 export const UX_KEYS = {
   '': {
     produto: 'product', navegacao: 'navigation', arquetipos: 'archetypes', acoes: 'actions', confirmacao: 'confirmation',
@@ -27,7 +27,7 @@ export const UX_KEYS = {
   },
 };
 
-/** Valores antigos por caminho novo. */
+/** Old values per new path. */
 export const UX_VALUES = {
   'product.register': { operacional: 'operational', consumo: 'consumer', marca: 'brand' },
   'product.platform': { ambos: 'both' },
@@ -46,7 +46,7 @@ export const UX_VALUES = {
   'content.buttons': { 'verbo-objeto': 'verb-object' },
 };
 
-/** Ids antigos de arquétipo → novos. */
+/** Old archetype ids → new. */
 export const ARCHETYPE_IDS = {
   'lista-operacional': 'operational-list', 'mestre-detalhe': 'master-detail', 'documento-com-visor': 'document-viewer',
   'editor-com-painel': 'editor-with-panel', 'assistente-em-etapas': 'step-wizard', 'painel-de-acompanhamento': 'monitoring-dashboard',
@@ -54,7 +54,7 @@ export const ARCHETYPE_IDS = {
   'dialogo-de-formulario': 'form-dialog', 'dialogo-de-confirmacao': 'confirmation-dialog', 'painel-lateral-de-detalhe': 'detail-side-panel',
 };
 
-/** Ids antigos de estado → novos. */
+/** Old state ids → new. */
 export const STATE_IDS = {
   carregando: 'loading', 'erro-de-campo': 'field-error', erro: 'error', enviando: 'submitting', sucesso: 'success',
   'rascunho-retomado': 'draft-restored', vazio: 'empty', 'vazio-por-filtro': 'empty-filtered', 'sem-acesso': 'no-access',
@@ -69,8 +69,8 @@ const isMap = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const join = (p, k) => (p ? `${p}.${k}` : k);
 
 /**
- * Converte um front matter de UX.md com nomes antigos para os novos.
- * Devolve { frontMatter, warnings }. Não altera o objeto recebido.
+ * Converts a UX.md front matter with old names to the new ones.
+ * Returns { frontMatter, warnings }. Does not change the object it receives.
  */
 export function normalizeUxFrontMatter(fm) {
   const warnings = [];
@@ -80,20 +80,20 @@ export function normalizeUxFrontMatter(fm) {
     for (const [k, v] of Object.entries(obj)) {
       const nk = keys[k] ?? k;
       const np = join(path, nk), op = join(oldPath, k);
-      if (nk !== k) warnings.push(`nome antigo "${op}", renomeie para "${np}"`);
-      if (nk in out) warnings.push(`"${np}" aparece com o nome novo e com o antigo; vale o último`);
+      if (nk !== k) warnings.push(`old name "${op}", rename to "${np}"`);
+      if (nk in out) warnings.push(`"${np}" appears under both the new and the old name; the last one wins`);
       let val = v;
       if (np === 'archetypes' && isMap(v)) {
         val = {};
         for (const [id, routes] of Object.entries(v)) {
           const nid = ARCHETYPE_IDS[id] ?? id;
-          if (nid !== id) warnings.push(`arquétipo com id antigo "${id}" em ${np}, renomeie para "${nid}"`);
+          if (nid !== id) warnings.push(`archetype with old id "${id}" in ${np}, rename to "${nid}"`);
           val[nid] = routes;
         }
       } else if (np === 'states' && Array.isArray(v)) {
         val = v.map((s) => {
           const ns = STATE_IDS[s] ?? s;
-          if (ns !== s) warnings.push(`estado com nome antigo "${s}" em states, renomeie para "${ns}"`);
+          if (ns !== s) warnings.push(`state with old name "${s}" in states, rename to "${ns}"`);
           return ns;
         });
       } else if (isMap(v) && UX_KEYS[np]) {
@@ -102,7 +102,7 @@ export function normalizeUxFrontMatter(fm) {
         val = walk(v, np, op);
       } else if (typeof v === 'string' && UX_VALUES[np]?.[v]) {
         val = UX_VALUES[np][v];
-        warnings.push(`valor antigo "${v}" em ${np}, renomeie para "${val}"`);
+        warnings.push(`old value "${v}" in ${np}, rename to "${val}"`);
       }
       out[nk] = val;
     }
@@ -111,7 +111,7 @@ export function normalizeUxFrontMatter(fm) {
   return { frontMatter: isMap(fm) ? walk(fm, '', '') : fm, warnings };
 }
 
-// ---------------------------------------------------------------- mapa de fluxo (flows-<module>.json)
+// ---------------------------------------------------------------- flow map (flows-<module>.json)
 
 const FLOW_TOP = { telas: 'screens', transicoes: 'transitions', jornadas: 'journeys' };
 const FLOW_ITEM = {
@@ -120,36 +120,36 @@ const FLOW_ITEM = {
   journeys: { nome: 'name', passos: 'steps', trocas_persona: 'persona_switches' },
 };
 const TRIGGER = { tipo: 'type', rotulo: 'label' };
-/** Tipos de tela antigos → novos. */
+/** Old screen types → new. */
 export const SCREEN_TYPES = { pagina: 'page', página: 'page', dialogo: 'dialog', diálogo: 'dialog', aba: 'tab', painel: 'panel', gaveta: 'drawer' };
 
-/** Converte um mapa de fluxo com nomes antigos. Devolve { map, warnings }. */
+/** Converts a flow map with old names. Returns { map, warnings }. */
 export function normalizeFlowMap(map) {
   const warnings = new Set();
   if (!isMap(map)) return { map, warnings: [] };
   const out = {};
   for (const [k, v] of Object.entries(map)) {
     const nk = FLOW_TOP[k] ?? k;
-    if (nk !== k) warnings.add(`nome antigo "${k}", renomeie para "${nk}"`);
+    if (nk !== k) warnings.add(`old name "${k}", rename to "${nk}"`);
     const itemKeys = FLOW_ITEM[nk];
     out[nk] = itemKeys && Array.isArray(v) ? v.map((it) => {
       if (!isMap(it)) return it;
       const o = {};
       for (const [ik, iv] of Object.entries(it)) {
         const nik = itemKeys[ik] ?? ik;
-        if (nik !== ik) warnings.add(`nome antigo "${nk}[].${ik}", renomeie para "${nik}"`);
+        if (nik !== ik) warnings.add(`old name "${nk}[].${ik}", rename to "${nik}"`);
         let val = iv;
         if (nik === 'trigger' && isMap(iv)) {
           val = {};
           for (const [tk, tv] of Object.entries(iv)) {
             const ntk = TRIGGER[tk] ?? tk;
-            if (ntk !== tk) warnings.add(`nome antigo "trigger.${tk}", renomeie para "${ntk}"`);
+            if (ntk !== tk) warnings.add(`old name "trigger.${tk}", rename to "${ntk}"`);
             val[ntk] = tv;
           }
         }
         if (nk === 'screens' && nik === 'type' && typeof iv === 'string' && SCREEN_TYPES[iv.toLowerCase()]) {
           val = SCREEN_TYPES[iv.toLowerCase()];
-          warnings.add(`tipo de tela antigo "${iv}", renomeie para "${val}"`);
+          warnings.add(`old screen type "${iv}", rename to "${val}"`);
         }
         o[nik] = val;
       }
@@ -159,7 +159,7 @@ export function normalizeFlowMap(map) {
   return { map: out, warnings: [...warnings] };
 }
 
-// ---------------------------------------------------------------- cases.json (páginas de escolha)
+// ---------------------------------------------------------------- cases.json (choice pages)
 
 const CASE_TOP = { casos: 'cases' };
 const CASE_ITEM = {
@@ -169,7 +169,7 @@ const CASE_ITEM = {
 const OPTION_ITEM = { texto: 'text', convencao: 'convention', nota: 'note' };
 const RECOMMENDED = { indice: 'index', porque: 'why' };
 
-/** Converte um cases.json (ou casos.json) com nomes antigos. Aceita lista ou { cases }. Devolve { data, warnings }. */
+/** Converts a cases.json (or casos.json) with old names. Accepts a list or { cases }. Returns { data, warnings }. */
 export function normalizeCases(data) {
   const warnings = new Set();
   const mapKeys = (obj, table, where) => {
@@ -177,7 +177,7 @@ export function normalizeCases(data) {
     const o = {};
     for (const [k, v] of Object.entries(obj)) {
       const nk = table[k] ?? k;
-      if (nk !== k) warnings.add(`nome antigo "${where}${k}", renomeie para "${nk}"`);
+      if (nk !== k) warnings.add(`old name "${where}${k}", rename to "${nk}"`);
       o[nk] = v;
     }
     return o;
@@ -197,7 +197,7 @@ export function normalizeCases(data) {
   return { data: out, warnings: [...warnings] };
 }
 
-// ---------------------------------------------------------------- saída JSON dos verificadores
+// ---------------------------------------------------------------- detector JSON output
 
 const DETECTOR_KEYS = {
   achados: 'findings', resumo: 'summary', telas: 'screens', regra: 'rule', severidade: 'severity', texto: 'text', mensagem: 'message',
@@ -206,18 +206,18 @@ const DETECTOR_KEYS = {
   dialogoAberto: 'dialog_open', inventario: 'inventory', dado: 'probable_data', provavelDado: 'probable_data', severidadeOriginal: 'original_severity',
   porRegra: 'by_rule', porSeveridade: 'by_severity', porTipo: 'by_type', inventarioPorTipo: 'inventory_by_type', telasComAchado: 'screens_with_findings',
   transicoes: 'transitions', jornadas: 'journeys', textos: 'texts',
-  // camelCase da versão 0.5.0 em desenvolvimento → snake_case (convenção: todo JSON em snake_case)
+  // camelCase of the in-development 0.5.0 → snake_case (convention: all JSON in snake_case)
   dialogOpen: 'dialog_open', probableData: 'probable_data', originalSeverity: 'original_severity', byRule: 'by_rule', bySeverity: 'by_severity',
   byType: 'by_type', inventoryByType: 'inventory_by_type', screensWithFindings: 'screens_with_findings', fromAriaLabel: 'from_aria_label',
   byStatus: 'by_status', byFamily: 'by_family',
 };
-/** Tipos de elemento antigos (saída do verificador de texto) → novos. */
+/** Old element types (text detector output) → new. */
 export const TEXT_TYPES = {
   'título': 'title', 'botão': 'button', aba: 'tab', 'rótulo': 'label', 'texto de apoio': 'helper', alerta: 'alert',
   'nome acessível': 'accessible-name', 'valor vazio': 'empty-value',
 };
 
-/** Converte (recursivamente) a saída JSON antiga de text.mjs / screen.mjs / flow.mjs para os nomes novos. */
+/** Converts (recursively) the old JSON output of text.mjs / screen.mjs / flow.mjs to the new names. */
 export function normalizeDetectorJson(json) {
   const rec = (v, key) => {
     if (Array.isArray(v)) return v.map((x) => (key === 'types' && typeof x === 'string' ? TEXT_TYPES[x] ?? x : rec(x)));

@@ -1,6 +1,6 @@
 ---
 id: when-to-avoid-modal
-title: Quando não usar modal?
+title: When should you not use a modal?
 category: modals
 components: [modal, alert, toast, side-panel, page]
 type: anti-pattern
@@ -11,103 +11,103 @@ wcag: ["2.1.2", "2.4.3", "2.4.7", "1.4.10", "4.1.3"]
 related: [when-to-use-modal, close-modal, toast-vs-inline-alert, error-placement]
 ---
 
-# Quando não usar modal?
+# When should you not use a modal?
 
-> **Regra:** Trate o modal como último recurso: use-o só para decisão curta que exige atenção imediata; fluxos longos, mensagens rotineiras e textos extensos ficam na página.
+> **Rule:** Treat the modal as a last resort: use it only for a short decision that needs immediate attention; long flows, routine messages and long texts stay on the page.
 
-## Contexto
+## Context
 
-Um modal interrompe o fluxo e bloqueia a página ao fundo. Usado para tarefas extensas ou situações rotineiras, aumenta a complexidade e dificulta a navegação.
+A modal interrupts the flow and blocks the page behind it. Used for long tasks or routine situations, it adds complexity and makes navigation harder.
 
-Ele também cria problemas de foco, rolagem e leitura em dispositivos móveis e tecnologias assistivas. Antes de abrir um modal, confira se o conteúdo cabe na página, se pode virar uma mensagem contextual ou se pede uma tela própria.
+It also creates focus, scrolling and reading problems on mobile devices and with assistive technology. Before opening a modal, check whether the content fits on the page, can become a contextual message or calls for its own screen.
 
-Orientações de design systems tratam o modal como exceção, sobretudo para fluxos de várias etapas, mensagens comuns, conteúdo longo e links externos.
+Design system guidance treats the modal as an exception, especially for multi-step flows, common messages, long content and external links.
 
-## Decisão
+## Decision
 
-- **SE** o fluxo tem várias etapas ou o formulário é longo **ENTÃO** use uma página própria.
-- **SE** é mensagem de sucesso ou status **ENTÃO** use alerta ou toast, não modal.
-- **SE** é erro de campo **ENTÃO** mostre inline e resumo, nunca modal.
-- **SE** o conteúdo exige leitura extensa **ENTÃO** use página ou seção expansível.
-- **SE** é informação complementar **ENTÃO** use painel lateral ou seção expansível.
-- **SE** é uma tarefa simples **ENTÃO** use criação ou edição inline mantendo a página interativa.
-- **SE** a pessoa vai para outro endereço **ENTÃO** use link direto, sem modal de confirmação.
-- **SE** a decisão é curta e exige atenção imediata **ENTÃO** o modal é aceitável.
-- **SE** o modal abriria sem ação da pessoa **ENTÃO** não abra.
-- **SENÃO** mantenha o conteúdo na página.
+- **IF** the flow has several steps or the form is long **THEN** use a dedicated page.
+- **IF** it is a success or status message **THEN** use an alert or toast, not a modal.
+- **IF** it is a field error **THEN** show it inline plus a summary, never in a modal.
+- **IF** the content needs extended reading **THEN** use a page or an expandable section.
+- **IF** it is supplementary information **THEN** use a side panel or an expandable section.
+- **IF** it is a simple task **THEN** use inline creation or editing and keep the page interactive.
+- **IF** the person is going to another address **THEN** use a direct link, with no confirmation modal.
+- **IF** the decision is short and needs immediate attention **THEN** a modal is acceptable.
+- **IF** the modal would open without any action from the person **THEN** do not open it.
+- **ELSE** keep the content on the page.
 
-## Quando usar
+## When to use
 
-Este padrão orienta a evitar modal em:
+This pattern advises avoiding a modal for:
 
-- Fluxos de várias etapas.
-- Formulários longos.
-- Leitura extensa.
-- Mensagens comuns ou rotineiras.
-- Situações em que a página pode continuar interativa.
-- Navegação para outro endereço.
+- Multi-step flows.
+- Long forms.
+- Extended reading.
+- Common or routine messages.
+- Situations where the page can stay interactive.
+- Navigation to another address.
 
-## Quando evitar
+## When to avoid
 
-- Mensagem de sucesso → **use em vez disso:** toast ou alerta.
-- Erro de campo → **use em vez disso:** mensagem inline e resumo.
-- Texto longo → **use em vez disso:** página ou seção expansível.
-- Tarefa complexa → **use em vez disso:** página dedicada.
-- Link externo bloqueado por confirmação → **use em vez disso:** link com aviso no texto.
-- Abertura automática sem necessidade → **use em vez disso:** conteúdo no fluxo, aberto por ação da pessoa.
+- Success message → **use instead:** toast or alert.
+- Field error → **use instead:** inline message and summary.
+- Long text → **use instead:** page or expandable section.
+- Complex task → **use instead:** dedicated page.
+- External link blocked by a confirmation → **use instead:** a link with a note in its text.
+- Unneeded automatic opening → **use instead:** content in the flow, opened by the person's action.
 
-## Faça
+## Do
 
-- Prefira página própria para tarefas longas.
-- Mostre erros no contexto.
-- Use alerta para status.
-- Mantenha a página interativa.
-- Teste o fluxo no mobile.
-- Reserve modal para exceções.
+- Prefer a dedicated page for long tasks.
+- Show errors in context.
+- Use an alert for status.
+- Keep the page interactive.
+- Test the flow on mobile.
+- Reserve modals for exceptions.
 
-## Evite
+## Avoid
 
-- Colocar um fluxo inteiro em modal.
-- Usar modal para toda mensagem.
-- Esconder conteúdo importante no modal.
-- Interromper sem ação da pessoa.
-- Exigir confirmação para abrir links.
-- Usar rolagem interna como solução padrão.
+- Putting a whole flow inside a modal.
+- Using a modal for every message.
+- Hiding important content in a modal.
+- Interrupting without any action from the person.
+- Requiring confirmation to open links.
+- Using internal scrolling as the default solution.
 
-## Acessibilidade
+## Accessibility
 
-- Se o modal for mantido, siga o padrão de diálogo: foco preso na janela, teclado previsível, fechamento claro e retorno do foco ao acionador (2.4.3, 2.1.2).
-- Use `aria-modal="true"` só quando o fundo estiver realmente inativo para todos; caso contrário a semântica pode ocultar conteúdo necessário.
-- Foco visível (2.4.7) e reflow em tela pequena e zoom (1.4.10).
-- Mensagens de status na página usam região de status, sem roubar o foco (4.1.3).
-- Teste a alternativa com teclado, zoom, leitor de tela e telas diferentes.
+- If the modal stays, follow the dialog pattern: focus trapped in the window, predictable keyboard, clear closing and focus returned to the trigger (2.4.3, 2.1.2).
+- Use `aria-modal="true"` only when the background is truly inert for everyone; otherwise the semantics can hide needed content.
+- Visible focus (2.4.7) and reflow on small screens and with zoom (1.4.10).
+- Status messages on the page use a status region and do not steal focus (4.1.3).
+- Test the alternative with keyboard, zoom, screen reader and different screens.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Sucesso sem modal | "Cliente cadastrado." |
-| Erro sem modal | "Informe um e-mail válido." |
-| Link externo | "Ver regulamento (abre em nova aba)" |
-| Decisão curta que justifica modal | "Descartar as alterações?" |
+| Success without a modal | "Customer added." |
+| Error without a modal | "Enter a valid email address." |
+| External link | "View terms (opens in a new tab)" |
+| Short decision that justifies a modal | "Discard your changes?" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A tarefa pode ser concluída na página.
-- [ ] O fluxo não tem várias etapas dentro do modal.
-- [ ] O conteúdo é curto.
-- [ ] A mensagem é realmente crítica.
-- [ ] A pessoa iniciou a ação que abre o modal.
-- [ ] Existe alternativa menos interruptiva e ela foi avaliada.
-- [ ] A página continua utilizável no mobile.
-- [ ] Links externos não passam por modal de confirmação.
-- [ ] A alternativa passou por teste com leitor de tela e teclado.
+- [ ] The task can be completed on the page.
+- [ ] The flow does not have several steps inside the modal.
+- [ ] The content is short.
+- [ ] The message is truly critical.
+- [ ] The person started the action that opens the modal.
+- [ ] A less disruptive alternative exists and was considered.
+- [ ] The page remains usable on mobile.
+- [ ] External links do not go through a confirmation modal.
+- [ ] The alternative was tested with screen reader and keyboard.
 
-## Fundamentação
+## Rationale
 
-- USWDS (Modal): avaliar outra solução primeiro; evitar em fluxos complexos, mensagens comuns, conteúdo extenso e links externos.
-- W3C WAI-ARIA APG (Dialog Modal): fundo inativo, foco, teclado e retorno ao acionador.
-- Padrão Digital GOV.BR (Modal): interrupção proposital, conteúdo conciso, ações claras.
-- IBM Carbon (fluxos de criação; notificações): criação inline e toasts como alternativas não bloqueantes.
-- GOV.UK Design System (Error summary): validação no fluxo, sem modal.
-- AMAWeb e ABNT NBR 17225: foco visível, ordem previsível e ausência de bloqueio de teclado.
+- USWDS (Modal): consider another solution first; avoid for complex flows, common messages, long content and external links.
+- W3C WAI-ARIA APG (Dialog Modal): inert background, focus, keyboard and return to trigger.
+- GOV.BR Digital Standard (Modal): deliberate interruption, concise content, clear actions.
+- IBM Carbon (creation flows; notifications): inline creation and toasts as non-blocking alternatives.
+- GOV.UK Design System (Error summary): validation in the flow, without a modal.
+- AMAWeb and ABNT NBR 17225: visible focus, predictable order and no keyboard trap.

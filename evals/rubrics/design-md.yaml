@@ -1,4 +1,4 @@
-# Rubrica: qualidade de um DESIGN.md (espelha skills/design-md, Modo C).
+# Rubric: quality of a DESIGN.md (mirrors skills/design-md, Mode C).
 id: design-md
 version: 1
 max-score: 100
@@ -11,19 +11,19 @@ bands:
 gates:
   - id: lint
     evaluator: code
-    how: "node tools/lint-design-md.mjs DESIGN.md → 0 erros"
+    how: "node tools/lint-design-md.mjs DESIGN.md → 0 errors"
   - id: fidelity
     evaluator: human
-    how: "amostra de 5 telas/arquivos não contradiz os tokens e componentes do arquivo"
+    how: "a sample of 5 screens/files does not contradict the file's tokens and components"
   - id: essential-contrast
     evaluator: code
-    how: "pares on-* e text-* sobre canvas/surface dentro do mínimo (já coberto pelo lint)"
+    how: "on-* and text-* pairs over canvas/surface within the minimum (already covered by the lint)"
   - id: connected-to-agent
     evaluator: code
-    how: "CLAUDE.md, AGENTS.md ou regra da ferramenta referencia DESIGN.md"
+    how: "CLAUDE.md, AGENTS.md or a tool rule references DESIGN.md"
   - id: no-conflict
     evaluator: judge
-    how: "nenhuma regra de ferramenta (.cursor/rules, copilot-instructions) contradiz o DESIGN.md"
+    how: "no tool rule (.cursor/rules, copilot-instructions) contradicts the DESIGN.md"
 
 criteria:
   - { id: source-fidelity,     weight: 15, evaluator: human }
@@ -38,12 +38,12 @@ criteria:
   - { id: maintenance,             weight: 3,  evaluator: code }
 
 generic-anchors:
-  # Aplique a cada critério e multiplique pela fração do peso.
-  0.0: "Ausente ou contraditório."
-  0.33: "Presente, mas genérico: o agente ainda precisaria adivinhar decisões centrais."
-  0.67: "Específico na maior parte; lacunas pontuais."
-  1.0: "Específico, verificável e com exemplos; a geração controlada não revela invenções neste critério."
+  # Apply to each criterion and multiply by the weight fraction.
+  0.0: "Missing or contradictory."
+  0.33: "Present but generic: the agent would still have to guess core decisions."
+  0.67: "Specific for the most part; isolated gaps."
+  1.0: "Specific, verifiable and with examples; controlled generation reveals no inventions on this criterion."
 
 acceptance-test:
-  description: "Geração controlada: peça uma tela nova usando só o DESIGN.md e o código; cada valor/estado/componente inventado é uma lacuna."
+  description: "Controlled generation: ask for a new screen using only the DESIGN.md and the code; every invented value/state/component is a gap."
   attempts: 3

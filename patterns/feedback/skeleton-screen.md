@@ -1,6 +1,6 @@
 ---
 id: skeleton-screen
-title: Skeleton screen melhora a percepção de carregamento?
+title: Does a skeleton screen improve perceived loading?
 category: feedback
 components: [skeleton, loading-indicator, table, card]
 type: contextual-decision
@@ -11,99 +11,99 @@ wcag: ["4.1.3", "2.3.3", "1.4.1", "2.4.3"]
 related: [skeleton-vs-spinner, long-loading, progress-percentage, empty-state]
 ---
 
-# Skeleton screen melhora a percepção de carregamento?
+# Does a skeleton screen improve perceived loading?
 
-> **Regra:** Use skeleton quando a estrutura do conteúdo for previsível e a espera for perceptível; ele melhora a percepção, não o desempenho real.
+> **Rule:** Use a skeleton when the content's structure is predictable and the wait is noticeable; it improves perception, not actual performance.
 
-## Contexto
+## Context
 
-Skeleton é um substituto que imita, de modo simplificado, a estrutura do conteúdo enquanto os dados chegam. Ele antecipa o que vai surgir e deixa uma espera moderada mais tolerável, sem encurtar o tempo real.
+A skeleton is a placeholder that imitates, in simplified form, the structure of the content while the data arrives. It anticipates what will appear and makes a moderate wait more tolerable, without shortening the real time.
 
-A escolha depende do contexto. Skeleton funciona melhor em carregamento de página ou de áreas grandes com estrutura conhecida; spinner serve para ação curta ou módulo isolado; barra de progresso serve quando o avanço é mensurável.
+The choice depends on context. A skeleton works best for loading a page or large areas with a known structure; a spinner fits a short action or an isolated module; a progress bar fits when progress is measurable.
 
-Um substituto impreciso, animado por muito tempo ou deixado na tela após uma falha piora a frustração e passa uma falsa impressão de desempenho. O ganho é perceptivo e depende de como se executa; tempo de resposta, estabilidade do layout e recuperação de erros seguem como responsabilidade do produto.
+An inaccurate placeholder, animated for too long or left on screen after a failure, makes frustration worse and gives a false impression of performance. The gain is perceptual and depends on execution; response time, layout stability and error recovery remain the product's responsibility.
 
-## Decisão
+## Decision
 
-- **SE** há espera perceptível e forma, hierarquia e tamanho do conteúdo são previsíveis **ENTÃO** use skeleton.
-- **SE** o carregamento costuma ser imediato **ENTÃO** não mostre estado intermediário, para não piscar.
-- **SE** o processo tem progresso mensurável (upload, exportação) **ENTÃO** use indicador determinado.
-- **SE** o conteúdo pode assumir formas muito diferentes ou a ação é localizada (um botão, um pequeno controle) **ENTÃO** use spinner no escopo da operação.
-- **SE** o carregamento falha **ENTÃO** substitua o skeleton por erro com recuperação.
-- **SE** o resultado é vazio **ENTÃO** substitua por estado vazio.
-- **SE** o skeleton for usado **ENTÃO** reproduza o layout final e reserve o espaço, para evitar salto visual.
-- **SENÃO** use indicador de carregamento adequado ao escopo.
+- **IF** there is a noticeable wait and the content's shape, hierarchy and size are predictable **THEN** use a skeleton.
+- **IF** loading is usually immediate **THEN** show no intermediate state, to avoid flicker.
+- **IF** the process has measurable progress (upload, export) **THEN** use a determinate indicator.
+- **IF** the content can take very different shapes or the action is localized (a button, a small control) **THEN** use a spinner within the operation's scope.
+- **IF** loading fails **THEN** replace the skeleton with an error with recovery.
+- **IF** the result is empty **THEN** replace it with an empty state.
+- **IF** a skeleton is used **THEN** reproduce the final layout and reserve the space, to avoid a visual jump.
+- **ELSE** use a loading indicator suited to the scope.
 
-## Quando usar
+## When to use
 
-- Estrutura final previsível.
-- Espera longa o bastante para justificar um estado intermediário.
-- Placeholder consegue reservar o espaço do conteúdo.
-- A página permanece reconhecível durante o carregamento.
-- Transição para o conteúdo final sem salto visual.
-- O estado pode virar erro, vazio ou sucesso.
+- A predictable final structure.
+- A wait long enough to justify an intermediate state.
+- A placeholder can reserve the content's space.
+- The page stays recognizable while loading.
+- A transition to the final content without a visual jump.
+- The state can turn into error, empty or success.
 
-## Quando evitar
+## When to avoid
 
-- Resposta quase imediata → **use em vez disso:** nenhum indicador.
-- Conteúdo de forma imprevisível → **use em vez disso:** spinner.
-- Progresso mensurável → **use em vez disso:** barra de progresso.
-- Pequeno controle ou ação momentânea → **use em vez disso:** spinner local.
-- Placeholder que esconde falha ou vazio → **use em vez disso:** estado de erro ou vazio.
-- Animação que distrai → **use em vez disso:** placeholder estático.
+- A near-immediate response → **use instead:** no indicator.
+- Content of unpredictable shape → **use instead:** a spinner.
+- Measurable progress → **use instead:** a progress bar.
+- A small control or momentary action → **use instead:** a local spinner.
+- A placeholder that hides a failure or empty result → **use instead:** an error or empty state.
+- Distracting animation → **use instead:** a static placeholder.
 
-## Faça
+## Do
 
-- Reproduza o layout final.
-- Reserve o espaço do conteúdo.
-- Mostre o estado no escopo certo.
-- Use movimento com moderação.
-- Remova o placeholder ao concluir.
-- Meça o tempo real e a percepção.
+- Reproduce the final layout.
+- Reserve the content's space.
+- Show the state in the right scope.
+- Use motion sparingly.
+- Remove the placeholder when done.
+- Measure real time and perception.
 
-## Evite
+## Avoid
 
-- Usar por padrão.
-- Simular progresso.
-- Deixar a tela vazia.
-- Animar sem fim.
-- Esconder falhas.
-- Tratar skeleton como otimização de desempenho.
+- Using it by default.
+- Simulating progress.
+- Leaving the screen blank.
+- Animating endlessly.
+- Hiding failures.
+- Treating a skeleton as a performance optimization.
 
-## Acessibilidade
+## Accessibility
 
-- Informe que a área está carregando uma única vez, sem anunciar cada placeholder.
-- Use aria-busy="true" na região durante a carga e remova ao concluir.
-- Mensagens de status via role="status", sem mover o foco (4.1.3).
-- Não se apoie só em cor, brilho ou movimento para transmitir o estado (1.4.1).
-- Respeite prefers-reduced-motion (2.3.3).
-- Mantenha a ordem de foco estável (2.4.3) e oculte linhas decorativas da leitura assistiva.
-- Valide com teclado, zoom e leitor de tela.
+- Announce that the area is loading once, without announcing each placeholder.
+- Use aria-busy="true" on the region during loading and remove it when done.
+- Status messages via role="status", without moving focus (4.1.3).
+- Do not rely only on color, shimmer or motion to convey the state (1.4.1).
+- Respect prefers-reduced-motion (2.3.3).
+- Keep a stable focus order (2.4.3) and hide decorative lines from assistive reading.
+- Validate with keyboard, zoom and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Anúncio único para leitor de tela | "Carregando pedidos" |
-| Falha | "Não foi possível carregar os pedidos. Tentar novamente" |
-| Vazio | "Você ainda não tem pedidos." |
+| Single screen reader announcement | "Loading orders" |
+| Failure | "We couldn't load the orders. Try again" |
+| Empty | "You don't have any orders yet." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O carregamento dura o bastante para justificar o skeleton.
-- [ ] O placeholder tem a mesma estrutura e o mesmo espaço do conteúdo final.
-- [ ] Não há salto de layout quando os dados chegam.
-- [ ] Falha e vazio substituem o skeleton.
-- [ ] Uploads e exportações usam progresso mensurável.
-- [ ] A animação é sutil e respeita movimento reduzido.
-- [ ] A região tem aria-busy durante a carga.
-- [ ] O leitor de tela ouve um único aviso, não um por placeholder.
-- [ ] O tempo real de carregamento também foi otimizado.
+- [ ] Loading lasts long enough to justify the skeleton.
+- [ ] The placeholder has the same structure and space as the final content.
+- [ ] There is no layout jump when the data arrives.
+- [ ] Failure and empty states replace the skeleton.
+- [ ] Uploads and exports use measurable progress.
+- [ ] The animation is subtle and respects reduced motion.
+- [ ] The region has aria-busy during loading.
+- [ ] The screen reader hears a single notice, not one per placeholder.
+- [ ] The real loading time was also optimized.
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group, skeleton screens: placeholder semelhante a wireframe, efeito na percepção, diferença para spinner e barra de progresso, risco de moldura vazia.
-- W3C WAI-ARIA, aria-busy e técnica ARIA22 (role=status): comunicar estado sem roubar foco.
-- IBM Carbon, padrões de carregamento: skeleton, indicadores e carregamento progressivo.
-- GitHub Primer, carregamento e tabela de dados: skeleton para grandes áreas e um único anúncio de carregamento.
-- Atlassian Design System, skeleton: variações básica e com shimmer, com cautela sobre animação.
+- Nielsen Norman Group, skeleton screens: a wireframe-like placeholder, its effect on perception, how it differs from a spinner and a progress bar, the risk of an empty frame.
+- W3C WAI-ARIA, aria-busy and technique ARIA22 (role=status): communicate state without stealing focus.
+- IBM Carbon, loading patterns: skeleton, indicators and progressive loading.
+- GitHub Primer, loading and data table: skeleton for large areas and a single loading announcement.
+- Atlassian Design System, skeleton: basic and shimmer variants, with caution about animation.

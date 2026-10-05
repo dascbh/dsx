@@ -1,5 +1,5 @@
-// Paridade UX.md × DESIGN.md (DSX 0.7): nota de 100 e gates, drift UX.md × produto, desvio declarado que vira
-// accepted-deviation no registro e glossário por módulo.
+// UX.md × DESIGN.md parity (DSX 0.7): 100-point score and gates, UX.md × product drift, declared deviation that
+// becomes accepted-deviation in the register, and per-module glossary.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
@@ -19,7 +19,7 @@ const NOW = new Date('2026-10-03T12:00:00Z');
 const example = readFileSync('examples/UX.md', 'utf8');
 const NO_DIR = { archetypesDir: join(tmpdir(), 'dsx-no-archetypes-dir') };
 
-// ---------- projeto sintético ----------
+// ---------- synthetic project ----------
 
 const MAP = {
   screens: [
@@ -91,34 +91,34 @@ function project(ux) {
   return { root, map: join(root, '.dsx', 'maps', 'flows-m.json'), screens: code, ux: join(root, 'UX.md') };
 }
 
-// ---------- yaml e lint ----------
+// ---------- yaml and lint ----------
 
 test('yaml-lite: block lists of maps and scalars, nested in maps', () => {
   const y = parseYaml('deviations:\n  - id: D1\n    screens: [a, b]\n    rules:\n      - T1\n      - L9\n    reason: "x, y"\n  - id: D2\n    reason: z\nother:\n- 1\n- dois\nlast: 3');
   assert.deepEqual(y.deviations, [{ id: 'D1', screens: ['a', 'b'], rules: ['T1', 'L9'], reason: 'x, y' }, { id: 'D2', reason: 'z' }]);
   assert.deepEqual(y.other, [1, 'dois']);
   assert.equal(y.last, 3);
-  assert.throws(() => parseYaml('a: 1\n- solto'), /sem chave dona|lista/);
+  assert.throws(() => parseYaml('a: 1\n- solto'), /sem chave dona|without an owning key|list/);
 });
 
 test('UX.md lint: version is semver; "alpha" warns; anything else fails', () => {
   assert.equal(lintUxMd(example, NO_DIR).warnings.some((w) => /version/.test(w)), false);
   const alpha = lintUxMd(example.replace('version: 1.4.0', 'version: alpha'), NO_DIR);
   assert.equal(alpha.ok, true);
-  assert.ok(alpha.warnings.some((w) => /versão do formato/.test(w)));
+  assert.ok(alpha.warnings.some((w) => /format version/.test(w)));
   const bad = lintUxMd(example.replace('version: 1.4.0', 'version: v2'), NO_DIR);
   assert.ok(bad.errors.some((e) => /semver/.test(e)));
 });
 
 test('UX.md lint: deviations are validated and matched against the body table', () => {
   const r = lintUxMd(example.replace('    rules: [L9]\n', '    rules: [L99]\n').replace('    decided-by: "finance"\n', ''), NO_DIR);
-  assert.ok(r.errors.some((e) => /regra "L99"/.test(e)));
-  assert.ok(r.errors.some((e) => /D3: sem decided-by/.test(e)));
+  assert.ok(r.errors.some((e) => /rule "L99"/.test(e)));
+  assert.ok(r.errors.some((e) => /D3: no decided-by/.test(e)));
   const onlyBody = lintUxMd(example.replace(/^deviations:[\s\S]*?(?=^---)/m, ''), NO_DIR);
-  assert.ok(onlyBody.warnings.some((w) => /D1, D2, D3 só no corpo/.test(w)));
+  assert.ok(onlyBody.warnings.some((w) => /D1, D2, D3 only in the body/.test(w)));
   const { deviations, errors } = parseDeviations({ D9: { screens: ['x'], rules: ['T3'], reason: 'r', 'decided-by': 'd' } });
   assert.deepEqual(errors, []);
-  assert.equal(deviations[0].id, 'D9', 'mapa id → campos também é aceito');
+  assert.equal(deviations[0].id, 'D9', 'an id → fields map is also accepted');
 });
 
 test('UX.md lint: content.glossary accepts a per-module map', () => {
@@ -130,7 +130,7 @@ test('UX.md lint: content.glossary accepts a per-module map', () => {
   assert.ok(list.errors.some((e) => /content\.glossary/.test(e)));
 });
 
-// ---------- nota ----------
+// ---------- score ----------
 
 test('score: rubric yaml and SCORE_CRITERIA are the same list and sum 100', () => {
   const rubric = parseYaml(readFileSync('evals/rubrics/ux-md.yaml', 'utf8'));
@@ -148,8 +148,8 @@ test('score: example without inventory caps coverage at half; template scores hi
   assert.equal(by.glossary.points, 10);
   assert.ok(r.score >= 80, `nota do exemplo ${r.score}`);
   assert.equal(r.gates.find((g) => g.id === 'lint').ok, true);
-  assert.equal(r.gates.find((g) => g.id === 'essential-coverage').ok, null, 'sem inventário, não verificado');
-  assert.equal(r.gates.find((g) => g.id === 'connected-to-agent').ok, true, 'AGENTS.md do DSX cita UX.md');
+  assert.equal(r.gates.find((g) => g.id === 'essential-coverage').ok, null, 'without an inventory, not checked');
+  assert.equal(r.gates.find((g) => g.id === 'connected-to-agent').ok, true, 'the DSX AGENTS.md cites UX.md');
   const t = scoreUxMd(readFileSync('templates/UX.md', 'utf8'), { now: NOW });
   assert.equal(t.band, 'high-risk');
   assert.equal(t.gates.find((g) => g.id === 'lint').ok, false);
@@ -161,13 +161,13 @@ test('score: inventory drives coverage, coverage gate, policy gate and freshness
   try {
     const r = scoreUxMd(readFileSync(p.ux, 'utf8'), { uxPath: p.ux, map: p.map, screens: p.screens, now: NOW, lastChange: { date: '2026-10-02', source: 'git', paths: [p.map] } });
     const by = Object.fromEntries(r.criteria.map((c) => [c.id, c]));
-    assert.equal(by['screen-coverage'].points, 16, '4 de 5 telas (orfa sem arquétipo)');
+    assert.equal(by['screen-coverage'].points, 16, '4 of 5 screens (orfa without an archetype)');
     assert.match(by['screen-coverage'].evidence, /4\/5/);
     assert.equal(by.freshness.points, 5, 'semver + updated, mas telas mais novas que o updated');
     const gate = Object.fromEntries(r.gates.map((g) => [g.id, g]));
     assert.equal(gate['essential-coverage'].ok, false);
     assert.match(gate['essential-coverage'].detail, /orfa/);
-    assert.equal(gate['policy-fidelity'].ok, false, 'os dois diálogos têm a ordem invertida');
+    assert.equal(gate['policy-fidelity'].ok, false, 'both dialogs have the reversed order');
     assert.equal(gate['connected-to-agent'].ok, false);
     assert.equal(r.ok, false);
   } finally { rmSync(p.root, { recursive: true, force: true }); }
@@ -185,11 +185,11 @@ test('drift: U1–U6 on a synthetic project', () => {
     assert.deepEqual(rules('U2').map((f) => f.screen), ['removida']);
     assert.equal(rules('U3').length, 1);
     assert.equal(rules('U3')[0].policy, 'actions.dialog-order');
-    assert.match(rules('U3')[0].message, /2 de 2 telas de confirmation-dialog/);
+    assert.match(rules('U3')[0].message, /2 of 2 confirmation-dialog screens/);
     assert.deepEqual(r.summary.missing_states, ['no-access']);
     assert.equal(rules('U5').length, 1);
-    assert.equal(rules('U6').length, 2, 'vencido e com tela fora do mapa');
-    assert.match(driftHeadline(r), /sem arquétipo \(orfa\)/);
+    assert.equal(rules('U6').length, 2, 'expired, and citing a screen missing from the map');
+    assert.match(driftHeadline(r), /without an archetype \(orfa\)/);
   } finally { rmSync(p.root, { recursive: true, force: true }); }
 });
 
@@ -203,7 +203,7 @@ test('drift: a deviation covering the screens silences U1 and the U3 majority; u
   } finally { rmSync(p.root, { recursive: true, force: true }); }
 });
 
-// ---------- desvio aceito no registro ----------
+// ---------- accepted deviation in the register ----------
 
 const run = (items) => ({ items: findings.assignIds(items), families: ['screen'] });
 const T2 = (screen) => ({ family: 'screen', rule: 'T2', severity: 2, element: 'button', text: 'ordem invertida', variants: [], screens: [screen], region: 'diálogo', source: [`${screen}.html:3`], message: 'ordem invertida' });
@@ -217,23 +217,23 @@ test('findings: covered item is accepted-deviation, does not count as open nor i
   assert.equal(a.status, 'accepted-deviation');
   assert.deepEqual(a.deviation, { id: 'D2', reason: 'decisão do time de compras', decided_by: 'dono', until: null });
   assert.equal(b.status, 'open');
-  assert.deepEqual(reg.deviations, devs, 'a cópia vigente fica no registro');
+  assert.deepEqual(reg.deviations, devs, 'the active copy is kept in the register');
   assert.ok(!findings.OPEN_STATUSES.includes('accepted-deviation'));
   const s = findings.summary(reg);
   assert.equal(s.by_status['accepted-deviation'], 1);
   assert.equal(s.accepted_deviation[0].deviation, 'D2');
-  // trava: item novo coberto não reprova
+  // gate: a new covered item does not fail
   const fresh = { ...T2('05-dlg-c'), screens: ['05-dlg-c'] };
   const wide = parseDeviations([{ id: 'D3', screens: ['*'], rules: ['T2'], reason: 'todas', 'decided-by': 'dono' }]).deviations;
   const c = findings.check(reg, run([fresh]), { min: 2, deviations: wide, now: NOW });
   assert.equal(c.pass, true);
   assert.equal(c.accepted.length, 1);
   assert.equal(findings.check(reg, run([fresh]), { min: 2, deviations: [], now: NOW }).pass, false);
-  // página mostra o motivo
+  // the page shows the reason
   const html = findings.renderPage(reg, { items: {} }, { items: {} }, {});
-  assert.match(html, /Desvio aceito D2/);
+  assert.match(html, /Desvio aceito D2|Accepted deviation D2/i);
   assert.match(html, /decisão do time de compras/);
-  // desvio sai do UX.md → volta a abrir
+  // deviation removed from the UX.md → it opens again
   findings.merge(reg, run([T2('03-dlg-a'), T2('04-dlg-b')]), { now: NOW, deviations: [] });
   assert.equal(reg.items.find((i) => i.screens[0] === '03-dlg-a').status, 'open');
   assert.equal(reg.items.find((i) => i.screens[0] === '03-dlg-a').deviation, undefined);
@@ -258,7 +258,7 @@ test('findings: deviationsFromUx reads the front matter; missing file keeps the 
   } finally { rmSync(p.root, { recursive: true, force: true }); }
 });
 
-// ---------- glossário por módulo ----------
+// ---------- per-module glossary ----------
 
 test('glossary: per-module map is chosen by --module, falls back to default, single path stays compatible', () => {
   const dir = mkdtempSync(join(tmpdir(), 'dsx-gloss-'));
@@ -275,11 +275,11 @@ test('glossary: per-module map is chosen by --module, falls back to default, sin
     assert.deepEqual(loadGlossary(cfg, ux).map((g) => g.term), ['Centro de custo']);
     assert.equal(glossarySource(cfg.content.glossary, 'compras').module, 'compras');
     assert.deepEqual(loadGlossary(configFrom({ content: { glossary: 'compras.md' } }), ux, 'compras').map((g) => g.term), ['Proposta', 'Nota Fiscal']);
-    // mapa termo → sinônimos continua sendo glossário único
+    // a term → synonyms map is still a single glossary
     assert.equal(isModuleGlossary({ Proposta: ['rascunho'] }), false);
-    // sem default e módulo ausente: nada
+    // no default and missing module: nothing
     assert.deepEqual(loadGlossary(configFrom({ content: { glossary: { compras: 'compras.md' } } }), ux, 'financeiro'), []);
-    // text.mjs: termo canônico com maiúscula no meio vira nome próprio no X10
+    // text.mjs: a canonical term with a capital in the middle becomes an X10 proper noun
     const nouns = glossaryProperNouns(loadGlossary(cfg, ux, 'compras'));
     assert.deepEqual(nouns, ['Nota Fiscal']);
     const html = '<!doctype html><html><body><main><h1>Gerar Nota Fiscal</h1><h2>Lista De Propostas</h2></main></body></html>';
@@ -301,10 +301,10 @@ test('audit: passes --module to text and consistency; drift is a prerequisite wa
     const fresh = r.prerequisites.find((x) => x.id === 'ux-fresh');
     assert.equal(fresh.ok, false);
     assert.equal(fresh.warning, true);
-    assert.match(fresh.detail, /^UX\.md desatualizado: .*orfa/);
+    assert.match(fresh.detail, /^UX\.md (desatualizado|out of date): .*orfa/);
     assert.ok(r.ux_drift.findings.some((f) => f.rule === 'U1'));
     const text = formatReport(r);
-    assert.match(text, /! ux-fresh: UX\.md desatualizado/);
-    assert.match(text, /UX\.md × produto/);
+    assert.match(text, /! ux-fresh: UX\.md (desatualizado|out of date)/);
+    assert.match(text, /UX\.md × (produto|product)/);
   } finally { rmSync(p.root, { recursive: true, force: true }); }
 });

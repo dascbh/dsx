@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// Valida um DESIGN.md: estrutura, referências, contraste dos pares declarados e sinais de texto vago.
-// Cobre os critérios OBJETIVOS da rubrica (gates 1 e 3 + parte de "validade técnica" e "acessibilidade").
-// Os critérios de julgamento (intenção, fidelidade à fonte) ficam com a skill dsx-design-md.
-// Uso: node tools/lint-design-md.mjs [caminho/DESIGN.md] [--json]
+// Validates a DESIGN.md: structure, references, contrast of the declared pairs and signs of vague text.
+// Covers the OBJECTIVE criteria of the rubric (gates 1 and 3 + part of "technical validity" and "accessibility").
+// The judgment criteria (intent, fidelity to the source) belong to the design-md skill.
+// Usage: node tools/lint-design-md.mjs [path/DESIGN.md] [--json]
 import { readFileSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from './lib/yaml-lite.mjs';
 import { contrast } from './lib/color.mjs';
 import { parseArgs } from './lib/cli.mjs';
 
-// Seções obrigatórias (ordem recomendada) e sinônimos aceitos em pt-BR.
+// Required sections (recommended order) and accepted pt-BR synonyms.
 export const REQUIRED_SECTIONS = [
   ['Overview', 'Visão geral'],
   ['Colors', 'Cores'],
@@ -24,7 +24,8 @@ export const RECOMMENDED_SECTIONS = [
   ['Agent Instructions', 'Instruções para agentes', 'Agent Prompt'],
 ];
 
-const VAGUE = /\b(moderno|moderna|clean|limpo|limpa|bonito|bonita|elegante|minimalista|intuitivo|intuitiva|amigável|sofisticad[oa]|premium|arrojad[oa])\b/gi;
+// Vague adjectives, pt-BR and English.
+const VAGUE = /(?<![\p{L}])(moderno|moderna|clean|limpo|limpa|bonito|bonita|elegante|minimalista|intuitivo|intuitiva|amigável|sofisticad[oa]|premium|arrojad[oa]|modern|beautiful|elegant|minimalist|intuitive|friendly|sophisticated|sleek)(?![\p{L}])/giu;
 const HEX = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9& ]/g, '').trim();
 
@@ -36,24 +37,24 @@ export function lintDesignMd(md) {
 
   // --- Front matter -------------------------------------------------------
   let fm = {};
-  if (!frontMatter) warnings.push('Sem front matter YAML: tokens não são verificáveis por máquina.');
+  if (!frontMatter) warnings.push('No YAML front matter: tokens cannot be checked by machine.');
   else {
-    try { fm = parseYaml(frontMatter); } catch (e) { errors.push(`Front matter inválido: ${e.message}`); }
+    try { fm = parseYaml(frontMatter); } catch (e) { errors.push(`Invalid front matter: ${e.message}`); }
   }
   const colors = fm.colors ?? {};
-  if (frontMatter && !fm.colors) errors.push('Front matter sem grupo "colors".');
-  if (frontMatter && !fm.typography) errors.push('Front matter sem grupo "typography".');
-  if (frontMatter && !fm.owner) warnings.push('Sem "owner": defina quem mantém o arquivo.');
-  if (frontMatter && !fm.updated) warnings.push('Sem "updated": registre a data da última revisão.');
+  if (frontMatter && !fm.colors) errors.push('Front matter without a "colors" group.');
+  if (frontMatter && !fm.typography) errors.push('Front matter without a "typography" group.');
+  if (frontMatter && !fm.owner) warnings.push('No "owner": state who maintains the file.');
+  if (frontMatter && !fm.updated) warnings.push('No "updated": record the date of the last review.');
 
   const fmPlaceholders = (frontMatter ?? '').split('\n').filter((l) => !/^\s*#/.test(l) && /<[^>]+>/.test(l));
-  if (fmPlaceholders.length) errors.push(`Front matter com ${fmPlaceholders.length} placeholder(s) não preenchido(s), ex.: "${fmPlaceholders[0].trim()}"`);
+  if (fmPlaceholders.length) errors.push(`Front matter with ${fmPlaceholders.length} unfilled placeholder(s), e.g. "${fmPlaceholders[0].trim()}"`);
 
   for (const [k, v] of Object.entries(colors)) {
-    if (typeof v === 'string' && !v.startsWith('{') && !HEX.test(v) && !/<[^>]+>/.test(v)) errors.push(`colors.${k}: valor "${v}" não é hex válido.`);
+    if (typeof v === 'string' && !v.startsWith('{') && !HEX.test(v) && !/<[^>]+>/.test(v)) errors.push(`colors.${k}: value "${v}" is not a valid hex.`);
   }
 
-  // Resolve referências {grupo.chave}
+  // Resolves {group.key} references
   const lookup = (path) => path.split('.').reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), fm);
   const refs = [];
   const walk = (o, p) => {
@@ -63,17 +64,17 @@ export function lintDesignMd(md) {
     }
   };
   walk(fm, '');
-  for (const r of refs) if (lookup(r.ref) === undefined) errors.push(`Referência quebrada em ${r.at}: {${r.ref}}`);
+  for (const r of refs) if (lookup(r.ref) === undefined) errors.push(`Broken reference in ${r.at}: {${r.ref}}`);
   info.references = refs.length;
 
-  // Componentes com valor cru em vez de referência
+  // Components with a raw value instead of a reference
   for (const [name, def] of Object.entries(fm.components ?? {})) {
     for (const [prop, v] of Object.entries(def ?? {})) {
-      if (/color/i.test(prop) && typeof v === 'string' && HEX.test(v)) warnings.push(`components.${name}.${prop} usa cor crua (${v}); referencie {colors.*}.`);
+      if (/color/i.test(prop) && typeof v === 'string' && HEX.test(v)) warnings.push(`components.${name}.${prop} uses a raw color (${v}); reference {colors.*}.`);
     }
   }
 
-  // --- Contraste ----------------------------------------------------------
+  // --- Contrast ------------------------------------------------------------
   const resolveColor = (v) => {
     for (let i = 0; i < 5 && typeof v === 'string' && v.startsWith('{'); i++) v = lookup(v.slice(1, -1));
     return typeof v === 'string' && HEX.test(v) && v.length <= 7 ? v : null;
@@ -92,52 +93,52 @@ export function lintDesignMd(md) {
     if (!a || !b) continue;
     const ratio = +contrast(a, b).toFixed(2);
     info.contrast_pairs.push({ fg, bg, ratio, min, ok: ratio >= min });
-    if (ratio < min) errors.push(`Contraste insuficiente: ${fg} sobre ${bg} = ${ratio}:1 (mínimo ${min}:1).`);
+    if (ratio < min) errors.push(`Insufficient contrast: ${fg} on ${bg} = ${ratio}:1 (minimum ${min}:1).`);
   }
 
-  // --- Tipografia e espaçamento -------------------------------------------
+  // --- Typography and spacing ---------------------------------------------
   const px = (v) => (typeof v === 'string' ? parseFloat(v) : typeof v === 'number' ? v : NaN);
   const bodyType = fm.typography?.body;
   if (bodyType) {
     if (px(bodyType.fontSize) < 14) warnings.push(`typography.body.fontSize ${bodyType.fontSize} < 14px.`);
     if (Number(bodyType.lineHeight) < 1.4) warnings.push(`typography.body.lineHeight ${bodyType.lineHeight} < 1.4.`);
-  } else if (fm.typography) warnings.push('typography sem nível "body".');
+  } else if (fm.typography) warnings.push('typography without a "body" level.');
   for (const [k, v] of Object.entries(fm.spacing ?? {})) {
     const n = px(v);
-    if (!Number.isNaN(n) && n % 4 !== 0 && n !== 2) warnings.push(`spacing.${k} = ${v} fora da grade de 4px.`);
+    if (!Number.isNaN(n) && n % 4 !== 0 && n !== 2) warnings.push(`spacing.${k} = ${v} off the 4px grid.`);
   }
 
-  // --- Corpo --------------------------------------------------------------
+  // --- Body ----------------------------------------------------------------
   const headings = [...body.matchAll(/^##\s+(.+)$/gm)].map((m) => m[1].trim());
   const hasSection = (aliases) => headings.find((h) => aliases.some((a) => norm(h) === norm(a)));
   info.sections = headings;
-  for (const aliases of REQUIRED_SECTIONS) if (!hasSection(aliases)) errors.push(`Seção obrigatória ausente: "## ${aliases[0]}"`);
-  for (const aliases of RECOMMENDED_SECTIONS) if (!hasSection(aliases)) warnings.push(`Seção recomendada ausente: "## ${aliases[0]}"`);
+  for (const aliases of REQUIRED_SECTIONS) if (!hasSection(aliases)) errors.push(`Missing required section: "## ${aliases[0]}"`);
+  for (const aliases of RECOMMENDED_SECTIONS) if (!hasSection(aliases)) warnings.push(`Missing recommended section: "## ${aliases[0]}"`);
 
-  // Seções vazias (só comentários) e placeholders
+  // Empty sections (comments only) and placeholders
   const sections = body.split(/^##\s+/m).slice(1);
   for (const s of sections) {
     const [title, ...rest] = s.split('\n');
     const content = rest.join('\n').replace(/<!--[\s\S]*?-->/g, '').trim();
-    if (!content || /^(\*\*[^*]+\*\*\s*|-\s*<[^>]+>\s*)+$/.test(content)) errors.push(`Seção "${title.trim()}" está vazia.`);
+    if (!content || /^(\*\*[^*]+\*\*\s*|-\s*<[^>]+>\s*)+$/.test(content)) errors.push(`Section "${title.trim()}" is empty.`);
   }
   const bodyNoComments = body.replace(/<!--[\s\S]*?-->/g, '').replace(/`[^`]*`/g, '');
   const ph = bodyNoComments.match(/<(?!\/?(?:br|kbd|abbr|code)\b)[a-zà-ú][^>]{1,60}>/gi);
-  if (ph) errors.push(`Corpo com ${ph.length} placeholder(s) não preenchido(s), ex.: ${ph[0]}`);
+  if (ph) errors.push(`Body with ${ph.length} unfilled placeholder(s), e.g. ${ph[0]}`);
 
-  // Do's / Don'ts com pelo menos 3 itens cada
+  // Do's / Don'ts with at least 3 items each
   const dd = sections.find((s) => /do|faça/i.test(s.split('\n')[0]) && /don|não faça|evite/i.test(s.split('\n')[0]));
   if (dd) {
-    const [dos, donts] = dd.split(/\*\*(?:Não faça|Evite|Don'?ts?)\*\*/i);
+    const [dos, donts] = dd.split(/\*\*(?:Não faça|Evite|Don'?ts?)\*\*|^#{3,6}\s*(?:Não faça|Evite|Don'?ts?)\s*$/im);
     const count = (t) => (t ?? '').split('\n').filter((l) => /^\s*[-*]\s+\S/.test(l)).length;
-    if (count(dos) < 3) warnings.push(`Do's com ${count(dos)} item(ns); recomendado ≥ 3, derivados de erros reais.`);
-    if (donts === undefined) warnings.push('Não encontrei o bloco "**Não faça**" dentro de Do\'s and Don\'ts.');
-    else if (count(donts) < 3) warnings.push(`Don'ts com ${count(donts)} item(ns); recomendado ≥ 3.`);
+    if (count(dos) < 3) warnings.push(`Do's with ${count(dos)} item(s); ≥ 3 recommended, drawn from real mistakes.`);
+    if (donts === undefined) warnings.push('No "**Don\'t**" block found inside Do\'s and Don\'ts.');
+    else if (count(donts) < 3) warnings.push(`Don'ts with ${count(donts)} item(s); ≥ 3 recommended.`);
   }
 
-  // Adjetivos vagos sem critério
+  // Vague adjectives with no criterion
   const vague = [...new Set((bodyNoComments.match(VAGUE) ?? []).map((w) => w.toLowerCase()))];
-  if (vague.length) warnings.push(`Adjetivos vagos no corpo (${vague.join(', ')}): troque por critérios observáveis.`);
+  if (vague.length) warnings.push(`Vague adjectives in the body (${vague.join(', ')}): replace them with observable criteria.`);
 
   return { ok: errors.length === 0, errors, warnings, info };
 }
@@ -149,11 +150,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (a.json) console.log(JSON.stringify(result, null, 2));
   else {
     console.log(`DESIGN.md: ${file}`);
-    for (const e of result.errors) console.log(`  ERRO   ${e}`);
-    for (const w of result.warnings) console.log(`  AVISO  ${w}`);
+    for (const e of result.errors) console.log(`  ERROR   ${e}`);
+    for (const w of result.warnings) console.log(`  WARNING ${w}`);
     const p = result.info.contrast_pairs ?? [];
-    console.log(`\n  ${result.info.sections?.length ?? 0} seções · ${result.info.references ?? 0} referências · ${p.filter((x) => x.ok).length}/${p.length} pares de contraste OK`);
-    console.log(result.ok ? '  Gates objetivos: APROVADO' : `  Gates objetivos: REPROVADO (${result.errors.length} erro(s))`);
+    console.log(`\n  ${result.info.sections?.length ?? 0} sections · ${result.info.references ?? 0} references · ${p.filter((x) => x.ok).length}/${p.length} contrast pairs OK`);
+    console.log(result.ok ? '  Objective gates: PASSED' : `  Objective gates: FAILED (${result.errors.length} error(s))`);
   }
   process.exit(result.ok ? 0 : 1);
 }

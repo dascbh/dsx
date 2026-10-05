@@ -1,6 +1,6 @@
 ---
 id: form-errors
-title: Como estruturar mensagens de erro em formulários?
+title: How do you structure error messages in forms?
 category: forms
 components: [form-field, error-message, error-summary]
 type: accessibility
@@ -11,94 +11,94 @@ wcag: ["3.3.1", "3.3.3", "1.4.1", "1.3.1", "4.1.3"]
 related: [helpful-error-message, preserve-data-after-error, validation-timing, not-color-alone, required-fields]
 ---
 
-# Como estruturar mensagens de erro em formulários?
+# How do you structure error messages in forms?
 
-> **Regra:** Toda mensagem de erro de campo nomeia o campo pelo rótulo, descreve o problema, diz como corrigir, fica ligada ao controle e não apaga o que a pessoa digitou.
+> **Rule:** Every field error message names the field by its label, describes the problem, says how to fix it, is tied to the control and does not erase what the person typed.
 
-## Contexto
+## Context
 
-Durante ou após o envio, a pessoa pode informar dados ausentes, inválidos ou incompatíveis com as regras. Ela precisa identificar o problema, entender a correção e retomar a tarefa sem redigitar tudo.
+During or after submitting, the person may enter data that is missing, invalid or incompatible with the rules. They need to identify the problem, understand the fix and resume the task without retyping everything.
 
-"Ocorreu um erro" obriga a investigar; uma mensagem que cita o campo, explica o que falhou e aponta o próximo passo transforma a falha em ação. Isso reduz retrabalho e ajuda quem tem limitação visual, cognitiva ou de linguagem.
+"An error occurred" forces them to investigate; a message that names the field, explains what failed and points to the next step turns the failure into an action. This reduces rework and helps people with visual, cognitive or language limitations.
 
-Formatos, limites e requisitos previsíveis devem ser explicados antes do erro, na dica do campo.
+Predictable formats, limits and requirements should be explained before the error, in the field hint.
 
-## Decisão
+## Decision
 
-- **SE** o sistema detecta entrada ausente, fora do formato ou fora dos valores permitidos **ENTÃO** mostre mensagem junto ao campo.
-- **SE** há vários erros **ENTÃO** repita as mensagens em resumo no início do formulário.
-- **SE** o formato ou limite é previsível **ENTÃO** explique antes, na dica.
-- **SE** existe correção conhecida **ENTÃO** sugira-a, salvo risco de segurança.
-- **SE** a falha é de serviço, permissão ou elegibilidade **ENTÃO** não use erro de campo; use comunicação própria com próximos passos.
-- **SE** a correção exige consulta ou edição **ENTÃO** não use alerta temporário.
-- **SE** a pessoa ainda não teve chance razoável de preencher **ENTÃO** não acuse erro.
-- **SENÃO** valide ao tentar avançar ou enviar.
+- **IF** the system detects missing input, a wrong format or a value outside the allowed ones **THEN** show a message next to the field.
+- **IF** there are several errors **THEN** repeat the messages in a summary at the start of the form.
+- **IF** the format or limit is predictable **THEN** explain it beforehand, in the hint.
+- **IF** a fix is known **THEN** suggest it, unless that is a security risk.
+- **IF** the failure is about the service, permission or eligibility **THEN** do not use a field error; use dedicated communication with next steps.
+- **IF** the fix requires looking something up or editing **THEN** do not use a temporary alert.
+- **IF** the person has not yet had a reasonable chance to fill in the field **THEN** do not flag an error.
+- **ELSE** validate when the person tries to move on or submit.
 
-## Quando usar
+## When to use
 
-- Campo obrigatório vazio.
-- Formato incorreto (e-mail, data).
-- Número fora do intervalo ou opção não permitida.
-- Combinação de valores que o sistema consegue explicar.
+- An empty required field.
+- A wrong format (email, date).
+- A number out of range or an option that is not allowed.
+- A combination of values the system can explain.
 
-## Quando evitar
+## When to avoid
 
-- Problemas que a pessoa não resolve alterando a entrada → **use em vez disso:** mensagem de serviço com contexto e próximo passo.
-- Toast para erro que exige correção → **use em vez disso:** mensagem inline persistente.
-- Tratar mensagem inline, foco e momento como regra universal → **use em vez disso:** testar no fluxo real.
+- Problems the person cannot solve by changing the input → **use instead:** a service message with context and a next step.
+- A toast for an error that requires a fix → **use instead:** a persistent inline message.
+- Treating inline message, focus and timing as a universal rule → **use instead:** testing in the real flow.
 
-## Faça
+## Do
 
-- Nomeie o campo com o mesmo texto do rótulo.
-- Descreva o que foi aceito ou rejeitado.
-- Indique ação concreta.
-- Preserve os valores digitados.
-- Mantenha a mensagem visível até a correção.
+- Name the field with the same text as the label.
+- Describe what was accepted or rejected.
+- Point to a concrete action.
+- Preserve the typed values.
+- Keep the message visible until it is fixed.
 
-## Evite
+## Avoid
 
-- Mensagens vagas.
-- Depender só de cor.
-- Validar cedo demais.
-- Apagar dados.
-- Confundir erro de entrada com falha do serviço.
-- Fazer a mensagem sumir sozinha.
+- Vague messages.
+- Relying only on color.
+- Validating too early.
+- Erasing data.
+- Confusing an input error with a service failure.
+- Making the message disappear on its own.
 
-## Acessibilidade
+## Accessibility
 
-- Erro detectado automaticamente é identificado e descrito em texto (3.3.1); correção sugerida quando conhecida (3.3.3).
-- Cor não é o único sinal (1.4.1).
-- Vincule a mensagem por `aria-describedby` ou `aria-errormessage`; aplique `aria-invalid="true"` quando o valor foi tido como inválido, e não apenas porque o campo obrigatório está vazio antes do envio.
-- Mensagens dinâmicas em região ao vivo; `role="alert"` só para o realmente importante e sem mover o foco (4.1.3).
-- O resumo deve permitir navegar a cada campo.
+- An automatically detected error is identified and described in text (3.3.1); a fix is suggested when known (3.3.3).
+- Color is not the only signal (1.4.1).
+- Link the message with `aria-describedby` or `aria-errormessage`; apply `aria-invalid="true"` when the value was judged invalid, not merely because a required field is empty before submitting.
+- Dynamic messages in a live region; `role="alert"` only for what is truly important, without moving focus (4.1.3).
+- The summary must allow navigating to each field.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Obrigatório vazio | "Informe seu e-mail." |
-| Formato | "Digite o e-mail no formato nome@empresa.com.br." |
-| Intervalo | "A quantidade deve ser entre 1 e 10." |
-| Data | "Informe uma data a partir de hoje." |
-| Evitar | "Entrada inválida." |
+| Empty required field | "Enter your email." |
+| Format | "Enter the email in the format name@company.com." |
+| Range | "The quantity must be between 1 and 10." |
+| Date | "Enter a date from today onward." |
+| Avoid | "Invalid input." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O texto identifica o campo.
-- [ ] A mensagem explica o problema.
-- [ ] A mensagem indica como corrigir.
-- [ ] O erro não depende só de cor ou ícone.
-- [ ] A mensagem está associada ao campo por atributo ARIA.
-- [ ] Os dados digitados são preservados.
-- [ ] O resumo, quando existe, tem links para os campos.
-- [ ] O erro não aparece antes de uma tentativa razoável.
-- [ ] Foi testado com teclado, zoom e leitor de tela.
+- [ ] The text identifies the field.
+- [ ] The message explains the problem.
+- [ ] The message says how to fix it.
+- [ ] The error does not rely only on color or icon.
+- [ ] The message is associated with the field through an ARIA attribute.
+- [ ] Typed data is preserved.
+- [ ] The summary, when present, has links to the fields.
+- [ ] The error does not appear before a reasonable attempt.
+- [ ] Tested with keyboard, zoom and screen reader.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2: 3.3.1 (identificação de erro), 3.3.3 (sugestão de correção), 1.4.1 (cor), 1.3.1 (relações).
-- WAI-ARIA 1.2 (aria-invalid, aria-errormessage) e padrão Alert do APG.
-- GOV.UK Design System (Error message, Error summary): proximidade, resumo vinculado, não apagar valores.
-- Nielsen Norman Group (diretrizes de mensagens de erro; heurística 9): linguagem humana, problema preciso, sugestão construtiva.
-- Padrão Digital GOV.BR (Message, Input) e Adobe Spectrum (escrita para erros).
-- CMS Design System (Error validation) e AMAWeb.
+- WCAG 2.2: 3.3.1 (error identification), 3.3.3 (error suggestion), 1.4.1 (color), 1.3.1 (relationships).
+- WAI-ARIA 1.2 (aria-invalid, aria-errormessage) and the APG Alert pattern.
+- GOV.UK Design System (Error message, Error summary): proximity, linked summary, do not erase values.
+- Nielsen Norman Group (error message guidelines; heuristic 9): human language, precise problem, constructive suggestion.
+- GOV.BR Digital Standard (Message, Input) and Adobe Spectrum (writing for errors).
+- CMS Design System (Error validation) and AMAWeb.

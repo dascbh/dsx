@@ -1,6 +1,6 @@
 ---
 id: confirm-password
-title: Quando pedir confirmação de senha?
+title: When should you ask for password confirmation?
 category: authentication
 components: [password-field, show-password, reauthentication, mfa]
 type: contextual-decision
@@ -11,102 +11,102 @@ wcag: ["3.3.8", "1.3.5", "3.3.2"]
 related: [show-password, password-requirements, password-recovery, preserve-data-after-error]
 ---
 
-# Quando pedir confirmação de senha?
+# When should you ask for password confirmation?
 
-> **Regra:** Não repita o campo de senha por padrão; use um único campo com "mostrar senha" na criação e reautentique apenas antes de ações sensíveis.
+> **Rule:** Do not repeat the password field by default; use a single field with "show password" when creating a password, and reauthenticate only before sensitive actions.
 
-## Contexto
+## Context
 
-"Confirmar senha" tem dois sentidos distintos: digitar de novo uma senha nova para flagrar erro de digitação, ou comprovar a identidade outra vez antes de uma ação sensível. As regras diferem e não devem ser misturadas.
+"Confirm password" means two different things: typing a new password again to catch a typo, or proving identity again before a sensitive action. The rules differ and should not be mixed.
 
-Na criação ou redefinição, o segundo campo soma esforço e atrapalha gerenciadores de senha. Repetir não garante senha melhor: a pessoa pode colar o mesmo valor, repetir o mesmo erro ou abandonar o fluxo.
+When creating or resetting a password, the second field adds effort and gets in the way of password managers. Repeating it does not produce a better password: people may paste the same value, repeat the same mistake or abandon the flow.
 
-Em alterações críticas, uma sessão aberta não prova que quem está na frente da tela é a titular. Ali, a reautenticação proporcional ao risco é o que protege a conta.
+For critical changes, an open session does not prove that the person in front of the screen is the account holder. There, reauthentication proportional to the risk is what protects the account.
 
-## Decisão
+## Decision
 
-- **SE** a pessoa está criando ou redefinindo a senha **ENTÃO** use um único campo com alternância mostrar/ocultar, requisitos visíveis e validação clara.
-- **SE** testes mostrarem erros relevantes de digitação mesmo com "mostrar senha" **ENTÃO** adicione "Confirmar nova senha".
-- **SE** a ação é sensível (alterar senha, e-mail principal, recuperação, MFA, dados financeiros, permissões) **ENTÃO** reautentique no momento da ação.
-- **SE** a conta usa senha e o risco é moderado **ENTÃO** peça a senha atual.
-- **SE** o risco é alto **ENTÃO** exija um fator adicional ou autenticação resistente a phishing.
-- **SE** houve autenticação forte recente e ainda válida **ENTÃO** não peça de novo.
-- **SE** a ação é rotineira e de baixo risco **ENTÃO** não peça credencial.
-- **SENÃO** um campo único de senha.
+- **IF** the person is creating or resetting the password **THEN** use a single field with a show/hide toggle, visible requirements and clear validation.
+- **IF** testing shows relevant typing errors even with "show password" **THEN** add "Confirm new password".
+- **IF** the action is sensitive (changing the password, primary email, recovery methods, MFA, financial data, permissions) **THEN** reauthenticate at the moment of the action.
+- **IF** the account uses a password and the risk is moderate **THEN** ask for the current password.
+- **IF** the risk is high **THEN** require an additional factor or phishing-resistant authentication.
+- **IF** there was a recent strong authentication that is still valid **THEN** do not ask again.
+- **IF** the action is routine and low risk **THEN** do not ask for credentials.
+- **ELSE** a single password field.
 
-## Quando usar
+## When to use
 
-- Troca de senha, do e-mail principal ou dos métodos de recuperação.
-- Desativar MFA ou adicionar dispositivo confiável.
-- Ver ou modificar dados muito sensíveis.
-- Transações e permissões de alto impacto.
-- Após inatividade, recuperação de conta ou atividade suspeita.
+- Changing the password, the primary email or recovery methods.
+- Turning off MFA or adding a trusted device.
+- Viewing or changing highly sensitive data.
+- High-impact transactions and permissions.
+- After inactivity, account recovery or suspicious activity.
 
-## Quando evitar
+## When to avoid
 
-- Segundo campo obrigatório em todo cadastro → **use em vez disso:** campo único com mostrar senha.
-- Ações rotineiras de baixo risco → **use em vez disso:** nenhuma verificação adicional.
-- Logo após autenticação forte válida → **use em vez disso:** reaproveitar a sessão de maior confiança por um período.
-- Quando a senha não é o melhor fator → **use em vez disso:** MFA ou outro fator.
-- Quando a repetição bloqueia gerenciadores → **use em vez disso:** campo único.
+- A mandatory second field on every sign-up → **use instead:** a single field with show password.
+- Routine, low-risk actions → **use instead:** no additional verification.
+- Right after a valid strong authentication → **use instead:** reuse the higher-trust session for a period.
+- When the password is not the best factor → **use instead:** MFA or another factor.
+- When repetition blocks password managers → **use instead:** a single field.
 
-## Faça
+## Do
 
-- Defina o risco da ação antes de escolher o mecanismo.
-- Explique o motivo antes do campo.
-- Use rótulos separados para "Senha atual", "Nova senha" e, só se for indispensável, "Confirmar nova senha".
-- Permita colar e aceite gerenciadores de senha.
-- Valide a correspondência sem apagar os valores digitados.
-- Mostre o erro junto ao campo.
-- Confirme o resultado e notifique por canal confiável após mudança crítica.
+- Define the risk of the action before choosing the mechanism.
+- Explain why before the field.
+- Use separate labels for "Current password", "New password" and, only if essential, "Confirm new password".
+- Allow pasting and support password managers.
+- Validate the match without clearing what was typed.
+- Show the error next to the field.
+- Confirm the result and notify through a trusted channel after a critical change.
 
-## Evite
+## Avoid
 
-- Repetir o campo por padrão.
-- Bloquear colar.
-- Pedir senha em excesso.
-- Confundir senha atual com nova.
-- Depender só da sessão aberta para ações críticas.
-- Apagar valores após erro.
-- Revelar credenciais em mensagens.
+- Repeating the field by default.
+- Blocking paste.
+- Asking for the password too often.
+- Confusing the current password with the new one.
+- Relying only on the open session for critical actions.
+- Clearing values after an error.
+- Revealing credentials in messages.
 
-## Acessibilidade
+## Accessibility
 
-- Mantenha rótulos visíveis e específicos; não dependa só da posição dos campos (3.3.2).
-- Não bloqueie copiar, colar, preenchimento automático nem gerenciadores; autenticação não deve exigir memorização ou transcrição sem alternativa (3.3.8).
-- Use autocomplete="current-password" na senha existente e autocomplete="new-password" na nova senha e em sua confirmação (1.3.5).
-- Associe requisitos e erros ao campo e anuncie mudanças sem interromper a digitação.
-- O botão de mostrar senha precisa de nome acessível específico e comunicar seu estado.
-- Preserve o foco e teste teclado, leitor de tela, zoom, contraste e mobile.
+- Keep labels visible and specific; do not rely only on field position (3.3.2).
+- Do not block copy, paste, autofill or password managers; authentication must not require memorizing or transcribing without an alternative (3.3.8).
+- Use autocomplete="current-password" on the existing password and autocomplete="new-password" on the new password and its confirmation (1.3.5).
+- Associate requirements and errors with the field and announce changes without interrupting typing.
+- The show-password button needs a specific accessible name and must convey its state.
+- Preserve focus and test with keyboard, screen reader, zoom, contrast and mobile.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Motivo da reautenticação | "Por segurança, confirme sua senha atual para alterar o e-mail." |
-| Rótulos | "Senha atual", "Nova senha", "Confirmar nova senha" |
-| Divergência | "As senhas não coincidem. Confira a nova senha e tente de novo." |
-| Botão | "Confirmar e alterar e-mail" |
-| Pós-alteração | "Senha alterada. Enviamos um aviso para o seu e-mail." |
+| Reason for reauthentication | "For your security, confirm your current password to change your email." |
+| Labels | "Current password", "New password", "Confirm new password" |
+| Mismatch | "The passwords don't match. Check the new password and try again." |
+| Button | "Confirm and change email" |
+| After the change | "Password changed. We sent a notice to your email." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O fluxo distingue revisar uma senha nova de reautenticar.
-- [ ] A criação de senha usa um único campo com mostrar/ocultar, salvo evidência de teste em contrário.
-- [ ] A reautenticação ocorre junto da ação sensível.
-- [ ] O motivo da confirmação aparece antes do campo.
-- [ ] Colar e gerenciadores de senha funcionam.
-- [ ] Os valores de autocomplete são current-password e new-password.
-- [ ] O erro de divergência não apaga os valores.
-- [ ] O botão de mostrar senha tem nome acessível e estado.
-- [ ] Mudanças críticas geram confirmação e notificação.
+- [ ] The flow distinguishes checking a new password from reauthenticating.
+- [ ] Password creation uses a single field with show/hide, unless test evidence says otherwise.
+- [ ] Reauthentication happens right at the sensitive action.
+- [ ] The reason for the confirmation appears before the field.
+- [ ] Paste and password managers work.
+- [ ] The autocomplete values are current-password and new-password.
+- [ ] A mismatch error does not clear the values.
+- [ ] The show-password button has an accessible name and state.
+- [ ] Critical changes produce a confirmation and a notification.
 
-## Fundamentação
+## Rationale
 
-- Padrão de campo de senha do GOV.UK Design System: evitar o campo "confirmar senha", sobretudo com mostrar/ocultar.
-- OWASP, guias de autenticação e MFA: pedir nova autenticação após eventos de risco e antes de ações críticas; exigir MFA em ações sensíveis.
-- NIST SP 800-63B, reautenticação: frequência e força conforme risco e nível de garantia.
-- WCAG 2.2, critério 3.3.8: autenticação sem exigir memorização ou transcrição.
-- WCAG 2.2, critério 1.3.5: propósito de entrada identificável (current-password, new-password).
-- Adobe Spectrum, campo de texto: requisitos junto ao campo para reduzir erros.
-- Documentação pública de grandes produtos sobre modo de reautenticação e verificação para ações sensíveis: reautenticar só diante de risco e manter confiança temporária.
+- GOV.UK Design System password input pattern: avoid the "confirm password" field, especially with show/hide.
+- OWASP authentication and MFA guidance: require new authentication after risk events and before critical actions; require MFA for sensitive actions.
+- NIST SP 800-63B, reauthentication: frequency and strength according to risk and assurance level.
+- WCAG 2.2, criterion 3.3.8: authentication without requiring memorization or transcription.
+- WCAG 2.2, criterion 1.3.5: identifiable input purpose (current-password, new-password).
+- Adobe Spectrum, text field: requirements next to the field to reduce errors.
+- Public documentation of large products on reauthentication mode and verification for sensitive actions: reauthenticate only when there is risk and keep temporary trust.

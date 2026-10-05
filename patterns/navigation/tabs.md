@@ -1,6 +1,6 @@
 ---
 id: tabs
-title: Quando usar abas?
+title: When should you use tabs?
 category: navigation
 components: [tabs, tablist, panel]
 type: recommendation
@@ -11,102 +11,102 @@ wcag: ["4.1.2", "2.1.1", "1.4.11", "2.4.7", "1.4.10"]
 related: [breadcrumbs, carousel, main-navigation, filter-structure]
 ---
 
-# Quando usar abas?
+# When should you use tabs?
 
-> **Regra:** Use abas só para poucos conteúdos relacionados, de mesma importância e independentes o bastante para serem vistos um de cada vez.
+> **Rule:** Use tabs only for a few related contents of equal importance that are independent enough to be seen one at a time.
 
-## Contexto
+## Context
 
-Abas alternam painéis dentro do mesmo contexto, mostrando um por vez. Compactam a interface, mas escondem conteúdo: a pessoa precisa deduzir pelo rótulo o que há em cada painel e lembrar o que viu ao alternar.
+Tabs switch panels within the same context, showing one at a time. They compact the interface but hide content: the person has to infer from the label what each panel holds and remember what they saw when switching.
 
-A escolha depende da relação entre os conteúdos e da tarefa, não da quantidade de texto. Quando os grupos são relacionados e os rótulos claros, o componente reduz a sobrecarga visual; quando são diferentes, numerosos ou exigem comparação, a alternância custa caro.
+The choice depends on the relationship between the contents and on the task, not on the amount of text. When the groups are related and the labels clear, the component reduces visual overload; when they are different, numerous or need comparison, switching is costly.
 
-Nem toda faixa horizontal é aba. Filtros, carrosséis, paginação e indicadores de progresso traduzem relações distintas.
+Not every horizontal strip is a set of tabs. Filters, carousels, pagination and progress indicators express different relationships.
 
-## Decisão
+## Decision
 
-- **SE** os conteúdos são visões equivalentes do mesmo objeto, área ou tarefa **ENTÃO** use abas.
-- **SE** os grupos não têm relação direta **ENTÃO** use navegação própria, links ou páginas separadas.
-- **SE** os itens são etapas de um processo **ENTÃO** use indicador de progresso, não abas.
-- **SE** a pessoa precisa comparar conteúdos **ENTÃO** mostre-os juntos.
-- **SE** o conteúdo é crítico para concluir a tarefa **ENTÃO** deixe visível, fora das abas.
-- **SE** as abas são filtros ou modos do mesmo conjunto de dados **ENTÃO** use controle de filtro ou segmentado.
-- **SE** a lista de abas cresce ou os rótulos ficam longos **ENTÃO** reavalie: página aberta ou acordeão.
-- **SE** o painel carrega sem atraso perceptível **ENTÃO** ative a aba ao receber foco.
-- **SE** há carregamento ou consulta demorada **ENTÃO** use ativação manual (Enter ou Espaço).
-- **SE** as abas levam a páginas diferentes **ENTÃO** use links com URLs reais e indique a página atual.
-- **SENÃO** abra a aba mais útil para a maioria como padrão.
+- **IF** the contents are equivalent views of the same object, area or task **THEN** use tabs.
+- **IF** the groups have no direct relationship **THEN** use dedicated navigation, links or separate pages.
+- **IF** the items are steps of a process **THEN** use a progress indicator, not tabs.
+- **IF** the person needs to compare contents **THEN** show them together.
+- **IF** the content is critical to completing the task **THEN** leave it visible, outside the tabs.
+- **IF** the tabs are filters or modes of the same data set **THEN** use a filter or segmented control.
+- **IF** the tab list grows or the labels get long **THEN** reconsider: an open page or an accordion.
+- **IF** the panel loads without noticeable delay **THEN** activate the tab when it receives focus.
+- **IF** there is loading or a slow lookup **THEN** use manual activation (Enter or Space).
+- **IF** the tabs lead to different pages **THEN** use links with real URLs and indicate the current page.
+- **ELSE** open the tab most useful to most people by default.
 
-## Quando usar
+## When to use
 
-- Configurações relacionadas do mesmo objeto.
-- Visões equivalentes de um painel.
-- Poucas categorias do mesmo assunto.
-- Detalhes complementares que não precisam aparecer juntos.
-- Painéis que carregam sem perder estado.
+- Related settings of the same object.
+- Equivalent views of a dashboard.
+- A few categories on the same subject.
+- Complementary details that do not need to appear together.
+- Panels that load without losing state.
 
-## Quando evitar
+## When to avoid
 
-- Etapas obrigatórias → **use em vez disso:** indicador de progresso ou formulário em etapas.
-- Comparação simultânea → **use em vez disso:** conteúdo lado a lado.
-- Seções essenciais de página de produto → **use em vez disso:** seções expandidas ou acordeão.
-- Listas longas de destinos diferentes → **use em vez disso:** navegação principal.
-- Abas dentro de abas → **use em vez disso:** achatar a estrutura.
+- Required steps → **use instead:** a progress indicator or a multi-step form.
+- Simultaneous comparison → **use instead:** side-by-side content.
+- Essential sections of a product page → **use instead:** expanded sections or an accordion.
+- Long lists of different destinations → **use instead:** main navigation.
+- Tabs inside tabs → **use instead:** flattening the structure.
 
-## Faça
+## Do
 
-- Escreva rótulos curtos e previsíveis.
-- Destaque a aba ativa com indicador perceptível.
-- Conecte visualmente cada aba ao seu painel.
-- Preserve o estado e os dados do painel ao alternar.
-- No celular, use rolagem horizontal com indicação de abas fora da área visível.
-- Valide se as pessoas entendem os rótulos e percebem os outros painéis.
+- Write short, predictable labels.
+- Highlight the active tab with a noticeable indicator.
+- Visually connect each tab to its panel.
+- Preserve the panel's state and data when switching.
+- On mobile, use horizontal scrolling with an indication of tabs outside the visible area.
+- Validate that people understand the labels and notice the other panels.
 
-## Evite
+## Avoid
 
-- Esconder informação crítica na aba secundária.
-- Usar abas para etapas ou filtros.
-- Forçar comparação por alternância.
-- Criar muitas abas.
-- Empilhar várias linhas de abas.
-- Aninhar abas.
-- Indicar a aba ativa só por cor.
+- Hiding critical information in a secondary tab.
+- Using tabs for steps or filters.
+- Forcing comparison by switching.
+- Creating many tabs.
+- Stacking several rows of tabs.
+- Nesting tabs.
+- Indicating the active tab only by color.
 
-## Acessibilidade
+## Accessibility
 
-- Estrutura semântica: role="tablist", role="tab" e role="tabpanel", com aria-controls e aria-labelledby; aria-selected="true" só na ativa; nome acessível no conjunto (4.1.2).
-- O foco entra na aba ativa; setas Esquerda e Direita em listas horizontais, Cima e Baixo em verticais; Enter ou Espaço ativam no modo manual (2.1.1).
-- Indicador de seleção e foco com contraste suficiente (1.4.11, 2.4.7).
-- Em telas estreitas, a rolagem horizontal deve funcionar por teclado e toque; teste zoom de 200% e 400% (1.4.10).
-- O foco não pode desaparecer quando o painel muda.
+- Semantic structure: role="tablist", role="tab" and role="tabpanel", with aria-controls and aria-labelledby; aria-selected="true" only on the active one; an accessible name for the set (4.1.2).
+- Focus enters on the active tab; Left and Right arrows in horizontal lists, Up and Down in vertical ones; Enter or Space activate in manual mode (2.1.1).
+- Selection and focus indicators with sufficient contrast (1.4.11, 2.4.7).
+- On narrow screens, horizontal scrolling must work by keyboard and touch; test 200% and 400% zoom (1.4.10).
+- Focus must not disappear when the panel changes.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulos de abas | "Resumo", "Pagamentos", "Histórico" |
-| Nome do conjunto (leitor de tela) | "Detalhes do cliente" |
-| Painel carregando | "Carregando histórico..." |
-| Painel vazio | "Nenhum pagamento registrado neste período." |
+| Tab labels | "Summary", "Payments", "History" |
+| Set name (screen reader) | "Customer details" |
+| Panel loading | "Loading history..." |
+| Empty panel | "No payments recorded in this period." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Todas as abas tratam do mesmo objeto ou contexto.
-- [ ] Os rótulos têm no máximo duas palavras ou cabem sem quebra.
-- [ ] Não há abas dentro de abas.
-- [ ] A aba padrão é a mais útil para a maioria.
-- [ ] Nenhuma informação crítica fica só em aba secundária.
-- [ ] A aba ativa tem indicador além da cor.
-- [ ] role tablist, tab e tabpanel e aria-selected estão corretos.
-- [ ] Setas navegam entre abas.
-- [ ] No mobile, existe indicação de abas fora da área visível.
-- [ ] Trocar de aba não apaga dados já preenchidos.
+- [ ] Every tab is about the same object or context.
+- [ ] Labels have at most two words or fit without wrapping.
+- [ ] There are no tabs inside tabs.
+- [ ] The default tab is the most useful to most people.
+- [ ] No critical information lives only in a secondary tab.
+- [ ] The active tab has an indicator beyond color.
+- [ ] The tablist, tab and tabpanel roles and aria-selected are correct.
+- [ ] Arrow keys move between tabs.
+- [ ] On mobile, there is an indication of tabs outside the visible area.
+- [ ] Switching tabs does not erase data already entered.
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group, uso correto de abas: conteúdos relacionados, poucos grupos, rótulos curtos, painel inicial útil, sem comparação entre abas.
-- W3C WAI-ARIA Authoring Practices, padrão de abas e exemplo de ativação automática: papéis, relações, teclado e quando usar ativação automática ou manual.
-- Padrão Digital GOV.BR, aba: rótulos breves, telas pequenas, não aninhar.
-- Material Design, abas: diferença entre abas, paginação e carrossel.
-- IBM Carbon, abas: não usar para comparação, progresso ou filtragem.
-- Baymard Institute: seções essenciais de páginas de produto escondidas em abas horizontais geram problemas (achado específico, não proibição geral).
+- Nielsen Norman Group, using tabs correctly: related contents, few groups, short labels, a useful initial panel, no comparison across tabs.
+- W3C WAI-ARIA Authoring Practices, tabs pattern and automatic activation example: roles, relationships, keyboard and when to use automatic or manual activation.
+- GOV.BR Digital Standard, tab: brief labels, small screens, no nesting.
+- Material Design, tabs: the difference between tabs, pagination and carousel.
+- IBM Carbon, tabs: not for comparison, progress or filtering.
+- Baymard Institute: essential product-page sections hidden in horizontal tabs cause problems (a specific finding, not a general ban).

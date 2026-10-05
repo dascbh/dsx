@@ -1,6 +1,6 @@
 ---
 id: progress-percentage
-title: Quando mostrar porcentagem de progresso?
+title: When should you show a progress percentage?
 category: feedback
 components: [progress-bar, loading-indicator]
 type: recommendation
@@ -11,97 +11,97 @@ wcag: ["4.1.3", "4.1.2", "1.4.1", "1.4.11", "2.2.2"]
 related: [skeleton-vs-spinner, long-loading, file-upload, retry]
 ---
 
-# Quando mostrar porcentagem de progresso?
+# When should you show a progress percentage?
 
-> **Regra:** Mostre porcentagem apenas quando o total e o avanço forem medidos de verdade; sem medida confiável, use indicador indeterminado com rótulo.
+> **Rule:** Show a percentage only when the total and the progress are really measured; without a reliable measure, use a labeled indeterminate indicator.
 
-## Contexto
+## Context
 
-Uma porcentagem promete que existe um total e que o número mostra o caminho até a conclusão. Sem total conhecido, ela cria falsa precisão e, se muda de forma inexplicável ou trava, derruba a confiança e faz a espera parecer maior.
+A percentage promises that there is a total and that the number shows the way to completion. Without a known total, it creates false precision and, if it changes inexplicably or stalls, it destroys trust and makes the wait feel longer.
 
-Antes de mostrar o número, verifique quatro pontos: o avanço é mensurável, a medida é estável, a tarefa tem início e fim definidos e a pessoa precisa acompanhá-la. Se faltar algum, informe só o estado da operação.
+Before showing the number, check four points: progress is measurable, the measure is stable, the task has a defined start and end, and the person needs to follow it. If any is missing, report only the state of the operation.
 
-Quando o avanço se dá entre fases controladas pela pessoa, use etapas; não converta fases de duração desigual em percentual enganoso.
+When progress happens across phases the person controls, use steps; do not convert phases of unequal duration into a misleading percentage.
 
-## Decisão
+## Decision
 
-- **SE** o sistema conhece o tamanho total (arquivos, itens, bytes, etapas quantificáveis) **ENTÃO** use barra determinada com valor real de 0 a 100%.
-- **SE** uma medida absoluta é mais útil **ENTÃO** mostre "42 de 100 itens" no lugar ou junto do percentual.
-- **SE** o total ou o avanço são desconhecidos **ENTÃO** use indicador indeterminado com rótulo; não invente percentual, tempo restante ou etapa.
-- **SE** o total só se torna conhecido durante o processamento **ENTÃO** comece indeterminado e passe a determinado quando houver medida confiável.
-- **SE** o percentual é derivado só do tempo decorrido ou de estimativa sem base **ENTÃO** não o exiba.
-- **SE** a operação é rápida a ponto de o indicador virar apenas ruído **ENTÃO** dispense o indicador.
-- **SE** a tarefa é longa **ENTÃO** nomeie a tarefa, informe o resultado ao terminar e ofereça cancelar, tentar novamente ou retomar quando for seguro.
-- **SE** o total muda **ENTÃO** explique a mudança; o avanço não pode diminuir nem reiniciar sem aviso.
-- **SENÃO** indicador indeterminado.
+- **IF** the system knows the total size (files, items, bytes, quantifiable steps) **THEN** use a determinate bar with a real value from 0 to 100%.
+- **IF** an absolute measure is more useful **THEN** show "42 of 100 items" instead of or alongside the percentage.
+- **IF** the total or the progress are unknown **THEN** use a labeled indeterminate indicator; do not invent a percentage, time remaining or step.
+- **IF** the total only becomes known during processing **THEN** start indeterminate and switch to determinate when there is a reliable measure.
+- **IF** the percentage is derived only from elapsed time or a baseless estimate **THEN** do not show it.
+- **IF** the operation is so fast the indicator becomes mere noise **THEN** skip the indicator.
+- **IF** the task is long **THEN** name the task, report the result when it finishes and offer cancel, try again or resume when safe.
+- **IF** the total changes **THEN** explain the change; progress cannot decrease or restart without warning.
+- **ELSE** an indeterminate indicator.
 
-## Quando usar
+## When to use
 
-- Total de arquivos, itens ou bytes conhecido.
-- Avanço calculado com dados reais.
-- Tarefa com início, fim e conclusão definidos.
-- Processamento demorado com avanço significativo.
+- A known total of files, items or bytes.
+- Progress calculated from real data.
+- A task with a defined start, end and completion.
+- Long processing with meaningful progress.
 
-## Quando evitar
+## When to avoid
 
-- Total ou avanço desconhecidos → **use em vez disso:** indicador indeterminado.
-- Porcentagem por tempo decorrido → **use em vez disso:** estado "Processando".
-- Fases de duração muito desigual → **use em vez disso:** indicador de etapas.
-- Operação instantânea → **use em vez disso:** nenhum indicador.
+- Unknown total or progress → **use instead:** an indeterminate indicator.
+- A percentage based on elapsed time → **use instead:** a "Processing" state.
+- Phases of very unequal duration → **use instead:** a step indicator.
+- An instant operation → **use instead:** no indicator.
 
-## Faça
+## Do
 
-- Confirme o total antes de mostrar o número.
-- Mantenha o valor estável e arredonde.
-- Use rótulo que nomeie a tarefa.
-- Comunique conclusão e falha.
-- Ofereça saída segura.
+- Confirm the total before showing the number.
+- Keep the value stable and round it.
+- Use a label that names the task.
+- Communicate completion and failure.
+- Offer a safe way out.
 
-## Evite
+## Avoid
 
-- Inventar porcentagem ou prometer prazo incerto.
-- Reiniciar a barra sem explicação.
-- Casas decimais sem medição real.
-- Vários indicadores concorrentes.
-- Comunicar o estado só por cor ou movimento.
+- Inventing a percentage or promising an uncertain deadline.
+- Restarting the bar without explanation.
+- Decimal places without real measurement.
+- Several competing indicators.
+- Communicating the state only by color or motion.
 
-## Acessibilidade
+## Accessibility
 
-- Rótulo visível e nome acessível para a tarefa (4.1.2).
-- Determinado: `role="progressbar"` com `aria-valuemin`, `aria-valuemax` e `aria-valuenow` consistentes com o valor mostrado.
-- Indeterminado: omita `aria-valuenow`; não forneça número fictício.
-- Atualize via `role="status"` ou `aria-live="polite"`, sem deslocar o foco (4.1.3); use `aria-busy="true"` na região afetada.
-- Contraste do indicador (1.4.11) e sem depender só de cor (1.4.1).
+- A visible label and accessible name for the task (4.1.2).
+- Determinate: `role="progressbar"` with `aria-valuemin`, `aria-valuemax` and `aria-valuenow` consistent with the value shown.
+- Indeterminate: omit `aria-valuenow`; do not provide a fictitious number.
+- Update via `role="status"` or `aria-live="polite"`, without moving focus (4.1.3); use `aria-busy="true"` on the affected region.
+- Indicator contrast (1.4.11) and no reliance on color alone (1.4.1).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Determinado | "Enviando arquivos: 4 de 12" |
-| Percentual | "Importação em 42%" |
-| Indeterminado | "Processando…" |
-| Concluído | "Importação concluída: 120 contatos adicionados." |
-| Falha | "A importação falhou. Tentar novamente" |
+| Determinate | "Uploading files: 4 of 12" |
+| Percentage | "Import at 42%" |
+| Indeterminate | "Processing…" |
+| Done | "Import complete: 120 contacts added." |
+| Failure | "The import failed. Try again" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O total é conhecido.
-- [ ] O valor vem de dados reais.
-- [ ] O valor não diminui nem reinicia sem explicação.
-- [ ] O rótulo identifica a tarefa.
-- [ ] "4 de 12" foi avaliado como alternativa mais clara.
-- [ ] Sem medida confiável, o estado é indeterminado.
-- [ ] O resultado final é comunicado.
-- [ ] Há saída ou recuperação segura.
-- [ ] O progresso é anunciado sem mover o foco.
-- [ ] Foi testado com teclado, zoom e leitor de tela.
+- [ ] The total is known.
+- [ ] The value comes from real data.
+- [ ] The value does not decrease or restart without explanation.
+- [ ] The label identifies the task.
+- [ ] "4 of 12" was considered as a clearer alternative.
+- [ ] Without a reliable measure, the state is indeterminate.
+- [ ] The final result is communicated.
+- [ ] There is a safe way out or recovery.
+- [ ] Progress is announced without moving focus.
+- [ ] It was tested with keyboard, zoom and screen reader.
 
-## Fundamentação
+## Rationale
 
-- IBM Carbon (Progress bar): estados determinado e indeterminado, rótulos e valores.
-- Padrão Digital GOV.BR (Loading): loading determinado com cancelar e indeterminado sem prometer duração.
-- GitHub Primer (ProgressBar): contexto textual como "4 de 12 tarefas".
-- W3C ARIA Authoring Practices: aria-valuenow omitido quando o valor é desconhecido.
-- WCAG 2.2, 4.1.3: progresso e status sem receber foco.
-- Baymard Institute (fluxo de checkout): indicador de etapas deve espelhar o processo real.
-- Nielsen Norman Group (indicadores de progresso): visibilidade torna esperas longas compreensíveis.
+- IBM Carbon (Progress bar): determinate and indeterminate states, labels and values.
+- Brazilian Government Digital Standard GOV.BR (Loading): determinate loading with cancel, and indeterminate without promising a duration.
+- GitHub Primer (ProgressBar): textual context such as "4 of 12 tasks".
+- W3C ARIA Authoring Practices: aria-valuenow omitted when the value is unknown.
+- WCAG 2.2, 4.1.3: progress and status without receiving focus.
+- Baymard Institute (checkout flow): a step indicator should mirror the real process.
+- Nielsen Norman Group (progress indicators): visibility makes long waits understandable.

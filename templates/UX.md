@@ -1,32 +1,32 @@
 ---
-# version é a versão DESTE documento (semver). Suba no mesmo commit da mudança de UI:
-#   arquétipo novo ou trocado, política (actions, confirmation, feedback, forms, navigation, flows, states) ou desvio → menor (1.2.0 → 1.3.0)
-#   só texto, exemplo, evidência ou correção de redação → patch (1.2.0 → 1.2.1)
-#   mudança que invalida o que agentes já construíram (troca de modelo de navegação, de register) → maior (1.x → 2.0.0)
-# e atualize `updated`. format é a versão do formato UX.md do DSX.
+# version is the version of THIS document (semver). Bump it in the same commit as the UI change:
+#   new or replaced archetype, policy (actions, confirmation, feedback, forms, navigation, flows, states) or deviation → minor (1.2.0 → 1.3.0)
+#   text, example, evidence or wording fix only → patch (1.2.0 → 1.2.1)
+#   change that invalidates what agents already built (new navigation model, new register) → major (1.x → 2.0.0)
+# and update `updated`. format is the version of the DSX UX.md format.
 version: 1.0.0
 format: alpha
-name: <Nome do produto>
-description: <Tipo de produto, público e densidade. Ex.: "App web de pedidos de compra para o time de suprimentos, desktop, densidade alta.">
-owner: <time ou pessoa que mantém este arquivo>
-updated: <AAAA-MM-DD>
-# Quem usa e em que registro. persona e register são obrigatórios. Chaves e valores em inglês; o texto livre, em pt-BR.
+name: <Product name>
+description: <Product type, audience and density. E.g. "Web app for purchase orders used by the procurement team, desktop, high density.">
+owner: <team or person who maintains this file>
+updated: <YYYY-MM-DD>
+# Who uses it and in which register. persona and register are required. Keys and values in English; free text in the project language.
 product:
-  persona: <quem usa e para quê, numa frase>
+  persona: <who uses it and what for, in one sentence>
   register: <operational | consumer | editorial | brand>
   platform: <desktop | mobile | both>
   density: <low | medium | high>
 navigation:
-  model: <ex.: "menu lateral + abas na página">
-  max-depth: 3                    # níveis a partir da entrada do módulo
-  back: mandatory                 # toda tela não raiz tem caminho de volta visível (mandatory | optional)
-# Tipo de tela → rotas/telas do produto. Ids válidos: os cartões de archetypes/.
+  model: <e.g. "side menu + tabs on the page">
+  max-depth: 3                    # levels from the module entry point
+  back: mandatory                 # every non-root screen has a visible way back (mandatory | optional)
+# Screen type → product routes/screens. Valid ids: the cards in archetypes/.
 archetypes:
-  operational-list: ["<rota>"]
-  master-detail: ["<rota>"]
-  confirmation-dialog: ["<nome do diálogo>"]
+  operational-list: ["<route>"]
+  master-detail: ["<route>"]
+  confirmation-dialog: ["<dialog name>"]
 actions:
-  primary-per-region: 1           # máximo de botões cheios por região
+  primary-per-region: 1           # maximum filled buttons per region
   primary-position: <top-right | bottom-right | inline>
   dialog-order: <cancel-action | action-cancel>
   destructive-specific-label: true
@@ -44,145 +44,146 @@ forms:
   validation: <on-blur | on-submit | realtime>
   required: <mark-required | mark-optional>
 content:
-  glossary: <caminho do glossário ou "inline">   # por módulo: { default: <caminho>, <módulo>: <caminho ou inline> }
+  language: pt-BR                 # language of the product's own text, the one the text detectors judge (pt-BR | en; omitted = pt-BR)
+  glossary: <glossary path or "inline">   # per module: { default: <path>, <module>: <path or inline> }
   buttons: verb-object
-  forbidden: [<termo de implementação>, <outro termo>]   # nunca aparecem na tela
-  proper-nouns: []                # nomes próprios do domínio que podem ter maiúscula no meio (X10)
+  forbidden: [<implementation term>, <another term>]   # never appear on screen
+  proper-nouns: []                # domain proper nouns that may carry a capital in the middle (X10)
 flows:
   max-journey-steps: 12
   max-stacked-dialogs: 1
   dead-ends: 0
-# Como o ux-lint reconhece o kit do projeto nas capturas. Ajuste ao seu kit (MUI, shadcn, próprio).
-# Onde as ferramentas acham capturas, mapa e código (docs/project-paths.md). Apague o que for o padrão do DSX.
+# Where the tools find captures, map and code (docs/project-paths.md). Delete whatever is the DSX default.
 paths:
   captures: .dsx/captures/<module>
-  code: [<pasta do front onde o texto nasce>]
+  code: [<front-end folder where the text is born>]
+# How ux-lint recognizes the project's kit in the captures. Adjust to your kit (MUI, shadcn, in-house).
 verification:
-  kit: <auto | generic | mui | shadcn | chakra | antd | bootstrap>   # perfil de seletores do kit de componentes
+  kit: <auto | generic | mui | shadcn | chakra | antd | bootstrap>   # selector profile of the component kit
   selectors:
     regions: ["header", "nav", "aside", "main", "[role=dialog]"]
     dialog: "[role=dialog]"
-    primary: "<seletor do botão primário; apague para usar o do kit>"
-    destructive: "<seletor do botão destrutivo; apague para usar o do kit>"
+    primary: "<primary button selector; delete to use the kit's>"
+    destructive: "<destructive button selector; delete to use the kit's>"
     button: "button, [role=button]"
     field: "input:not([type=hidden]), textarea, select"
-# Desvios aceitos: o que difere do cartão do arquétipo ou de uma política, com motivo e dono. Achado de regra listada
-# em `rules` numa tela de `screens` (ids do mapa de fluxo/capturas) vira "desvio aceito" no registro de achados e não
-# conta como aberto. Apague o bloco se não houver desvio.
+# Accepted deviations: what differs from the archetype card or from a policy, with reason and owner. A finding of a rule
+# listed in `rules` on a screen in `screens` (ids from the flow map/captures) becomes an "accepted deviation" in the
+# findings register and does not count as open. Delete the block if there is no deviation.
 deviations:
   - id: D1
-    screens: [<id da tela>]
-    rules: [<id da regra, ex.: L9>]
-    reason: "<por que o produto difere aqui>"
-    decided-by: "<quem aceitou>"
-    until: <AAAA-MM-DD, opcional>
+    screens: [<screen id>]
+    rules: [<rule id, e.g. L9>]
+    reason: "<why the product differs here>"
+    decided-by: "<who accepted it>"
+    until: <YYYY-MM-DD, optional>
 ---
 
-# <Nome do produto> — UX
+# <Product name> — UX
 
-<!-- Diga de onde vieram as decisões (código, mapas de .dsx/maps/, pesquisa) e o que vence em caso de conflito.
-     Marque com "(inferido)" o que foi deduzido sem evidência explícita. Apague todos os comentários ao preencher. -->
+<!-- Say where the decisions came from (code, maps in .dsx/maps/, research) and what wins in a conflict.
+     Mark with "(inferred)" whatever was deduced without explicit evidence. Delete every comment when filling in. -->
 
-## Visão geral
+## Overview
 
-<!-- Para quem, para quê, em que contexto de uso (dispositivo, frequência, pressa). Termine com o que a
-     experiência NUNCA faz (ex.: "nunca aplica uma decisão sem confirmação humana"). -->
+<!-- For whom, what for, in which context of use (device, frequency, time pressure). End with what the
+     experience NEVER does (e.g. "never applies a decision without human confirmation"). -->
 
-<Parágrafo de visão geral>
+<Overview paragraph>
 
-## Personas e tarefas
+## Personas & Tasks
 
-<!-- Tabela: persona | tarefa principal | frequência | o que é crítico errar. Tarefas, não telas. -->
+<!-- Table: persona | main task | frequency | what is critical to get wrong. Tasks, not screens. -->
 
-| Persona | Tarefa | Frequência | Erro crítico |
+| Persona | Task | Frequency | Critical error |
 |---|---|---|---|
-| <persona> | <tarefa> | <diária/semanal/rara> | <o que custa caro errar> |
+| <persona> | <task> | <daily/weekly/rare> | <what is expensive to get wrong> |
 
-## Arquitetura da informação
+## Information Architecture
 
-<!-- Áreas do produto com os nomes que aparecem na tela; o que é entrada (lista, painel) e o que é detalhe. -->
+<!-- Product areas with the names that appear on screen; what is an entry point (list, dashboard) and what is detail. -->
 
-<Áreas e onde cada coisa mora>
+<Areas and where each thing lives>
 
-## Navegação
+## Navigation
 
-<!-- Modelo (menu lateral, abas, migalhas), profundidade máxima, como se volta, como se sabe onde se está. -->
+<!-- Model (side menu, tabs, breadcrumbs), maximum depth, how to go back, how people know where they are. -->
 
-<Modelo de navegação>
+<Navigation model>
 
-## Arquétipos de tela
+## Screen Archetypes
 
-<!-- Tabela: tela/rota | arquétipo (link archetypes/<id>.md) | variação escolhida | desvio declarado (ou "—").
-     Toda tela do front matter aparece aqui. Desvio = o que difere do cartão e por quê. -->
+<!-- Table: screen/route | archetype (link archetypes/<id>.md) | chosen variation | declared deviation (or "—").
+     Every screen in the front matter appears here. Deviation = what differs from the card and why. -->
 
-| Tela | Arquétipo | Variação | Desvio |
+| Screen | Archetype | Variation | Deviation |
 |---|---|---|---|
-| <rota> | <id do arquétipo> | <variação> | <id do desvio (D1) ou —> |
+| <route> | <archetype id> | <variation> | <deviation id (D1) or —> |
 
-### Desvios declarados
+### Declared deviations
 
-<!-- Uma linha por desvio, com o mesmo id do bloco `deviations` do front matter (o linter confere os dois). -->
+<!-- One row per deviation, with the same id as the `deviations` block in the front matter (the linter checks both). -->
 
-| # | Tela | Desvio | Motivo |
+| # | Screen | Deviation | Reason |
 |---|---|---|---|
-| D1 | <id da tela> | <o que difere do cartão ou da política> | <motivo e custo> |
+| D1 | <screen id> | <what differs from the card or the policy> | <reason and cost> |
 
-## Layout e regiões
+## Layout & Regions
 
-<!-- Regiões fixas do produto (cabeçalho, menu, conteúdo, painel) e o que vai em cada uma. -->
+<!-- The product's fixed regions (header, menu, content, panel) and what goes in each one. -->
 
-<Regiões>
+<Regions>
 
-## Ações
+## Actions
 
-<!-- Hierarquia (primária, secundária, terciária), posição, quantas primárias, destrutivas, desabilitado × escondido. -->
+<!-- Hierarchy (primary, secondary, tertiary), position, how many primaries, destructive actions, disabled vs. hidden. -->
 
-<Política de ações>
+<Action policy>
 
-## Feedback e estados
+## Feedback & States
 
-<!-- Política de feedback (toast, inline, alerta) e como cada tipo de tela mostra os cinco estados. -->
+<!-- Feedback policy (toast, inline, alert) and how each screen type shows the five states. -->
 
-<Feedback e estados>
+<Feedback and states>
 
-## Formulários
+## Forms
 
-<!-- Rótulos, validação, obrigatórios; quando o formulário vai em diálogo e quando vira página. -->
+<!-- Labels, validation, required fields; when a form goes in a dialog and when it becomes a page. -->
 
-<Regras de formulário>
+<Form rules>
 
-## Conteúdo e microcopy
+## Content & Microcopy
 
-<!-- Glossário (termo da tela ↔ conceito), verbos dos botões, tom, termos proibidos, fórmulas de erro/vazio/confirmação. -->
+<!-- Glossary (screen term ↔ concept), button verbs, tone, forbidden terms, formulas for error/empty/confirmation. -->
 
-<Conteúdo e microcopy>
+<Content and microcopy>
 
-## Fluxos
+## Flows
 
-<!-- Jornadas principais (início → fim, nº de passos), limites, onde a pessoa troca de canal (link para terceiro, e-mail). -->
+<!-- Main journeys (start → end, number of steps), limits, where the person switches channel (third-party link, e-mail). -->
 
-<Fluxos>
+<Flows>
 
-## Faça e não faça
+## Do's and Don'ts
 
-<!-- Mínimo 3 em cada bloco, cada um vindo de um problema real (tela, achado, reclamação). Critério observável. -->
+<!-- At least 3 in each block, each coming from a real problem (screen, finding, complaint). Observable criterion. -->
 
-### Faça
+### Do
 
-- <regra concreta>
-- <regra concreta>
-- <regra concreta>
+- <concrete rule>
+- <concrete rule>
+- <concrete rule>
 
-### Não faça
+### Don't
 
-- <proibição concreta>
-- <proibição concreta>
-- <proibição concreta>
+- <concrete prohibition>
+- <concrete prohibition>
+- <concrete prohibition>
 
-## Instruções para agentes
+## Agent Instructions
 
-<!-- Quando consultar este arquivo, o que preservar, como validar (comandos). -->
+<!-- When to consult this file, what to preserve, how to validate (commands). -->
 
-- Consulte antes de criar ou rearranjar qualquer tela; identifique o arquétipo pela seção 5.
-- Toda mudança de UI que altera comportamento (tela nova, arquétipo, política, fluxo, estado) atualiza este arquivo no mesmo commit, com `version` e `updated`.
-- Valide com `node <DSX>/tools/lint-ux-md.mjs UX.md --score --map <mapa> --screens <capturas>`, com o drift (`node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .`) e com o ux-lint de tela e fluxo.
+- Consult it before creating or rearranging any screen; identify the archetype in section 5.
+- Every UI change that alters behavior (new screen, archetype, policy, flow, state) updates this file in the same commit, with `version` and `updated`.
+- Validate with `node <DSX>/tools/lint-ux-md.mjs UX.md --score --map <map> --screens <captures>`, with the drift check (`node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <m> --root .`) and with the screen and flow ux-lint.

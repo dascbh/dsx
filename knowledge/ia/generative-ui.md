@@ -1,169 +1,169 @@
 ---
 id: generative-ui
 area: ai
-title: Generative UI (interface gerada em tempo de uso)
+title: Generative UI (interface generated at use time)
 evidence: signal
-related: [ux-para-agentes, evals, multimodal]
+related: [ux-for-agents, evals, multimodal]
 ---
 
 # Generative UI
 
-> **Quando consultar**
-> - Quando o produto vai decidir, durante o uso, **qual forma de interface** apresentar (tabela, formulário, gráfico, controles) conforme a intenção da pessoa.
-> - Ao projetar o catálogo de componentes que um agente pode compor, ou as regras do que nunca pode mudar.
-> - Ao decidir se uma área deve ser gerada ou continuar fixa.
-> - Ao avaliar saídas de UI geradas por agente (ver também a rubrica em `evals.md`).
+> **When to consult**
+> - When the product will decide, during use, **which interface form** to present (table, form, chart, controls) according to the person's intent.
+> - When designing the component catalog an agent can compose, or the rules for what can never change.
+> - When deciding whether an area should be generated or stay fixed.
+> - When evaluating agent-generated UI outputs (see also the rubric in `evals.md`).
 >
-> **Não confundir com:** ferramentas que geram mockups ou código para a equipe revisar antes de publicar. Isso é IA assistindo o processo de design (ver `divida-de-experiencia.md`). Generative UI acontece **dentro do produto, em tempo de uso**.
+> **Do not confuse with:** tools that generate mockups or code for the team to review before publishing. That is AI assisting the design process (see `experience-debt.md`). Generative UI happens **inside the product, at use time**.
 
-## 1. Definição
+## 1. Definition
 
-Generative UI é a interface criada ou adaptada dinamicamente por IA enquanto a pessoa usa o produto, em função da intenção, do contexto e dos dados disponíveis naquele momento.
+Generative UI is an interface created or adapted dynamically by AI while the person uses the product, based on the intent, context and data available at that moment.
 
-Três situações que convivem e devem ser distinguidas:
+Three situations coexist and must be distinguished:
 
-| Abordagem | O que varia | Estrutura |
+| Approach | What varies | Structure |
 |---|---|---|
-| Interface tradicional | Apenas os dados | Fixa |
-| Personalização | Ordem, destaque, recomendações | Fixa na arquitetura |
-| Generative UI | A própria forma de apresentar e interagir | Composta a cada situação |
+| Traditional interface | Only the data | Fixed |
+| Personalization | Order, emphasis, recommendations | Fixed in the architecture |
+| Generative UI | The very form of presentation and interaction | Composed for each situation |
 
-Também não é sinônimo de chatbot: a conversa pode ser a entrada, mas a resposta pode virar seletor de data, tabela filtrável ou checkboxes quando isso reduz esforço.
+It is also not a synonym for chatbot: the conversation can be the input, but the answer can become a date picker, a filterable table or checkboxes when that reduces effort.
 
-**Nível de evidência:** a área está em formação. Há produtos e pesquisas concretos (sinal forte), e um estudo acadêmico de 2026 encontrou preferência humana maior por interfaces geradas para a tarefa do que por conversa pura em certas condições, com ganho de até 72% no cenário avaliado. Trate como resultado específico daquele estudo, não como garantia para qualquer produto. `[evidência: sinal]`
+**Evidence level:** the field is still forming. There are concrete products and research (strong signal), and a 2026 academic study found greater human preference for task-generated interfaces than for pure conversation under certain conditions, with a gain of up to 72% in the evaluated scenario. Treat it as a result specific to that study, not as a guarantee for any product. `[evidence: signal]`
 
-## 2. Como funciona (ciclo)
+## 2. How it works (cycle)
 
-1. A pessoa expressa intenção (texto, voz, seleção, arquivo, imagem).
-2. O sistema interpreta objetivo e contexto (estado da conversa, permissões, dados do produto, resultados de ferramentas).
-3. Decide qual forma de interface serve à situação.
-4. **Compõe dentro de um espaço permitido.**
-5. A pessoa interage, gerando novo contexto; o sistema atualiza só o necessário.
+1. The person expresses intent (text, voice, selection, file, image).
+2. The system interprets goal and context (conversation state, permissions, product data, tool results).
+3. It decides which interface form serves the situation.
+4. **It composes within a permitted space.**
+5. The person interacts, generating new context; the system updates only what is needed.
 
-O trabalho de design se desloca: em vez de definir cada tela, define-se **o espaço dentro do qual telas podem ser produzidas** e os critérios para julgar o que foi produzido.
+Design work shifts: instead of defining each screen, you define **the space within which screens can be produced** and the criteria for judging what was produced.
 
-## 3. Três níveis de maturidade
+## 3. Three maturity levels
 
-| Nível | O que a IA decide | Liberdade | Risco |
+| Level | What the AI decides | Freedom | Risk |
 |---|---|---|---|
-| **1. Controles contextuais** | Quando inserir botões, checkboxes, campos dentro de uma estrutura estável | Baixa | Baixo |
-| **2. Composição por catálogo** | Quais componentes aprovados usar e como combiná-los (cards, tabelas, formulários, gráficos) via especificação declarativa | Média | Moderado |
-| **3. Experiência específica da tarefa** | Página, ferramenta, simulador ou miniaplicação inteira | Alta | Alto |
+| **1. Contextual controls** | When to insert buttons, checkboxes, fields within a stable structure | Low | Low |
+| **2. Catalog composition** | Which approved components to use and how to combine them (cards, tables, forms, charts) via declarative specification | Medium | Moderate |
+| **3. Task-specific experience** | An entire page, tool, simulator or mini-application | High | High |
 
-**Regra:** comece no nível 1 ou 2. Só avance para o 3 quando houver suíte de avaliação, fallback testado e isolamento de execução. Quanto mais liberdade, mais difícil garantir consistência, acessibilidade, desempenho, segurança e previsibilidade.
+**Rule:** start at level 1 or 2. Only move to 3 when there is an evaluation suite, a tested fallback and execution isolation. The more freedom, the harder it is to guarantee consistency, accessibility, performance, security and predictability.
 
-## 4. Invariantes
+## 4. Invariants
 
-Defina explicitamente o que **nunca** é gerado. Por padrão, são invariantes:
+Explicitly define what is **never** generated. By default, these are invariants:
 
-- Navegação global e posição dos elementos de orientação.
-- Identidade visual (tokens, tipografia, marca).
-- Mensagens legais, consentimentos e avisos obrigatórios.
-- Ações de alto risco ou críticas (pagar, excluir, publicar, alterar acesso) e suas confirmações.
-- Rótulo de conteúdo gerado por IA ([`label-ai-content`](../../patterns/ai/label-ai-content.md)).
-- Controles de cancelar, desfazer e sair.
+- Global navigation and the position of orientation elements.
+- Visual identity (tokens, typography, brand).
+- Legal messages, consents and mandatory notices.
+- High-risk or critical actions (pay, delete, publish, change access) and their confirmations.
+- AI-generated content label ([`label-ai-content`](../../patterns/ai/label-ai-content.md)).
+- Cancel, undo and exit controls.
 
-Só **áreas contextuais** se adaptam. Consistência não serve apenas à marca: é ela que permite à pessoa aprender caminhos e formar memória espacial.
+Only **contextual areas** adapt. Consistency does not serve only the brand: it is what lets the person learn paths and build spatial memory.
 
-## 5. Composição declarativa por catálogo
+## 5. Declarative catalog composition
 
-Prefira que o agente **descreva** o que precisa ser exibido e que a aplicação **renderize** com seus próprios componentes. Executar código arbitrário escrito pelo modelo abre uma superfície de risco muito maior. Existem especificações abertas nessa linha (intenção de interface declarativa, renderização pelo cliente).
+Prefer that the agent **describe** what needs to be displayed and that the application **render** it with its own components. Executing arbitrary code written by the model opens a much larger risk surface. There are open specifications along these lines (declarative interface intent, client-side rendering).
 
-Cada componente do catálogo precisa declarar, para leitura por agente:
+Each catalog component needs to declare, for agents to read:
 
 ```yaml
-componente: tabela-comparativa
-proposito: "Comparar 2 a 8 itens em atributos comuns"
-usar_quando: ["usuário pede comparação", "itens compartilham >= 3 atributos"]
-nao_usar_quando: ["1 item", "mais de 8 itens (usar lista filtrável)", "dados sem atributos comuns"]
-propriedades:
-  itens: { tipo: lista, min: 2, max: 8 }
-  atributos: { tipo: lista, min: 3 }
-  destaque: { tipo: enum, valores: [nenhum, melhor-valor] }
-estados: [loading, empty, error, partial]
-combinacoes_invalidas:
-  - "dentro de modal em mobile"
-  - "junto de outro componente de comparação na mesma resposta"
-acessibilidade: "cabeçalhos de linha e coluna obrigatórios; ordem de leitura por linha"
+component: comparison-table
+purpose: "Compare 2 to 8 items on common attributes"
+use_when: ["user asks for a comparison", "items share >= 3 attributes"]
+do_not_use_when: ["1 item", "more than 8 items (use a filterable list)", "data with no common attributes"]
+properties:
+  items: { type: list, min: 2, max: 8 }
+  attributes: { type: list, min: 3 }
+  highlight: { type: enum, values: [none, best-value] }
+states: [loading, empty, error, partial]
+invalid_combinations:
+  - "inside a modal on mobile"
+  - "together with another comparison component in the same answer"
+accessibility: "row and column headers required; reading order by row"
 ```
 
-Regras:
-- **SE** o componente não está no catálogo **ENTÃO** o agente não pode usá-lo; recorre ao fallback.
-- **SE** a combinação está listada como inválida **ENTÃO** a renderização deve rejeitá-la de forma determinística (validação de schema), não depender do modelo "lembrar".
-- Valores visuais vêm sempre de tokens; nunca valores crus gerados.
+Rules:
+- **IF** the component is not in the catalog **THEN** the agent cannot use it; it falls back.
+- **IF** the combination is listed as invalid **THEN** rendering must reject it deterministically (schema validation), not depend on the model "remembering".
+- Visual values always come from tokens; never generated raw values.
 
 ## 6. Fallbacks
 
-A geração pode atrasar, falhar ou produzir algo que não passa nos critérios. O produto precisa continuar utilizável.
+Generation can be delayed, fail or produce something that does not meet the criteria. The product must remain usable.
 
-| Situação | Fallback |
+| Situation | Fallback |
 |---|---|
-| Geração lenta | Esqueleto do componente provável + conteúdo textual assim que disponível |
-| Geração falhou | Resposta em texto estruturado + ação de tentar novamente |
-| Spec inválida (schema) | Componente padrão seguro (lista ou texto) com os mesmos dados |
-| Dados insuficientes | Pedir a informação faltante em formulário mínimo, não inventar |
-| Camada generativa indisponível | Interface fixa equivalente para a tarefa |
+| Slow generation | Skeleton of the likely component + text content as soon as available |
+| Generation failed | Structured text answer + retry action |
+| Invalid spec (schema) | Safe default component (list or text) with the same data |
+| Insufficient data | Ask for the missing information in a minimal form, do not invent |
+| Generative layer unavailable | Equivalent fixed interface for the task |
 
-**NUNCA** deixe uma saída órfã: toda composição gerada mantém estado visível, controle e caminho de recuperação.
+**NEVER** leave an orphan output: every generated composition keeps visible state, control and a recovery path.
 
-## 7. Quando gerar e quando a interface fixa vence
+## 7. When to generate and when the fixed interface wins
 
-Gere quando:
-- o contexto varia muito entre pessoas e pedidos;
-- há muitas combinações de dados e opções;
-- a melhor forma depende da pergunta;
-- o trabalho é exploratório ou analítico;
-- texto puro obriga esforço desnecessário (digitar o que poderia ser selecionado).
+Generate when:
+- context varies a lot between people and requests;
+- there are many combinations of data and options;
+- the best form depends on the question;
+- the work is exploratory or analytical;
+- plain text forces unnecessary effort (typing what could be selected).
 
-Mantenha fixa quando:
-- a tarefa é frequente e a pessoa já conhece o caminho (velocidade e repetição);
-- a operação é de alto risco e exige revisão clara e comportamento idêntico;
-- o ambiente é regulado e precisa de auditoria;
-- a ação é simples e gerar só adiciona latência;
-- mudar posições prejudicaria memória espacial.
+Keep it fixed when:
+- the task is frequent and the person already knows the path (speed and repetition);
+- the operation is high risk and requires clear review and identical behavior;
+- the environment is regulated and needs auditing;
+- the action is simple and generating only adds latency;
+- changing positions would harm spatial memory.
 
-**SE** um botão fixo resolve melhor e mais rápido **ENTÃO** não gere outro botão. O cenário realista é híbrido: estrutura estável, personalização onde dados conhecidos bastam, geração onde o formato ideal depende da tarefa.
+**IF** a fixed button solves it better and faster **THEN** do not generate another button. The realistic scenario is hybrid: stable structure, personalization where known data is enough, generation where the ideal format depends on the task.
 
-## 8. Fluxo de design em quatro passos
+## 8. Four-step design flow
 
-1. **Resultado antes de tela.** Defina o que a pessoa precisa conseguir e os critérios de sucesso. Separe o que pode variar do que é invariante.
-2. **Catálogo confiável.** Liste componentes, propriedades, contextos de uso, contraindicações e combinações inválidas. Disponibilizar não basta: sem regra de uso, surgem composições plausíveis e erradas.
-3. **Estados de falha e acessibilidade na infraestrutura.** Carregando, erro, parcial, fallback. Componentes acessíveis reduzem risco, mas hierarquia, ordem de foco, relação entre controles e conteúdo e anúncio de atualizações dinâmicas precisam ser avaliados na composição final.
-4. **Avaliar dinamicamente e testar com pessoas.** Revisar uma tela não basta quando há milhares possíveis. Monte evals e amostre saídas reais.
+1. **Outcome before screen.** Define what the person needs to achieve and the success criteria. Separate what can vary from what is invariant.
+2. **Reliable catalog.** List components, properties, usage contexts, contraindications and invalid combinations. Making them available is not enough: without usage rules, plausible but wrong compositions appear.
+3. **Failure states and accessibility in the infrastructure.** Loading, error, partial, fallback. Accessible components reduce risk, but hierarchy, focus order, the relationship between controls and content, and the announcement of dynamic updates must be evaluated in the final composition.
+4. **Evaluate dynamically and test with people.** Reviewing one screen is not enough when thousands are possible. Build evals and sample real outputs.
 
-## 9. Critérios de avaliação
+## 9. Evaluation criteria
 
-Para cada saída gerada, julgar:
+For each generated output, judge:
 
-- **Adequação do formato:** o tipo de componente era o certo para a tarefa?
-- **Completude:** a informação necessária para decidir está presente?
-- **Conclusão da tarefa:** a pessoa consegue terminar o que queria?
-- **Conformidade com o catálogo:** só componentes e combinações permitidos, só tokens.
-- **Invariantes preservados:** navegação, identidade, avisos e ações críticas intactos.
-- **Acessibilidade da composição:** semântica, foco, contraste, leitura por tecnologia assistiva.
-- **Consistência entre variações:** pedidos semelhantes geram composições reconhecivelmente semelhantes.
-- **Comportamento em falha:** dados faltantes e erros levam ao fallback correto.
+- **Format fit:** was the component type the right one for the task?
+- **Completeness:** is the information needed to decide present?
+- **Task completion:** can the person finish what they wanted?
+- **Catalog compliance:** only permitted components and combinations, only tokens.
+- **Invariants preserved:** navigation, identity, notices and critical actions intact.
+- **Composition accessibility:** semantics, focus, contrast, reading by assistive technology.
+- **Consistency across variations:** similar requests produce recognizably similar compositions.
+- **Failure behavior:** missing data and errors lead to the correct fallback.
 
-Rubrica completa em YAML: `evals.md`, seção 8.
+Full YAML rubric: `evals.md`, section 8.
 
-## 10. Anti-padrões
+## 10. Anti-patterns
 
-- **Variabilidade sem propósito:** mudar a forma sem reduzir esforço, só acrescentando latência.
-- **Imprevisibilidade** que quebra memória espacial em tarefas recorrentes.
-- **Geração sem controle:** execução de código arbitrário em vez de especificação declarativa.
-- **Acessibilidade testada em uma tela estática** quando o sistema gera milhares de combinações.
-- **Ausência de fallback.**
-- **Saídas órfãs:** composição sem estado visível, sem controle, sem recuperação.
-- **Ação de alto risco dentro de área gerada**, sem confirmação invariante.
-- **GenUI como objetivo em si**, não como resposta a um problema de esforço.
+- **Purposeless variability:** changing the form without reducing effort, only adding latency.
+- **Unpredictability** that breaks spatial memory in recurring tasks.
+- **Uncontrolled generation:** executing arbitrary code instead of a declarative specification.
+- **Accessibility tested on one static screen** when the system generates thousands of combinations.
+- **No fallback.**
+- **Orphan outputs:** a composition with no visible state, no control, no recovery.
+- **High-risk action inside a generated area**, without an invariant confirmation.
+- **GenUI as a goal in itself**, rather than as an answer to an effort problem.
 
 ## 11. Checklist
 
-- [ ] O nível de maturidade (1, 2 ou 3) está declarado e justificado.
-- [ ] Os invariantes estão listados e protegidos por validação, não por instrução ao modelo.
-- [ ] Cada componente do catálogo tem propósito, usar/não usar, propriedades, estados e combinações inválidas.
-- [ ] A geração é declarativa e validada por schema antes de renderizar.
-- [ ] Todos os fallbacks da seção 6 existem e foram testados.
-- [ ] Ações de alto risco ficam fora da área gerada ou passam por confirmação fixa.
-- [ ] Há suíte de avaliação com os critérios da seção 9 e amostragem de produção.
-- [ ] Houve teste com pessoas para confirmar que a adaptação reduz esforço.
+- [ ] The maturity level (1, 2 or 3) is declared and justified.
+- [ ] The invariants are listed and protected by validation, not by an instruction to the model.
+- [ ] Each catalog component has a purpose, use/do-not-use, properties, states and invalid combinations.
+- [ ] Generation is declarative and schema-validated before rendering.
+- [ ] All fallbacks in section 6 exist and have been tested.
+- [ ] High-risk actions stay outside the generated area or go through a fixed confirmation.
+- [ ] There is an evaluation suite with the criteria in section 9 and production sampling.
+- [ ] There was testing with people to confirm the adaptation reduces effort.

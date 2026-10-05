@@ -1,14 +1,14 @@
-// Parser YAML mínimo para front matter de DESIGN.md e UX.md: mapas aninhados por indentação
-// (qualquer profundidade), escalares (string, número, booleano), listas e mapas inline
-// ([a, "b, c"], { k: v }), listas em bloco de escalares ("- item") e de mapas ("- id: D1" com as
-// chaves seguintes alinhadas ao "id") e comentários. Texto multilinha (| e >) e lista dentro de
-// lista em bloco não são suportados. Aspas protegem "#" e "," dentro de valores. Lança erro com
-// número de linha quando não entende.
+// Minimal YAML parser for DESIGN.md and UX.md front matter: maps nested by indentation
+// (any depth), scalars (string, number, boolean), inline lists and maps
+// ([a, "b, c"], { k: v }), block lists of scalars ("- item") and of maps ("- id: D1" with the
+// following keys aligned with "id") and comments. Multiline text (| and >) and a list inside a
+// block list are not supported. Quotes protect "#" and "," inside values. Throws an error with the
+// line number when it cannot parse.
 
-// Aspas só abrem no começo de um valor (apóstrofo no meio de texto, como em "it's", não conta).
+// Quotes only open at the start of a value (an apostrophe mid-text, as in "it's", does not count).
 const opensQuote = (prev) => prev === undefined || /[\s[{,:]/.test(prev);
 
-// Divide pelo separador só no nível de topo (fora de aspas, [] e {}).
+// Splits on the separator only at the top level (outside quotes, [] and {}).
 function splitTop(s, sep) {
   const out = [];
   let depth = 0, quote = null, cur = '';
@@ -24,7 +24,7 @@ function splitTop(s, sep) {
   return out;
 }
 
-// Remove comentário "# ..." (início da linha ou precedido de espaço), fora de aspas.
+// Strips a "# ..." comment (at line start or after a space), outside quotes.
 function stripComment(line) {
   let quote = null;
   for (let i = 0; i < line.length; i++) {
@@ -40,7 +40,7 @@ function scalar(raw) {
   const v = raw.trim();
   if (v === '') return null;
   if (/^".*"$/.test(v) || /^'.*'$/.test(v)) return v.slice(1, -1);
-  // Mapa inline { a: 1, b: x }. Sem ":" é tratado como string (referência {grupo.chave} sem aspas).
+  // Inline map { a: 1, b: x }. Without ":" it is a string (an unquoted {group.key} reference).
   if (/^\{.*:.*\}$/.test(v)) {
     const out = {};
     for (const pair of splitTop(v.slice(1, -1), ',')) {
@@ -60,12 +60,12 @@ function scalar(raw) {
 
 export function parseYaml(text) {
   const root = {};
-  // Cada entrada: { indent, obj, parent?, key?, item? }. `item` marca o mapa de um item de lista em bloco: as chaves
-  // do item ficam na coluna do conteúdo depois do "- ", então uma chave nessa mesma coluna continua no item.
+  // Each entry: { indent, obj, parent?, key?, item? }. `item` marks the map of a block list item: the item's keys sit
+  // at the content column after "- ", so a key at that same column continues the item.
   const stack = [{ indent: -1, obj: root }];
   const setKey = (entry, rest, indent, lineNo, line) => {
     const m = rest.match(/^("[^"]+"|'[^']+'|[^:]+):(.*)$/);
-    if (!m) throw new Error(`YAML linha ${lineNo}: não reconhecido: "${line.trim()}"`);
+    if (!m) throw new Error(`YAML line ${lineNo}: not recognized: "${line.trim()}"`);
     const key = m[1].replace(/^["']|["']$/g, '').trim();
     const val = scalar(m[2]);
     if (val === null) {
@@ -80,16 +80,16 @@ export function parseYaml(text) {
     const trimmed = noComment.trim();
     const dash = trimmed.match(/^-(?:\s+(.*))?$/);
     if (dash) {
-      // Item de lista em bloco: fecha o que estiver mais fundo (e o item anterior na mesma coluna).
+      // Block list item: closes whatever is deeper (and the previous item at the same column).
       while (stack.length > 1 && (stack.at(-1).indent > indent || (stack.at(-1).indent === indent && stack.at(-1).item))) stack.pop();
       const owner = stack.at(-1);
-      if (!owner.parent) throw new Error(`YAML linha ${i + 1}: item de lista sem chave dona: "${line.trim()}"`);
+      if (!owner.parent) throw new Error(`YAML line ${i + 1}: list item without an owning key: "${line.trim()}"`);
       if (!Array.isArray(owner.obj)) {
-        if (Object.keys(owner.obj).length) throw new Error(`YAML linha ${i + 1}: lista e mapa misturados em "${owner.key}"`);
+        if (Object.keys(owner.obj).length) throw new Error(`YAML line ${i + 1}: list and map mixed in "${owner.key}"`);
         owner.obj = owner.parent[owner.key] = [];
       }
       const rest = (dash[1] ?? '').trim();
-      if (!rest) throw new Error(`YAML linha ${i + 1}: item de lista vazio ou lista dentro de lista (não suportado)`);
+      if (!rest) throw new Error(`YAML line ${i + 1}: empty list item or list inside a list (not supported)`);
       const contentIndent = indent + noComment.slice(indent).indexOf(rest);
       const isPair = /^("[^"]+"|'[^']+'|[^:[{"']+):(\s|$)/.test(rest);
       if (!isPair) { owner.obj.push(scalar(rest)); return; }
@@ -102,13 +102,13 @@ export function parseYaml(text) {
     }
     while (stack.length > 1 && (stack.at(-1).item ? indent < stack.at(-1).indent : indent <= stack.at(-1).indent)) stack.pop();
     const top = stack.at(-1);
-    if (Array.isArray(top.obj)) throw new Error(`YAML linha ${i + 1}: chave dentro de lista sem "- ": "${line.trim()}"`);
+    if (Array.isArray(top.obj)) throw new Error(`YAML line ${i + 1}: key inside a list without "- ": "${line.trim()}"`);
     setKey(top, trimmed, indent, i + 1, line);
   });
   return root;
 }
 
-/** Separa front matter (--- ... ---) do corpo Markdown. */
+/** Splits front matter (--- ... ---) from the Markdown body. */
 export function splitFrontMatter(md) {
   const m = md.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
   if (!m) return { frontMatter: null, body: md, bodyStartLine: 1 };

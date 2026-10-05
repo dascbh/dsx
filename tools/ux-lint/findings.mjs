@@ -1,22 +1,25 @@
 #!/usr/bin/env node
-// Registro de achados de UX (contrato: knowledge/fundamentos/achados-de-ux.md). Sem dependências.
-// Junta o resultado dos verificadores de texto, tela e fluxo num registro durável por módulo, com id estável,
-// decisão do dono separada do resultado da máquina e status calculado entre execuções.
+// UX findings register (contract: knowledge/foundations/ux-findings.md). No dependencies.
+// Merges the results of the text, screen and flow checkers into a durable register per module, with a stable id,
+// the owner's decision kept apart from the machine result, and a status computed across runs.
 //
 //   node tools/ux-lint/findings.mjs register --module <m> [--dir .dsx/findings] [--text t.json] [--screen s.json] [--flow f.json]
 //                                            [--states st.json] [--consistency c.json] [--layout l.json] [--root <repo>] [--ux UX.md] [--include-sev0]
 //   node tools/ux-lint/findings.mjs options  --module <m> --from cases.json
-//   node tools/ux-lint/findings.mjs decide   --module <m> <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
+//   node tools/ux-lint/findings.mjs decide   --module <m> <id> <index|ignore|free> [--reason "…"] [--text "…"] [--by name]
 //   node tools/ux-lint/findings.mjs import   --module <m> decisions.json
 //   node tools/ux-lint/findings.mjs status   --module <m> [--json]
 //   node tools/ux-lint/findings.mjs check    --module <m> [--min 2] [--text …] [--screen …] [--flow …] [--root <repo>] [--ux UX.md]
-//   node tools/ux-lint/findings.mjs page     --module <m> <saida.html> [--product …] [--color …] [--previews <dir>] [--preview-files]
-//                                            [--no-preview] [--max-page-mb 10]   (páginas: <saida>.html, <saida>-2.html…)
+//   node tools/ux-lint/findings.mjs page     --module <m> <out.html> [--product …] [--color …] [--previews <dir>] [--preview-files]
+//                                            [--no-preview] [--max-page-mb 10] [--lang en|pt-BR]   (pages: <out>.html, <out>-2.html…)
 //
-// Arquivos em <dir>/<módulo>/: findings.json (escrito aqui), options.json (opções da skill), decisions.json (dono).
-// Desvios declarados no UX.md (`deviations:`, lido de --ux ou de <root>/UX.md) marcam o achado coberto como
-// `accepted-deviation`; a cópia vigente fica em findings.json (`deviations`) e o status volta a `open` quando o
-// desvio sai do UX.md ou vence.
+// Files in <dir>/<module>/: findings.json (written here), options.json (the skill's options), decisions.json (owner).
+// Deviations declared in UX.md (`deviations:`, read from --ux or <root>/UX.md) mark the covered finding as
+// `accepted-deviation`; the current copy is kept in findings.json (`deviations`) and the status goes back to `open`
+// when the deviation leaves UX.md or expires.
+// Reworded messages: screen/flow/states/layout ids hash the detector message; when only the wording changed (e.g. the
+// detectors moved to English), `relinkReworded` gives the new item the id of the registered one (same family, rule,
+// first screen and region), so status and decision survive.
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from '../lib/yaml-lite.mjs';
 import { parseDeviations, coveringDeviation } from './lib/deviations.mjs';
@@ -27,24 +30,26 @@ import { pathToFileURL } from 'node:url';
 import { parseArgs } from '../lib/cli.mjs';
 import { renderTextPages, normalizeElement, sortCases, PAGE_MAX_BYTES, MAX_OUTPUT_FILES } from './text-page.mjs';
 import { loadPreviews, attachPreviews, previewKeys, embeddedSize, embedded } from './lib/preview-page.mjs';
+import { pageStrings, pageLang } from './lib/page-strings.mjs';
 import { normalizeCases, normalizeDetectorJson } from './lib/legacy.mjs';
 import { resolveProjectPaths } from './lib/project-paths.mjs';
 
-/** Verificadores que produzem a entrada de cada família (nomes isolados aqui para renomear sem caçar no código). */
+/** Checkers that produce each family's input (names kept here so they can be renamed without hunting in the code). */
 export const DETECTORS = {
   text: 'tools/ux-lint/text.mjs', screen: 'tools/ux-lint/screen.mjs', flow: 'tools/ux-lint/flow.mjs',
   states: 'tools/ux-lint/states.mjs', consistency: 'tools/ux-lint/consistency.mjs', layout: 'tools/ux-lint/layout.mjs',
 };
 export const FAMILIES = ['text', 'screen', 'flow', 'states', 'consistency', 'layout'];
 const PREFIX = { text: 't', screen: 's', flow: 'f', states: 'st', consistency: 'c', layout: 'l' };
-/** Famílias cujo achado compara telas entre si: a âncora do id é só o texto, sem tela nem região. */
+/** Families whose finding compares screens with each other: the id anchor is only the text, no screen or region. */
 const CROSS_SCREEN = ['text', 'consistency'];
 export const STATUSES = ['open', 'decided', 'ignored', 'accepted-deviation', 'fixed', 'regression'];
-const STATUS_PT = { open: 'aberto', decided: 'decidido', ignored: 'ignorado', 'accepted-deviation': 'desvio aceito', fixed: 'corrigido', regression: 'regressão' };
-/** Status que contam como abertos (dívida a tratar). `ignored` e `accepted-deviation` não contam. */
+/** Status names in CLI output (English; the page uses the dictionary of its --lang). */
+const STATUS_LABEL = pageStrings('en').status;
+/** Statuses that count as open (debt to handle). `ignored` and `accepted-deviation` do not count. */
 export const OPEN_STATUSES = ['open', 'decided', 'regression'];
 
-/** Desvios do front matter de um UX.md (caminho). Sem arquivo, null (o registro mantém os que tinha). */
+/** Deviations from the front matter of a UX.md (path). No file → null (the register keeps the ones it had). */
 export function deviationsFromUx(uxPath) {
   if (!uxPath || !existsSync(uxPath)) return null;
   const { frontMatter } = splitFrontMatter(readFileSync(uxPath, 'utf8').replace(/\r\n/g, '\n'));
@@ -52,11 +57,11 @@ export function deviationsFromUx(uxPath) {
   try { return parseDeviations(parseYaml(frontMatter).deviations).deviations; } catch { return []; }
 }
 
-// ---------- normalização ----------
+// ---------- normalization ----------
 
 const ZW = /[​-‍﻿]/g;
 const clean = (s) => String(s ?? '').replace(ZW, '').replace(/\s+/g, ' ').trim();
-/** Troca dado variável (datas, horas, valores, números, marcadores `{nome}`) por `{}`, preservando a caixa. */
+/** Replaces variable data (dates, times, amounts, numbers, `{name}` markers) with `{}`, keeping the case. */
 export function maskData(s) {
   return clean(s)
     .replace(/\{[^{}]*\}/g, '{}')
@@ -69,7 +74,7 @@ export function maskData(s) {
 }
 export const normText = (s) => maskData(s).toLowerCase();
 
-/** Texto-modelo a partir das variantes: palavras iguais no começo e no fim ficam, o miolo que muda vira `{}`. */
+/** Template text from the variants: words equal at the start and end stay, the middle that changes becomes `{}`. */
 export function templateOf(text, variants = []) {
   const all = [...new Set([text, ...variants].filter((v) => clean(v)).map(maskData))];
   if (all.length <= 1) return all[0] ?? '';
@@ -88,9 +93,9 @@ const fileOf = (src) => String(src).replace(/:\d+(:\d+)?$/, '');
 const isCode = (src) => !/\.html?(:\d+)*$/.test(String(src));
 
 /**
- * Id estável: hash de `family | rule | âncora`. Âncora: arquivo da primeira origem no código (sem linha) + texto
- * normalizado; sem origem no código, tela + região + texto. A família flow ancora sempre na tela do mapa (a
- * evidência dela lista transições de entrada, que mudam sem que o achado mude).
+ * Stable id: hash of `family | rule | anchor`. Anchor: file of the first code source (no line) + normalized text;
+ * without a code source, screen + region + text. The flow family always anchors on the map screen (its evidence
+ * lists incoming transitions, which change without the finding changing).
  */
 export function stableId(item) {
   const code = item.family === 'flow' ? null : (item.source ?? []).find(isCode);
@@ -100,7 +105,7 @@ export function stableId(item) {
   return `${PREFIX[item.family]}-${sha(`${item.family}|${item.rule}|${anchor}`).slice(0, 8)}`;
 }
 
-// ---------- normalização das três saídas ----------
+// ---------- normalization of the detector outputs ----------
 
 const ELEMENT_FROM_TYPE = {
   title: 'title', button: 'button', tab: 'tab', label: 'label', placeholder: 'placeholder', helper: 'helper',
@@ -119,8 +124,8 @@ function makeRel(root) {
 }
 
 /**
- * Saída do verificador de texto (`--json`) → itens. Severidade 0 (provável dado) fica fora salvo `includeSev0`.
- * A saída antiga, com chaves em pt-BR, também é lida (lib/legacy.mjs) — vale para as três famílias.
+ * Text checker output (`--json`) → items. Severity 0 (probable data) is left out unless `includeSev0`.
+ * The old output, with pt-BR keys, is also read (lib/legacy.mjs); the same holds for every family.
  */
 export function fromText(input, { root = null, includeSev0 = false } = {}) {
   const json = normalizeDetectorJson(input);
@@ -138,7 +143,7 @@ export function fromText(input, { root = null, includeSev0 = false } = {}) {
   });
 }
 
-/** Saída do verificador de tela (`--json`) → itens (um por tela, região e mensagem). */
+/** Screen checker output (`--json`) → items (one per screen, region and message). */
 export function fromScreen(input, { root = null } = {}) {
   const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
@@ -154,7 +159,7 @@ export function fromScreen(input, { root = null } = {}) {
   return out;
 }
 
-/** Saída do verificador de fluxo (`--json`) → itens (âncora: a tela ou jornada do mapa). */
+/** Flow checker output (`--json`) → items (anchor: the map screen or journey). */
 export function fromFlow(input, { root = null } = {}) {
   const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
@@ -175,8 +180,8 @@ export function fromFlow(input, { root = null } = {}) {
 }
 
 /**
- * Saída do verificador de estados (`--json`) → itens. A tela é a do nome da captura sem o estado (`02-acervo`); a
- * região leva o estado (`error · main`), para o mesmo problema em estados diferentes não colapsar num id só.
+ * States checker output (`--json`) → items. The screen is the capture name without the state (`02-library`); the
+ * region carries the state (`error · main`), so the same problem in different states does not collapse into one id.
  */
 export function fromStates(input, { root = null } = {}) {
   const json = normalizeDetectorJson(input);
@@ -195,7 +200,7 @@ export function fromStates(input, { root = null } = {}) {
 }
 
 const ELEMENT_FROM_CONSISTENCY_RULE = { C1: 'button', C2: 'button', C3: 'title' };
-/** Saída do verificador de consistência (`--json`) → itens (âncora: a chave da função ou do conceito, sem tela). */
+/** Consistency checker output (`--json`) → items (anchor: the key of the function or concept, no screen). */
 export function fromConsistency(input, { root = null } = {}) {
   const json = normalizeDetectorJson(input);
   const rel = makeRel(root);
@@ -210,8 +215,8 @@ export function fromConsistency(input, { root = null } = {}) {
 
 const ELEMENT_FROM_LAYOUT_RULE = { L1: 'button', L3: 'title', L5: 'label', L6: 'button', L8: 'button' };
 /**
- * Saída do verificador de layout (`--json`) → itens. Âncora do id: tela + regra + região + `anchor` (rótulo ou
- * seletor do elemento, sem coordenadas); a medida fica na mensagem, que pode mudar sem mudar o id.
+ * Layout checker output (`--json`) → items. Id anchor: screen + rule + region + `anchor` (label or element
+ * selector, no coordinates); the measurement stays in the message, which can change without changing the id.
  */
 export function fromLayout(input) {
   const json = normalizeDetectorJson(input);
@@ -221,14 +226,14 @@ export function fromLayout(input) {
       family: 'layout', rule: a.rule, severity: a.severity, element: ELEMENT_FROM_LAYOUT_RULE[a.rule] ?? null,
       text: clean(a.anchor ?? a.message), variants: [], screens: [screenName(t.screen ?? t.file)], region: a.region ?? '',
       source: [basename(String(t.file ?? `${t.screen}.html`))], message: a.message,
-      // Seletor do elemento na captura (caminho do measure.mjs): localiza a prévia; não entra no id.
+      // Selector of the element in the capture (measure.mjs path): locates the preview; not part of the id.
       ...(Array.isArray(a.elements) && a.elements.length ? { selectors: a.elements.slice(0, 8) } : {}),
     });
   }
   return out;
 }
 
-/** Junta itens de mesmo id dentro de uma execução (ex.: dois textos que só diferem por um número). */
+/** Merges items with the same id within a run (e.g. two texts that differ only by a number). */
 function collapse(items) {
   const by = new Map();
   for (const it of items) {
@@ -245,9 +250,9 @@ function collapse(items) {
 const textKeys = (it) => new Set([it.text, ...(it.variants ?? [])].filter(Boolean).map(normText));
 
 /**
- * Dá id aos itens de uma execução. Quando o id calculado não existe no registro mas um item registrado da mesma
- * família, regra e arquivo tem uma variante em comum (o conjunto de variantes mudou e o modelo mudou junto),
- * herda o id registrado.
+ * Gives ids to the items of a run. When the computed id is not in the register but a registered item of the same
+ * family, rule and file shares a variant (the set of variants changed and the template changed with it), it
+ * inherits the registered id.
  */
 export function assignIds(items, registry = []) {
   const known = new Set(registry.map((r) => r.id));
@@ -264,7 +269,7 @@ export function assignIds(items, registry = []) {
   return collapse(items);
 }
 
-/** Lê as entradas da execução (arquivos JSON de cada família). Devolve { items, families }. */
+/** Reads the run inputs (JSON files of each family). Returns { items, families }. */
 export function collect({ text, screen, flow, states, consistency, layout, root = null, includeSev0 = false }, registry = []) {
   const items = [];
   const families = [];
@@ -276,6 +281,50 @@ export function collect({ text, screen, flow, states, consistency, layout, root 
   if (consistency) { items.push(...fromConsistency(read(consistency), { root })); families.push('consistency'); }
   if (layout) { items.push(...fromLayout(read(layout))); families.push('layout'); }
   return { items: assignIds(items, registry), families };
+}
+
+// ---------- reworded messages ----------
+
+/**
+ * Families whose id can change when the detector wording changes: screen, flow, states, layout (message or anchor)
+ * and consistency (its text carries detector words such as " (dialog)"). Only text is left out.
+ */
+const MESSAGE_ANCHORED = (it) => it.family !== 'text' && (it.family === 'flow' || it.family === 'consistency' || !(it.source ?? []).some(isCode));
+/** Region with the old pt-BR detector words mapped to English (states regions are `<state> · <region>`). */
+export const normRegion = (r) => String(r ?? '')
+  .replace(/diálogo/g, 'dialog').replace(/\(tela\)/g, '(screen)').replace(/\(fora de região\)/g, '(outside any region)').replace(/º/g, '#')
+  .replace(/\s+/g, ' ').trim();
+/** Match key: family + rule + first screen + normalized region; consistency (no region) uses the sorted screen list. */
+const relinkKey = (it) => (it.family === 'consistency'
+  ? `${it.family}|${it.rule}|${[...(it.screens ?? [])].sort().join(',')}`
+  : `${it.family}|${it.rule}|${(it.screens ?? [])[0] ?? ''}|${normRegion(it.region)}`);
+
+/**
+ * A detector message reworded (same finding, new wording, e.g. after the detectors moved to English) changes the
+ * id of message-anchored findings. For each match key (see `relinkKey`): when exactly one new item
+ * (id not in the register) and exactly one registered item (not fixed, not a review item, not seen in this run)
+ * share the key, the new item takes the registered id. Changes `items` in place; returns [{ from, to }].
+ */
+export function relinkReworded(reg, items) {
+  const known = new Map(reg.items.map((i) => [i.id, i]));
+  const seen = new Set(items.map((i) => i.id));
+  const fresh = new Map();
+  for (const it of items) {
+    if (known.has(it.id) || !MESSAGE_ANCHORED(it)) continue;
+    const k = relinkKey(it);
+    if (!fresh.has(k)) fresh.set(k, []);
+    fresh.get(k).push(it);
+  }
+  const out = [];
+  for (const [k, list] of fresh) {
+    if (list.length !== 1) continue;
+    const cands = reg.items.filter((r) => r.status !== 'fixed' && r.origin !== 'review' && !seen.has(r.id) && MESSAGE_ANCHORED(r) && relinkKey(r) === k);
+    if (cands.length !== 1) continue;
+    out.push({ from: list[0].id, to: cands[0].id });
+    list[0].id = cands[0].id;
+    seen.add(cands[0].id);
+  }
+  return out;
 }
 
 // ---------- status ----------
@@ -291,8 +340,8 @@ export function statusOf(item, decisions = {}, deviations = [], now = new Date()
 }
 
 /**
- * Recalcula o status de todos os itens. Desvios: os passados em `deviations` ou, sem eles, a cópia guardada no
- * registro (`reg.deviations`). Item coberto ganha `deviation: { id, reason, decided_by, until }`.
+ * Recomputes the status of every item. Deviations: the ones passed in `deviations` or, without them, the copy kept
+ * in the register (`reg.deviations`). A covered item gets `deviation: { id, reason, decided_by, until }`.
  */
 export function restatus(reg, decisions, { deviations = reg.deviations ?? [], now = new Date() } = {}) {
   for (const it of reg.items) {
@@ -304,7 +353,7 @@ export function restatus(reg, decisions, { deviations = reg.deviations ?? [], no
   return reg;
 }
 
-// ---------- registro em disco ----------
+// ---------- register on disk ----------
 
 const today = (now) => (now ?? new Date()).toISOString().slice(0, 10);
 export function paths(dir, module) {
@@ -320,11 +369,13 @@ export const load = (p, module) => ({
 });
 
 /**
- * Funde uma execução no registro. Só as famílias que vieram nesta execução podem marcar ausência; itens de
- * revisão manual (`origin: "review"`) não são vistos pelos verificadores e nunca ficam ausentes por eles.
+ * Merges a run into the register. Only the families present in this run can mark absence; manual review items
+ * (`origin: "review"`) are not seen by the checkers and are never marked absent by them. Items whose message was
+ * only reworded keep the registered id (`relinkReworded`); the relinks are listed in `run.relinked`.
  */
 export function merge(reg, run, { now = new Date(), commit = null, decisions = { items: {} }, deviations = null } = {}) {
   const day = today(now);
+  run.relinked = relinkReworded(reg, run.items);
   if (Array.isArray(deviations)) reg.deviations = deviations;
   const byId = new Map(reg.items.map((i) => [i.id, i]));
   const seen = new Set();
@@ -361,14 +412,14 @@ function gitCommit(root) {
   try { return execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null; } catch { return null; }
 }
 
-// ---------- opções ----------
+// ---------- options ----------
 
 const stripMarks = (k) => k.replace(/\{\}/g, ' ').replace(/[—–-]/g, ' ').replace(/\s+/g, ' ').trim();
 
 /**
- * Um caso de opções cobre o item? Mesma regra e: texto igual (normalizado) a uma das variantes, em qualquer
- * arquivo (a origem anotada no caso pode ser outra ocorrência do mesmo texto); ou um texto contido no outro
- * (8+ caracteres) com arquivo em comum.
+ * Does an options case cover the item? Same rule and: text equal (normalized) to one of the variants, in any file
+ * (the source noted in the case may be another occurrence of the same text); or one text contained in the other
+ * (8+ characters) with a file in common.
  */
 export function caseMatches(entry, item) {
   if (item.family !== 'text' || item.rule !== entry.rule || item.origin === 'review') return false;
@@ -383,7 +434,7 @@ export function caseMatches(entry, item) {
   return sa.some((x) => sb.some((y) => x === y || x.includes(y) || y.includes(x)));
 }
 
-/** Importa casos com opções; devolve { matched, manual, links } e altera reg/options. */
+/** Imports cases with options; returns { matched, manual, links } and changes reg/options. */
 export function importOptions(reg, options, input, { now = new Date() } = {}) {
   const cases = normalizeCases(input).data ?? [];
   const day = today(now);
@@ -418,19 +469,19 @@ export function importOptions(reg, options, input, { now = new Date() } = {}) {
   return { matched, manual, links };
 }
 
-// ---------- decisões ----------
+// ---------- decisions ----------
 
-export function makeDecision(choice, { reason = null, text = null, by = 'dono', now = new Date(), options = null } = {}) {
+export function makeDecision(choice, { reason = null, text = null, by = 'owner', now = new Date(), options = null } = {}) {
   let c = choice;
   if (typeof c === 'string' && /^\d+$/.test(c)) c = Number(c);
-  if (c !== 'ignore' && c !== 'free' && !Number.isInteger(c)) throw new Error(`escolha inválida "${choice}" (use o índice da opção, ignore ou free)`);
-  if (c === 'ignore' && !clean(reason)) throw new Error('ignore exige --reason');
-  if (c === 'free' && !clean(text)) throw new Error('free exige --text');
-  if (Number.isInteger(c) && options && !(c >= 0 && c < (options.options ?? []).length)) throw new Error(`índice ${c} fora das opções (0–${(options.options ?? []).length - 1})`);
-  return { choice: c, by: by || 'dono', at: today(now), reason: clean(reason) || null, ...(c === 'free' ? { text: clean(text) } : {}) };
+  if (c !== 'ignore' && c !== 'free' && !Number.isInteger(c)) throw new Error(`invalid choice "${choice}" (use the option index, ignore or free)`);
+  if (c === 'ignore' && !clean(reason)) throw new Error('ignore requires --reason');
+  if (c === 'free' && !clean(text)) throw new Error('free requires --text');
+  if (Number.isInteger(c) && options && !(c >= 0 && c < (options.options ?? []).length)) throw new Error(`index ${c} outside the options (0–${(options.options ?? []).length - 1})`);
+  return { choice: c, by: by || 'owner', at: today(now), reason: clean(reason) || null, ...(c === 'free' ? { text: clean(text) } : {}) };
 }
 
-/** Importa o JSON exportado pela página (`{items:{id:{choice,…}}}`). Devolve { ok, unknown, invalid }. */
+/** Imports the JSON exported by the page (`{items:{id:{choice,…}}}`). Returns { ok, unknown, invalid }. */
 export function importDecisions(reg, decisions, data, { now = new Date() } = {}) {
   const known = new Set(reg.items.map((i) => i.id));
   const out = { ok: 0, unknown: [], invalid: [] };
@@ -447,9 +498,10 @@ export function importDecisions(reg, decisions, data, { now = new Date() } = {})
 
 // ---------- check ----------
 
-/** Compara uma execução com o registro, sem gravar. Devolve { pass, added, regressions, known }. */
+/** Compares a run with the register, without writing. Returns { pass, added, regressions, known, accepted, relinked }. */
 export function check(reg, run, { min = 2, decisions = { items: {} }, deviations = reg.deviations ?? [], now = new Date() } = {}) {
   const byId = new Map(reg.items.map((i) => [i.id, i]));
+  const relinked = relinkReworded(reg, run.items);
   const added = [], regressions = [], known = [], accepted = [];
   for (const it of run.items) {
     if (coveringDeviation({ ...it, present: true }, deviations, now)) { accepted.push(it); continue; }
@@ -460,10 +512,10 @@ export function check(reg, run, { min = 2, decisions = { items: {} }, deviations
     if (st === 'fixed' || st === 'regression') regressions.push({ ...it, was: st });
     else known.push({ ...it, status: st });
   }
-  return { pass: !added.length && !regressions.length, added, regressions, known, accepted };
+  return { pass: !added.length && !regressions.length, added, regressions, known, accepted, relinked };
 }
 
-// ---------- status (resumo) ----------
+// ---------- status (summary) ----------
 
 export function summary(reg) {
   const countBy = (f) => reg.items.reduce((o, i) => { const k = f(i); o[k] = (o[k] || 0) + 1; return o; }, {});
@@ -476,11 +528,11 @@ export function summary(reg) {
   };
 }
 
-// ---------- página ----------
+// ---------- page ----------
 
 const escH = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-/** Monta os casos da página: um por caso de opções (vários ids) ou por item sem opções; corrigidos ficam fora. */
+/** Builds the page cases: one per options case (several ids) or per item without options; fixed ones are left out. */
 export function pageCases(reg, options, decisions) {
   const alive = reg.items.filter((i) => i.status !== 'fixed');
   const groups = new Map();
@@ -531,11 +583,13 @@ const PAGE_STYLE = `
 #saida{width:100%;min-height:140px;font:12px var(--mono);border:1px solid var(--control-line);border-radius:8px;background:var(--surface);color:var(--fg);padding:8px}
 #aviso{font-size:13px}`;
 
-// Decisões atravessam as páginas: cada escolha vai para o localStorage (chave por módulo + versão do registro) e
-// "Copiar decisões" junta as de todas as páginas. Sem localStorage, vale só o formulário da página aberta.
+// Decisions cross pages: each choice goes to localStorage (key per module + register version) and "Copy decisions"
+// gathers the ones of every page. Without localStorage, only the form of the open page counts. The script's text
+// comes from the page language (META.t), so the code is the same in every language.
 const PAGE_SCRIPT = `
 const hoje=new Date().toISOString().slice(0,10);
 const META=JSON.parse(document.getElementById('dsx-decisions').textContent);
+const T=META.t;const fmt=(s,o)=>s.replace(/\\{(\\w+)\\}/g,(m,k)=>(k in o?o[k]:m));
 let mem={by:'',cases:{}};
 function ler(){try{const v=localStorage.getItem(META.key);if(v){const o=JSON.parse(v);if(o&&o.cases)mem=o;}}catch(e){}}
 function gravar(){try{localStorage.setItem(META.key,JSON.stringify(mem));}catch(e){}}
@@ -548,47 +602,51 @@ if(d){const r=f.querySelector('input[type=radio][value="'+d.choice+'"]');if(r)r.
 const upd=()=>{const r=f.querySelector('input[type=radio]:checked');if(!r)return;mem.cases[f.dataset.case]={choice:r.value,reason:(m.value||'').trim()||null,ids:f.dataset.ids.split(' ')};gravar();contar();};
 f.addEventListener('change',upd);m.addEventListener('input',upd);});
 function atual(c){return mem.cases[c.case]||(c.prior!==null?{choice:String(c.prior),reason:c.reason,ids:c.ids}:null);}
-function contar(){const n=META.cases.filter(atual).length;document.querySelectorAll('.contador').forEach(e=>{e.textContent=n+' decididos de '+META.cases.length;});}
+function contar(){const n=META.cases.filter(atual).length;document.querySelectorAll('.contador').forEach(e=>{e.textContent=fmt(T.counter,{n,total:META.cases.length});});}
 contar();
 document.getElementById('copiar').addEventListener('click',async()=>{const aviso=document.getElementById('aviso');const saida=document.getElementById('saida');
-const itens={};const erros=[];const quem=(por.value||'').trim()||mem.by||'dono';
+const itens={};const erros=[];const quem=(por.value||'').trim()||mem.by||T.owner;
 sets.forEach(f=>f.querySelector('input[type=text]').removeAttribute('aria-invalid'));
 META.cases.forEach(c=>{const d=atual(c);if(!d)return;
 if(d.choice==='ignore'&&!d.reason){erros.push(c.case);const f=document.querySelector('fieldset.decisao[data-case="'+c.case+'"]');if(f)f.querySelector('input[type=text]').setAttribute('aria-invalid','true');return;}
 const escolha=d.choice==='ignore'?'ignore':Number(d.choice);c.ids.forEach(id=>{itens[id]={choice:escolha,by:quem,at:hoje,reason:d.reason||null};});});
-if(erros.length){aviso.textContent='Para ignorar, escreva o motivo ('+erros.length+' caso(s) sem motivo'+(erros.some(e=>!document.querySelector('fieldset.decisao[data-case="'+e+'"]'))?', alguns em outras páginas':'')+'; os desta página estão em vermelho).';return;}
+if(erros.length){aviso.textContent=fmt(T.needReason,{n:erros.length,other:erros.some(e=>!document.querySelector('fieldset.decisao[data-case="'+e+'"]'))?T.otherPages:''});return;}
 const n=Object.keys(itens).length;const json=JSON.stringify({items:itens},null,2);saida.value=json;saida.hidden=false;
-try{await navigator.clipboard.writeText(json);aviso.textContent=n+' decisão(ões) de todas as páginas copiadas. Cole em decisions.json ou no chat.';}
-catch(e){saida.focus();saida.select();aviso.textContent=n+' decisão(ões) no campo abaixo, já selecionadas: copie com Ctrl+C ou Cmd+C.';}});`;
+try{await navigator.clipboard.writeText(json);aviso.textContent=fmt(T.copied,{n});}
+catch(e){saida.focus();saida.select();aviso.textContent=fmt(T.selectToCopy,{n});}});`;
 
 /**
- * Páginas de decisão. Devolve [{ file, html, cases, bytes }] (uma página quando cabe).
- * opts: { product, color, file, previews: manifesto de lib/preview-page.mjs (null = sem prévia), preview_files:
- *         caminho relativo da página até a pasta de prévias (referencia em vez de embutir), maxBytes, maxCases }.
+ * Decision pages. Returns [{ file, html, cases, bytes }] (one page when it fits).
+ * opts: { product, color, file, previews: manifest from lib/preview-page.mjs (null = no preview), previewFiles:
+ *         relative path from the page to the previews folder (references instead of embedding), maxBytes, maxCases,
+ *         lang (page language, en | pt-BR; default en) }.
  */
-export function renderPages(reg, options, decisions, { product = '', color = '#2B59C3', file = 'page.html', previews = null, previewFiles = null, maxBytes, maxCases } = {}) {
+export function renderPages(reg, options, decisions, { product = '', color = '#2B59C3', file = 'page.html', previews = null, previewFiles = null, maxBytes, maxCases, lang } = {}) {
+  const L = pageLang(lang);
+  const S = pageStrings(L);
   const cases = pageCases(reg, options, decisions);
-  if (previews) attachPreviews(cases, previews);
+  if (previews) attachPreviews(cases, previews, { lang: L });
   const fixed = reg.items.filter((i) => i.status === 'fixed').length;
   const acceptedCount = reg.items.filter((i) => i.status === 'accepted-deviation').length;
-  const header = (c) => `<span class="meta">${[...new Set(c.statuses)].map((s) => `<span class="st st-${s}">${STATUS_PT[s] ?? s}</span>`).join('')}<code>${c.ids.slice(0, 4).map(escH).join(' ')}${c.ids.length > 4 ? ` +${c.ids.length - 4}` : ''}</code></span>`;
+  const header = (c) => `<span class="meta">${[...new Set(c.statuses)].map((s) => `<span class="st st-${s}">${S.status[s] ?? s}</span>`).join('')}<code>${c.ids.slice(0, 4).map(escH).join(' ')}${c.ids.length > 4 ? ` +${c.ids.length - 4}` : ''}</code></span>`;
   const footer = (c) => {
     if (c.deviation) {
       const v = c.deviation;
-      return `<p class="desvio"><strong>Desvio aceito ${escH(v.id)}</strong> (declarado no UX.md${v.decided_by ? `, decidido por ${escH(v.decided_by)}` : ''}${v.until ? `, vale até ${escH(v.until)}` : ''}): ${escH(v.reason)}. Para reabrir, tire o desvio do UX.md e registre de novo.</p>`;
+      return `<p class="desvio">${S.deviation(escH(v.id), v.decided_by ? escH(v.decided_by) : null, v.until ? escH(v.until) : null, escH(v.reason))}</p>`;
     }
     const d = c.decision;
     const checked = (v) => (d && String(d.choice) === String(v) ? ' checked' : '');
     const ops = c.options.map((_, i) => `<label><input type="radio" name="d-${escH(c.id)}" value="${i}"${checked(i)}> ${String.fromCharCode(65 + i)}</label>`).join('');
-    const already = d ? `<span class="ja">Decidido: ${d.choice === 'ignore' ? 'ignorar' : d.choice === 'free' ? `texto livre "${escH(d.text)}"` : `opção ${String.fromCharCode(65 + d.choice)}`}${d.by ? ` por ${escH(d.by)}` : ''}${d.at ? ` em ${escH(d.at)}` : ''}</span>` : '';
-    return `<fieldset class="decisao" data-ids="${escH(c.ids.join(' '))}" data-case="${escH(c.id)}"><legend>Sua decisão</legend>${ops}<label><input type="radio" name="d-${escH(c.id)}" value="ignore"${checked('ignore')}> Ignorar</label><input type="text" aria-label="Motivo" placeholder="Motivo (obrigatório para ignorar)" value="${escH(d?.reason ?? '')}">${already}</fieldset>`;
+    const already = d ? `<span class="ja">${S.decided(d.choice === 'ignore' ? S.decidedIgnore : d.choice === 'free' ? S.decidedFree(escH(d.text)) : S.decidedOption(String.fromCharCode(65 + d.choice)), d.by ? escH(d.by) : null, d.at ? escH(d.at) : null)}</span>` : '';
+    return `<fieldset class="decisao" data-ids="${escH(c.ids.join(' '))}" data-case="${escH(c.id)}"><legend>${escH(S.yourDecision)}</legend>${ops}<label><input type="radio" name="d-${escH(c.id)}" value="ignore"${checked('ignore')}> ${escH(S.ignore)}</label><input type="text" aria-label="${escH(S.reason)}" placeholder="${escH(S.reasonPlaceholder)}" value="${escH(d?.reason ?? '')}">${already}</fieldset>`;
   };
   const meta = {
     key: `dsx-findings:${reg.module}:${reg.updated ?? ''}#${reg.runs?.length ?? 0}`,
     cases: cases.filter((c) => !c.deviation).map((c) => ({ case: c.id, ids: c.ids, prior: c.decision && c.decision.choice !== 'free' ? c.decision.choice : null, reason: c.decision?.reason ?? null })),
+    t: S.script,
   };
-  const bottom = `<div class="acoes"><label>Quem decide <input id="por" type="text" autocomplete="name"></label><button type="button" id="copiar">Copiar decisões</button><span class="contador" aria-live="polite"></span><span id="aviso" role="status" aria-live="polite"></span>
-  <textarea id="saida" hidden readonly aria-label="Decisões em JSON"></textarea></div>
+  const bottom = `<div class="acoes"><label>${escH(S.whoDecides)} <input id="por" type="text" autocomplete="name"></label><button type="button" id="copiar">${escH(S.copyDecisions)}</button><span class="contador" aria-live="polite"></span><span id="aviso" role="status" aria-live="polite"></span>
+  <textarea id="saida" hidden readonly aria-label="${escH(S.decisionsJson)}"></textarea></div>
   <script type="application/json" id="dsx-decisions">${JSON.stringify(meta).replace(/</g, '\\u003c')}</script>`;
   const withPreview = cases.some((c) => c.preview);
   const pv = withPreview
@@ -597,38 +655,40 @@ export function renderPages(reg, options, decisions, { product = '', color = '#2
       : { mode: 'embed', sizeOf: (k) => embeddedSize(previews.dir, k), embedded: (k) => embedded(previews.dir, k) })
     : null;
   return renderTextPages(cases, {
-    title: `Achados de UX · ${reg.module}`, product, color, eyebrow: 'Registro de achados de UX', file,
-    lede: `Cada caso mostra o elemento como aparece hoje e as opções${withPreview ? ', com a prévia tirada da captura real da tela (antes e depois, com o elemento contornado; clique para ampliar e use Antes | Depois para comparar no mesmo lugar)' : ''}. Escolha uma opção ou "Ignorar" (com motivo) e use "Copiar decisões" no fim da página: o JSON, com as decisões de todas as páginas, vai para decisions.json pelo comando import. ${fixed} achado(s) corrigido(s) ficaram fora da lista.${acceptedCount ? ` ${acceptedCount} achado(s) cobertos por desvio declarado no UX.md aparecem com o motivo e não contam como abertos.` : ''}`,
+    title: S.findingsTitle(reg.module), product, color, eyebrow: S.findingsEyebrow, file, lang: L,
+    lede: S.findingsLede(withPreview, fixed, acceptedCount),
     top: '<p class="contador" aria-live="polite"></p>',
     card: { header, footer }, style: PAGE_STYLE, script: PAGE_SCRIPT, bottom, previews: pv, maxBytes, maxCases,
   });
 }
 
-/** Página única (a primeira, quando há várias). */
+/** Single page (the first one, when there are several). */
 export function renderPage(reg, options, decisions, opts = {}) {
   return renderPages(reg, options, decisions, opts)[0].html;
 }
 
 /**
- * Grava as páginas em `out` (a primeira com o nome dado, as demais `<nome>-2.html`…). Prévias: lidas de
- * `previewsDir` (manifesto do preview.mjs); `previewFiles` referencia as imagens em vez de embutir. Devolve
+ * Writes the pages to `out` (the first with the given name, the others `<name>-2.html`…). Previews: read from
+ * `previewsDir` (preview.mjs manifest); `previewFiles` references the images instead of embedding them. Returns
  * { pages: [{ file, bytes, cases }], warnings }.
  */
-export function writePages(reg, options, decisions, out, { product = '', color = '#2B59C3', previewsDir = null, screensDir = null, previewFiles = false, noPreview = false, maxBytes, maxCases } = {}) {
+export function writePages(reg, options, decisions, out, { product = '', color = '#2B59C3', previewsDir = null, screensDir = null, previewFiles = false, noPreview = false, maxBytes, maxCases, lang } = {}) {
   const warnings = [];
+  const L = pageLang(lang);
   const outDir = dirname(resolve(out));
   const previews = !noPreview && previewsDir ? loadPreviews(previewsDir, { screensDir }) : null;
+  if (previews && (previews.lang ?? 'pt-BR') !== L) warnings.push(`the previews were generated with --lang ${previews.lang ?? 'pt-BR'} and the page uses ${L}; the text drawn on the images stays in ${previews.lang ?? 'pt-BR'} (run preview.mjs --lang ${L})`);
   let rel = null;
   if (previews && previewFiles) { rel = relative(outDir, previewsDir).split(sep).join('/'); }
-  const pages = renderPages(reg, options, decisions, { product, color, file: basename(out), previews, previewFiles: previews && previewFiles ? rel : null, maxBytes, maxCases });
+  const pages = renderPages(reg, options, decisions, { product, color, file: basename(out), previews, previewFiles: previews && previewFiles ? rel : null, maxBytes, maxCases, lang: L });
   if (previews && previewFiles) {
     const keys = new Set(pages.flatMap((p) => p.cases.flatMap(previewKeys)));
-    if (pages.length + keys.size > MAX_OUTPUT_FILES) warnings.push(`${pages.length} página(s) + ${keys.size} imagem(ns) passam de ${MAX_OUTPUT_FILES} arquivos; para publicar, prefira as imagens embutidas (sem --preview-files) ou suba --min-severity no preview.mjs`);
+    if (pages.length + keys.size > MAX_OUTPUT_FILES) warnings.push(`${pages.length} page(s) + ${keys.size} image(s) exceed ${MAX_OUTPUT_FILES} files; to publish, prefer embedded images (without --preview-files) or raise --min-severity in preview.mjs`);
   }
-  if (pages.length > MAX_OUTPUT_FILES) warnings.push(`${pages.length} páginas passam de ${MAX_OUTPUT_FILES} arquivos`);
-  for (const p of pages) if (p.bytes > (maxBytes ?? PAGE_MAX_BYTES) * 1.1) warnings.push(`${p.file} tem ${(p.bytes / 1048576).toFixed(1)} MB (um caso sozinho passa do limite por página)`);
+  if (pages.length > MAX_OUTPUT_FILES) warnings.push(`${pages.length} pages exceed ${MAX_OUTPUT_FILES} files`);
+  for (const p of pages) if (p.bytes > (maxBytes ?? PAGE_MAX_BYTES) * 1.1) warnings.push(`${p.file} is ${(p.bytes / 1048576).toFixed(1)} MB (a single case is over the per-page limit)`);
   mkdirSync(outDir, { recursive: true });
-  // páginas de uma execução anterior com mais páginas ficariam órfãs
+  // pages from an earlier run with more pages would be left orphaned
   const stem = basename(out).replace(/\.html?$/, '');
   for (const f of readdirSync(outDir)) {
     const m = f.match(new RegExp(`^${stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d+)\\.html$`));
@@ -640,22 +700,22 @@ export function writePages(reg, options, decisions, out, { product = '', color =
 
 // ---------- CLI ----------
 
-const USO = `Uso: node tools/ux-lint/findings.mjs <register|options|decide|import|status|check|page> --module <m> [opções]
+const USO = `Usage: node tools/ux-lint/findings.mjs <register|options|decide|import|status|check|page> --module <m> [options]
   register --text t.json --screen s.json --flow f.json --states st.json --consistency c.json --layout l.json [--root <repo>] [--ux UX.md] [--include-sev0]
   options  --from cases.json
-  decide   <id> <índice|ignore|free> [--reason "…"] [--text "…"] [--by nome]
+  decide   <id> <index|ignore|free> [--reason "…"] [--text "…"] [--by name]
   import   decisions.json
   status   [--json]
   check    [--min 2] --text … --screen … --flow … --states … --consistency … --layout … [--root <repo>] [--ux UX.md]
-  page     <saida.html> [--product …] [--color …] [--previews <dir>] [--preview-files] [--no-preview] [--max-page-mb 10]
-  (--dir padrão: paths.findings do projeto, senão <root ou diretório atual>/.dsx/findings; --config <file>; entradas vêm de ${Object.values(DETECTORS).join(', ')} com --json)`;
+  page     <out.html> [--product …] [--color …] [--previews <dir>] [--preview-files] [--no-preview] [--max-page-mb 10] [--lang en|pt-BR]
+  (--dir default: the project's paths.findings, else <root or current directory>/.dsx/findings; --config <file>; inputs come from ${Object.values(DETECTORS).join(', ')} with --json)`;
 
 function main() {
   const a = parseArgs();
   const [cmd, ...pos] = a._;
   if (!cmd || !a.module || a.module === true) { console.error(USO); process.exit(2); }
   const root = typeof a.root === 'string' ? resolve(a.root) : null;
-  // caminhos do projeto: lib/project-paths.mjs (flag > --config/.dsx/config.json > `paths` do UX.md > padrão)
+  // project paths: lib/project-paths.mjs (flag > --config/.dsx/config.json > UX.md `paths` > default)
   const pp = resolveProjectPaths({ root: root ?? process.cwd(), module: a.module, config: typeof a.config === 'string' ? a.config : null,
     flags: { dir: typeof a.dir === 'string' ? resolve(a.dir) : null, ux: typeof a.ux === 'string' ? resolve(a.ux) : null, screens: typeof a.screens === 'string' ? resolve(a.screens) : null } });
   const dir = pp.findings;
@@ -669,33 +729,34 @@ function main() {
   const uxDeviations = deviationsFromUx(uxPath);
 
   if (cmd === 'register') {
-    if (!FAMILIES.some((f) => inputs[f])) { console.error(`register: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
+    if (!FAMILIES.some((f) => inputs[f])) { console.error(`register: give at least one input (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     st.findings.module = a.module;
     merge(st.findings, run, { now, commit: gitCommit(root), decisions: st.decisions, deviations: uxDeviations });
     writeJson(p.findings, st.findings);
     const s = summary(st.findings);
-    console.log(`${relative(process.cwd(), p.findings) || p.findings} · ${run.items.length} achados nesta execução (${run.families.join(', ')}); registro com ${s.total}: ${Object.entries(s.by_status).map(([k, v]) => `${STATUS_PT[k]} ${v}`).join(', ')}`);
+    for (const r of run.relinked ?? []) console.error(`relinked ${r.to} (message reworded; new id would be ${r.from})`);
+    console.log(`${relative(process.cwd(), p.findings) || p.findings} · ${run.items.length} finding(s) in this run (${run.families.join(', ')}); register with ${s.total}: ${Object.entries(s.by_status).map(([k, v]) => `${STATUS_LABEL[k] ?? k} ${v}`).join(', ')}`);
     return;
   }
   if (cmd === 'options') {
-    if (!str(a.from)) { console.error('options: informe --from cases.json'); process.exit(2); }
+    if (!str(a.from)) { console.error('options: give --from cases.json'); process.exit(2); }
     const { data, warnings } = normalizeCases(JSON.parse(readFileSync(a.from, 'utf8')));
-    for (const w of warnings) console.error(`AVISO ${a.from}: ${w}`);
+    for (const w of warnings) console.error(`WARNING ${a.from}: ${w}`);
     const cases = (Array.isArray(data) ? data : data?.cases) ?? [];
     const r = importOptions(st.findings, st.options, cases, { now });
     restatus(st.findings, st.decisions);
     writeJson(p.findings, st.findings);
     writeJson(p.options, st.options);
-    console.log(`${cases.length} casos: ${r.matched} casaram com achados do registro (${r.links.filter((l) => l.ids.length && l.ids.length > 1).length} cobrindo mais de um id); ${r.manual} viraram achado de revisão manual.`);
+    console.log(`${cases.length} case(s): ${r.matched} matched findings in the register (${r.links.filter((l) => l.ids.length && l.ids.length > 1).length} covering more than one id); ${r.manual} became manual review findings.`);
     return;
   }
   if (cmd === 'decide') {
     const [id, choice] = pos;
     if (!id || choice === undefined) { console.error(USO); process.exit(2); }
-    if (!st.findings.items.some((i) => i.id === id)) { console.error(`id ${id} não está no registro`); process.exit(1); }
+    if (!st.findings.items.some((i) => i.id === id)) { console.error(`id ${id} is not in the register`); process.exit(1); }
     try {
-      st.decisions.items[id] = makeDecision(choice, { reason: str(a.reason), text: str(a.text), by: str(a.by) ?? 'dono', now, options: st.options.items[id] });
+      st.decisions.items[id] = makeDecision(choice, { reason: str(a.reason), text: str(a.text), by: str(a.by) ?? 'owner', now, options: st.options.items[id] });
     } catch (e) { console.error(e.message); process.exit(2); }
     restatus(st.findings, st.decisions);
     writeJson(p.decisions, st.decisions);
@@ -709,45 +770,47 @@ function main() {
     restatus(st.findings, st.decisions);
     writeJson(p.decisions, st.decisions);
     writeJson(p.findings, st.findings);
-    console.log(`${r.ok} decisão(ões) importadas${r.unknown.length ? `; ${r.unknown.length} id(s) fora do registro: ${r.unknown.join(', ')}` : ''}${r.invalid.length ? `; inválidas: ${r.invalid.join('; ')}` : ''}`);
+    console.log(`${r.ok} decision(s) imported${r.unknown.length ? `; ${r.unknown.length} id(s) not in the register: ${r.unknown.join(', ')}` : ''}${r.invalid.length ? `; invalid: ${r.invalid.join('; ')}` : ''}`);
     process.exit(r.invalid.length ? 1 : 0);
   }
   if (cmd === 'status') {
     const s = summary(st.findings);
     if (a.json) { console.log(JSON.stringify(s, null, 2)); return; }
-    const line = (o, f = (k) => k) => Object.entries(o).sort().map(([k, v]) => `${f(k)} ${v}`).join(' · ') || 'nenhum';
-    console.log(`Módulo ${s.module} · ${s.total} achados · ${s.runs} execução(ões) · atualizado ${s.updated ?? '-'}`);
-    console.log(`  status: ${line(s.by_status, (k) => STATUS_PT[k] ?? k)}`);
-    console.log(`  família: ${line(s.by_family)}`);
-    console.log(`  regra: ${Object.entries(s.by_rule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
-    console.log(`  severidade: ${line(s.by_severity)}`);
-    for (const [label, l] of [['Regressões', s.regression], ['Decididos, falta aplicar', s.decided], ['Desvios aceitos (UX.md)', s.accepted_deviation]]) {
+    const line = (o, f = (k) => k) => Object.entries(o).sort().map(([k, v]) => `${f(k)} ${v}`).join(' · ') || 'none';
+    console.log(`Module ${s.module} · ${s.total} finding(s) · ${s.runs} run(s) · updated ${s.updated ?? '-'}`);
+    console.log(`  status: ${line(s.by_status, (k) => STATUS_LABEL[k] ?? k)}`);
+    console.log(`  family: ${line(s.by_family)}`);
+    console.log(`  rule: ${Object.entries(s.by_rule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
+    console.log(`  severity: ${line(s.by_severity)}`);
+    for (const [label, l] of [['Regressions', s.regression], ['Decided, not applied yet', s.decided], ['Accepted deviations (UX.md)', s.accepted_deviation]]) {
       console.log(`\n${label} (${l.length})`);
       for (const i of l) console.log(`  ${i.id} ${i.rule}${i.deviation ? ` [${i.deviation}]` : ''} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
     }
     return;
   }
   if (cmd === 'check') {
-    if (!FAMILIES.some((f) => inputs[f])) { console.error(`check: informe ao menos uma entrada (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
+    if (!FAMILIES.some((f) => inputs[f])) { console.error(`check: give at least one input (${FAMILIES.map((f) => `--${f}`).join(', ')})`); process.exit(2); }
     const run = collect(inputs, st.findings.items);
     const min = Number(a.min ?? 2);
     const r = check(st.findings, run, { min, decisions: st.decisions, now, ...(uxDeviations ? { deviations: uxDeviations } : {}) });
-    for (const i of r.added) console.log(`NOVO ${i.id} ${i.rule} sev ${i.severity} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
-    for (const i of r.regressions) console.log(`REGRESSÃO ${i.id} ${i.rule} (estava ${STATUS_PT[i.was]}) "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
-    console.log(`${r.pass ? 'Passou' : 'Reprovou'}: ${r.added.length} novo(s) de severidade ≥ ${min}, ${r.regressions.length} regressão(ões), ${r.known.length} conhecido(s) em aberto tolerado(s), ${r.accepted.length} coberto(s) por desvio declarado.`);
+    for (const i of r.added) console.log(`NEW ${i.id} ${i.rule} sev ${i.severity} "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
+    for (const i of r.regressions) console.log(`REGRESSION ${i.id} ${i.rule} (was ${STATUS_LABEL[i.was]}) "${String(i.text).slice(0, 80)}" · ${loc(i)}`);
+    console.log(`${r.pass ? 'Passed' : 'Failed'}: ${r.added.length} new of severity ≥ ${min}, ${r.regressions.length} regression(s), ${r.known.length} known open tolerated, ${r.accepted.length} covered by a declared deviation.`);
     process.exit(r.pass ? 0 : 1);
   }
   if (cmd === 'page') {
     if (!pos[0]) { console.error(USO); process.exit(2); }
+    let lang;
+    try { lang = pageLang(a.lang); } catch (e) { console.error(e.message); process.exit(2); }
     restatus(st.findings, st.decisions);
     const r = writePages(st.findings, st.options, st.decisions, pos[0], {
       product: str(a.product) ?? '', color: str(a.color) ?? '#2B59C3', previewsDir: str(a.previews) ? resolve(a.previews) : join(p.base, 'previews'),
       screensDir: str(a.screens) || root ? pp.captures : null,
-      previewFiles: !!a['preview-files'], noPreview: !!a['no-preview'], maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1048576 : undefined,
+      previewFiles: !!a['preview-files'], noPreview: !!a['no-preview'], maxBytes: a['max-page-mb'] ? Number(a['max-page-mb']) * 1048576 : undefined, lang,
     });
-    for (const w of r.warnings) console.error(`AVISO: ${w}`);
-    console.log(`${r.pages.length} página(s), ${pageCases(st.findings, st.options, st.decisions).length} casos${r.previews ? ', com prévia' : ''}:`);
-    for (const pg of r.pages) console.log(`  ${pg.file} · ${pg.cases} casos · ${(pg.bytes / 1048576).toFixed(2)} MB`);
+    for (const w of r.warnings) console.error(`WARNING: ${w}`);
+    console.log(`${r.pages.length} page(s), ${pageCases(st.findings, st.options, st.decisions).length} case(s)${r.previews ? ', with previews' : ''}:`);
+    for (const pg of r.pages) console.log(`  ${pg.file} · ${pg.cases} case(s) · ${(pg.bytes / 1048576).toFixed(2)} MB`);
     return;
   }
   console.error(USO);

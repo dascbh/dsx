@@ -1,5 +1,5 @@
 {
-  "$description": "Camada 3 — componente (opcional). Só referencia tokens semânticos. Crie aqui apenas quando um componente precisa variar independentemente da intenção semântica.",
+  "$description": "Layer 3 — component (optional). References semantic tokens only. Create one here only when a component must vary independently of the semantic intent.",
   "button": {
     "primary": {
       "bg":       { "$type": "color", "$value": "{color.action.primary}" },

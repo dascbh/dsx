@@ -1,6 +1,6 @@
 ---
 id: link-in-new-tab
-title: Links devem abrir em nova aba?
+title: Should links open in a new tab?
 category: navigation
 components: [link, external-link-icon]
 type: contextual-decision
@@ -11,90 +11,90 @@ wcag: ["2.4.4", "3.2.5", "3.2.2", "1.4.1"]
 related: [link-vs-button, link-text, main-navigation, breadcrumbs]
 ---
 
-# Links devem abrir em nova aba?
+# Should links open in a new tab?
 
-> **Regra:** Por padrão, abra links na mesma aba; reserve a nova aba para resguardar uma tarefa em curso e avise sempre no próprio link.
+> **Rule:** By default, open links in the same tab; reserve a new tab for protecting a task in progress and always say so in the link itself.
 
-## Contexto
+## Context
 
-Um link normal leva ao destino na mesma aba, e a pessoa conta com o botão Voltar. Forçar nova aba muda o contexto de navegação e o histórico daquela aba, o que desorienta quando acontece sem aviso.
+A normal link takes the person to the destination in the same tab, and they count on the Back button. Forcing a new tab changes the browsing context and that tab's history, which disorients when it happens without warning.
 
-A decisão é útil quando é preciso consultar algo externo sem perder o que já foi preenchido. Fora disso, é uma imposição do site: o navegador já deixa a pessoa escolher nova aba com Ctrl ou Command, ou pelo menu de contexto.
+The decision is useful when the person needs to look something up externally without losing what they already filled in. Otherwise it is an imposition by the site: the browser already lets the person choose a new tab with Ctrl or Command, or through the context menu.
 
-Leitores de tela podem não anunciar a mudança, e a nova aba pode ser confundida com a página de origem.
+Screen readers may not announce the change, and the new tab can be mistaken for the original page.
 
-## Decisão
+## Decision
 
-- **SE** não é preciso manter a página atual **ENTÃO** abra na mesma aba.
-- **SE** sair da página faria perder dados de uma tarefa em andamento **ENTÃO** abra em nova aba.
-- **SE** a pessoa precisa consultar referência externa sem interromper o fluxo **ENTÃO** nova aba é aceitável.
-- **SE** abrir em nova aba **ENTÃO** avise no texto do link ("abre em nova aba") ou no nome acessível.
-- **SE** usar ícone de link externo **ENTÃO** trate-o como reforço, nunca como único aviso.
-- **SE** usar `target="_blank"` **ENTÃO** inclua `rel="noopener noreferrer"`, conforme a política do projeto.
-- **SE** o link está em menu, breadcrumb, resultado de busca ou rodapé **ENTÃO** nunca force nova aba.
-- **SENÃO** mesma aba.
+- **IF** there is no need to keep the current page **THEN** open in the same tab.
+- **IF** leaving the page would lose data from a task in progress **THEN** open in a new tab.
+- **IF** the person needs to consult an external reference without interrupting the flow **THEN** a new tab is acceptable.
+- **IF** it opens in a new tab **THEN** say so in the link text ("opens in a new tab") or in the accessible name.
+- **IF** you use an external link icon **THEN** treat it as reinforcement, never as the only warning.
+- **IF** you use `target="_blank"` **THEN** include `rel="noopener noreferrer"`, according to the project's policy.
+- **IF** the link is in a menu, breadcrumb, search result or footer **THEN** never force a new tab.
+- **ELSE** the same tab.
 
-## Quando usar
+## When to use
 
-- Tarefa em andamento perderia dados ao sair.
-- Referência, documento ou ferramenta complementar ao trabalho atual.
-- O contexto já indica uma superfície independente.
+- A task in progress would lose data on leaving.
+- A reference, document or tool that complements the current work.
+- The context already signals an independent surface.
 
-## Quando evitar
+## When to avoid
 
-- Navegação comum entre páginas do mesmo site → **use em vez disso:** mesma aba.
-- Links externos por preferência de marketing → **use em vez disso:** mesma aba.
-- Link dentro de formulário não concluído sem salvar → **use em vez disso:** nova aba com aviso ou salvar rascunho.
-- Aviso só em tooltip, ícone ou cor → **use em vez disso:** aviso no texto.
+- Ordinary navigation between pages of the same site → **use instead:** the same tab.
+- External links opened in new tabs as a marketing preference → **use instead:** the same tab.
+- A link inside an unfinished form with no saving → **use instead:** a new tab with a warning, or save a draft.
+- A warning only in a tooltip, icon or color → **use instead:** a warning in the text.
 
-## Faça
+## Do
 
-- Escreva o destino no texto do link.
-- Mantenha o aviso no nome acessível.
-- Teste o retorno ao fluxo ao fechar a nova aba.
-- Revise a segurança de cada `target="_blank"`.
+- Write the destination in the link text.
+- Keep the warning in the accessible name.
+- Test returning to the flow after closing the new tab.
+- Review the security of each `target="_blank"`.
 
-## Evite
+## Avoid
 
-- Forçar nova aba em todo link externo.
-- Usar "clique aqui" ou "saiba mais".
-- Esconder o aviso em tooltip.
-- Depender só do ícone.
+- Forcing a new tab on every external link.
+- Using "click here" or "learn more".
+- Hiding the warning in a tooltip.
+- Relying only on the icon.
 
-## Acessibilidade
+## Accessibility
 
-- O propósito do link deve ser determinável pelo texto ou contexto (2.4.4).
-- Abrir nova aba é mudança de contexto; o critério 3.2.5 (AAA) pede que ela ocorra por solicitação ou possa ser desativada.
-- O aviso precisa estar disponível por teclado, leitor de tela e lista de links.
-- Aviso visualmente oculto continua no nome acessível sem substituir o destino visível.
-- Não use só cor ou ícone para sinalizar (1.4.1).
+- The link's purpose must be determinable from its text or context (2.4.4).
+- Opening a new tab is a change of context; criterion 3.2.5 (AAA) asks that it happen on request or can be turned off.
+- The warning must be available by keyboard, screen reader and links list.
+- A visually hidden warning stays in the accessible name without replacing the visible destination.
+- Do not rely only on color or icon to signal it (1.4.1).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Link com aviso | "Consultar o manual do usuário (abre em nova aba)" |
-| Documento externo | "Termos do parceiro (abre em nova aba)" |
-| Link comum | "Voltar para pedidos" |
-| Evitar | "Clique aqui" |
+| Link with warning | "Read the user manual (opens in a new tab)" |
+| External document | "Partner terms (opens in a new tab)" |
+| Ordinary link | "Back to orders" |
+| Avoid | "Click here" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O link abre na mesma aba por padrão.
-- [ ] Existe motivo concreto para nova aba.
-- [ ] O aviso aparece antes da ativação.
-- [ ] O texto informa o destino.
-- [ ] O aviso faz parte do nome acessível.
-- [ ] O ícone externo é só reforço.
-- [ ] O link é compreensível em lista de links.
-- [ ] `target="_blank"` vem com `rel="noopener noreferrer"`.
-- [ ] O retorno ao fluxo foi testado.
+- [ ] The link opens in the same tab by default.
+- [ ] There is a concrete reason for a new tab.
+- [ ] The warning appears before activation.
+- [ ] The text states the destination.
+- [ ] The warning is part of the accessible name.
+- [ ] The external icon is only reinforcement.
+- [ ] The link is understandable in a links list.
+- [ ] `target="_blank"` comes with `rel="noopener noreferrer"`.
+- [ ] Returning to the flow was tested.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2: 2.4.4 (propósito do link) e 3.2.5 (mudança sob solicitação, AAA).
-- W3C WAI técnica H83: indicar nova janela no texto do link.
-- GitHub Primer (Links and buttons): não forçar nova aba.
-- Microsoft Fluent 2 (Link): aviso prévio e ícone de abertura externa.
-- Adobe Spectrum (Link): texto comunica o destino.
-- MDN Web Docs (rel noopener): proteção de window.opener.
+- WCAG 2.2: 2.4.4 (Link Purpose) and 3.2.5 (Change on Request, AAA).
+- W3C WAI technique H83: indicate a new window in the link text.
+- GitHub Primer (Links and buttons): do not force a new tab.
+- Microsoft Fluent 2 (Link): advance warning and an external-opening icon.
+- Adobe Spectrum (Link): the text communicates the destination.
+- MDN Web Docs (rel noopener): window.opener protection.

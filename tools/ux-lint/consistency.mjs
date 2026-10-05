@@ -1,23 +1,24 @@
 #!/usr/bin/env node
-// ux-lint, nível consistência: aplica as regras C1–C3 do contrato do UX.md (knowledge/fundamentos/ux-md.md,
-// "Consistência") sobre a pasta de capturas HTML, comparando as telas entre si. Sem dependências.
+// ux-lint, consistency level: applies rules C1–C3 of the UX.md contract (knowledge/foundations/ux-md.md,
+// "Consistency") to the folder of HTML captures, comparing the screens with each other. No dependencies.
 //
-// Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]
+// Usage: node tools/ux-lint/consistency.mjs <folder-or-files.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]
 //
-// Inventário: botões, títulos e abas de cada captura (o mesmo do text.mjs, `takeInventory`). Com diálogo aberto, só o
-// diálogo. Capturas de estado (`<nn>-<tela>.<estado>.html`) contam como a mesma tela.
+// Inventory: buttons, titles and tabs of each capture (the same as text.mjs, `takeInventory`). With a dialog open,
+// only the dialog. State captures (`<nn>-<screen>.<state>.html`) count as the same screen.
 //
-// C1 mesma ação com rótulos diferentes. Mesma função = mesmo grupo de verbo (excluir/remover/apagar; salvar/gravar;
-//    criar/novo/adicionar; editar/alterar; baixar/exportar/download) sobre o mesmo objeto (primeira palavra de
-//    conteúdo depois do verbo, sem plural; sem objeto no rótulo, vale o do nome acessível ou o do título do diálogo
-//    quando ele começa com verbo do mesmo grupo; sem objeto nenhum, o botão fica fora). Dispensar (cancelar/voltar/
-//    fechar) só conta em diálogo e com o mesmo papel: "cancelar" quando o diálogo tem outra ação, "fechar" quando
-//    não tem.
-// C2 mesmo rótulo de botão com variantes visuais diferentes (cheio × contornado × texto) entre capturas.
-// C3 mesmo conceito com nomes diferentes nos títulos e abas: termo da coluna "nunca chamar de"/"evitar" do glossário
-//    (`content.glossary` do UX.md: caminho de um .md com tabela, mapa termo → sinônimos, "inline" = tabela no
-//    próprio UX.md, ou mapa por módulo { default: …, <módulo>: … } escolhido por --module) e pares de sinônimos
-//    conhecidos (KNOWN_SYNONYMS), que valem com ou sem glossário.
+// C1 same action with different labels. Same function = same verb group (excluir/remover/apagar, delete/remove;
+//    salvar/gravar, save; criar/novo/adicionar, create/new/add; editar/alterar, edit; baixar/exportar, download/export)
+//    on the same object (first content word after the verb, singular; with no object in the label, the one in the
+//    accessible name or in the dialog title when it starts with a verb of the same group; with no object at all, the
+//    button is left out). Dismiss (cancelar/voltar/fechar, cancel/back/close) counts only inside a dialog and with the
+//    same role: "cancel" when the dialog has another action, "close" when it has none.
+// C2 same button label with different visual variants (contained × outlined × text) across captures.
+// C3 same concept with different names in titles and tabs: a term from the glossary's "never call it"/"avoid" column
+//    (UX.md `content.glossary`: path to a .md with a table, term → synonyms map, "inline" = table in the UX.md
+//    itself, or per-module map { default: …, <module>: … } chosen by --module) and known synonym pairs of the
+//    declared language pack (`content.language`), which apply with or without a glossary.
+// Verb groups and action stop/destination words come from every language pack (lib/lang/).
 // JSON (--json): { summary, findings: [{ rule, severity, key, text, message, occurrences: [{ text, kind, variant,
 //                  screens, evidence }] }] }.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -29,28 +30,17 @@ import { loadConfig, configFrom } from './lib/config.mjs';
 import { closest, querySelectorAll, matches, isHidden } from './lib/html.mjs';
 import { takeInventory, visibleText } from './text.mjs';
 import { kitProfile } from './lib/kits.mjs';
+import { langPack, unionList, unionVerbGroups } from './lib/lang/index.mjs';
 
 export const SEVERITY = { C1: 2, C2: 1, C3: 1 };
-/** Grupos de verbo da mesma ação (minúsculas, sem acento). `novo`/`nova` contam como o mesmo verbo. */
-export const VERB_GROUPS = {
-  delete: ['excluir', 'remover', 'apagar', 'deletar', 'delete', 'remove'],
-  save: ['salvar', 'gravar', 'save'],
-  dismiss: ['cancelar', 'voltar', 'fechar', 'cancel', 'close', 'back'],
-  create: ['criar', 'novo', 'nova', 'cadastrar', 'create', 'new'],
-  // adicionar põe algo que já existe num lugar (item do catálogo no pedido); criar faz um objeto novo
-  add: ['adicionar', 'incluir', 'add'],
-  edit: ['editar', 'alterar', 'modificar', 'edit'],
-  download: ['baixar', 'exportar', 'download', 'descarregar', 'export'],
-};
-/** Conceitos com nomes rivais em títulos e abas (sem glossário, só estes). */
-export const KNOWN_SYNONYMS = [
-  ['configuracoes', 'preferencias'], ['modelo', 'template'], ['painel', 'dashboard'], ['historico', 'log'],
-  ['lixeira', 'excluidos'], ['notificacoes', 'avisos'], ['pesquisa', 'busca'], ['usuario', 'utilizador'], ['relatorio', 'report'],
-];
+/** Verb groups of the same action (lowercase, no diacritics), union of every language pack. `novo`/`nova` count as one verb. */
+export const VERB_GROUPS = unionVerbGroups();
+/** Rival names of the same concept in titles and tabs, default (pt-BR) pack; the analysis uses the declared pack. */
+export const KNOWN_SYNONYMS = langPack().knownSynonyms;
 const VISUAL_VARIANTS = ['contained', 'outlined', 'text'];
 const SKIP_VARIANTS = ['composite', 'chip', 'sort', 'toggle', 'list-item'];
-const STOP = new Set('o a os as um uma uns umas de da do das dos em no na nos nas para pra ao aos à às e ou com sem por the of to a an this esta este esse essa'.split(' '));
-const DESTINATION = new Set(['a', 'ao', 'aos', 'na', 'no', 'nas', 'nos', 'em', 'para', 'pra', 'to', 'into']);
+const STOP = new Set(unionList('actionStopWords'));
+const DESTINATION = new Set(unionList('destinationWords'));
 const CAPTURE_RE = /^(\d+-[a-z0-9]+(?:-[a-z0-9]+)*)(?:\.[a-z0-9-]+)?\.html$/;
 
 const fold = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -60,27 +50,27 @@ const singular = (w) => (w.length > 4 && /[^s]s$/.test(w) ? w.slice(0, -1) : w).
 const VERB_OF = new Map(Object.entries(VERB_GROUPS).flatMap(([g, vs]) => vs.map((v) => [v, g])));
 const canonicalVerb = (v) => (v === 'nova' ? 'novo' : v);
 
-/** Tela de uma captura: `<nn>-<id>` (o estado do nome do arquivo sai). */
+/** Screen of a capture: `<nn>-<id>` (the state in the file name is dropped). */
 export const screenOf = (file) => { const b = basename(String(file)); const m = CAPTURE_RE.exec(b); return m ? m[1] : b.replace(/\.html?$/, ''); };
 
-/** Rótulo → { verb, group, object } (objeto = 1ª palavra de conteúdo depois do verbo, no singular). */
+/** Label → { verb, group, object } (object = 1st content word after the verb, singular). */
 export function parseAction(label) {
   const w = words(label);
   if (!w.length) return null;
   const group = VERB_OF.get(w[0]);
   if (!group) return null;
-  // "Adicionar à proposta", "Salvar no modelo": o que vem depois da preposição é o destino, não o objeto.
+  // "Adicionar à proposta", "Add to proposal": what follows the preposition is the destination, not the object.
   if (w[1] && DESTINATION.has(w[1])) return { verb: canonicalVerb(w[0]), group, object: null, destination: singular(w.slice(2).find((x) => !STOP.has(x)) ?? '') || null };
   const rest = w.slice(1).filter((x) => !STOP.has(x) && !/^\d+$/.test(x));
   return { verb: canonicalVerb(w[0]), group, object: rest.length ? singular(rest[0]) : null };
 }
 
-// ---------- inventário ----------
+// ---------- inventory ----------
 
-/** Inventário de uma captura: [{ kind: button|title|tab, text, variant, screen, evidence, action }]. */
+/** Inventory of one capture: [{ kind: button|title|tab, text, variant, screen, evidence, action }]. */
 export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
   const sel = cfg.verification.selectors;
-  // rodapé e título de diálogo do kit (lib/kits.mjs); o rodapé declarado no UX.md vence
+  // dialog footer and title of the kit (lib/kits.mjs); the footer declared in UX.md wins
   const kit = cfg.kitProfile ?? kitProfile(cfg.verification?.kit);
   const footerSel = sel['dialog-footer'] || kit.regions['dialog-footer'];
   const titleSel = `h1, h2, h3${kit['dialog-title'] ? `, ${kit['dialog-title']}` : ''}`;
@@ -99,8 +89,8 @@ export function inventory(html, cfg = configFrom({}), file = 'tela.html') {
         action.object = (aria?.group === action.group && aria.object) || (title?.group === action.group && title.object) || null;
       }
       if (action?.group === 'dismiss') {
-        // só o botão de dispensar com texto (o ✕ de ícone tem outro papel), dentro de diálogo; o papel depende de o
-        // grupo de botões dele (rodapé) ter uma ação principal (primária ou destrutiva)
+        // only a dismiss button with text (the icon ✕ has another role), inside a dialog; the role depends on whether
+        // its button group (footer) has a main action (primary or destructive)
         if (!dialog || it.variant === 'icon' || words(entry.text).length > 1) action = null;
         else {
           const footer = (footerSel && closest(it.node.parent, footerSel)) ?? it.node.parent;
@@ -120,12 +110,12 @@ function dialogTitle(dialog, titleSel = 'h1, h2, h3') {
   return t ? visibleText(t) : '';
 }
 
-// ---------- glossário ----------
+// ---------- glossary ----------
 
-// Leitura do glossário (único ou por módulo) em lib/glossary.mjs; reexportado aqui por compatibilidade.
+// Glossary reading (single or per module) lives in lib/glossary.mjs; re-exported here for compatibility.
 export { glossaryFromMarkdown, loadGlossary } from './lib/glossary.mjs';
 
-// ---------- regras ----------
+// ---------- rules ----------
 
 const containsPhrase = (text, phrase) => {
   const t = ` ${words(text).map(singular).join(' ')} `;
@@ -145,13 +135,14 @@ function occurrences(entries, { byVariant = true } = {}) {
   return [...by.values()];
 }
 
-/** Aplica C1–C3 ao inventário de todas as capturas. Devolve a lista de achados. */
-export function analyzeConsistency(entries, { glossary = [] } = {}) {
+/** Applies C1–C3 to the inventory of every capture. Returns the list of findings. `cfg` picks the synonym pack. */
+export function analyzeConsistency(entries, { glossary = [], cfg = null } = {}) {
+  const synonyms = langPack(cfg).knownSynonyms;
   const findings = [];
   const add = (rule, key, text, message, occ) => findings.push({ rule, severity: SEVERITY[rule], key, text, message, occurrences: occ });
   const fmt = (occ) => occ.map((o) => `"${o.text}" (${o.screens.slice(0, 3).join(', ')}${o.screens.length > 3 ? ', …' : ''})`).join(' × ');
 
-  // C1 — mesma função, verbos diferentes.
+  // C1: same function, different verbs.
   const byFunction = new Map();
   for (const e of entries) {
     if (e.kind !== 'button' || !e.action?.object) continue;
@@ -164,18 +155,18 @@ export function analyzeConsistency(entries, { glossary = [] } = {}) {
     if (verbs.length < 2) continue;
     const [group, object] = k.split('|');
     const occ = occurrences(list, { byVariant: false });
-    const role = group === 'dismiss' ? (object === 'cancel' ? 'dispensar diálogo com ação' : 'fechar diálogo sem ação') : `${group} · ${object}`;
-    // texto estável (âncora do id no registro): a função, não os verbos encontrados, que mudam entre execuções
+    const role = group === 'dismiss' ? (object === 'cancel' ? 'dismiss dialog with an action' : 'close dialog without an action') : `${group} · ${object}`;
+    // stable text (id anchor in the register): the function, not the verbs found, which change between runs
     add('C1', k, group === 'dismiss' ? role : `${VERB_GROUPS[group][0]} ${object}`,
-      `mesma ação (${role}) com rótulos diferentes: ${fmt(occ)} — escolha um verbo e use em todas as telas`, occ);
+      `same action (${role}) with different labels: ${fmt(occ)}; pick one verb and use it on every screen`, occ);
   }
 
-  // C2 — mesmo rótulo, variantes visuais diferentes.
+  // C2: same label, different visual variants.
   const byLabel = new Map();
   for (const e of entries) {
     if (e.kind !== 'button' || !VISUAL_VARIANTS.includes(e.variant)) continue;
-    // o gatilho na página ("Remover", texto) e a confirmação no diálogo ("Remover", cheio) têm papéis diferentes:
-    // compara só dentro do mesmo contexto
+    // the trigger on the page ("Remove", text) and the confirmation in the dialog ("Remove", contained) have
+    // different roles: compare only within the same context
     const k = `${e.context}|${fold(e.text).replace(/[.!?:…]+$/, '')}`;
     if (!byLabel.has(k)) byLabel.set(k, []);
     byLabel.get(k).push(e);
@@ -184,11 +175,11 @@ export function analyzeConsistency(entries, { glossary = [] } = {}) {
     const variants = [...new Set(list.map((e) => e.variant))];
     if (variants.length < 2) continue;
     const occ = occurrences(list);
-    add('C2', k, `${list[0].text}${list[0].context === 'dialog' ? ' (diálogo)' : ''}`,
-      `botão "${list[0].text}" com variantes visuais diferentes (${occ.map((o) => `${o.variant} em ${o.screens.slice(0, 3).join(', ')}${o.screens.length > 3 ? ', …' : ''}`).join('; ')}) — a mesma ação tem o mesmo peso em todas as telas`, occ);
+    add('C2', k, `${list[0].text}${list[0].context === 'dialog' ? ' (dialog)' : ''}`,
+      `button "${list[0].text}" with different visual variants (${occ.map((o) => `${o.variant} on ${o.screens.slice(0, 3).join(', ')}${o.screens.length > 3 ? ', …' : ''}`).join('; ')}); the same action has the same weight on every screen`, occ);
   }
 
-  // C3 — nomes rivais do mesmo conceito em títulos e abas.
+  // C3: rival names of the same concept in titles and tabs.
   const heads = entries.filter((e) => e.kind === 'title' || e.kind === 'tab');
   const canonical = new Set(glossary.map((g) => fold(g.term)));
   for (const g of glossary) {
@@ -198,16 +189,16 @@ export function analyzeConsistency(entries, { glossary = [] } = {}) {
       if (!hit.length) continue;
       const occ = occurrences(hit);
       add('C3', `glossary|${fold(avoid)}`, `${avoid} → ${g.term}`,
-        `${occ.map((o) => `"${o.text}"`).join(', ')} usa "${avoid}"; o glossário chama de "${g.term}"`, occ);
+        `${occ.map((o) => `"${o.text}"`).join(', ')} uses "${avoid}"; the glossary calls it "${g.term}"`, occ);
     }
   }
-  for (const set of KNOWN_SYNONYMS) {
+  for (const set of synonyms) {
     const present = set.map((w) => heads.filter((e) => words(e.text).map(singular).includes(singular(w))));
     const used = present.filter((l) => l.length);
     if (used.length < 2) continue;
     const occ = occurrences(used.flat());
     add('C3', `synonyms|${set.join('|')}`, set.filter((_, i) => present[i].length).join(' × '),
-      `mesmo conceito com nomes diferentes em títulos/abas: ${fmt(occ)} — fixe um nome (e registre no glossário)`, occ);
+      `same concept with different names in titles/tabs: ${fmt(occ)}; settle on one name (and record it in the glossary)`, occ);
   }
   return findings.sort((a, b) => a.rule.localeCompare(b.rule) || a.key.localeCompare(b.key));
 }
@@ -233,7 +224,7 @@ export function summarize(findings, files, entries) {
   };
 }
 
-const USAGE = 'Uso: node tools/ux-lint/consistency.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]';
+const USAGE = 'Usage: node tools/ux-lint/consistency.mjs <folder-or-files.html...> [--ux UX.md] [--module <m>] [--json] [--fail-at 3]';
 
 function main() {
   const args = parseCli('ux-lint/consistency.mjs');
@@ -245,7 +236,7 @@ function main() {
   const glossaryKey = glossarySource(cfg.content?.glossary, module).module;
   const files = listHtml(args._);
   const entries = files.flatMap((f) => inventory(readFileSync(f, 'utf8'), cfg, f));
-  const findings = analyzeConsistency(entries, { glossary });
+  const findings = analyzeConsistency(entries, { glossary, cfg });
   const summary = { ...summarize(findings, files, entries), glossary_terms: glossary.length, ...(glossaryKey ? { glossary_module: glossaryKey } : {}) };
   const threshold = Number(args['fail-at'] ?? 3);
   if (args.json) console.log(JSON.stringify({ summary, findings, ...(cfg.legacyWarnings.length ? { warnings: cfg.legacyWarnings } : {}) }, null, 2));
@@ -254,8 +245,8 @@ function main() {
       console.log(`${f.rule} sev ${f.severity} | ${f.text}\n   ${f.message}`);
       for (const o of f.occurrences) console.log(`      "${o.text}"${o.variant ? ` [${o.variant}]` : ''} · ${o.evidence[0]}`);
     }
-    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum';
-    console.log(`\nResumo: ${summary.captures} capturas (${summary.screens} telas), ${summary.inventory.button} botões, ${summary.inventory.title} títulos, ${summary.inventory.tab} abas; glossário${glossaryKey ? ` (${glossaryKey})` : ''} com ${glossary.length} termos; ${summary.findings} achados (${rules})`);
+    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'none';
+    console.log(`\nSummary: ${summary.captures} captures (${summary.screens} screens), ${summary.inventory.button} buttons, ${summary.inventory.title} titles, ${summary.inventory.tab} tabs; glossary${glossaryKey ? ` (${glossaryKey})` : ''} with ${glossary.length} terms; ${summary.findings} findings (${rules})`);
   }
   process.exit(findings.some((f) => f.severity >= threshold) ? 1 : 0);
 }

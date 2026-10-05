@@ -1,6 +1,6 @@
 ---
 id: button-text
-title: Como escrever o texto de um botão?
+title: How do you write button text?
 category: ux-writing
 components: [button]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["2.5.3", "2.4.6"]
 related: [link-text, button-hierarchy, icon-only-button, confirm-deletion]
 ---
 
-# Como escrever o texto de um botão?
+# How do you write button text?
 
-> **Regra:** Inicie o rótulo com um verbo e nomeie o resultado da ação; se alguém puder indagar "enviar o quê?" ou "continuar para onde?", inclua o objeto ou o destino.
+> **Rule:** Start the label with a verb and name the result of the action; if someone could ask "send what?" or "continue where?", include the object or the destination.
 
-## Contexto
+## Context
 
-O rótulo do botão faz parte da orientação da tarefa. Ele precisa antecipar o que acontece ao acionar o controle, sem obrigar a pessoa a deduzir o efeito de uma palavra genérica.
+The button label is part of the task's guidance. It must anticipate what happens when the control is used, without forcing the person to infer the effect from a generic word.
 
-Rótulo curto não é sinônimo de rótulo vago. A escolha depende do que está visível na tela: etapa do fluxo, objeto afetado e demais ações próximas.
+A short label is not the same as a vague label. The choice depends on what is visible on screen: the step of the flow, the affected object and the other actions nearby.
 
-Rótulos genéricos empurram a interpretação para o usuário, atrasam a comparação entre ações e aumentam a chance de clique errado. Em listas com botões repetidos, "Editar" ou "Excluir" soltos também são insuficientes para quem navega por leitor de tela.
+Generic labels push interpretation onto the user, slow down comparing actions and increase the chance of a wrong click. In lists with repeated buttons, a bare "Edit" or "Delete" is also not enough for people navigating with a screen reader.
 
-## Decisão
+## Decision
 
-- **SE** o botão inicia uma ação ou avança uma etapa **ENTÃO** use verbo no infinitivo no começo do rótulo ("Salvar", "Baixar", "Cadastrar").
-- **SE** o verbo sozinho deixa dúvida sobre objeto ou destino **ENTÃO** acrescente o complemento ("Salvar alterações", "Continuar para o pagamento").
-- **SE** o efeito real é diferente da mecânica técnica **ENTÃO** nomeie o efeito ("Criar conta" em vez de "Enviar").
-- **SE** duas ou mais ações no mesmo grupo soam parecidas **ENTÃO** diferencie-as ("Salvar rascunho" e "Publicar", nunca dois "Salvar").
-- **SE** o botão se repete em lista ou tabela **ENTÃO** inclua o objeto no nome acessível ("Excluir relatório mensal").
-- **SE** o título, a instrução ou o feedback da etapa usam um termo **ENTÃO** reutilize exatamente esse termo no botão.
-- **SENÃO** use o rótulo mais curto que ainda preveja o resultado, em sentence case.
+- **IF** the button starts an action or moves to a step **THEN** begin the label with a verb in the imperative ("Save", "Download", "Register"). pt-BR example: Portuguese uses the infinitive ("Salvar", "Baixar", "Cadastrar").
+- **IF** the verb alone leaves doubt about the object or destination **THEN** add the complement ("Save changes", "Continue to payment").
+- **IF** the real effect differs from the technical mechanics **THEN** name the effect ("Create account" instead of "Submit").
+- **IF** two or more actions in the same group sound alike **THEN** set them apart ("Save draft" and "Publish", never two "Save").
+- **IF** the button repeats in a list or table **THEN** include the object in the accessible name ("Delete monthly report").
+- **IF** the step's title, instruction or feedback use a term **THEN** reuse exactly that term on the button.
+- **ELSE** use the shortest label that still predicts the result, in sentence case.
 
-## Quando usar
+## When to use
 
-- Botões que iniciam ação ou mudam de etapa.
-- Fluxos com salvar, revisar, pagar ou publicar.
-- Telas com várias ações próximas que precisam ser distinguidas.
-- Rótulos que precisam funcionar fora do contexto visual, como em lista de elementos de leitor de tela.
+- Buttons that start an action or change step.
+- Flows with save, review, pay or publish.
+- Screens with several nearby actions that need to be told apart.
+- Labels that must work outside the visual context, such as in a screen reader's elements list.
 
-## Quando evitar
+## When to avoid
 
-- Rótulos como "Ação" ou "Clique aqui" → **use em vez disso:** verbo + objeto.
-- "Enviar" quando o efeito pode ser nomeado → **use em vez disso:** o nome do efeito.
-- "Continuar" em fluxo longo sem destino → **use em vez disso:** "Continuar para <etapa>".
-- Perguntas, slogans e pontuação decorativa → **use em vez disso:** verbo direto.
+- Labels such as "Action" or "Click here" → **use instead:** verb + object.
+- "Submit" when the effect can be named → **use instead:** the name of the effect.
+- "Continue" in a long flow with no destination → **use instead:** "Continue to <step>".
+- Questions, slogans and decorative punctuation → **use instead:** a direct verb.
 
-## Faça
+## Do
 
-- Comece com verbo no infinitivo.
-- Nomeie o resultado e, se necessário, o objeto.
-- Use os mesmos termos do restante do fluxo.
-- Mantenha o rótulo curto, em sentence case.
-- Teste o rótulo isolado, numa lista de controles.
+- Start with a verb (imperative in English, infinitive in pt-BR).
+- Name the result and, when needed, the object.
+- Use the same terms as the rest of the flow.
+- Keep the label short, in sentence case.
+- Test the label on its own, in a list of controls.
 
-## Evite
+## Avoid
 
-- Repetir o mesmo rótulo para ações diferentes.
-- Trocar o termo do botão sem trocar o do restante do fluxo.
-- Transformar o botão em frase explicativa.
-- Usar apenas símbolos como rótulo.
+- Repeating the same label for different actions.
+- Changing the button's term without changing it in the rest of the flow.
+- Turning the button into an explanatory sentence.
+- Using only symbols as the label.
 
-## Acessibilidade
+## Accessibility
 
-- Use o elemento nativo `<button>` para ações da interface.
-- O nome acessível deve conter o texto visível do botão (WCAG 2.5.3), para que comando de voz funcione.
-- Em controles repetidos, acrescente o objeto ao nome acessível mantendo as palavras visíveis no início.
-- Valide teclado, foco, estados de carregamento e mensagem pós-ação; um bom rótulo não compensa botão sem foco ou sem feedback.
+- Use the native `<button>` element for interface actions.
+- The accessible name must contain the button's visible text (WCAG 2.5.3), so voice commands work.
+- On repeated controls, add the object to the accessible name while keeping the visible words at the start.
+- Validate keyboard, focus, loading states and the post-action message; a good label does not make up for a button without focus or feedback.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Salvar edição | "Salvar alterações" |
-| Avançar em checkout | "Continuar para o pagamento" |
-| Criar conta | "Criar conta" |
-| Rascunho vs. publicação | "Salvar rascunho" / "Publicar" |
-| Item em lista | "Excluir relatório mensal" |
+| Saving an edit | "Save changes" |
+| Moving forward in checkout | "Continue to payment" |
+| Creating an account | "Create account" |
+| Draft vs. publishing | "Save draft" / "Publish" |
+| Item in a list | "Delete monthly report" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O rótulo começa com verbo?
-- [ ] Alguém prevê o resultado sem ler o parágrafo da tela?
-- [ ] Nenhum botão usa "Ação", "Clique aqui" ou "Enviar" quando o efeito é nomeável?
-- [ ] Ações próximas têm rótulos distintos?
-- [ ] O rótulo usa o mesmo termo do título e do feedback da etapa?
-- [ ] O rótulo está em sentence case?
-- [ ] O nome acessível contém o texto visível?
-- [ ] Botões repetidos têm o objeto no nome acessível?
+- [ ] Does the label start with a verb?
+- [ ] Can someone predict the result without reading the screen's paragraph?
+- [ ] Does no button use "Action", "Click here" or "Submit" when the effect can be named?
+- [ ] Do nearby actions have distinct labels?
+- [ ] Does the label use the same term as the step's title and feedback?
+- [ ] Is the label in sentence case?
+- [ ] Does the accessible name contain the visible text?
+- [ ] Do repeated buttons have the object in the accessible name?
 
-## Fundamentação
+## Rationale
 
-- W3C WAI-ARIA APG (nomes e descrições acessíveis): preferir texto visível, nomes curtos e distintos, palavras mais importantes primeiro.
-- WCAG 2.2, critério 2.5.3 (Label in Name): nome acessível contém o texto visível.
-- Baymard Institute: nome programático preserva a essência do rótulo visível; evitar "Apply" quando a ação pode ser automática (contexto de checkout).
-- U.S. Web Design System: texto curto, sentence case, começar com verbo.
-- Padrão Digital GOV.BR: rótulo obrigatório no botão, verbos no infinitivo.
-- Adobe Spectrum: rótulos como verbos, resultado claro, texto conciso.
-- GOV.UK Design System: rótulos variam conforme o comportamento real do serviço ("Continue" vs. "Confirm and send").
+- W3C WAI-ARIA APG (accessible names and descriptions): prefer visible text, short and distinct names, most important words first.
+- WCAG 2.2, criterion 2.5.3 (Label in Name): the accessible name contains the visible text.
+- Baymard Institute: the programmatic name keeps the essence of the visible label; avoid "Apply" when the action can be automatic (checkout context).
+- U.S. Web Design System: short text, sentence case, start with a verb.
+- GOV.BR Digital Standard: a label is required on the button, verbs in the infinitive (Portuguese).
+- Adobe Spectrum: labels as verbs, clear result, concise text.
+- GOV.UK Design System: labels vary with the service's real behavior ("Continue" vs. "Confirm and send").

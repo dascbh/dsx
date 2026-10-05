@@ -202,10 +202,10 @@
     "rule": "Design-system adherence has its own verdict per changed consumer (pass/fail/unknown/not-applicable, with foundation revision, scope and evidence). Passing adherence cannot compensate for a poor task topology; passing UI quality cannot excuse unexplained DS drift.",
     "principles": ["MNT-5", "MNT-11", "USE-3", "USE-6", "USE-11"],
     "checks": [
-      { "id": "tokens-and-kit", "name": "Tokens and kit", "evidence": "consumer/source diff, raw-value and duplicate search with documented exceptions", "dsx_tools": ["tools/lint-raw-values.mjs", "tools/lint-design-md.mjs", "skill auditar-ds"], "dsx_rules": [] },
-      { "id": "semantics", "name": "Semantics", "evidence": "glossary, status/action meaning, object/cardinality, allowed composition", "dsx_tools": ["UX.md glossary", "skill auditar-ds"], "dsx_rules": ["C2"] },
+      { "id": "tokens-and-kit", "name": "Tokens and kit", "evidence": "consumer/source diff, raw-value and duplicate search with documented exceptions", "dsx_tools": ["tools/lint-raw-values.mjs", "tools/lint-design-md.mjs", "skill audit-ds"], "dsx_rules": [] },
+      { "id": "semantics", "name": "Semantics", "evidence": "glossary, status/action meaning, object/cardinality, allowed composition", "dsx_tools": ["UX.md glossary", "skill audit-ds"], "dsx_rules": ["C2"] },
       { "id": "rendered-parity", "name": "Rendered parity", "evidence": "approved reference/wireframe comparison across affected states, themes and viewports", "dsx_tools": ["captures", "tools/stitch/analyze-html.mjs"], "dsx_rules": [] },
-      { "id": "interaction-accessibility", "name": "Interaction and accessibility", "evidence": "keyboard/focus/zoom, APG contract, axe, recovery/race probes", "dsx_tools": ["tools/contrast.mjs", "skill acessibilidade"], "dsx_rules": ["L8"] },
+      { "id": "interaction-accessibility", "name": "Interaction and accessibility", "evidence": "keyboard/focus/zoom, APG contract, axe, recovery/race probes", "dsx_tools": ["tools/contrast.mjs", "skill accessibility"], "dsx_rules": ["L8"] },
       { "id": "adoption", "name": "Adoption", "evidence": "consumer list, migrations/deprecations, rollback and explicit debt against the declared revision scope", "dsx_tools": ["design/foundation.md drift/debt log"], "dsx_rules": [] }
     ]
   },

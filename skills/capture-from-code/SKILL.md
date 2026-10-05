@@ -58,14 +58,14 @@ Captures only run with `DSX_CAPTURE=1` (`it.runIf(CAPTURE)`): CI and the normal 
 
 ## Capture a module
 
-1. **Inventory the surface.** Route, page component, state (tab, filter, open dialog) and **every API call** the screen and its children make (search the components for the API client). A dialog = its parent page + the action that opens it. Take labels and order from the flow map when there is one (skill `mapear`, checked with `node <DSX>/tools/capture/validate-flow.mjs .dsx/maps/flows-<m>.json --root .`).
+1. **Inventory the surface.** Route, page component, state (tab, filter, open dialog) and **every API call** the screen and its children make (search the components for the API client). A dialog = its parent page + the action that opens it. Take labels and order from the flow map when there is one (skill `map-ux`, checked with `node <DSX>/tools/capture/validate-flow.mjs .dsx/maps/flows-<m>.json --root .`).
 2. **Real vocabulary, fictional data.** Labels that come from the back end: generate the fixture from the back end's own source, never type it by hand. Data: in `<area>.data.ts`, in the exact shape the API returns (copy it from the API client's normalizer or the test fixtures), with invented companies, people and ids. **Never** real customer data — the HTML leaves the machine.
 3. **Write the capture test** from the example: mocks in the test file itself; mount with `mountPage`; wait for the final state with `findBy*` (data on screen, the tab present), never a timer; for a dialog or menu, click the real trigger and `await waitForDialog(name)`; call `assertAllRoutesSimulated()` so a missing route fails instead of capturing an error banner; save with `captureName(nn, screen[, state])` — `nn` in flow order, `screen` the flow map's screen id.
 4. **Run:** `DSX_CAPTURE=1 DSX_CAPTURE_MODULE=<m> npx vitest run --config vitest.capture.config.ts tests/capture/<area>.capture.test.tsx`.
 5. **Look at it** (recommended): `node <DSX>/tools/capture/render.mjs <capture.html> --out /tmp/x.png` from a project folder with Playwright, then read the PNG. It must match the app: logo, icons, badges, borders, active tab, no error banner. The command also flags images that did not load and empty bodies.
 6. **States.** For each main screen, the states its archetype requires (`UX.md` → `states`; `archetypes/<id>.md`): `<nn>-<screen>.loading.html`, `.empty.html`, `.error.html`, `.no-access.html`… with the same `nn` and screen id.
 
-Then the DSX tools read them with no extra flags: `node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <project> --measure` (skill `auditar-ux`), variations (skill `repensar-ux`), `ux-writing`, `revisar-ux`.
+Then the DSX tools read them with no extra flags: `node <DSX>/tools/ux-lint/audit.mjs --module <m> --root <project> --measure` (skill `audit-ux`), variations (skill `rethink-ux`), `ux-writing`, `review-ux`.
 
 ## Known fixes (already in `serialize.ts` — do not redo them in tests)
 
@@ -100,7 +100,7 @@ node <DSX>/tools/stitch/journeys.mjs .dsx/maps/flows-<m>.json --module <m> --out
 
 All of them accept `--dry-run` where they would touch the network. Verify in Stitch with `get_screen` (download the screenshot) and record screen ids in `.stitch/metadata.json` (skill `stitch`).
 
-Comparing design systems on real screens (skill `escolher-ds`): `apply_design_system` does not work on captured screens (their CSS is real and fixed). Render the same flow with each option's theme on top of the product theme (a provider in `mountPage` built from the option's `DESIGN.md` front matter), save with `{ subdir: 'options/<option>' }`, send each set and arrange with `--rows`.
+Comparing design systems on real screens (skill `choose-ds`): `apply_design_system` does not work on captured screens (their CSS is real and fixed). Render the same flow with each option's theme on top of the product theme (a provider in `mountPage` built from the option's `DESIGN.md` front matter), save with `{ subdir: 'options/<option>' }`, send each set and arrange with `--rows`.
 
 ## Other stacks
 

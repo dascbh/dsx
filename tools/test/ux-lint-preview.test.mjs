@@ -20,17 +20,19 @@ test('text options: ready text → text; "(remover)" → remove; "Manter…" →
   const c = textCase();
   assert.deepEqual(optionOps(c, { text: 'Remover Ana da lista' }).ops, [{ op: 'text', text: 'Remover Ana da lista' }]);
   assert.deepEqual(optionOps(textCase({ element: 'helper' }), { text: '(remover)' }).ops, [{ op: 'remove' }]);
-  assert.deepEqual(optionOps(c, { text: 'Manter como está' }).ops, [{ op: 'badge', text: 'Sem mudança' }]);
+  assert.deepEqual(optionOps(c, { text: 'Manter como está' }).ops, [{ op: 'badge', text: 'No change' }]);
+  assert.deepEqual(optionOps(c, { text: 'Keep as is' }, { lang: 'pt-BR' }).ops, [{ op: 'badge', text: 'Sem mudança' }]);
+  assert.deepEqual(optionOps(c, { text: '(remove)' }).ops, [{ op: 'remove' }], 'English option text is read too');
   assert.deepEqual(optionOps(textCase({ element: 'accessible-name' }), { text: 'Menu de Compras' }).ops, [{ op: 'annotate', kind: 'screen-reader', text: 'Menu de Compras' }]);
   assert.deepEqual(optionOps(textCase({ element: 'tooltip' }), { text: 'Lê de novo' }).ops, [{ op: 'annotate', kind: 'tooltip', text: 'Lê de novo' }]);
-  // nome acessível citado numa instrução: a anotação traz o nome, não a instrução
+  // accessible name cited in an instruction: the annotation carries the name, not the instruction
   assert.equal(optionOps(textCase({ element: 'accessible-name' }), { text: 'Dica "Critério: x"; nome acessível "Mostrar x no texto"' }).ops[0].text, 'Mostrar x no texto');
-  // instrução com o texto entre aspas depois do nome do elemento: troca só o texto principal
+  // instruction with quoted text after the element name: replaces only the main text
   const instr = optionOps(textCase({ element: 'helper' }), { text: 'Rodapé "Código do documento: 9f3c". É o mesmo.' });
   assert.deepEqual(instr.ops, [{ op: 'text', text: 'Código do documento: 9f3c' }]);
   assert.ok(instr.note);
-  assert.match(optionOps(textCase({ element: 'helper' }), { text: 'Mover o aviso para o rodapé' }).none, /estrutura/);
-  // num botão, verbo no começo é o próprio texto do botão
+  assert.match(optionOps(textCase({ element: 'helper' }), { text: 'Mover o aviso para o rodapé' }).none, /structure/);
+  // on a button, a leading verb is the button text itself
   assert.equal(optionOps(c, { text: 'Remover Ana' }).ops[0].op, 'text');
 });
 
@@ -45,7 +47,7 @@ test('declared preview wins and is validated (style limited to the listed proper
   const c = textCase();
   assert.deepEqual(optionOps(c, { text: 'x', preview: { op: 'variant', variant: 'outlined' } }).ops, [{ op: 'variant', variant: 'outlined' }]);
   assert.deepEqual(optionOps(c, { text: 'x', preview: [{ op: 'move', to: 'end' }, { op: 'style', css: { 'max-width': '72ch' } }] }).ops.map((o) => o.op), ['move', 'style']);
-  assert.match(optionOps(c, { text: 'x', preview: { op: 'style', css: { color: 'red' } } }).none, /fora da lista/);
+  assert.match(optionOps(c, { text: 'x', preview: { op: 'style', css: { color: 'red' } } }).none, /not in the list/);
   assert.match(optionOps(c, { text: 'x', preview: { op: 'none', reason: 'decisão de produto' } }).none, /decisão de produto/);
   assert.ok(validateOp({ op: 'grow' }).error);
   assert.ok(validateOp({ op: 'example' }).error);
@@ -59,7 +61,7 @@ test('family defaults: L1 → move, L7 → style, C2 → variant of the majority
   assert.deepEqual(variantPlan(msg), { major: 'text', minor: 'contained', screen: '24-catalogo' });
   assert.deepEqual(implicitPreview({ family: 'consistency', rule: 'C2', message: msg }).ops, [{ op: 'variant', variant: 'text' }]);
   const files = ['02-catalogo.error.html', '13-dlg-x.html', '14-dlg-y.error.html', '13-dlg-x.error.html'];
-  assert.equal(pickExample(files, 'error', '13-dlg-x'), '14-dlg-y.error', 'outra tela, do mesmo tipo (diálogo)');
+  assert.equal(pickExample(files, 'error', '13-dlg-x'), '14-dlg-y.error', 'another screen, same type (dialog)');
   assert.equal(pickExample(files, 'error', '05-lista'), '02-catalogo.error');
   assert.equal(pickExample(files, 'no-access', '05-lista'), null);
   const s1 = { family: 'states', rule: 'S1', region: 'error · (tela)', screens: ['05-lista'] };
@@ -67,7 +69,7 @@ test('family defaults: L1 → move, L7 → style, C2 → variant of the majority
   assert.deepEqual(implicitPreview({ ...s1, region: 'no-access · (tela)' }).ops, [{ op: 'synthesize-state', state: 'no-access' }]);
   assert.ok(implicitPreview({ family: 'flow', rule: 'F5' }).flow);
   assert.match(implicitPreview({ family: 'screen', rule: 'F9' }).none, /F9/);
-  // opção sem preview em família não textual usa a mesma prévia padrão
+  // an option without preview in a non-text family uses the same default preview
   assert.equal(optionOps({ family: 'layout', rule: 'L7' }, { text: 'Limitar a linha' }).ops[0].op, 'style');
 });
 
@@ -78,8 +80,8 @@ test('locator: layout keeps the measured selector; text turns the template into 
   const p = new RegExp(toPattern('Documento {}f{}c{}'), 'i');
   assert.ok(p.test('Documento 9f3c21'));
   assert.ok(!p.test('Documento'));
-  assert.equal(toPattern('{status} — {motivo de conclusão}'), null, 'modelo só de marcadores casaria qualquer texto');
-  assert.equal(toPattern('—'), '^—$', 'texto literal curto (célula vazia) continua valendo');
+  assert.equal(toPattern('{status} — {motivo de conclusão}'), null, 'a template of only markers would match any text');
+  assert.equal(toPattern('—'), '^—$', 'short literal text (empty cell) still counts');
   const loc = locatorFor(textCase());
   assert.ok(loc.patterns.some((x) => new RegExp(x).test('Remover da lista — Ricardo Almeida')));
   const t1 = locatorFor({ family: 'screen', rule: 'T1', message: '2 ações primárias (máx. 1): "De acordo", "Enviar"' });
@@ -97,12 +99,13 @@ test('flow diagram: before/after SVG for F1, F2 and F5 without a browser', () =>
   const f5 = flowDiagram(MAP, 'dlg', 'F5');
   assert.match(f5.before, /^<svg/);
   assert.ok(!f5.before.includes('voltar para'));
-  assert.match(f5.after, /voltar para Detalhe/);
+  assert.match(f5.after, /back to Detalhe/);
+  assert.match(flowDiagram(MAP, 'dlg', 'F5', 'pt-BR').after, /voltar para Detalhe/);
   const f1 = flowDiagram(MAP, 'det', 'F1');
   assert.match(f1.after, /class="n new"/);
   const f2 = flowDiagram(MAP, 'lista', 'F2');
-  assert.match(f2.before, /fora de todas as jornadas/);
-  assert.match(f2.after, /jornada declarada/);
+  assert.match(f2.before, /outside every journey/);
+  assert.match(f2.after, /journey declared/);
   assert.equal(flowDiagram(MAP, 'nada', 'F2'), null);
 });
 
@@ -128,11 +131,12 @@ test('manifest and cache: flow diagrams without Playwright; element cases say wh
     const m = JSON.parse(readFileSync(join(out, 'previews.json'), 'utf8'));
     assert.equal(m.cases['case-f1'].before.file.endsWith('.svg'), true);
     assert.ok(existsSync(join(out, m.cases['case-f1'].after.find((a) => a.file).file)));
-    assert.match(m.cases['case-c1'].failed, /Playwright indisponível/);
+    assert.match(m.cases['case-c1'].failed, /Playwright not available/);
+    assert.equal(m.lang, 'en');
     assert.equal(r1.stats.generated, 1);
     const r2 = await runPreviews(planPreviews(cases, { screensDir: screens, map: MAP }), { screensDir: screens, outDir: out, map: MAP, playwright: null });
-    assert.equal(r2.stats.cached, 1, 'diagrama refeito só quando o hash muda');
-    // filtro de severidade e casos resolvidos ficam fora
+    assert.equal(r2.stats.cached, 1, 'diagram redone only when the hash changes');
+    // severity filter and resolved cases are left out
     assert.equal(planPreviews(cases, { screensDir: screens, map: MAP, minSeverity: 3 }).length, 1);
     assert.equal(planPreviews([{ ...flowCase, statuses: ['accepted-deviation'] }], { screensDir: screens, map: MAP }).length, 0);
     // mudar a captura muda o hash do caso
@@ -154,7 +158,7 @@ test('register keeps the measured selector of layout findings without changing t
   assert.deepEqual(reg.items[0].selectors, ['main > div > button']);
 });
 
-// ---------- página ----------
+// ---------- page ----------
 
 function registryWithPreview(n = 3) {
   const reg = { module: 'm', updated: '2026-10-04', runs: [{}], items: [] };
@@ -174,7 +178,7 @@ function manifestDir(reg, { bytes = 2000 } = {}) {
   return dir;
 }
 
-test('page with previews: before and after side by side, Antes | Depois toggle, alt text, lightbox; without: none of it', () => {
+test('page with previews: before and after side by side, Before | After toggle, alt text, lightbox; without: none of it', () => {
   const { reg, options } = registryWithPreview(1);
   const dir = manifestDir(reg);
   try {
@@ -182,19 +186,23 @@ test('page with previews: before and after side by side, Antes | Depois toggle, 
     const r = writePages(reg, options, { items: {} }, join(outDir, 'page.html'), { previewsDir: dir });
     const html = readFileSync(r.pages[0].file, 'utf8');
     assert.match(html, /data:image\/webp;base64,/);
-    assert.match(html, /alt="Hoje: botão &quot;Botão 0&quot; na tela 01-lista, contornado em vermelho"/);
-    assert.match(html, /alt="Opção A aplicada: texto trocado por &quot;Novo&quot;/);
-    assert.match(html, /data-show="b"[^>]*>Antes<\/button><button type="button" data-show="a" aria-pressed="true">Depois/);
+    assert.match(html, /alt="Today: button &quot;Botão 0&quot; on the screen 01-lista, outlined in red"/);
+    assert.match(html, /alt="Option A applied: /);
+    assert.match(html, /data-show="b"[^>]*>Before<\/button><button type="button" data-show="a" aria-pressed="true">After/);
+    const pt = readFileSync(writePages(reg, options, { items: {} }, join(outDir, 'pt.html'), { previewsDir: dir, lang: 'pt-BR' }).pages[0].file, 'utf8');
+    assert.match(pt, /alt="Hoje: botão &quot;Botão 0&quot; na tela 01-lista, contornado em vermelho"/);
+    assert.match(pt, /alt="Opção A aplicada: texto trocado por &quot;Novo&quot;/);
+    assert.match(pt, /data-show="b"[^>]*>Antes<\/button><button type="button" data-show="a" aria-pressed="true">Depois/);
     assert.match(html, /<dialog id="pv-dlg"/);
     assert.match(html, /prefers-color-scheme:dark/);
     assert.match(html, /:root\[data-theme="dark"\]/);
     assert.match(html, /body\{background:var\(--bg\)/);
-    // referência por arquivo em vez de embutir
+    // reference by file instead of embedding
     const rf = writePages(reg, options, { items: {} }, join(outDir, 'files.html'), { previewsDir: dir, previewFiles: true });
     const hf = readFileSync(rf.pages[0].file, 'utf8');
     assert.ok(!hf.includes('data:image/webp'));
     assert.match(hf, /<img src="[^"]*t-0\.before\.webp"/);
-    // sem prévia
+    // without preview
     const plain = renderPages(reg, options, { items: {} })[0].html;
     assert.ok(!plain.includes('pv-dlg') && !plain.includes('pv-alt'));
     rmSync(outDir, { recursive: true, force: true });
@@ -207,16 +215,16 @@ test('page size limit: pages split by bytes, each self-contained with its own im
   try {
     const outDir = tmp();
     const r = writePages(reg, options, { items: {} }, join(outDir, 'page.html'), { previewsDir: dir, maxBytes: 1.6 * 1024 * 1024 });
-    assert.ok(r.pages.length >= 3, `${r.pages.length} páginas`);
+    assert.ok(r.pages.length >= 3, `${r.pages.length} pages`);
     assert.deepEqual(r.pages.map((p) => p.file.replace(/^.*\//, '')).slice(0, 2), ['page.html', 'page-2.html']);
     for (const p of r.pages) {
       assert.ok(p.bytes <= 1.6 * 1024 * 1024 * 1.05, `${p.file} ${p.bytes}`);
       const html = readFileSync(p.file, 'utf8');
       const data = JSON.parse(html.match(/<script type="application\/json" id="pv-data">([\s\S]*?)<\/script>/)[1]);
-      for (const k of html.matchAll(/data-k="([^"]+)"/g)) assert.ok(data[k[1]], `imagem ${k[1]} embutida na própria página`);
-      assert.equal((html.match(/<nav class="paginas"/g) ?? []).length, 2, 'navegação no topo e no rodapé');
+      for (const k of html.matchAll(/data-k="([^"]+)"/g)) assert.ok(data[k[1]], `image ${k[1]} embedded in its own page`);
+      assert.equal((html.match(/<nav class="paginas"/g) ?? []).length, 2, 'navigation at the top and at the bottom');
     }
-    // nova execução com menos páginas apaga as órfãs
+    // a new run with fewer pages deletes the orphans
     writePages(reg, options, { items: {} }, join(outDir, 'page.html'), { previewsDir: dir });
     assert.deepEqual(readdirSync(outDir).filter((f) => f.endsWith('.html')), ['page.html']);
     rmSync(outDir, { recursive: true, force: true });
@@ -233,7 +241,7 @@ test('paginate keeps group order and cuts by case count', () => {
 
 const pwDir = process.env.DSX_PLAYWRIGHT_CWD ?? process.cwd();
 const playwright = resolvePlaywright(pwDir);
-test('Playwright: before/after crops from the real capture, element outlined, mutation applied', { skip: !playwright && 'Playwright indisponível (defina DSX_PLAYWRIGHT_CWD para uma pasta que o tenha)' }, async () => {
+test('Playwright: before/after crops from the real capture, element outlined, mutation applied', { skip: !playwright && 'Playwright not available (set DSX_PLAYWRIGHT_CWD to a folder that has it)' }, async () => {
   const { root, screens } = fixture();
   try {
     const out = join(root, 'previews');
@@ -246,18 +254,18 @@ test('Playwright: before/after crops from the real capture, element outlined, mu
     try {
       r = await runPreviews(planPreviews(cases, { screensDir: screens }), { screensDir: screens, outDir: out, playwright });
     } catch (e) {
-      if (/Executable doesn't exist/.test(e.message)) return; // navegador não instalado
+      if (/Executable doesn't exist/.test(e.message)) return; // browser not installed
       throw e;
     }
     const m = r.manifest.cases;
     assert.ok(!m['case-t'].failed, m['case-t'].failed);
     assert.match(m['case-t'].before.file, /\.(webp|jpg)$/);
     assert.equal(m['case-t'].after.filter((a) => a.file).length, 3);
-    assert.equal(m['case-t'].after[2].kind_label, 'Sem mudança', '"Manter" mostra a imagem de hoje com o selo');
+    assert.equal(m['case-t'].after[2].kind_label, 'No change', '"Manter" shows today\'s image with the badge');
     assert.equal(m['case-t'].crop.width >= 480, true);
     assert.equal(m['case-d'].after[0].op[0].op, 'remove');
     assert.equal(m['case-s'].after[0].op[0].op, 'synthesize-state');
-    assert.equal(m['case-s'].after[0].kind_label, 'Proposta montada com componentes da própria tela');
+    assert.equal(m['case-s'].after[0].kind_label, 'Proposal built with components of the screen itself');
     assert.ok(m['case-s'].after[0].file, m['case-s'].after[0].failed);
     const sizes = m['case-t'].after.filter((a) => a.file).map((a) => readFileSync(join(out, a.file)).length);
     assert.ok(sizes.every((n) => n > 500));
@@ -265,7 +273,7 @@ test('Playwright: before/after crops from the real capture, element outlined, mu
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-// ---------- operações novas (sem navegador) ----------
+// ---------- new operations (no browser) ----------
 
 test('validateOp: new operations and their required fields', () => {
   assert.deepEqual(validateOp({ op: 'insert', like: 'chip', text: '1' }).op, { op: 'insert', position: 'after', like: 'chip', text: '1' });
@@ -279,7 +287,7 @@ test('validateOp: new operations and their required fields', () => {
   assert.equal(validateOp({ op: 'annotate', text: 'Menu' }).op.kind, 'screen-reader');
   assert.match(validateOp({ op: 'annotate', kind: 'tooltip' }).error, /text/);
   assert.match(validateOp({ op: 'annotate', kind: 'som', text: 'x' }).error, /kind/);
-  assert.equal(validateOp({ op: 'badge' }).op.text, 'Sem mudança');
+  assert.equal(validateOp({ op: 'badge' }).op.text, 'No change');
   assert.deepEqual(validateOp({ op: 'synthesize-state', state: 'no-access', text: 'Peça ao aprovador.' }).op, { op: 'synthesize-state', state: 'no-access', text: 'Peça ao aprovador.' });
   assert.match(validateOp({ op: 'synthesize-state' }).error, /state/);
   assert.equal(validateOp({ op: 'synthesize-region', region: 'side-panel' }).op.region, 'side-panel');
@@ -288,7 +296,7 @@ test('validateOp: new operations and their required fields', () => {
   assert.match(validateOp({ op: 'variant', variant: 'outlined', targets: 'quase todos' }).error, /targets/);
   assert.equal(validateOp({ op: 'move', to: 'region-top' }).op.fold, 900);
   assert.ok(validateOp({ op: 'style', css: { 'font-size': 'theme:h2' } }).op);
-  assert.match(validateOp({ op: 'style', css: { 'font-size': 'theme:h9' } }).error, /tema/);
+  assert.match(validateOp({ op: 'style', css: { 'font-size': 'theme:h9' } }).error, /theme/);
 });
 
 test('text options: quoted sentence, arrow, "Label: text" and "X, com apoio/selo/nome acessível" are extracted', () => {
@@ -308,7 +316,7 @@ test('list options: stem and number matching; no match falls back to the first s
   assert.equal(pickSegment('Ver 1 mudança · Ver 3 mudanças', ['Histórico (1)']), 'Ver 1 mudança');
   const r = optionOps(textCase({ element: 'cell', text: '—', variants: [] }), { text: 'Sem finalidade · Nenhum' });
   assert.equal(r.ops[0].text, 'Sem finalidade');
-  assert.match(r.note, /nenhum repete/);
+  assert.match(r.note, /none repeats/);
 });
 
 test('rule defaults for the rules that had none', () => {
@@ -349,14 +357,15 @@ test('state recipes: page and dialog, option text over the default, field-error 
 });
 
 test('previewKind: short label of each preview type for the page legend', () => {
-  assert.equal(previewKind([{ op: 'text', text: 'x' }]), 'Texto trocado');
-  assert.equal(previewKind([{ op: 'remove' }]), 'Elemento removido');
+  assert.equal(previewKind([{ op: 'text', text: 'x' }]), 'Text replaced');
+  assert.equal(previewKind([{ op: 'text', text: 'x' }], 'pt-BR'), 'Texto trocado');
+  assert.equal(previewKind([{ op: 'remove' }]), 'Element removed');
   assert.equal(previewKind([{ op: 'synthesize-state', state: 'error' }]), PROPOSAL_LABEL);
   assert.equal(previewKind([{ op: 'text', text: 'x' }, { op: 'insert', like: 'chip' }]), PROPOSAL_LABEL);
-  assert.equal(previewKind([{ op: 'annotate', kind: 'screen-reader', text: 'x' }]), 'Anotação: leitor de tela');
-  assert.equal(previewKind([{ op: 'badge', text: 'Sem mudança' }]), 'Sem mudança');
-  assert.equal(previewKind([{ op: 'style', css: { 'font-size': 'theme:h1' } }]), 'Tamanho na escala do tema');
-  assert.equal(previewKind([{ op: 'example', screen: 'x' }]), 'Exemplo de outra tela');
+  assert.equal(previewKind([{ op: 'annotate', kind: 'screen-reader', text: 'x' }]), 'Annotation: screen reader');
+  assert.equal(previewKind([{ op: 'badge', text: 'No change' }]), 'No change');
+  assert.equal(previewKind([{ op: 'style', css: { 'font-size': 'theme:h1' } }]), 'Size on the theme scale');
+  assert.equal(previewKind([{ op: 'example', screen: 'x' }]), 'Example from another screen');
   assert.match(describeOps([{ op: 'replace-text-many', pairs: [{ from: 'SMTP', to: 'e-mail' }] }]), /"SMTP" → "e-mail"/);
 });
 
@@ -365,7 +374,7 @@ test('kit helpers: text lines of a capture, lines a state adds, monotone heading
   assert.deepEqual(addedLines('<body><h1>Lista</h1></body>', '<body><h1>Lista</h1><p>Não foi possível carregar.</p></body>'), ['Não foi possível carregar.']);
   const scale = typographyScale({ h1: [{ size: 24, line: '32px', weight: '700' }, { size: 24, line: '32px', weight: '700' }, { size: 30, line: '36px', weight: '700' }], h3: [{ size: 26, line: '30px', weight: '600' }] });
   assert.equal(scale.h1.size, 24, 'moda');
-  assert.equal(scale.h3.size, 24, 'nível de baixo nunca maior que o de cima');
+  assert.equal(scale.h3.size, 24, 'a lower level is never larger than the one above');
 });
 
 test('page cases keep the declared preview of the option', () => {
@@ -408,7 +417,7 @@ function fixtureNew() {
 }
 const sc = (over) => ({ ids: ['x'], statuses: ['open'], variants: [], message: '', region: '', selectors: [], options: [], severity: 2, ...over });
 
-test('Playwright: new operations change the real capture (state, region, insert, annotate, badge, variant, style, align, move, replace)', { skip: !playwright && 'Playwright indisponível (defina DSX_PLAYWRIGHT_CWD para uma pasta que o tenha)' }, async () => {
+test('Playwright: new operations change the real capture (state, region, insert, annotate, badge, variant, style, align, move, replace)', { skip: !playwright && 'Playwright not available (set DSX_PLAYWRIGHT_CWD to a folder that has it)' }, async () => {
   const { root, screens } = fixtureNew();
   try {
     const out = join(root, 'previews');
@@ -440,18 +449,33 @@ test('Playwright: new operations change the real capture (state, region, insert,
     }
     const m = r.manifest.cases;
     const made = (id, i = 0) => { const a = (m[id].after ?? [])[i]; assert.ok(a && a.file, `${id}: ${m[id].failed ?? a?.failed}`); return a; };
-    for (const id of ['c-err-dlg', 'c-field', 'c-noacc', 'c-conf', 'c-l9']) assert.equal(made(id).kind_label, 'Proposta montada com componentes da própria tela', id);
+    for (const id of ['c-err-dlg', 'c-field', 'c-noacc', 'c-conf', 'c-l9']) assert.equal(made(id).kind_label, 'Proposal built with components of the screen itself', id);
     assert.equal(m['c-err-dlg'].kind, 'synth');
-    assert.equal(made('c-t1').kind_label, 'Peso do botão trocado');
+    assert.equal(made('c-t1').kind_label, 'Button weight changed');
     assert.equal(made('c-l3').kind_label, 'Tamanho na escala do tema');
     assert.match(made('c-t6').description, /"SMTP" → "e-mail"/);
-    assert.equal(made('c-t7').op[0].text, 'Confirmar nome do campo', 'o objeto vem do rótulo mais próximo');
+    assert.equal(made('c-t7').op[0].text, 'Confirmar nome do campo', 'the object comes from the nearest label');
     assert.equal(made('c-l6').kind_label, 'Elemento movido');
     assert.equal(made('c-ops', 0).op[1].text, '1,2 MB');
-    assert.equal(made('c-ops', 1).kind_label, 'Sem mudança');
-    assert.equal(made('c-ops', 2).kind_label, 'Anotação: dica');
+    assert.equal(made('c-ops', 1).kind_label, 'No change');
+    assert.equal(made('c-ops', 2).kind_label, 'Annotation: hint');
     assert.equal(made('c-ops', 3).kind_label, PROPOSAL_LABEL);
-    assert.equal(made('c-icon').kind_label, 'Anotação: leitor de tela', 'botão só de ícone: a troca vira anotação');
+    assert.equal(made('c-icon').kind_label, 'Annotation: screen reader', 'icon-only button: the change becomes an annotation');
     assert.ok(existsSync(join(out, 'kit.json')));
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('detector messages in English wording are parsed like the pt-BR ones (C2, L6, L9, T6, T7, X6)', () => {
+  const ops = (c) => implicitPreview(c).ops;
+  assert.deepEqual(variantPlan('button "Confirm" with different visual variants (text on 03-doc, 26-max; contained on 24-catalog) — the same action…'), { major: 'text', minor: 'contained', screen: '24-catalog' });
+  assert.equal(ops({ family: 'layout', rule: 'L6', message: 'primary action "Save" outside the first fold (ends at 1200 px; fold at 700 px)' })[0].fold, 700);
+  assert.equal(locatorFor({ family: 'layout', rule: 'L6', selectors: ['main button'], message: 'fold at 640 px' }).fold, 640);
+  assert.deepEqual(ops({ family: 'layout', rule: 'L9', text: 'region kpi-strip missing' }), [{ op: 'synthesize-region', region: 'kpi-strip', title: 'Indicadores' }]);
+  assert.deepEqual(implicitPreview({ family: 'layout', rule: 'L9', text: 'region kpi-strip missing' }, { productLang: 'en' }).ops[0].title, 'Indicators');
+  assert.deepEqual(ops({ family: 'screen', rule: 'T6', message: 'forbidden term "SMTP" in the visible text (1×), e.g. "Sent: SMTP not set"' }), [{ op: 'replace-text-many', pairs: [{ from: 'SMTP', to: 'e-mail' }], scope: 'element' }]);
+  assert.deepEqual(locatorFor({ family: 'screen', rule: 'T6', message: 'forbidden term "SMTP" (1×), e.g. "Sent: SMTP not set"' }).contains, ['Sent: SMTP not set']);
+  assert.deepEqual(ops({ family: 'screen', rule: 'T7', message: 'button "Confirm" without verb + object (e.g. "Send order")' }), [{ op: 'text', text: 'Confirm {context}' }]);
+  assert.deepEqual(ops({ family: 'text', rule: 'X6', message: 'button with 9 words (max. 4)' }), [{ op: 'text', text: '{part:0}' }]);
+  assert.equal(ops({ family: 'text', rule: 'X6', message: 'button "OK" without an object', text: 'OK' })[0].text, 'OK {context}');
+  assert.equal(stateRecipe('no-access', {}, 'en').page.title, 'You do not have access to this area');
 });

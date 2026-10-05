@@ -7,13 +7,13 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   stableId, templateOf, maskData, fromText, fromScreen, fromFlow, assignIds, merge, statusOf, check,
-  importOptions, importDecisions, makeDecision, renderPage, renderPages, pageCases, fromLayout,
+  importOptions, importDecisions, makeDecision, renderPage, renderPages, pageCases, fromLayout, restatus,
 } from '../ux-lint/findings.mjs';
 
 const CLI = fileURLToPath(new URL('../ux-lint/findings.mjs', import.meta.url));
 const ROOT = '/proj';
 
-// Saídas mínimas no formato `--json` de cada verificador.
+// Minimal outputs in each checker's `--json` format.
 const textJson = (findings) => ({ summary: {}, findings });
 const textFinding = ({ rule = 'X1', sev = 2, text = 'Remover da lista — Ana', line = 80, file = '/proj/src/Dlg.tsx', variants, probable_data = false } = {}) => ({
   rule, severity: probable_data ? 0 : sev, text, message: 'travessão', types: ['button'], screens: ['07-dlg.html'],
@@ -24,6 +24,7 @@ const screenJson = { summary: {}, screens: [{ file: '/proj/caps/03-doc.html', fi
 const flowJson = { findings: [{ rule: 'F1', severity: 3, screen: 'respondido', message: '"Resposta" não tem saída; chega-se por 3 transição(ões)', evidence: ['t-a (src/pages/A.tsx:208)'] }] };
 
 const run = (findings, reg = []) => ({ items: assignIds(fromText(textJson(findings), { root: ROOT }), reg), families: ['text'] });
+const collect0 = (json, reg = []) => ({ items: assignIds(fromScreen(json, { root: ROOT }), reg), families: ['screen'] });
 const newRegistry = () => ({ module: 'm', updated: null, runs: [], items: [] });
 const day = (d) => new Date(`2026-10-${d}T12:00:00Z`);
 
@@ -73,7 +74,7 @@ test('screen and flow normalized with family, prefix and source', () => {
   const [f] = assignIds(fromFlow(flowJson, { root: ROOT }));
   assert.match(f.id, /^f-/);
   assert.deepEqual(f.source, ['src/pages/A.tsx:208']);
-  // Âncora do fluxo é a tela do mapa: mudar a evidência não muda o id.
+  // The flow anchor is the map screen: changing the evidence does not change the id.
   const [f2] = assignIds(fromFlow({ findings: [{ ...flowJson.findings[0], evidence: ['t-b (src/pages/B.tsx:10)'] }] }));
   assert.equal(f.id, f2.id);
 });
@@ -90,7 +91,7 @@ test('merge keeps first_seen and decisions; absence only for the family of the r
   assert.equal(t.last_seen, '2026-10-03');
   assert.deepEqual(t.source, ['src/Dlg.tsx:81']);
   assert.equal(t.status, 'decided');
-  assert.equal(reg.items.find((i) => i.family === 'screen').present, true, 'família que não veio não fica ausente');
+  assert.equal(reg.items.find((i) => i.family === 'screen').present, true, 'a family that did not come is not marked absent');
   assert.equal(reg.runs.length, 2);
   assert.equal(reg.runs[0].commit, 'abc1234');
   assert.deepEqual(reg.runs[1].sources, ['text']);
@@ -128,12 +129,12 @@ test('check: fails new finding ≥ min and regression; tolerates known open', ()
   assert.equal(r.pass, false);
   assert.equal(r.added.length, 1);
   r = check(reg, run([textFinding({ rule: 'X5', sev: 1, text: 'Pronto.' })], reg.items), { decisions: dec });
-  assert.equal(r.pass, true, 'novo abaixo do mínimo passa');
+  assert.equal(r.pass, true, 'new below the minimum passes');
   merge(reg, run([]), { now: day('02') });
   r = check(reg, run([textFinding()], reg.items), { decisions: dec });
   assert.equal(r.pass, false);
   assert.equal(r.regressions.length, 1);
-  assert.equal(reg.items[0].status, 'fixed', 'check não grava');
+  assert.equal(reg.items[0].status, 'fixed', 'check does not write');
 });
 
 test('options: grouped case covers several ids; case without finding becomes a review item', () => {
@@ -156,7 +157,7 @@ test('options: grouped case covers several ids; case without finding becomes a r
   assert.equal(manual.element, 'helper');
   assert.deepEqual(options.items[r.links[0].ids[0]].recommended, { index: 0, why: 'pt-BR' });
   assert.equal(options.items[r.links[0].ids[0]].options[1].text, 'Resumo');
-  // Reimportar não duplica; detector que não vê o item de revisão não o marca como corrigido.
+  // Reimporting does not duplicate; a detector that does not see the review item does not mark it fixed.
   importOptions(reg, options, cases, { now: day('02') });
   assert.equal(reg.items.filter((i) => i.rule === 'desc').length, 1);
   merge(reg, run([]), { now: day('03') });
@@ -174,7 +175,7 @@ test('import decisions in the page format', () => {
   assert.deepEqual(r.unknown, ['t-00000000']);
   assert.deepEqual(dec.items[id], { choice: 2, by: 'Ana', at: '2026-10-04', reason: null });
   const bad = importDecisions(reg, dec, { items: { [id]: { choice: 'ignore' } } });
-  assert.equal(bad.invalid.length, 1, 'ignore sem reason é recusado');
+  assert.equal(bad.invalid.length, 1, 'ignore without reason is refused');
 });
 
 test('page: id, status, checked decision and form that copies decisions.json', () => {
@@ -186,18 +187,20 @@ test('page: id, status, checked decision and form that copies decisions.json', (
   merge(reg, run([textFinding()]), { now: day('02'), decisions: dec });
   const html = renderPage(reg, options, dec, { product: 'X' });
   assert.ok(html.includes(id));
-  assert.ok(html.includes('decidido'));
+  assert.ok(html.includes('decided'));
+  assert.ok(html.includes('Copy decisions'));
+  const pt = renderPage(reg, options, dec, { product: 'X', lang: 'pt-BR' });
+  assert.ok(pt.includes('decidido') && pt.includes('Copiar decisões') && pt.includes('Sua decisão'), 'pt-BR keeps the previous page text');
   assert.match(html, /<fieldset class="decisao" data-ids="[^"]*"/);
   assert.match(html, /value="1" checked/);
   assert.match(html, /value="ignore"/);
-  assert.ok(html.includes('Copiar decisões'));
   assert.ok(html.includes('navigator.clipboard.writeText'));
   assert.ok(html.includes('<textarea id="saida"'));
-  assert.ok(!/fetch\(|download=/.test(html), 'sem fetch, sem download');
-  assert.match(html, /try\{localStorage\.setItem/, 'localStorage só dentro de try/catch');
+  assert.ok(!/fetch\(|download=/.test(html), 'no fetch, no download');
+  assert.match(html, /try\{localStorage\.setItem/, 'localStorage only inside try/catch');
   assert.equal(pageCases(reg, options, dec).length, 1);
 
-  // O script do formulário gera o JSON no formato de decisions.json, com ou sem localStorage.
+  // The form script produces the JSON in the decisions.json format, with or without localStorage.
   const runs = [null, throwingStorage()].map((storage) => runPageScript(html, { storage, checked: '1' }).click().then((copied) => {
     const out = JSON.parse(copied);
     assert.equal(out.items[id].choice, 1);
@@ -207,11 +210,11 @@ test('page: id, status, checked decision and form that copies decisions.json', (
   return Promise.all(runs);
 });
 
-/** Armazenamento que falha (navegação privada, site bloqueado): a página tem de funcionar igual. */
-function throwingStorage() { return { getItem() { throw new Error('bloqueado'); }, setItem() { throw new Error('bloqueado'); } }; }
+/** Storage that fails (private browsing, blocked site): the page must work the same. */
+function throwingStorage() { return { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } }; }
 function memoryStorage(init = {}) { const m = { ...init }; return { getItem: (k) => m[k] ?? null, setItem: (k, v) => { m[k] = v; }, dump: m }; }
 
-/** Roda o script da página num DOM mínimo: um fieldset por caso da página, com a opção `checked` marcada. */
+/** Runs the page script in a minimal DOM: one fieldset per page case, with the `checked` option selected. */
 function runPageScript(html, { storage = null, checked = null, por = 'Ana' } = {}) {
   const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
   const meta = html.match(/<script type="application\/json" id="dsx-decisions">([\s\S]*?)<\/script>/)[1];
@@ -246,17 +249,19 @@ test('page: decisions cross pages through localStorage; counter shows decided of
   const [a, b] = reg.items.map((i) => i.id);
   const options = { items: { [a]: { problem: 'P1', options: [{ text: 'Remover Ana' }], recommended: null }, [b]: { problem: 'P2', options: [{ text: 'Código' }, { text: 'Código do documento' }], recommended: null } } };
   const pages = renderPages(reg, options, { items: {} }, { maxCases: 1 });
-  assert.equal(pages.length, 2, 'um caso por página');
+  assert.equal(pages.length, 2, 'one case per page');
   assert.equal(pages[1].file, 'page-2.html');
   assert.match(pages[0].html, /<nav class="paginas"[\s\S]*page-2\.html/);
   assert.match(pages[1].html, /rel="prev"/);
   const storage = memoryStorage();
-  // decide na página 1…
+  // decide on page 1…
   const p1 = runPageScript(pages[0].html, { storage, checked: '0' });
-  assert.equal(p1.counter(), '1 decididos de 2');
-  // …e na página 2, cujo "Copiar" leva as duas.
+  assert.equal(p1.counter(), '1 decided of 2');
+  // …and on page 2, whose "Copy" takes both.
   const p2 = runPageScript(pages[1].html, { storage, checked: '1' });
-  assert.equal(p2.counter(), '2 decididos de 2');
+  assert.equal(p2.counter(), '2 decided of 2');
+  const ptPage = renderPages(reg, options, { items: {} }, { maxCases: 1, lang: 'pt-BR' })[0].html;
+  assert.equal(runPageScript(ptPage, { storage: memoryStorage(), checked: '0' }).counter(), '1 decididos de 2');
   const out = JSON.parse(await p2.click());
   const caseOfB = pages.findIndex((p) => p.html.includes(`data-ids="${b}"`));
   assert.equal(Object.keys(out.items).length, 2);
@@ -278,7 +283,7 @@ test('CLI: register, options, decide, status, check and page in a temp directory
     assert.equal(reg.items.length, 2);
     assert.equal(reg.items[0].source[0], 'src/Dlg.tsx:80');
     const id = reg.items.find((i) => i.family === 'text').id;
-    assert.equal(cli('decide', id, 'ignore').status, 2, 'ignore sem reason');
+    assert.equal(cli('decide', id, 'ignore').status, 2, 'ignore without reason');
     assert.equal(cli('decide', id, 'free', '--text', 'Remover Ana', '--by', 'Ana').status, 0);
     const dec = JSON.parse(readFileSync(join(dir, 'm/decisions.json'), 'utf8'));
     assert.equal(dec.items[id].choice, 'free');
@@ -290,10 +295,16 @@ test('CLI: register, options, decide, status, check and page in a temp directory
     writeFileSync(t2, JSON.stringify(textJson([textFinding({ file: join(tmp, 'src/Dlg.tsx') }), textFinding({ rule: 'X11', text: 'Hash', file: join(tmp, 'src/Dlg.tsx') })])));
     const bad = cli('check', '--text', t2, '--root', tmp);
     assert.equal(bad.status, 1);
-    assert.match(bad.stdout, /NOVO .* src\/Dlg\.tsx:80/);
+    assert.match(bad.stdout, /NEW .* src\/Dlg\.tsx:80/);
     const html = join(tmp, 'p.html');
     assert.equal(cli('page', html).status, 0);
+    assert.ok(readFileSync(html, 'utf8').includes('Copy decisions'));
+    assert.match(readFileSync(html, 'utf8'), /^<title>UX findings · m<\/title>/);
+    assert.equal(cli('page', html, '--lang', 'pt-BR').status, 0);
     assert.ok(readFileSync(html, 'utf8').includes('Copiar decisões'));
+    const badLang = cli('page', html, '--lang', 'xx');
+    assert.equal(badLang.status, 2);
+    assert.match(badLang.stderr, /unknown --lang "xx"/);
   } finally { rmSync(tmp, { recursive: true, force: true }); }
 });
 
@@ -306,7 +317,9 @@ test('text-page: CLI still renders the page from cases.json', () => {
     execFileSync('node', [fileURLToPath(new URL('../ux-lint/text-page.mjs', import.meta.url)), cases, out, '--product', 'P']);
     const html = readFileSync(out, 'utf8');
     assert.ok(html.includes('<span class="btn">Salvar</span>'));
-    assert.ok(html.includes('Botões'));
+    assert.ok(html.includes('Buttons'));
+    execFileSync('node', [fileURLToPath(new URL('../ux-lint/text-page.mjs', import.meta.url)), cases, out, '--lang', 'pt-BR']);
+    assert.ok(readFileSync(out, 'utf8').includes('Botões'));
   } finally { rmSync(tmp, { recursive: true, force: true }); }
 });
 
@@ -325,11 +338,32 @@ test('legacy: old Portuguese detector output and casos.json are still read', () 
     const out = join(tmp, 'o.html');
     const r = spawnSync('node', [fileURLToPath(new URL('../ux-lint/text-page.mjs', import.meta.url)), legacyCases, out], { encoding: 'utf8' });
     assert.equal(r.status, 0);
-    assert.match(r.stderr, /nome antigo "casos", renomeie para "cases"/);
+    assert.match(r.stderr, /old name "casos", rename to "cases"/);
     assert.ok(readFileSync(out, 'utf8').includes('<span class="btn">Salvar</span>'));
     const old = spawnSync('node', [fileURLToPath(new URL('../ux-lint/text-page.mjs', import.meta.url)), legacyCases, out, '--produto', 'P'], { encoding: 'utf8' });
     assert.equal(old.status, 0);
-    assert.match(old.stderr, /--produto é nome antigo, use --product/);
+    assert.match(old.stderr, /--produto is an old name, use --product/);
     assert.ok(readFileSync(out, 'utf8').includes('P'));
   } finally { rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('relink: a reworded detector message (pt-BR → English) keeps the registered id, status and decision', () => {
+  const reg = newRegistry();
+  const scr = (message, region = 'diálogo "Excluir"') => ({ summary: {}, screens: [{ file: '/proj/caps/03-doc.html', findings: [{ rule: 'T1', severity: 2, region, message, evidence: '/proj/caps/03-doc.html:5:1' }] }] });
+  merge(reg, collect0(scr('2 ações primárias na mesma região')), { now: day('01') });
+  const old = reg.items[0];
+  const dec = { items: { [old.id]: makeDecision(0, { by: 'Ana', now: day('02') }) } };
+  restatus(reg, dec);
+  assert.equal(old.status, 'decided');
+  const r = collect0(scr('2 primary actions in the same region', 'dialog "Excluir"'), reg.items);
+  assert.notEqual(r.items[0].id, old.id, 'the new wording hashes to another id');
+  const ck = check(reg, { ...r, items: r.items.map((i) => ({ ...i })) }, { decisions: dec });
+  assert.equal(ck.pass, true);
+  assert.equal(ck.relinked.length, 1);
+  merge(reg, r, { now: day('03'), decisions: dec });
+  assert.equal(reg.items.length, 1, 'no new item, no fixed old item');
+  assert.equal(reg.items[0].id, old.id);
+  assert.equal(reg.items[0].status, 'decided');
+  assert.equal(reg.items[0].message, '2 primary actions in the same region');
+  assert.deepEqual(r.relinked.map((x) => x.to), [old.id]);
 });

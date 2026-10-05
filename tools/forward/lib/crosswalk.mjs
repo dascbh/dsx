@@ -2,6 +2,7 @@
 // of rules_index and review_rules, and `principles` on every law of laws_index; the principle ids come from Forward's
 // catalog (data/forward/spec/dimensions/quality-attributes.toml). This module is the one place that reads that
 // crosswalk, so the report, the variations page and the exporters cite principles the same way.
+import { dataText } from '../../lib/data-text.mjs';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DSX_ROOT, loadPrinciples, loadDivergenceRules } from './snapshot.mjs';
@@ -36,12 +37,12 @@ export function principlesForLaw(law, matrix = loadMatrix()) {
   return [...(matrix.laws_index?.[law]?.principles ?? [])];
 }
 
-/** Laws of laws_index named in a text (by id or by its name), in order of appearance. */
+/** Laws of laws_index named in a text (by id, its name or a legacy alias), in order of appearance. */
 export function lawsIn(text, matrix = loadMatrix()) {
   const s = String(text ?? '').toLowerCase();
   const hits = [];
   for (const [id, l] of Object.entries(matrix.laws_index ?? {})) {
-    const names = [id, id.replace(/-/g, ' '), l.name_pt, l.name].filter(Boolean).map((x) => String(x).toLowerCase());
+    const names = [id, id.replace(/-/g, ' '), dataText(l, 'name'), l.name_pt, ...(l.aliases ?? [])].filter(Boolean).map((x) => String(x).toLowerCase());
     const at = Math.min(...names.map((n) => { const k = s.indexOf(n); return k < 0 ? Infinity : k; }));
     if (at !== Infinity) hits.push([at, id]);
   }
@@ -89,7 +90,7 @@ export function checkCrosswalk(matrix = loadMatrix(), principles = loadPrinciple
 }
 
 /**
- * Lens check for a variations manifest (skill repensar-ux), against the divergence gate's own lens list.
+ * Lens check for a variations manifest (skill rethink-ux), against the divergence gate's own lens list.
  * Variants may carry `lens`; the manifest may carry `how_might_we` (list). Returns { errors, warnings, lenses }.
  * Meant to be called by tools/ux-lint/variations.mjs `validate`; it never edits the manifest.
  */

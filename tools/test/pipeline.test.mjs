@@ -208,7 +208,7 @@ test('variations: Forward alternatives.md export and plain-language hypothesis o
   const md = toAlternativesMarkdown(m);
   for (const re of [/^## How might we…/m, /^## Alternatives/m, /^### A\. /m, /^Lens: subtract$/m, /^Lens: invert$/m, /^Hypothesis: for people who generate/m, /^Traded: gives up people without a spreadsheet$/m, /^## Convergence/m, /^Chose: A — the wait is the problem/m]) assert.match(md, re);
   assert.ok(!/^Traded:.*\n(?:.*\n)*?### B/m.test(md.split('### B')[0].split('### A')[1] ?? ''), 'the chosen variant records no discard');
-  const [p] = renderVariationsPages(m, { registry: loadRegistry(VROOT, 'demo').items, catalogs: loadCatalogs(), file: 'v.html' });
+  const [p] = renderVariationsPages(m, { registry: loadRegistry(VROOT, 'demo').items, catalogs: loadCatalogs(), file: 'v.html', lang: 'pt-BR' });
   assert.match(p.html, /Como saber se funciona/);
   assert.match(p.html, /Como testar se está errada/);
   assert.match(p.html, /Recomendada por quem desenhou/);

@@ -1,6 +1,6 @@
 ---
 id: pagination-vs-scroll
-title: Paginação, "Carregar mais" ou scroll infinito?
+title: Pagination, "Load more" or infinite scroll?
 category: navigation
 components: [pagination, load-more-button, infinite-scroll, list]
 type: contextual-decision
@@ -11,94 +11,94 @@ wcag: ["2.1.1", "2.4.3", "4.1.3", "1.4.10", "2.4.8"]
 related: [table-pagination, long-loading, skeleton-vs-spinner, active-filters]
 ---
 
-# Paginação, "Carregar mais" ou scroll infinito?
+# Pagination, "Load more" or infinite scroll?
 
-> **Regra:** Se localizar e retornar pesam mais, adote paginação; se explorar e comparar pesam mais, adote "Carregar mais"; deixe o scroll infinito para feeds em que seguir rolando é a própria tarefa.
+> **Rule:** If finding and returning matter more, use pagination; if exploring and comparing matter more, use "Load more"; leave infinite scroll for feeds where scrolling on is the task itself.
 
-## Contexto
+## Context
 
-Os três padrões fatiam uma coleção, mas produzem experiências distintas. A paginação gera páginas e pontos de retorno. "Carregar mais" conserva tudo no mesmo contexto mediante ação explícita. O scroll infinito acrescenta conteúdo sozinho conforme a rolagem.
+The three patterns slice a collection, but produce different experiences. Pagination creates pages and return points. "Load more" keeps everything in the same context through an explicit action. Infinite scroll adds content on its own as the person scrolls.
 
-A decisão parte da tarefa (localizar, comparar, explorar, revisitar, chegar ao fim), do volume, da estabilidade dos resultados, do desempenho e da necessidade de orientação. Estudos com listas de produtos sugerem situações em que "Carregar mais" favorece a comparação, mas isso é hipótese de design, e não regra geral.
+The decision starts from the task (find, compare, explore, revisit, reach the end), the volume, the stability of the results, performance and the need for orientation. Studies with product lists suggest situations where "Load more" favors comparison, but that is a design hypothesis, not a general rule.
 
-O custo vai além do visual: carregamento automático afeta histórico, foco, leitura assistiva, acesso ao rodapé e recuperação após abrir um item.
+The cost goes beyond the visual: automatic loading affects history, focus, assistive reading, access to the footer and recovery after opening an item.
 
-## Decisão
+## Decision
 
-- **SE** a pessoa precisa achar, citar, compartilhar ou rever uma página determinada **ENTÃO** adote paginação.
-- **SE** posição, total ou URL são relevantes **ENTÃO** use paginação.
-- **SE** resultados, tabelas e históricos pedem pontos de retorno previsíveis **ENTÃO** adote paginação.
-- **SE** a pessoa explora e compara itens numa lista contínua e decide quando ver mais **ENTÃO** use "Carregar mais".
-- **SE** o conteúdo é feed de descoberta ou sequencial e continuar é a tarefa **ENTÃO** considere scroll infinito, desde que posição, histórico, rodapé, teclado e tecnologia assistiva continuem funcionando.
-- **SE** precisa de continuidade mas também de controle **ENTÃO** use híbrido: blocos automáticos mais botão manual.
-- **SE** a lista é curta **ENTÃO** não pagine.
-- **SENÃO** comece pela paginação e valide com conteúdo e tarefas reais.
+- **IF** the person needs to find, cite, share or revisit a specific page **THEN** use pagination.
+- **IF** position, total or URL matter **THEN** use pagination.
+- **IF** results, tables and histories need predictable return points **THEN** use pagination.
+- **IF** the person explores and compares items in a continuous list and decides when to see more **THEN** use "Load more".
+- **IF** the content is a discovery or sequential feed and continuing is the task **THEN** consider infinite scroll, as long as position, history, footer, keyboard and assistive technology keep working.
+- **IF** you need continuity but also control **THEN** use a hybrid: automatic blocks plus a manual button.
+- **IF** the list is short **THEN** do not paginate.
+- **ELSE** start with pagination and validate with real content and tasks.
 
-## Quando usar
+## When to use
 
-- Paginação: buscas, tabelas, históricos, arquivos.
-- "Carregar mais": catálogos e listas de exploração.
-- Scroll infinito: feeds de novidades e conteúdo sequencial.
-- Blocos: coleções grandes que pesam se carregadas de uma vez.
+- Pagination: searches, tables, histories, archives.
+- "Load more": catalogs and exploration lists.
+- Infinite scroll: news feeds and sequential content.
+- Blocks: large collections that are heavy if loaded all at once.
 
-## Quando evitar
+## When to avoid
 
-- Scroll infinito em buscas ou tabelas de consulta → **use em vez disso:** paginação.
-- Paginação em lista curta → **use em vez disso:** lista completa.
-- "Carregar mais" quando se precisa ir direto à última página → **use em vez disso:** paginação.
-- Todo padrão que perde filtros, ordenação, posição ou itens já vistos → **use em vez disso:** guardar o estado na URL ou na sessão.
-- Escolher porque o concorrente usa → **use em vez disso:** testar a tarefa principal.
+- Infinite scroll in searches or lookup tables → **use instead:** pagination.
+- Pagination on a short list → **use instead:** the full list.
+- "Load more" when the person needs to jump to the last page → **use instead:** pagination.
+- Any pattern that loses filters, sorting, position or items already seen → **use instead:** keeping the state in the URL or the session.
+- Choosing because a competitor uses it → **use instead:** testing the main task.
 
-## Faça
+## Do
 
-- Preserve posição, filtros, ordenação e itens já carregados.
-- Defina um fim claro da coleção.
-- Mostre espera, erro e fim.
-- Informe o que foi adicionado.
-- Meça localização de itens, retorno e percepção de controle.
+- Preserve position, filters, sorting and items already loaded.
+- Define a clear end of the collection.
+- Show waiting, error and end.
+- Say what was added.
+- Measure finding items, returning and the sense of control.
 
-## Evite
+## Avoid
 
-- Esconder o rodapé.
-- Duplicar itens ao carregar.
-- Mover o foco sem aviso.
-- Impedir voltar ao ponto anterior.
-- Disparar requisições simultâneas que alterem a ordem.
+- Hiding the footer.
+- Duplicating items when loading.
+- Moving focus without warning.
+- Preventing a return to the previous point.
+- Firing simultaneous requests that change the order.
 
-## Acessibilidade
+## Accessibility
 
-- Paginação dentro de `<nav>` com rótulo exclusivo, links de nome claro e `aria-current="page"`.
-- "Carregar mais" é `<button>` real; anuncie início, resultado e fim por mensagem de status sem roubar o foco (4.1.3).
-- Mantenha ordem de foco previsível após a atualização (2.4.3).
-- O scroll infinito como feed segue o padrão de feed do WAI-ARIA: artigos identificáveis, posição, tamanho do conjunto e `aria-busy`.
-- Teste teclado (2.1.1), zoom de 200% e 400% (1.4.10), conexão lenta e botão Voltar.
+- Pagination inside a `<nav>` with a unique label, clearly named links and `aria-current="page"`.
+- "Load more" is a real `<button>`; announce start, result and end through a status message without stealing focus (4.1.3).
+- Keep a predictable focus order after the update (2.4.3).
+- Infinite scroll as a feed follows the WAI-ARIA feed pattern: identifiable articles, position, set size and `aria-busy`.
+- Test keyboard (2.1.1), 200% and 400% zoom (1.4.10), a slow connection and the Back button.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Botão | "Carregar mais 20 resultados" |
-| Status | "20 itens adicionados. Mostrando 60 de 140." |
-| Fim | "Você chegou ao fim da lista." |
-| Erro | "Não foi possível carregar mais itens. Tentar novamente" |
-| Paginação | "Página 3 de 12" |
+| Button | "Load 20 more results" |
+| Status | "20 items added. Showing 60 of 140." |
+| End | "You've reached the end of the list." |
+| Error | "Couldn't load more items. Try again" |
+| Pagination | "Page 3 of 12" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A tarefa principal (encontrar, comparar, explorar) foi definida.
-- [ ] A necessidade de página ou URL específica foi avaliada.
-- [ ] A posição e os itens vistos são preservados.
-- [ ] Filtros, ordenação e busca permanecem ativos.
-- [ ] O padrão funciona por teclado.
-- [ ] Carregamento e resultado são anunciados.
-- [ ] Erro, repetição e fim da coleção têm tratamento.
-- [ ] O botão Voltar recupera o contexto.
-- [ ] A decisão foi testada com conteúdo real.
+- [ ] The main task (find, compare, explore) was defined.
+- [ ] The need for a specific page or URL was assessed.
+- [ ] Position and items seen are preserved.
+- [ ] Filters, sorting and search stay active.
+- [ ] The pattern works by keyboard.
+- [ ] Loading and result are announced.
+- [ ] Error, repetition and end of the collection are handled.
+- [ ] The Back button restores the context.
+- [ ] The decision was tested with real content.
 
-## Fundamentação
+## Rationale
 
-- USWDS (Pagination): navegação em `nav`, rótulo e página atual.
-- Padrão Digital GOV.BR (Pagination): variantes com botão e rolagem automática.
-- W3C WAI-ARIA APG (Feed Pattern): estrutura de feeds, posição, foco e aria-busy.
-- W3C (Status Messages, Focus Order): anúncio sem mover o foco e ordem de foco.
-- Baymard Institute (Product List UX): paginação versus carregamento adicional dependem de tarefa, volume e dispositivo; achados específicos de e-commerce.
+- USWDS (Pagination): navigation in `nav`, label and current page.
+- GOV.BR Digital Standard (Pagination): variants with a button and automatic scrolling.
+- W3C WAI-ARIA APG (Feed Pattern): feed structure, position, focus and aria-busy.
+- W3C (Status Messages, Focus Order): announcement without moving focus, and focus order.
+- Baymard Institute (Product List UX): pagination versus additional loading depends on task, volume and device; e-commerce-specific findings.

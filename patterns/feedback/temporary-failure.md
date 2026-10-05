@@ -1,6 +1,6 @@
 ---
 id: temporary-failure
-title: Como comunicar falhas temporárias do sistema?
+title: How do you communicate temporary system failures?
 category: feedback
 components: [alert, inline-message, toast, unavailable-page, button]
 type: recommendation
@@ -11,97 +11,97 @@ wcag: ["4.1.3", "1.4.1", "2.2.1", "3.3.1"]
 related: [retry, preserve-data-after-error, technical-error-code, toast-vs-inline-alert, long-loading]
 ---
 
-# Como comunicar falhas temporárias do sistema?
+# How do you communicate temporary system failures?
 
-> **Regra:** Informe o que falhou, diga se a operação foi concluída, está em andamento ou não aconteceu, guarde os dados e proponha uma só ação segura.
+> **Rule:** Say what failed, whether the operation completed, is in progress or did not happen, keep the data and propose a single safe action.
 
-## Contexto
+## Context
 
-A falha temporária acontece quando o sistema, a rede ou um serviço externo não consegue finalizar a operação naquele momento, mas a pessoa pode tentar mais tarde. Não se trata de erro de preenchimento: os dados informados não são o problema.
+A temporary failure happens when the system, the network or an external service cannot finish the operation at that moment, but the person can try later. It is not an input error: the data entered is not the problem.
 
-A mensagem deve esclarecer duas dúvidas: o que houve e o que é seguro fazer. Antes de sugerir "Tentar novamente", diga em que pé está a operação. Assim se evitam envios em duplicidade, pagamentos repetidos e perda de confiança.
+The message must answer two questions: what happened and what is safe to do. Before suggesting "Try again", say where the operation stands. That avoids duplicate submissions, repeated payments and loss of trust.
 
-Uma mensagem genérica aumenta a incerteza e leva a repetição, abandono ou duplicação. Mensagens hostis transferem à pessoa o trabalho de interpretar o problema.
+A generic message increases uncertainty and leads to repetition, abandonment or duplication. Hostile messages hand the work of interpreting the problem to the person.
 
-## Decisão
+## Decision
 
-- **SE** a falha é localizada (um bloco de conteúdo) **ENTÃO** use mensagem inline junto ao conteúdo afetado.
-- **SE** o serviço inteiro está indisponível **ENTÃO** use mensagem persistente ou página de indisponibilidade.
-- **SE** a falha é breve, clara e recuperável sem registro **ENTÃO** pode usar notificação temporária.
-- **SE** a falha exige ação **ENTÃO** não use toast que some; mantenha a mensagem visível.
-- **SE** o servidor não confirmou o resultado **ENTÃO** diga "Não foi possível confirmar" e oriente a conferir o histórico antes de repetir.
-- **SE** a operação não chegou a iniciar ou pode ser repetida sem risco **ENTÃO** use "Tentar novamente" como ação principal.
-- **SE** a operação pode ter sido criada mesmo sem confirmação **ENTÃO** ofereça consulta persistente do status em vez de reenvio.
-- **SE** a falha persiste **ENTÃO** ofereça alternativa concreta: voltar mais tarde, ver status ou falar com suporte.
-- **SE** há incidente em andamento **ENTÃO** atualize a informação sem prometer prazo desconhecido.
-- **SENÃO** descreva a falha na linguagem da tarefa, sem código técnico.
+- **IF** the failure is localized (one block of content) **THEN** use an inline message next to the affected content.
+- **IF** the whole service is unavailable **THEN** use a persistent message or an unavailability page.
+- **IF** the failure is brief, clear and recoverable with nothing to keep on record **THEN** a temporary notification is acceptable.
+- **IF** the failure requires action **THEN** do not use a toast that disappears; keep the message visible.
+- **IF** the server did not confirm the result **THEN** say "We couldn't confirm" and guide the person to check the history before repeating.
+- **IF** the operation never started or can be repeated without risk **THEN** use "Try again" as the primary action.
+- **IF** the operation may have been created even without confirmation **THEN** offer a persistent status check instead of resubmission.
+- **IF** the failure persists **THEN** offer a concrete alternative: come back later, see the status or contact support.
+- **IF** there is an ongoing incident **THEN** update the information without promising an unknown deadline.
+- **ELSE** describe the failure in the language of the task, without a technical code.
 
-## Quando usar
+## When to use
 
-- Falha de rede ou servidor.
-- Serviço externo indisponível.
-- Resultado ainda não confirmado.
-- Falha que afeta uma área inteira.
+- A network or server failure.
+- An unavailable external service.
+- A result not yet confirmed.
+- A failure that affects a whole area.
 
-## Quando evitar
+## When to avoid
 
-- Problema nos dados do campo → **use em vez disso:** erro de validação junto ao campo.
-- Operação ainda processando → **use em vez disso:** estado de carregamento.
-- Falha permanente → **use em vez disso:** mensagem que explique a mudança, sem sugerir nova tentativa.
-- Tentativas sem limite → **use em vez disso:** limite e alternativa de suporte.
+- A problem with the field's data → **use instead:** a validation error next to the field.
+- An operation still processing → **use instead:** a loading state.
+- A permanent failure → **use instead:** a message that explains the change, without suggesting another attempt.
+- Unlimited attempts → **use instead:** a limit and a support alternative.
 
-## Faça
+## Do
 
-- Circunscreva o escopo: "Não foi possível carregar seus pedidos".
-- Preserve o que a pessoa digitou, selecionou ou anexou.
-- Mantenha o contexto da tarefa.
-- Registre o erro para a equipe, sem expô-lo à pessoa.
+- Bound the scope: "We couldn't load your orders".
+- Preserve what the person typed, selected or attached.
+- Keep the context of the task.
+- Log the error for the team, without exposing it to the person.
 
-## Evite
+## Avoid
 
-- Culpar a pessoa.
-- Dizer apenas "Erro".
-- Estimular repetição de operação incerta.
-- Apagar o preenchimento.
-- Jargão técnico e prazo incerto.
-- Depender só de vermelho.
+- Blaming the person.
+- Saying only "Error".
+- Encouraging repetition of an uncertain operation.
+- Clearing what was filled in.
+- Technical jargon and uncertain deadlines.
+- Relying only on red.
 
-## Acessibilidade
+## Accessibility
 
-- Falha dinâmica sem urgência: região `role="status"` já presente no DOM antes do texto, anúncio polido, sem roubar foco (4.1.3).
-- Erro urgente: `role="alert"` com parcimônia.
-- Texto, não só cor, ícone ou som (1.4.1).
-- Botão de nova tentativa com nome acessível, foco visível e operação por teclado; não pode sumir antes de ser lido (2.2.1).
-- Associe a mensagem ao conteúdo afetado.
+- A non-urgent dynamic failure: a `role="status"` region already in the DOM before the text, a polite announcement, without stealing focus (4.1.3).
+- An urgent error: `role="alert"`, used sparingly.
+- Text, not only color, icon or sound (1.4.1).
+- A retry button with an accessible name, visible focus and keyboard operation; it must not disappear before it is read (2.2.1).
+- Associate the message with the affected content.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Carregamento falhou | "Não foi possível carregar seus pedidos. Tentar novamente" |
-| Resultado incerto | "Não conseguimos confirmar o envio. Confira em Histórico antes de enviar de novo." |
-| Serviço fora | "Estamos com instabilidade. Seus dados foram mantidos. Tente de novo em alguns minutos." |
-| Persistente | "Ainda não deu certo. Fale com o suporte." |
+| Load failed | "We couldn't load your orders. Try again" |
+| Uncertain result | "We couldn't confirm it was sent. Check History before sending it again." |
+| Service down | "We're having some instability. Your data was kept. Try again in a few minutes." |
+| Persistent | "Still not working. Contact support." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem identifica o que falhou.
-- [ ] Distingue falha do sistema de erro de preenchimento.
-- [ ] Diz se a operação terminou, segue em processamento ou não ocorreu.
-- [ ] Deixa claro se é seguro tentar de novo.
-- [ ] Os dados preenchidos foram preservados.
-- [ ] Há uma ação de recuperação clara.
-- [ ] Existe alternativa quando a falha persiste.
-- [ ] O texto não usa jargão nem código técnico.
-- [ ] O estado é anunciado sem mover o foco.
-- [ ] A ação opera com leitor de tela e teclado.
+- [ ] The message identifies what failed.
+- [ ] It distinguishes a system failure from an input error.
+- [ ] It says whether the operation finished, is still processing or did not happen.
+- [ ] It makes clear whether it is safe to try again.
+- [ ] The entered data was preserved.
+- [ ] There is a clear recovery action.
+- [ ] There is an alternative when the failure persists.
+- [ ] The text uses no jargon or technical code.
+- [ ] The state is announced without moving focus.
+- [ ] The action works with screen reader and keyboard.
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group (mensagens de erro hostis): evitar transferir à pessoa o trabalho de interpretar o problema; explicar e indicar saída.
-- WCAG 2.2, critério 4.1.3 (Status Messages): erros e estados anunciados sem mover o foco.
-- W3C WAI, técnica ARIA19: região de alerta ou live region mantida no DOM antes da atualização.
-- Baymard Institute (validação e preservação de entradas): mensagens específicas e preservação de dados reduzem esforço; evidência de checkout.
-- IBM Carbon (notificação) e Adobe Spectrum (toast): formatos inline, toast e acionável conforme contexto.
-- GOV.UK Design System (página de problema no serviço): orientar a tentar depois, destino das respostas e canais alternativos.
-- Padrão Digital de Governo (GOV.BR), Message: mensagens de estado objetivas e acessíveis.
+- Nielsen Norman Group (hostile error messages): avoid handing the person the work of interpreting the problem; explain and point to a way out.
+- WCAG 2.2, criterion 4.1.3 (Status Messages): errors and states announced without moving focus.
+- W3C WAI, technique ARIA19: an alert region or live region kept in the DOM before the update.
+- Baymard Institute (validation and input preservation): specific messages and preserving data reduce effort; checkout evidence.
+- IBM Carbon (notification) and Adobe Spectrum (toast): inline, toast and actionable formats depending on context.
+- GOV.UK Design System (problem with the service page): guide people to try later, where their answers went and alternative channels.
+- Brazilian Government Digital Standard (GOV.BR), Message: objective and accessible status messages.

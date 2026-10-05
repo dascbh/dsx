@@ -1,85 +1,85 @@
 ---
 name: tokens
-description: "Cria e corrige design tokens DTCG em 3 camadas: paleta OKLCH, escalas tipográfica e de espaçamento, temas claro/escuro e contraste verificado no build. Use ao montar a fundação, trocar a marca, adicionar dark mode ou achar valores crus."
+description: "Creates and fixes DTCG design tokens in 3 layers: OKLCH palette, type and spacing scales, light/dark themes and contrast verified at build time. Use when setting up the foundation, changing the brand, adding dark mode or finding raw values."
 ---
 
 # Design tokens
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `tokens/`, `tools/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. The `knowledge/`, `tokens/` and `tools/` paths are relative to it.
 
-Referências: `knowledge/design-system/tokens.md`, `cor.md`, `tipografia.md`, `espacamento-e-layout.md`.
+References: `knowledge/design-system/tokens.md`, `color.md`, `typography.md`, `spacing-and-layout.md`.
 
-## Arquitetura obrigatória
+## Mandatory architecture
 
-| Camada | Arquivo (no DSX) | Nomeia | Quem consome |
+| Layer | File (in DSX) | Names | Consumed by |
 |---|---|---|---|
-| 1. Primitivos | `tokens/primitives.tokens.json` | o **valor** (`color.brand.600`, `space.4`) | só a camada 2 |
-| 2. Semânticos | `tokens/semantic.light.tokens.json`, `semantic.dark.tokens.json` | a **intenção** (`color.text.primary`, `color.action.danger`, `space.stack-md`) | componentes e telas |
-| 3. Componente (opcional) | `tokens/component.tokens.json` | a **peça** (`button.primary.bg`) | um componente |
+| 1. Primitives | `tokens/primitives.tokens.json` | the **value** (`color.brand.600`, `space.4`) | layer 2 only |
+| 2. Semantic | `tokens/semantic.light.tokens.json`, `semantic.dark.tokens.json` | the **intent** (`color.text.primary`, `color.action.danger`, `space.stack-md`) | components and screens |
+| 3. Component (optional) | `tokens/component.tokens.json` | the **part** (`button.primary.bg`) | one component |
 
-Regras:
-- Componentes **nunca** consomem primitivos. Telas **nunca** consomem valores crus.
-- Temas são arquivos semânticos com **as mesmas chaves**; só os valores mudam. O build falha se o tema escuro tiver chave que o claro não tem.
-- Todo par texto/fundo e UI/fundo que existe na interface está declarado em `tokens/contrast-pairs.json` com o mínimo exigido (4.5 texto, 3 UI não textual).
+Rules:
+- Components **never** consume primitives. Screens **never** consume raw values.
+- Themes are semantic files with **the same keys**; only the values change. The build fails if the dark theme has a key the light one does not.
+- Every text/background and UI/background pair that exists in the interface is declared in `tokens/contrast-pairs.json` with the required minimum (4.5 text, 3 non-text UI).
 
-Se o projeto do usuário usa outro sistema (Tailwind, MUI, CSS vars soltas), **mantenha o formato dele** e aplique as mesmas três camadas e regras; use as ferramentas do DSX só para gerar e verificar valores.
+If the user's project uses another system (Tailwind, MUI, loose CSS vars), **keep its format** and apply the same three layers and rules; use the DSX tools only to generate and verify values.
 
-## Receitas
+## Recipes
 
-**Nova cor de marca / rampa de cor**
+**New brand color / color ramp**
 ```bash
-node tools/palette.mjs "#3d5afe" --name brand            # JSON com contraste de cada passo
+node tools/palette.mjs "#3d5afe" --name brand            # JSON with the contrast of each step
 node tools/palette.mjs "#3d5afe" --name brand --format dtcg
 ```
-- Rampa 50–950 em OKLCH (passos perceptualmente uniformes). Na prática, com texto branco o passo **600** costuma ser o primeiro ≥ 4.5:1 — confirme na saída.
-- Ação primária no tema claro: o primeiro passo com `contrast_white ≥ 4.5`. Texto de link: um passo mais escuro que a ação.
-- Tema escuro: **não inverta a rampa**. Use passos claros (200–300) para ação com texto escuro, e superfícies 900–950.
+- 50–950 ramp in OKLCH (perceptually uniform steps). In practice, with white text step **600** is usually the first ≥ 4.5:1 — confirm in the output.
+- Primary action in the light theme: the first step with `contrast_white ≥ 4.5`. Link text: one step darker than the action.
+- Dark theme: **do not invert the ramp**. Use light steps (200–300) for actions with dark text, and 900–950 surfaces.
 
-**Escala tipográfica**
+**Type scale**
 ```bash
 node tools/type-scale.mjs --base 16 --ratio major-third --format css
 node tools/type-scale.mjs --base 16 --ratio minor-third --fluid --max-ratio perfect-fourth --format css
 ```
-Razão: 1.125–1.2 para produto denso; 1.25 para produto geral; 1.333+ para editorial/marketing. Corpo nunca < 16px em leitura; mínimo absoluto 12px para legendas.
+Ratio: 1.125–1.2 for dense products; 1.25 for general products; 1.333+ for editorial/marketing. Body text never < 16px for reading; absolute minimum 12px for captions.
 
-**Escala de espaçamento**
+**Spacing scale**
 ```bash
 node tools/spacing-scale.mjs --base 4 --format dtcg
 ```
 
-**Compilar e verificar**
+**Compile and verify**
 ```bash
-node tools/build-tokens.mjs           # gera tokens/build/tokens.css (+ JSON resolvido por tema) e checa contraste
-node tools/build-tokens.mjs --check   # só verifica (CI)
+node tools/build-tokens.mjs           # generates tokens/build/tokens.css (+ resolved JSON per theme) and checks contrast
+node tools/build-tokens.mjs --check   # verify only (CI)
 node tools/contrast.mjs "#4f5a6b" "#ffffff"
 ```
 
-**Tokens de um projeto (não do DSX)**
+**A project's tokens (not DSX's)**
 ```bash
-node tools/build-tokens.mjs --tokens <projeto>/tokens          # gera <projeto>/tokens/build/ e verifica contraste
+node tools/build-tokens.mjs --tokens <project>/tokens          # generates <project>/tokens/build/ and checks contrast
 ```
 
-**Ponte com o Figma**
+**Figma bridge**
 ```bash
-node tools/figma/tokens-to-figma.mjs --tokens <pasta> --script > /tmp/vars.js   # colar em use_figma (skill figma-fundacoes)
-node tools/figma/figma-to-tokens.mjs --snapshot <snapshot-full.json> --tokens <pasta> [--write]
+node tools/figma/tokens-to-figma.mjs --tokens <folder> --script > /tmp/vars.js   # paste into use_figma (skill figma-foundations)
+node tools/figma/figma-to-tokens.mjs --snapshot <snapshot-full.json> --tokens <folder> [--write]
 ```
-A volta (`--write`) só altera tokens existentes e roda o gate de contraste; variável nova no Figma é decisão desta skill, nunca criação automática.
+The return trip (`--write`) only changes existing tokens and runs the contrast gate; a new variable in Figma is this skill's decision, never an automatic creation.
 
-## Fluxo para alterar tokens
+## Flow for changing tokens
 
-1. Mude o **primitivo** se o valor muda em todo lugar; mude o **semântico** se a intenção passa a apontar para outro valor.
-2. Ao criar semântico novo: nome = `<categoria>.<papel>[-<variante>][-<estado>]` (ex.: `color.action.primary-hover`). Adicione `$description` dizendo onde usar.
-3. Adicione o par em `contrast-pairs.json` se for cor de texto/UI.
-4. Rode o build. **Falha de contraste bloqueia** — ajuste o passo da rampa, não o mínimo.
-5. Rode `node tools/lint-raw-values.mjs <src>` no projeto para achar valores crus que agora têm token.
-6. Atualize o front matter e a seção Colors do `DESIGN.md` (skill `design-md`).
+1. Change the **primitive** if the value changes everywhere; change the **semantic** token if the intent now points to another value.
+2. When creating a new semantic token: name = `<category>.<role>[-<variant>][-<state>]` (e.g. `color.action.primary-hover`). Add a `$description` saying where to use it.
+3. Add the pair to `contrast-pairs.json` if it is a text/UI color.
+4. Run the build. **A contrast failure blocks** — adjust the ramp step, not the minimum.
+5. Run `node tools/lint-raw-values.mjs <src>` on the project to find raw values that now have a token.
+6. Update the front matter and the Colors section of `DESIGN.md` (skill `design-md`).
 
-## Saída
+## Output
 
 ```
-Tokens criados/alterados: <lista com camada>
-Pares de contraste: N verificados, todos ≥ mínimo (pior: <par> = X:1)
-Arquivos gerados: …
-Impacto: <componentes/telas afetados>
+Tokens created/changed: <list with layer>
+Contrast pairs: N verified, all ≥ minimum (worst: <pair> = X:1)
+Generated files: …
+Impact: <affected components/screens>
 ```

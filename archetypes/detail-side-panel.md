@@ -1,10 +1,10 @@
 ---
 id: detail-side-panel
-title: Painel lateral de detalhe
-summary: Painel que desliza da borda sobre a tela atual para mostrar ou editar um registro sem perder a lista ou o contexto de onde a pessoa veio.
+title: Detail side panel
+summary: Panel that slides in from the edge over the current screen to show or edit a record without losing the list or the context the person came from.
 register: [operational]
-when-to-use: SE a pessoa consulta ou ajusta um registro rapidamente e logo volta à lista ou à tela de origem ENTÃO use painel lateral de detalhe
-avoid-when: o detalhe é longo ou é onde a pessoa trabalha por muito tempo (use página própria ou master-detail), a tarefa exige toda a largura ou abriria outro painel ou diálogo por cima
+when-to-use: IF the person quickly views or adjusts a record and soon returns to the list or the originating screen THEN use a detail side panel
+avoid-when: the detail is long or is where the person works for a long time (use its own page or master-detail), the task needs the full width, or it would open another panel or dialog on top
 regions: [panel-header, panel-body, panel-footer]
 primary-action: { region: panel-footer, position: bottom-right, max: 1 }
 states: [loading, error, no-access, item-removed, editing, success]
@@ -13,91 +13,91 @@ variations: [overlay, push-content, read-with-page-link]
 rules: [T1, T2, T3, T6, T7, F4, F5]
 ---
 
-# Painel lateral de detalhe
+# Detail side panel
 
-Ver os dados de um destinatário, conferir o histórico de um item, ajustar o responsável de uma pendência, ler um comentário inteiro. A lista continua lá, na mesma posição de rolagem, com os filtros intactos. O painel é a resposta para "quero só olhar isso" sem pagar o custo de ir e voltar.
+Viewing a recipient's data, checking an item's history, changing the owner of a pending item, reading a whole comment. The list stays there, at the same scroll position, with its filters intact. The panel is the answer to "I just want to look at this" without paying the cost of going and coming back.
 
-## Quando usar
+## When to use
 
-- **SE** a consulta é curta e a pessoa vai seguir pela lista **ENTÃO** use painel lateral; a linha aberta fica marcada.
-- **SE** a pessoa só lê e às vezes precisa do registro completo **ENTÃO** use `read-with-page-link` com "Abrir página completa".
-- **SE** a pessoa precisa interagir com a lista enquanto o painel está aberto (abrir o próximo, comparar) **ENTÃO** use `push-content`, que não bloqueia o fundo.
-- **SE** a edição tem mais que poucos campos ou dura minutos **ENTÃO** leve a uma página ou ao `editor-with-panel`.
-- **SE** a ação dentro do painel precisa de confirmação **ENTÃO** a confirmação substitui o rodapé do painel ou é um único diálogo; nunca painel sobre painel.
-- **SENÃO** (o detalhe é o centro do trabalho) **ENTÃO** use `master-detail` ou página própria.
+- **IF** the lookup is short and the person will continue through the list **THEN** use a side panel; the open row stays marked.
+- **IF** the person only reads and sometimes needs the full record **THEN** use `read-with-page-link` with "Open full page".
+- **IF** the person needs to interact with the list while the panel is open (open the next one, compare) **THEN** use `push-content`, which does not block the background.
+- **IF** editing has more than a few fields or lasts minutes **THEN** lead to a page or to `editor-with-panel`.
+- **IF** an action inside the panel needs confirmation **THEN** the confirmation replaces the panel footer or is a single dialog; never a panel over a panel.
+- **ELSE** (the detail is the center of the work) **THEN** use `master-detail` or its own page.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────┬───────────────────────────────┐
-│ lista (tela de origem,        │ panel-header                   │
-│ esmaecida se sobreposto)      │ Nome do registro (h2)    ✕     │
-│                               │ Situação · atualizado há 2 h   │
-│  ▌linha aberta                ├───────────────────────────────┤
-│   linha                       │ panel-body                     │
-│   linha                       │ [Dados | Histórico]            │
-│                               │ Campo: valor                   │
-│                               │ Campo: valor                   │
+│ list (originating screen,     │ panel-header                   │
+│ dimmed if overlaid)           │ Record name (h2)         ✕     │
+│                               │ Status · updated 2 h ago       │
+│  ▌open row                    ├───────────────────────────────┤
+│   row                         │ panel-body                     │
+│   row                         │ [Data | History]               │
+│                               │ Field: value                   │
+│                               │ Field: value                   │
 │                               ├───────────────────────────────┤
-│                               │ panel-footer [Cancelar]        │
-│                               │                  [Salvar]      │
+│                               │ panel-footer [Cancel]          │
+│                               │                  [Save]        │
 └──────────────────────────────┴───────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **panel-header** — nome do registro (`h2`; o `h1` continua sendo o da tela de origem), situação, fechar (✕) com nome acessível; opcionalmente "anterior / próximo" e "Abrir página completa".
-- **panel-body** — dados em pares rótulo: valor, em leitura por padrão; edição campo a campo ou por "Editar" que transforma o bloco em formulário; abas quando há mais de dois grupos. Rolagem própria.
-- **panel-footer** — aparece só no modo de edição: "Cancelar" antes de "Salvar alterações"; em leitura, o painel não tem rodapé ou mostra uma ação de navegação.
+- **panel-header**: the record name (`h2`; the `h1` remains the originating screen's), status, close (✕) with an accessible name; optionally "previous / next" and "Open full page".
+- **panel-body**: data as label: value pairs, read-only by default; editing field by field or through "Edit", which turns the block into a form; tabs when there are more than two groups. Its own scrolling.
+- **panel-footer**: appears only in edit mode: "Cancel" before "Save changes"; in read mode, the panel has no footer or shows a navigation action.
 
-## Ações
+## Actions
 
-- **Primária:** uma, no `panel-footer`, bottom-right, apenas quando há edição; em leitura, nenhuma primária.
-- **Fechar:** ✕, Esc e (no modo sobreposto) clique fora; com edição pendente, pergunta antes de descartar.
-- **Foco:** ao abrir, vai para o título do painel; no modo sobreposto, fica preso no painel; ao fechar, volta para a linha que o abriu.
-- **Endereço:** o registro aberto vai para a URL, para recarregar e compartilhar abrindo o mesmo painel.
-- **Destrutivas:** em "Mais ações" no cabeçalho, com confirmação.
+- **Primary:** one, in the `panel-footer`, bottom-right, only when editing; in read mode, no primary.
+- **Close:** ✕, Esc and (in overlay mode) clicking outside; with pending edits, it asks before discarding.
+- **Focus:** on opening, goes to the panel title; in overlay mode, it stays trapped in the panel; on closing, returns to the row that opened it.
+- **Address:** the open record goes into the URL, so reloading and sharing opens the same panel.
+- **Destructive:** under "More actions" in the header, with confirmation.
 
-## Estados
+## States
 
-- **loading** — painel abre na hora com esqueleto; nunca espera os dados para começar a deslizar.
-- **error** — falha ao carregar ou salvar: mensagem no corpo, "Tentar novamente", dados digitados preservados.
-- **no-access** — sem permissão para este registro: o painel explica; a lista não oferece abrir o que a pessoa não pode ver.
-- **item-removed** — o registro foi excluído ou movido por outra pessoa enquanto o painel estava aberto: diga isso e ofereça fechar; atualize a lista.
-- **editing** — campos editáveis, rodapé com Cancelar e Salvar, aviso de pendência ao tentar fechar.
-- **success** — confirmação breve, painel volta à leitura com os valores novos, linha da lista atualizada.
+- **loading**: the panel opens immediately with a skeleton; it never waits for the data before starting to slide in.
+- **error**: failed to load or save: a message in the body, "Try again", typed data preserved.
+- **no-access**: no permission for this record: the panel explains; the list does not offer to open what the person cannot see.
+- **item-removed**: the record was deleted or moved by someone else while the panel was open: say so and offer to close; refresh the list.
+- **editing**: editable fields, a footer with Cancel and Save, a pending-changes warning when trying to close.
+- **success**: a brief confirmation, the panel returns to read mode with the new values, the list row updated.
 
-## Variações
+## Variations
 
 ### overlay
-Painel por cima da tela, fundo esmaecido e bloqueado (comportamento de diálogo).
-**Favorece:** foco no registro; telas médias; edição curta.
-**Piora:** a lista fica inacessível — abrir o próximo exige fechar; é modal, e valem todas as regras de diálogo.
+The panel on top of the screen, the background dimmed and blocked (dialog behavior).
+**Favors:** focus on the record; medium screens; short edits.
+**Worsens:** the list becomes inaccessible, so opening the next one requires closing; it is modal, and every dialog rule applies.
 
 ### push-content
-O painel ocupa uma coluna e a lista encolhe ao lado, ambos interativos.
-**Favorece:** percorrer itens com o painel aberto; comparação rápida.
-**Piora:** a lista perde colunas; em telas médias fica estreita demais — defina quais colunas somem.
+The panel takes a column and the list shrinks beside it, both interactive.
+**Favors:** going through items with the panel open; quick comparison.
+**Worsens:** the list loses columns; on medium screens it becomes too narrow, so define which columns disappear.
 
 ### read-with-page-link
-Painel só de leitura com resumo e "Abrir página completa" para editar e ver tudo.
-**Favorece:** consulta rápida sem duplicar formulários de edição; uma fonte de verdade para a edição.
-**Piora:** quem quer só ajustar um campo precisa trocar de tela.
+A read-only panel with a summary and "Open full page" to edit and see everything.
+**Favors:** quick lookups without duplicating edit forms; a single source of truth for editing.
+**Worsens:** whoever only wants to adjust one field has to switch screens.
 
-## Anti-padrões
+## Anti-patterns
 
-- Painel que abre outro painel ou um diálogo de formulário por cima.
-- `h1` dentro do painel competindo com o da tela.
-- Fechar ao clicar fora descartando edição sem perguntar.
-- Painel que só começa a abrir depois de os dados chegarem.
-- Formulário de vinte campos dentro do painel.
-- Fechar o painel e perder a posição de rolagem e os filtros da lista.
+- A panel that opens another panel or a form dialog on top.
+- An `h1` inside the panel competing with the screen's.
+- Closing on an outside click and discarding edits without asking.
+- A panel that only starts opening after the data arrives.
+- A twenty-field form inside the panel.
+- Closing the panel and losing the list's scroll position and filters.
 
 ## Checklist
 
-- [ ] Título `h2` com o nome do registro; `h1` da tela preservado.
-- [ ] Leitura por padrão; primária só no modo de edição.
-- [ ] Foco no título ao abrir e de volta à linha ao fechar; preso no modo sobreposto.
-- [ ] Fechar com edição pendente pergunta antes.
-- [ ] Registro aberto refletido na URL; lista intacta ao fechar.
-- [ ] `item-removed` tratado; nenhum painel ou diálogo empilhado.
+- [ ] An `h2` title with the record's name; the screen's `h1` preserved.
+- [ ] Read-only by default; a primary only in edit mode.
+- [ ] Focus on the title on opening and back on the row on closing; trapped in overlay mode.
+- [ ] Closing with pending edits asks first.
+- [ ] Open record reflected in the URL; list intact on closing.
+- [ ] `item-removed` handled; no stacked panels or dialogs.

@@ -1,5 +1,5 @@
 {
-  "$description": "Camada 1 — primitivos. Valores crus. NUNCA referenciados direto por componentes.",
+  "$description": "Layer 1 — primitives. Raw values. NEVER referenced directly by components.",
   "color": {
     "white": {
       "$type": "color",

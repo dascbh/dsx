@@ -45,7 +45,7 @@ test('spacing: multiples of the base', () => {
 test('tokens: aliases resolve and cycles are detected', () => {
   const flat = flatten({ a: { $value: '#fff' }, b: { $value: '{a}' }, c: { $value: '{b}' } });
   assert.equal(resolve(flat).c, '#fff');
-  assert.throws(() => resolve(flatten({ x: { $value: '{y}' }, y: { $value: '{x}' } })), /circular/);
+  assert.throws(() => resolve(flatten({ x: { $value: '{y}' }, y: { $value: '{x}' } })), /circular/i);
 });
 
 test('repository tokens: all contrast pairs pass in both themes', () => {
@@ -64,7 +64,7 @@ test('DESIGN.md lint: detects broken reference and poor contrast', () => {
   const md = `---\nname: X\ncolors:\n  canvas: "#ffffff"\n  primary: "#cccccc"\n  on-primary: "#ffffff"\ntypography:\n  body:\n    fontSize: 16px\n    lineHeight: 1.5\ncomponents:\n  b:\n    backgroundColor: "{colors.nope}"\n---\n## Overview\nx\n`;
   const r = lintDesignMd(md);
   assert.ok(r.errors.some((e) => e.includes('{colors.nope}')));
-  assert.ok(r.errors.some((e) => e.includes('on-primary sobre primary')));
+  assert.ok(r.errors.some((e) => e.includes('on-primary on primary')));
 });
 
 test('yaml-lite: nested maps and scalars', () => {
@@ -86,7 +86,7 @@ test('skills and agents front matter: name and description quoted (strict YAML)'
   for (const f of files) {
     const fm = readFileSync(f, 'utf8').split('---')[1];
     assert.match(fm, /^name: [a-z0-9-]+$/m, `${f}: name`);
-    // Sem aspas, ": " no meio do texto quebra o YAML e a skill aparece sem descrição.
-    assert.match(fm, /^description: "(?:[^"\\]|\\.)+"$/m, `${f}: description deve ser uma string entre aspas`);
+    // Without quotes, ": " mid-text breaks the YAML and the skill shows up with no description.
+    assert.match(fm, /^description: "(?:[^"\\]|\\.)+"$/m, `${f}: description must be a quoted string`);
   }
 });

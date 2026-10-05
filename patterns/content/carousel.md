@@ -1,6 +1,6 @@
 ---
 id: carousel
-title: Quando usar carrossel?
+title: When should you use a carousel?
 category: content
 components: [carousel, gallery, navigation-controls]
 type: contextual-decision
@@ -11,101 +11,101 @@ wcag: ["2.2.2", "1.4.10", "2.1.1", "2.3.3", "2.4.7", "4.1.2"]
 related: [auto-advancing-carousel, tabs, touch-target, filter-structure]
 ---
 
-# Quando usar carrossel?
+# When should you use a carousel?
 
-> **Regra:** Use carrossel apenas para itens relacionados e de exploração opcional, com controle manual e sem esconder conteúdo essencial.
+> **Rule:** Use a carousel only for related items meant for optional browsing, with manual control and without hiding essential content.
 
-## Contexto
+## Context
 
-Um carrossel exibe só parte de uma coleção e permite avançar, recuar ou arrastar. Poupa espaço, mas esconde conteúdo e pode trazer movimento, controles de difícil localização e problemas de leitura.
+A carousel shows only part of a collection and lets the person move forward, back or swipe. It saves space, but it hides content and can bring motion, hard-to-find controls and reading problems.
 
-Comece pela tarefa, não pelo componente. Se cada item é importante, independente ou necessário à decisão, uma composição estática é mais clara. O conteúdo escondido pode passar despercebido, e pesquisas encontraram problemas de usabilidade em parcela relevante de carrosséis de páginas iniciais.
+Start from the task, not the component. If each item is important, independent or needed for the decision, a static layout is clearer. Hidden content can go unnoticed, and research found usability problems in a significant share of homepage carousels.
 
-Isso não torna o carrossel sempre errado: ele funciona para coleções relacionadas com exploração sequencial opcional, desde que a equipe consiga implementar e testar semântica, controles e controle de movimento.
+That does not make carousels always wrong: they work for related collections with optional sequential browsing, provided the team can build and test the semantics, controls and motion control.
 
-## Decisão
+## Decision
 
-- **SE** os itens são relacionados e a exploração sequencial traz valor **ENTÃO** carrossel é aceitável.
-- **SE** os itens são mensagens independentes ou qualquer um pode ser essencial **ENTÃO** use seção estática.
-- **SE** é a única rota para uma chamada, produto ou ação importante **ENTÃO** não use carrossel.
-- **SE** há muitos itens **ENTÃO** reduza a coleção ou use grade, lista ou paginação.
-- **SE** o carrossel depende só de swipe **ENTÃO** adicione botões anterior e próximo.
-- **SE** é galeria de imagens **ENTÃO** use miniaturas ou rótulos úteis em vez de só pontos.
-- **SE** a rotação automática for realmente necessária **ENTÃO** ofereça pausar e parar, use intervalo confortável e interrompa ao receber foco ou interação.
-- **SENÃO** navegação manual por padrão, sem rotação.
+- **IF** the items are related and sequential browsing adds value **THEN** a carousel is acceptable.
+- **IF** the items are independent messages or any of them may be essential **THEN** use a static section.
+- **IF** it is the only route to an important call to action, product or action **THEN** do not use a carousel.
+- **IF** there are many items **THEN** reduce the collection or use a grid, list or pagination.
+- **IF** the carousel relies on swipe only **THEN** add previous and next buttons.
+- **IF** it is an image gallery **THEN** use thumbnails or useful labels instead of dots alone.
+- **IF** auto-rotation is truly necessary **THEN** provide pause and stop, use a comfortable interval and stop on focus or interaction.
+- **ELSE** manual navigation by default, with no rotation.
 
-## Quando usar
+## When to use
 
-- Galerias de imagens relacionadas.
-- Exploração de itens semelhantes.
-- Ordem dos itens faz sentido e a exploração é opcional.
-- Controles claros cabem no layout.
-- Há tempo para testar acessibilidade.
+- Galleries of related images.
+- Browsing similar items.
+- The order of items makes sense and browsing is optional.
+- Clear controls fit in the layout.
+- There is time to test accessibility.
 
-## Quando evitar
+## When to avoid
 
-- Mensagens críticas ou única chamada principal → **use em vez disso:** seção estática.
-- Conteúdo independente e essencial → **use em vez disso:** blocos visíveis.
-- Muitos itens → **use em vez disso:** grade ou paginação.
-- Dependência só de swipe → **use em vez disso:** botões e swipe.
-- Rotação que distrai → **use em vez disso:** controle manual.
+- Critical messages or the only main call to action → **use instead:** static section.
+- Independent, essential content → **use instead:** visible blocks.
+- Many items → **use instead:** grid or pagination.
+- Reliance on swipe alone → **use instead:** buttons and swipe.
+- Distracting rotation → **use instead:** manual control.
 
-## Faça
+## Do
 
-- Defina o objetivo do componente.
-- Mostre controles anterior e próximo com nomes acessíveis.
-- Indique posição atual e total ("2 de 6").
-- Use texto real em HTML, redimensionável.
-- Pause ao focar ou interagir.
-- Teste teclado, toque e zoom.
+- Define the component's goal.
+- Show previous and next controls with accessible names.
+- Indicate the current position and total ("2 of 6").
+- Use real, resizable HTML text.
+- Pause on focus or interaction.
+- Test keyboard, touch and zoom.
 
-## Evite
+## Avoid
 
-- Esconder informação essencial.
-- Usar apenas pontos como navegação.
-- Exigir só swipe.
-- Trocar slides rapidamente.
-- Reiniciar a posição sem motivo.
-- Sobrepor controles ao texto.
-- Usar imagens com texto embutido.
+- Hiding essential information.
+- Using dots as the only navigation.
+- Requiring swipe only.
+- Changing slides quickly.
+- Resetting the position for no reason.
+- Overlaying controls on text.
+- Using images with embedded text.
 
-## Acessibilidade
+## Accessibility
 
-- Use região semântica com nome acessível, controles anterior e próximo e identificação do slide atual (4.1.2).
-- Todos os controles funcionam por teclado e toque, com foco visível e área de toque suficiente (2.1.1, 2.4.7).
-- Com rotação automática, ofereça pausar, parar ou ocultar (2.2.2); pare quando o teclado entrar ou houver interação; respeite prefers-reduced-motion (2.3.3).
-- Comunique a mudança de slide sem mover o foco de forma inesperada.
-- Não dependa só de pontos, cor, posição ou gesto.
-- Cada slide deve se manter legível em viewport estreita e com zoom (1.4.10).
+- Use a semantic region with an accessible name, previous and next controls and identification of the current slide (4.1.2).
+- Every control works by keyboard and touch, with visible focus and enough touch area (2.1.1, 2.4.7).
+- With auto-rotation, provide pause, stop or hide (2.2.2); stop when the keyboard enters or there is interaction; respect prefers-reduced-motion (2.3.3).
+- Communicate slide changes without moving focus unexpectedly.
+- Do not rely on dots, color, position or gesture alone.
+- Each slide must stay readable in a narrow viewport and with zoom (1.4.10).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Botão anterior | "Slide anterior" |
-| Botão próximo | "Próximo slide" |
-| Posição | "Slide 2 de 6" |
-| Pausa | "Pausar rotação" |
-| Retomar | "Retomar rotação" |
-| Nome da região | "Fotos do produto" |
+| Previous button | "Previous slide" |
+| Next button | "Next slide" |
+| Position | "Slide 2 of 6" |
+| Pause | "Pause rotation" |
+| Resume | "Resume rotation" |
+| Region name | "Product photos" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Os itens são relacionados.
-- [ ] O conteúdo essencial também está disponível fora do carrossel.
-- [ ] Anterior e próximo estão visíveis e têm nome acessível.
-- [ ] Posição atual e total estão indicados.
-- [ ] Funciona por teclado e sem depender só de swipe.
-- [ ] Sem rotação automática, ou com pausa e parada disponíveis.
-- [ ] A rotação para ao focar ou interagir.
-- [ ] O texto é HTML real e redimensionável.
-- [ ] Funciona em zoom de 400% sem rolagem horizontal da página.
-- [ ] Respeita movimento reduzido.
+- [ ] The items are related.
+- [ ] Essential content is also available outside the carousel.
+- [ ] Previous and next are visible and have accessible names.
+- [ ] Current position and total are indicated.
+- [ ] It works by keyboard and does not rely on swipe alone.
+- [ ] No auto-rotation, or pause and stop are available.
+- [ ] Rotation stops on focus or interaction.
+- [ ] The text is real, resizable HTML.
+- [ ] It works at 400% zoom without horizontal page scrolling.
+- [ ] It respects reduced motion.
 
-## Fundamentação
+## Rationale
 
-- W3C WAI, tutorial de carrosséis e padrão de carrossel da WAI-ARIA APG: semântica, navegação, anúncio de mudanças, pausa e foco.
-- WCAG 2.2, critério 2.2.2 (pausar, parar, ocultar) e 1.4.10 (reflow).
-- Baymard Institute, requisitos de UX para carrosséis de página inicial: controles proeminentes, slide inicial, não ser rota única, pausa, texto legível, alternativa estática.
-- Baymard Institute, controles de página: miniaturas informativas em vez de só pontos.
-- Material Design 3, carrossel: variações e navegação de coleções.
+- W3C WAI carousels tutorial and the WAI-ARIA APG carousel pattern: semantics, navigation, change announcements, pause and focus.
+- WCAG 2.2, criteria 2.2.2 (pause, stop, hide) and 1.4.10 (reflow).
+- Baymard Institute, UX requirements for homepage carousels: prominent controls, initial slide, not the only route, pause, readable text, static alternative.
+- Baymard Institute, page controls: informative thumbnails instead of dots alone.
+- Material Design 3, carousel: variants and collection navigation.

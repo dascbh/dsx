@@ -1,6 +1,6 @@
 ---
 id: password-recovery
-title: Como criar uma recuperação de senha clara?
+title: How do you build a clear password recovery?
 category: authentication
 components: [forgot-password-link, identifier-field, code-field, reset-form]
 type: recommendation
@@ -11,100 +11,100 @@ wcag: ["3.3.2", "3.3.1", "1.4.1", "3.3.8", "2.1.1"]
 related: [password-requirements, show-password, confirm-password, session-expired, form-errors]
 ---
 
-# Como criar uma recuperação de senha clara?
+# How do you build a clear password recovery?
 
-> **Regra:** Disponibilize "Esqueci minha senha" perto do login, dê resposta neutra que não revele se a conta existe, envie link ou código de uso único com validade e descreva o passo seguinte e as alternativas.
+> **Rule:** Put "Forgot password" near the sign-in, give a neutral response that does not reveal whether the account exists, send a single-use link or code with an expiry, and describe the next step and the alternatives.
 
-## Contexto
+## Context
 
-Esquecer a senha é situação esperada, não exceção. A recuperação deve devolver o acesso sem tratar a pessoa como suspeita, sem revelar se uma conta existe e sem criar caminho mais frágil que o próprio login.
+Forgetting a password is an expected situation, not an exception. Recovery should give access back without treating the person as a suspect, without revealing whether an account exists and without creating a path weaker than the sign-in itself.
 
-O fluxo descreve o passo seguinte, recorre a um canal já vinculado à conta e abre uma saída quando a mensagem ou o código não chega. Segurança e clareza são desenhadas em conjunto.
+The flow describes the next step, relies on a channel already linked to the account and offers a way out when the message or code does not arrive. Security and clarity are designed together.
 
-Um fluxo frouxo favorece o sequestro de contas; um fluxo opaco ou sem alternativa trava pessoas legítimas e sobrecarrega o suporte. Numa pesquisa em e-commerce, demora, filtros de spam e falhas no e-mail de recuperação causaram abandono expressivo entre clientes com conta; o dado é contextual, mas reforça o valor de feedback e orientação.
+A loose flow invites account takeover; an opaque flow with no alternative locks out legitimate people and overloads support. In e-commerce research, delays, spam filters and failures in the recovery email caused significant abandonment among customers with accounts; the figure is contextual, but it reinforces the value of feedback and guidance.
 
-## Decisão
+## Decision
 
-- **SE** a tela é de login **ENTÃO** coloque "Esqueci minha senha" próximo ao campo de senha.
-- **SE** a pessoa informa o identificador **ENTÃO** responda sempre com a mesma mensagem neutra, exista a conta ou não.
-- **SE** o fluxo é iniciado **ENTÃO** envie link ou código aleatório, de uso único e validade limitada, pelo canal associado à conta.
-- **SE** o token foi usado ou expirou **ENTÃO** invalide-o no servidor.
-- **SE** há tentativas ou reenvios **ENTÃO** limite-os para conter abuso.
-- **SE** a conta é de maior risco **ENTÃO** exija combinação de fatores compatível com o impacto.
-- **SE** o e-mail ou código não chega **ENTÃO** oriente: verificar spam, aguardar, conferir o endereço mascarado, pedir novo código, procurar suporte ou outro método.
-- **SE** é a tela de nova senha **ENTÃO** mostre requisitos antes do envio, aceite colar e gerenciador de senhas e diga como corrigir valor inválido.
-- **SE** a troca concluiu **ENTÃO** confirme, notifique a conta e leve ao login ou à tarefa de origem, quando seguro.
-- **SENÃO** nunca envie senha atual, dica de senha ou senha provisória por e-mail.
+- **IF** the screen is the sign-in **THEN** place "Forgot password" next to the password field.
+- **IF** the person enters their identifier **THEN** always reply with the same neutral message, whether the account exists or not.
+- **IF** the flow starts **THEN** send a random, single-use link or code with a limited validity through the channel associated with the account.
+- **IF** the token was used or expired **THEN** invalidate it on the server.
+- **IF** there are attempts or resends **THEN** limit them to contain abuse.
+- **IF** the account is higher risk **THEN** require a combination of factors that matches the impact.
+- **IF** the email or code does not arrive **THEN** guide the person: check spam, wait, check the masked address, request a new code, contact support or use another method.
+- **IF** it is the new-password screen **THEN** show the requirements before submission, accept paste and password managers, and say how to fix an invalid value.
+- **IF** the change is complete **THEN** confirm it, notify the account and take the person to sign-in or back to the original task, when safe.
+- **ELSE** never email the current password, a password hint or a temporary password.
 
-## Quando usar
+## When to use
 
-- Qualquer conta com senha redefinível.
-- Acesso que depende de e-mail, telefone, app ou código de recuperação.
-- Login, cadastro e checkout, em que a tarefa pode ser interrompida.
-- Produtos com MFA, com recuperação compatível com o risco.
-- Pessoa sem acesso ao canal principal.
+- Any account with a resettable password.
+- Access that depends on email, phone, app or recovery code.
+- Sign-in, sign-up and checkout, where the task can be interrupted.
+- Products with MFA, with recovery that matches the risk.
+- A person without access to the primary channel.
 
-## Quando evitar
+## When to avoid
 
-- Pessoa autenticada que ainda pode trocar a senha → **use em vez disso:** troca na área de conta.
-- Enviar senha atual ou dica → **use em vez disso:** link ou código de uso único.
-- Perguntas de segurança como único fator → **use em vez disso:** canal associado mais verificação.
-- Informar se o identificador existe → **use em vez disso:** mensagem neutra.
-- Recuperação mais fraca que a autenticação → **use em vez disso:** nível equivalente de garantia.
+- A signed-in person who can still change the password → **use instead:** change it in the account area.
+- Sending the current password or a hint → **use instead:** a single-use link or code.
+- Security questions as the only factor → **use instead:** the associated channel plus verification.
+- Saying whether the identifier exists → **use instead:** a neutral message.
+- Recovery weaker than authentication → **use instead:** an equivalent assurance level.
 
-## Faça
+## Do
 
-- Explique o próximo passo em cada tela.
-- Preserve a tarefa de origem para retornar depois.
-- Ofereça suporte ou método alternativo seguro.
-- Notifique a redefinição à conta.
+- Explain the next step on every screen.
+- Preserve the original task to return to it later.
+- Offer support or a safe alternative method.
+- Notify the account of the reset.
 
-## Evite
+## Avoid
 
-- Código previsível.
-- Tentativas ilimitadas.
-- Fazer a pessoa recomeçar sem orientação.
-- Login automático por padrão após redefinir.
-- Mensagens que confirmam contas cadastradas.
+- Predictable codes.
+- Unlimited attempts.
+- Making the person start over without guidance.
+- Automatic sign-in by default after a reset.
+- Messages that confirm registered accounts.
 
-## Acessibilidade
+## Accessibility
 
-- Link ou botão com nome claro, rótulo permanente e instrução vinculada ao campo (3.3.2).
-- Código legível por teclado e leitor de tela, que aceita colar; sem depender de cor, posição ou imagem (1.4.1).
-- Resultado em texto, foco em ponto previsível, sem revelar dados da conta.
-- Erros identificados em texto e associados ao controle (3.3.1).
-- Não exija transcrever código sem permitir colar (3.3.8).
-- Teste com teclado, leitor de tela, zoom, mobile, conexão lenta e pessoas sem acesso ao canal principal.
+- A link or button with a clear name, a persistent label and instructions linked to the field (3.3.2).
+- A code readable by keyboard and screen reader that accepts paste; no reliance on color, position or image (1.4.1).
+- The result in text, focus at a predictable point, without revealing account data.
+- Errors identified in text and associated with the control (3.3.1).
+- Do not require transcribing a code without allowing paste (3.3.8).
+- Test with keyboard, screen reader, zoom, mobile, slow connections and people without access to the primary channel.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Link | "Esqueci minha senha" |
-| Resposta neutra | "Se houver uma conta com este e-mail, enviaremos instruções em alguns minutos." |
-| Não chegou | "Não recebeu? Confira o spam ou peça um novo código." |
-| Sucesso | "Senha alterada. Entre com a nova senha." |
-| Notificação | "Sua senha foi alterada. Se não foi você, fale com o suporte." |
+| Link | "Forgot password" |
+| Neutral response | "If there is an account with this email, we'll send instructions in a few minutes." |
+| Didn't arrive | "Didn't get it? Check your spam or request a new code." |
+| Success | "Password changed. Sign in with your new password." |
+| Notification | "Your password was changed. If this wasn't you, contact support." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] "Esqueci minha senha" está próximo ao login.
-- [ ] A resposta não revela se a conta existe.
-- [ ] O link ou código é de uso único, aleatório e com prazo.
-- [ ] Há limite de tentativas e reenvios.
-- [ ] A senha atual nunca é enviada.
-- [ ] Perguntas de segurança não são o único fator.
-- [ ] Requisitos da nova senha aparecem antes do envio.
-- [ ] É possível colar código e senha.
-- [ ] Existe orientação para quando o e-mail ou código não chegar.
-- [ ] O token é invalidado após o uso.
-- [ ] A pessoa é notificada após a redefinição.
-- [ ] A tarefa de origem é preservada quando possível.
+- [ ] "Forgot password" is next to the sign-in.
+- [ ] The response does not reveal whether the account exists.
+- [ ] The link or code is single-use, random and time-limited.
+- [ ] There is a limit on attempts and resends.
+- [ ] The current password is never sent.
+- [ ] Security questions are not the only factor.
+- [ ] The new password's requirements appear before submission.
+- [ ] Code and password can be pasted.
+- [ ] There is guidance for when the email or code does not arrive.
+- [ ] The token is invalidated after use.
+- [ ] The person is notified after the reset.
+- [ ] The original task is preserved when possible.
 
-## Fundamentação
+## Rationale
 
-- OWASP (Forgot Password Cheat Sheet): resposta consistente, proteção contra enumeração, tokens aleatórios de uso único, expiração e limite de abuso.
-- NIST SP 800-63B-4 (recuperação de conta): recuperação como operação de risco próprio e notificação após a recuperação.
-- Baymard Institute (requisitos de senha e destino após login ou redefinição): problemas de e-mail de redefinição geram abandono; preservar a intenção original; evidência de e-commerce.
-- Padrão Digital de Governo (GOV.BR): meios de recuperação variados e atendimento quando as opções digitais falham.
-- WCAG 2.2, critérios 3.3.2 e 3.3.1 (W3C WAI): rótulos, instruções e identificação de erros em texto.
+- OWASP (Forgot Password Cheat Sheet): consistent response, protection against enumeration, random single-use tokens, expiry and abuse limits.
+- NIST SP 800-63B-4 (account recovery): recovery as an operation with its own risk and notification after recovery.
+- Baymard Institute (password requirements and destination after sign-in or reset): reset-email problems cause abandonment; preserve the original intent; e-commerce evidence.
+- Brazilian Government Digital Standard (GOV.BR): varied recovery methods and human support when digital options fail.
+- WCAG 2.2, criteria 3.3.2 and 3.3.1 (W3C WAI): labels, instructions and error identification in text.

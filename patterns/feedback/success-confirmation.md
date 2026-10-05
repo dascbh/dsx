@@ -1,6 +1,6 @@
 ---
 id: success-confirmation
-title: Como comunicar uma ação concluída com sucesso?
+title: How do you communicate a successfully completed action?
 category: feedback
 components: [toast, inline-message, confirmation-page, status-region]
 type: recommendation
@@ -11,95 +11,95 @@ wcag: ["4.1.3", "1.4.1", "2.2.1", "2.1.1"]
 related: [toast-vs-inline-alert, toast-duration, undo, temporary-failure, long-loading]
 ---
 
-# Como comunicar uma ação concluída com sucesso?
+# How do you communicate a successfully completed action?
 
-> **Regra:** Confirme só o resultado real, nomeando a ação e o objeto, perto do contexto, com permanência proporcional ao impacto e sem roubar o foco.
+> **Rule:** Confirm only the real result, naming the action and the object, close to the context, with persistence proportional to the impact and without stealing focus.
 
-## Contexto
+## Context
 
-A mensagem de sucesso atesta que o sistema terminou uma ação e afasta a dúvida sobre o ocorrido. Pesa mais quando o resultado não aparece na interface, envolve envio de dados ou deve servir como comprovante.
+A success message attests that the system finished an action and removes doubt about what happened. It matters more when the result does not show in the interface, involves submitting data or must serve as a receipt.
 
-O retorno deve refletir o estado verdadeiro. Se o sistema apenas recebeu o pedido e ainda vai processá-lo, escreva "Solicitação recebida" ou "Processamento iniciado", jamais "Concluído". Só mostre sucesso quando a fonte responsável confirmar.
+The feedback must reflect the true state. If the system only received the request and will still process it, write "Request received" or "Processing started", never "Done". Only show success when the responsible source confirms it.
 
-A visibilidade do estado do sistema é heurística clássica: a pessoa precisa saber se a interação foi reconhecida e concluída.
+Visibility of system status is a classic heuristic: people need to know whether the interaction was acknowledged and completed.
 
-## Decisão
+## Decision
 
-- **SE** a mudança já é inequívoca na própria interface **ENTÃO** não mostre mensagem extra.
-- **SE** a ação é simples e reversível **ENTÃO** use alteração visível no componente ou toast breve.
-- **SE** a ação ocorre em formulário ou área da página **ENTÃO** use mensagem inline próxima ao local.
-- **SE** o resultado é uma compra, contrato, inscrição ou comprovante **ENTÃO** adote página ou seção persistente com número, data, resumo e próximos passos.
-- **SE** o sistema só recebeu a solicitação **ENTÃO** comunique "recebida" ou "em processamento", não sucesso.
-- **SE** a operação é assíncrona **ENTÃO** mostre estados separados (enviado, em processamento, concluído) e um local persistente para consultar depois.
-- **SE** há próximo passo **ENTÃO** diga onde acompanhar ou quando esperar resposta e inclua ação só se útil ("Ver pedido").
-- **SE** a mensagem tem ação **ENTÃO** garanta outro caminho para a mesma função caso ela desapareça.
-- **SENÃO** use mensagem curta nomeando o que foi feito.
+- **IF** the change is already unmistakable in the interface itself **THEN** show no extra message.
+- **IF** the action is simple and reversible **THEN** use a visible change on the component or a brief toast.
+- **IF** the action happens in a form or an area of the page **THEN** use an inline message near that place.
+- **IF** the result is a purchase, contract, registration or receipt **THEN** use a persistent page or section with a number, date, summary and next steps.
+- **IF** the system only received the request **THEN** communicate "received" or "processing", not success.
+- **IF** the operation is asynchronous **THEN** show separate states (sent, processing, done) and a persistent place to check later.
+- **IF** there is a next step **THEN** say where to follow up or when to expect a response, and include an action only if useful ("View order").
+- **IF** the message has an action **THEN** ensure another path to the same function in case the message disappears.
+- **ELSE** use a short message naming what was done.
 
-## Quando usar
+## When to use
 
-- Após enviar ou salvar dados cujo resultado não é visível.
-- Ao concluir operação assíncrona.
-- Ao criar, atualizar ou mover um item.
-- Após pagamentos, inscrições e solicitações.
+- After submitting or saving data whose result is not visible.
+- When an asynchronous operation finishes.
+- When creating, updating or moving an item.
+- After payments, registrations and requests.
 
-## Quando evitar
+## When to avoid
 
-- Mudança já inequívoca → **use em vez disso:** nenhuma mensagem.
-- Antes da confirmação do servidor → **use em vez disso:** estado de processamento.
-- Cada microinteração rotineira → **use em vez disso:** feedback no próprio controle.
-- Comprovante importante em toast → **use em vez disso:** página persistente.
-- Conteúdo promocional na confirmação → **use em vez disso:** mensagem objetiva.
+- A change that is already unmistakable → **use instead:** no message.
+- Before the server confirms → **use instead:** a processing state.
+- Every routine micro-interaction → **use instead:** feedback on the control itself.
+- An important receipt in a toast → **use instead:** a persistent page.
+- Promotional content in the confirmation → **use instead:** an objective message.
 
-## Faça
+## Do
 
-- Nomeie a ação e o objeto concluído.
-- Posicione perto de onde a ação aconteceu.
-- Ofereça comprovante quando necessário.
-- Deixe o tempo de exibição suficiente para ler e agir.
+- Name the action and the completed object.
+- Position it near where the action happened.
+- Offer a receipt when needed.
+- Keep it on screen long enough to read and act.
 
-## Evite
+## Avoid
 
-- Antecipar o sucesso ao pressionar o botão.
-- Escrever só "Sucesso!".
-- Depender da cor verde.
-- Usar modal sem decisão necessária.
-- Repetir a mesma mensagem em vários locais.
+- Announcing success as soon as the button is pressed.
+- Writing only "Success!".
+- Relying on the color green.
+- Using a modal when no decision is needed.
+- Repeating the same message in several places.
 
-## Acessibilidade
+## Accessibility
 
-- Região de status já existente no DOM antes da atualização (`role="status"`, com `aria-atomic="true"` se a mensagem inteira deve ser relida); não desloque o foco para toast passivo (4.1.3).
-- Se a conclusão abre nova página, reflita o resultado no título e no primeiro heading.
-- Mensagem com ação acessível por teclado; informações críticas não dependem de tempo curto (2.2.1).
-- Resultado em texto, não só verde, ícone ou animação (1.4.1); respeite movimento reduzido.
-- Não anuncie sucessos rotineiros em excesso.
+- A status region already in the DOM before the update (`role="status"`, with `aria-atomic="true"` if the whole message should be reread); do not move focus to a passive toast (4.1.3).
+- If completion opens a new page, reflect the result in the title and the first heading.
+- A message with an action accessible by keyboard; critical information does not depend on a short time (2.2.1).
+- The result in text, not only green, an icon or animation (1.4.1); respect reduced motion.
+- Do not over-announce routine successes.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Edição | "Perfil atualizado." |
-| Upload | "Arquivo enviado para Documentos." |
-| Recebido | "Solicitação recebida. Avisaremos por e-mail quando terminar." |
-| Pagamento | "Pagamento aprovado. Pedido nº 4821." |
-| Ação | "Ver pedido" / "Baixar recibo" |
+| Edit | "Profile updated." |
+| Upload | "File uploaded to Documents." |
+| Received | "Request received. We'll email you when it's done." |
+| Payment | "Payment approved. Order #4821." |
+| Action | "View order" / "Download receipt" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem só aparece após a conclusão confirmada.
-- [ ] O resultado não era evidente sem ela.
-- [ ] Nomeia a ação e o objeto, sem "Sucesso!" genérico.
-- [ ] O formato corresponde ao impacto da tarefa.
-- [ ] Fica perto do contexto da ação.
-- [ ] Comprovantes e próximos passos permanecem disponíveis.
-- [ ] Não depende só de cor ou ícone.
-- [ ] O leitor de tela recebe o estado sem que o foco mude.
-- [ ] O tempo de exibição permite leitura e interação.
+- [ ] The message only appears after confirmed completion.
+- [ ] The result was not evident without it.
+- [ ] It names the action and the object, without a generic "Success!".
+- [ ] The format matches the task's impact.
+- [ ] It sits close to the action's context.
+- [ ] Receipts and next steps remain available.
+- [ ] It does not rely only on color or an icon.
+- [ ] The screen reader receives the state without focus changing.
+- [ ] The display time allows reading and interaction.
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group (visibilidade do estado do sistema): a pessoa precisa saber se a interação foi reconhecida e concluída.
-- WCAG 2.2, critério 4.1.3 (Status Messages): sucesso, progresso e erro anunciados sem receber foco.
-- W3C WAI, técnica G199: confirmação explícita após envio reduz esforço de verificação.
-- W3C WAI, técnica ARIA22: `role="status"` e `aria-atomic` para anúncios sem deslocar foco.
-- Baymard Institute (confirmação de pedido): confirmações pouco claras dificultam verificar a compra; evidência específica de checkout.
-- IBM Carbon (notificação), Material Design 3 (snackbar), Atlassian (flag), Adobe Spectrum (toast), Padrão Digital de Governo (Message): formatos e proporção de feedback.
+- Nielsen Norman Group (visibility of system status): people need to know whether the interaction was acknowledged and completed.
+- WCAG 2.2, criterion 4.1.3 (Status Messages): success, progress and errors announced without receiving focus.
+- W3C WAI, technique G199: explicit confirmation after submission reduces checking effort.
+- W3C WAI, technique ARIA22: `role="status"` and `aria-atomic` for announcements without moving focus.
+- Baymard Institute (order confirmation): unclear confirmations make it harder to verify the purchase; checkout-specific evidence.
+- IBM Carbon (notification), Material Design 3 (snackbar), Atlassian (flag), Adobe Spectrum (toast), Brazilian Government Digital Standard (Message): formats and proportionality of feedback.

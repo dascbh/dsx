@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Verifica referências internas em todos os .md do DSX:
-//  - links Markdown relativos [texto](caminho.md#ancora) → arquivo existe (relativo ao arquivo)
-//  - caminhos citados em código `knowledge/…`, `patterns/…`, `templates/…`, `tools/…`, `skills/…`,
-//    `agents/…`, `evals/…`, `examples/…`, `tokens/…`, `docs/…`, `archetypes/…`, `references/…`, `hooks/…` → existem
-//    (relativos à raiz do DSX; exceto em docs/renames-*.md, que lista caminhos antigos de propósito)
-// Uso: node tools/check-links.mjs
+// Checks internal references in every DSX .md:
+//  - relative Markdown links [text](path.md#anchor) → the file exists (relative to the file)
+//  - paths cited in code spans `knowledge/…`, `patterns/…`, `templates/…`, `tools/…`, `skills/…`,
+//    `agents/…`, `evals/…`, `examples/…`, `tokens/…`, `docs/…`, `archetypes/…`, `references/…`, `hooks/…` → they exist
+//    (relative to the DSX root; except in docs/renames-*.md, which lists old paths on purpose)
+// Usage: node tools/check-links.mjs
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,11 +32,11 @@ export function checkLinks() {
       if (!target || /^[a-z]+:/i.test(target)) continue;
       if (!existsSync(join(dirname(file), target))) broken.push(`${rel}: link → ${m[1]}`);
     }
-    // Tabelas de renomeação (docs/renames-*.md) citam de propósito caminhos que não existem mais.
+    // Rename tables (docs/renames-*.md) cite paths that no longer exist on purpose.
     if (/^docs\/renames-[^/]+\.md$/.test(rel)) continue;
     for (const m of text.matchAll(/`((?:\.\.\/)*(?:[a-z-]+\/)*?(?:knowledge|patterns|archetypes|references|templates|tools|skills|agents|evals|examples|tokens|docs|hooks)\/[^`\s*<>{}]+?)`/g)) {
       let p = m[1].replace(/^(\.\.\/)+/, '');
-      if (/[*<>]/.test(p) || p.includes('build/')) continue; // globs, placeholders e artefatos gerados
+      if (/[*<>]/.test(p) || p.includes('build/')) continue; // globs, placeholders and generated artifacts
       if (!ROOTS.some((r) => p.startsWith(r + '/'))) continue;
       p = p.replace(/[.,;:)]+$/, '');
       if (!existsSync(join(ROOT, p))) broken.push(`${rel}: caminho → ${m[1]}`);
@@ -47,7 +47,7 @@ export function checkLinks() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const broken = checkLinks();
-  for (const b of broken) console.log(`QUEBRADO  ${b}`);
-  console.log(`${broken.length} referência(s) quebrada(s).`);
+  for (const b of broken) console.log(`BROKEN  ${b}`);
+  console.log(`${broken.length} broken reference(s).`);
   process.exit(broken.length ? 1 : 0);
 }

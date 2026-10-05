@@ -1,6 +1,6 @@
 ---
 id: toast-duration
-title: Quanto tempo uma notificação temporária deve permanecer?
+title: How long should a temporary notification stay on screen?
 category: feedback
 components: [toast, snackbar, temporary-notification]
 type: contextual-decision
@@ -11,101 +11,101 @@ wcag: ["2.2.1", "4.1.3", "2.1.1", "1.4.1"]
 related: [toast-vs-inline-alert, success-confirmation, undo, retry]
 ---
 
-# Quanto tempo uma notificação temporária deve permanecer?
+# How long should a temporary notification stay on screen?
 
-> **Regra:** Notificação com ação, erro importante ou informação única nunca some sozinha; só mensagens curtas de baixo impacto podem desaparecer, começando em 4 a 10 segundos e ajustadas pelo tamanho do texto.
+> **Rule:** A notification with an action, an important error or one-time information never disappears on its own; only short, low-impact messages can disappear, starting at 4 to 10 seconds and adjusted to the length of the text.
 
-## Contexto
+## Context
 
-Avisos temporários dão um retorno rápido sem cortar o fluxo. Quanto tempo ficam na tela é decisão de UX, e não um valor universal: varia com o tamanho da mensagem, a urgência, a ação esperada, o dispositivo e a chance de rever a informação depois.
+Temporary notices give quick feedback without cutting the flow. How long they stay on screen is a UX decision, not a universal value: it varies with the length of the message, the urgency, the expected action, the device and the chance of reviewing the information later.
 
-Se desaparece cedo, a mensagem se perde para quem precisa de mais tempo para ler ou achar. Se permanece demais, tapa controles e distrai. O risco aumenta quando o toast é o único meio de saber o ocorrido ou traz a única ação de correção.
+If it disappears too soon, the message is lost to people who need more time to read or find it. If it stays too long, it covers controls and distracts. The risk grows when the toast is the only way to learn what happened or carries the only corrective action.
 
-O intervalo de 4 a 10 segundos é referência de implementação de alguns sistemas, não lei comprovada. Valide com conteúdo, dispositivo, leitura assistiva e teste com pessoas.
+The 4 to 10 second range is an implementation reference from some systems, not a proven law. Validate it with content, device, assistive reading and testing with people.
 
-## Decisão
+## Decision
 
-- **SE** a mensagem é sucesso simples ou informação curta, sem ação obrigatória **ENTÃO** use dispensa automática.
-- **SE** o texto é curto **ENTÃO** comece testando entre 4 e 10 segundos.
-- **SE** o texto é mais longo **ENTÃO** aumente o tempo ou troque por mensagem persistente.
-- **SE** a mensagem tem ação (desfazer, tentar novamente, revisar) **ENTÃO** mantenha até a ação ser feita ou a mensagem ser dispensada.
-- **SE** é erro que exige correção, mensagem crítica ou emergencial **ENTÃO** não use temporizador; use padrão persistente.
-- **SE** é a única confirmação de uma ação importante **ENTÃO** não temporize.
-- **SE** a informação é relevante depois **ENTÃO** ofereça outro caminho de consulta (central de notificações, estado na página, histórico).
-- **SE** há várias mensagens em sequência **ENTÃO** mostre uma por vez, sem reiniciar nem esconder o tempo de leitura da anterior.
-- **SENÃO** prefira mensagem persistente.
+- **IF** the message is a simple success or short information, with no required action **THEN** use auto-dismiss.
+- **IF** the text is short **THEN** start by testing between 4 and 10 seconds.
+- **IF** the text is longer **THEN** increase the time or switch to a persistent message.
+- **IF** the message has an action (undo, try again, review) **THEN** keep it until the action is taken or the message is dismissed.
+- **IF** it is an error that requires correction, a critical or an emergency message **THEN** use no timer; use a persistent pattern.
+- **IF** it is the only confirmation of an important action **THEN** do not put it on a timer.
+- **IF** the information is relevant later **THEN** offer another way to look it up (notification center, state on the page, history).
+- **IF** there are several messages in sequence **THEN** show one at a time, without restarting or cutting short the previous one's reading time.
+- **ELSE** prefer a persistent message.
 
-## Quando usar
+## When to use
 
-- Dispensa automática para sucesso simples de baixo impacto.
-- Informação curta sem ação obrigatória.
-- Permanência quando há desfazer, tentar novamente ou outra ação.
-- Fechamento manual sempre disponível.
+- Auto-dismiss for a simple, low-impact success.
+- Short information with no required action.
+- Persistence when there is undo, try again or another action.
+- Manual close always available.
 
-## Quando evitar
+## When to avoid
 
-- Erros importantes → **use em vez disso:** mensagem inline ou alerta persistente.
-- Única confirmação de uma ação → **use em vez disso:** estado persistente na página.
-- Mensagem com ação necessária → **use em vez disso:** notificação que permanece até dispensar.
-- Textos longos → **use em vez disso:** alerta, inline ou página.
-- Mesma duração para todos os textos → **use em vez disso:** tempo definido pelo conteúdo.
+- Important errors → **use instead:** an inline message or persistent alert.
+- The only confirmation of an action → **use instead:** a persistent state on the page.
+- A message with a required action → **use instead:** a notification that stays until dismissed.
+- Long text → **use instead:** an alert, inline message or page.
+- The same duration for every text → **use instead:** a time set by the content.
 
-## Faça
+## Do
 
-- Defina o tempo pelo conteúdo.
-- Comece em 4 a 10 segundos para mensagens curtas.
-- Mantenha ações disponíveis.
-- Mostre uma mensagem por vez.
-- Ofereça botão de fechar.
-- Permita consultar depois o que for relevante.
+- Set the time by the content.
+- Start at 4 to 10 seconds for short messages.
+- Keep actions available.
+- Show one message at a time.
+- Offer a close button.
+- Allow looking up anything relevant later.
 
-## Evite
+## Avoid
 
-- Tempo fixo para tudo.
-- Fazer erro desaparecer.
-- Esconder a única confirmação.
-- Empilhar notificações.
-- Ação que some antes de ser usada.
-- Interromper sem necessidade.
+- A fixed time for everything.
+- Making an error disappear.
+- Hiding the only confirmation.
+- Stacking notifications.
+- An action that disappears before it can be used.
+- Interrupting unnecessarily.
 
-## Acessibilidade
+## Accessibility
 
-- Não use temporizador em mensagens críticas, emergenciais ou que exigem decisão.
-- Para informação sem ação, use região semântica status ou log, sem mover o foco (4.1.3).
-- Mensagens com ação ficam disponíveis a teclado e leitor de tela até serem resolvidas ou dispensadas (2.1.1).
-- Limites de tempo devem poder ser desativados, ajustados ou ampliados; o toast pode sumir sem isso apenas quando existe alternativa equivalente para consultar a informação (2.2.1).
-- O foco não pode se perder ao fechar o toast.
-- Não use só cor ou ícone (1.4.1).
-- Teste tempo com teclado, zoom, leitor de tela e tamanhos de texto maiores.
+- Do not use a timer for critical, emergency or decision-requiring messages.
+- For information without an action, use a semantic status or log region, without moving focus (4.1.3).
+- Messages with an action stay available to keyboard and screen reader until resolved or dismissed (2.1.1).
+- Time limits must be possible to turn off, adjust or extend; a toast may disappear without that only when there is an equivalent alternative to look up the information (2.2.1).
+- Focus must not get lost when the toast closes.
+- Do not rely only on color or an icon (1.4.1).
+- Test timing with keyboard, zoom, screen reader and larger text sizes.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Sucesso breve | "Alterações salvas." |
-| Com desfazer (persiste até agir) | "Conversa arquivada. Desfazer" |
-| Sessão encerrada | "Sua sessão terminou por inatividade. Entrar de novo" |
-| Fechar | "Fechar notificação" |
+| Brief success | "Changes saved." |
+| With undo (stays until acted on) | "Conversation archived. Undo" |
+| Session ended | "Your session ended due to inactivity. Sign in again" |
+| Close | "Close notification" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Toasts com auto-dispensa são curtos e de baixo impacto.
-- [ ] Toasts com ação não têm temporizador.
-- [ ] Erros importantes não usam toast temporário.
-- [ ] A duração varia conforme o comprimento do texto.
-- [ ] Existe botão de fechar com nome acessível.
-- [ ] A informação importante pode ser consultada depois.
-- [ ] Só uma notificação aparece por vez.
-- [ ] O toast usa role status ou log e não rouba o foco.
-- [ ] Testado com teclado, zoom e leitor de tela.
+- [ ] Auto-dismissing toasts are short and low impact.
+- [ ] Toasts with an action have no timer.
+- [ ] Important errors do not use a temporary toast.
+- [ ] The duration varies with the length of the text.
+- [ ] There is a close button with an accessible name.
+- [ ] Important information can be looked up later.
+- [ ] Only one notification appears at a time.
+- [ ] The toast uses role status or log and does not steal focus.
+- [ ] Tested with keyboard, zoom and screen reader.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 2.2.1 (limite de tempo ajustável): quando temporizar é aceitável.
-- IBM Carbon, padrão, uso e acessibilidade de notificações: toasts temporários, inline persistente, sem temporizador em críticas.
-- Material Design e Android Developers, snackbars: referência de 4 a 10 segundos, uma por vez, duração indefinida com controle de fechamento.
-- Atlassian Design, flag com dispensa automática: exemplo de implementação (8 segundos), não regra universal.
-- Padrão Digital de Governo, mensagem: evitar mensagens que desaparecem sozinhas.
-- Adobe Spectrum, toast: mensagem temporária e contextual.
-- Nielsen Norman Group, visibilidade do status do sistema: feedback oportuno, sem número universal.
-- Interaction Design Foundation e MeasuringU: feedback pouco interruptivo e validação da duração com testes.
+- WCAG 2.2, criterion 2.2.1 (Timing Adjustable): when a timer is acceptable.
+- IBM Carbon, notification pattern, usage and accessibility: temporary toasts, persistent inline, no timer on critical ones.
+- Material Design and Android Developers, snackbars: the 4 to 10 second reference, one at a time, indefinite duration with a close control.
+- Atlassian Design, auto-dismissing flag: an implementation example (8 seconds), not a universal rule.
+- Brazilian Government Digital Standard, message: avoid messages that disappear on their own.
+- Adobe Spectrum, toast: a temporary, contextual message.
+- Nielsen Norman Group, visibility of system status: timely feedback, with no universal number.
+- Interaction Design Foundation and MeasuringU: low-interruption feedback and validating the duration with tests.

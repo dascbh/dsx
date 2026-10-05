@@ -76,7 +76,7 @@ export function renderProductMd(ux, { source = 'UX.md', now = new Date() } = {})
   L.push('## Register', '');
   L.push(p.register ? `${p.register}${p.platform || p.density ? ` (${[p.platform && `platform: ${p.platform}`, p.density && `density: ${p.density}`].filter(Boolean).join(', ')})` : ''}` : '_Not declared in UX.md (`product.register`)._', '');
   L.push('## Personas', '');
-  if (p.persona) L.push('| Persona | Source |', '|---|---|', `| ${cell(p.persona)} | UX.md \`product.persona\` |`, '', 'The task table of UX.md ("Personas and tasks" section) stays the detailed source; copy the rows Forward review needs.', '');
+  if (p.persona) L.push('| Persona | Source |', '|---|---|', `| ${cell(p.persona)} | UX.md \`product.persona\` |`, '', 'The task table of UX.md ("Personas & Tasks" section) stays the detailed source; copy the rows Forward review needs.', '');
   else L.push('_Not declared in UX.md (`product.persona`)._', '');
   L.push('## Glossary', '');
   if (ux.glossary.length) {

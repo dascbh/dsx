@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Gera escala de espaçamento em grade de 4 ou 8 px.
-// Uso: node tools/spacing-scale.mjs --base 4 [--format json|css|dtcg]
+// Generates a spacing scale on a 4 or 8 px grid.
+// Usage: node tools/spacing-scale.mjs --base 4 [--format json|css|dtcg]
 import { parseArgs } from './lib/cli.mjs';
 
-// Multiplicadores da unidade-base. Denso no início (ajustes finos de componente),
-// esparso no fim (respiro entre seções).
+// Multipliers of the base unit. Dense at the start (fine component adjustments),
+// sparse at the end (breathing room between sections).
 const MULTIPLIERS = [0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32];
 
 export function spacingScale(base = 4) {

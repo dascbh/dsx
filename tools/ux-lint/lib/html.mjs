@@ -1,7 +1,7 @@
-// Parser HTML mínimo para o ux-lint: monta uma árvore de nós (elementos e texto) a partir de
-// HTML serializado (capturas de tela). Não valida nem corrige HTML malformado além do básico:
-// elementos vazios (void), conteúdo de script/style ignorado, fechamento implícito tolerante.
-// Inclui um motor de seletores para o subconjunto usado no contrato do UX.md.
+// Minimal HTML parser for ux-lint: builds a node tree (elements and text) from serialized HTML
+// (screen captures). It does not validate or repair malformed HTML beyond the basics:
+// void elements, script/style content skipped, tolerant implicit closing.
+// Includes a selector engine for the subset used by the UX.md contract.
 
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
 const RAW = new Set(['script', 'style', 'template', 'noscript']);
@@ -29,7 +29,7 @@ function el(tag, attrs, parent, line, col) {
   return { type: 'element', tag, attrs, children: [], parent, line, col };
 }
 
-/** Lê o HTML e devolve o nó raiz (type: 'document'). Cada elemento guarda linha e coluna de origem. */
+/** Reads the HTML and returns the root node (type: 'document'). Each element keeps its source line and column. */
 export function parseHtml(html) {
   const root = { type: 'document', tag: '#document', attrs: {}, children: [], parent: null, line: 1 };
   const stack = [root];
@@ -58,7 +58,7 @@ export function parseHtml(html) {
       if (idx > 0) stack.length = idx;
       continue;
     }
-    if (!m[2]) continue; // comentário, doctype, CDATA
+    if (!m[2]) continue; // comment, doctype, CDATA
     const tag = m[2].toLowerCase();
     const rawAttrs = m[3] || '';
     const selfClosing = /\/\s*$/.test(rawAttrs);
@@ -79,7 +79,7 @@ export function parseHtml(html) {
   return root;
 }
 
-// ---------- seletores ----------
+// ---------- selectors ----------
 
 function splitTop(s, sep) {
   const out = [];
@@ -113,13 +113,13 @@ function parseCompound(src) {
       c.nots.push(parseSelector(s.slice(m[0].length, i - 1)));
       s = s.slice(i);
       continue;
-    } else throw new Error(`Seletor não suportado: "${src}" (perto de "${s}")`);
+    } else throw new Error(`Unsupported selector: "${src}" (near "${s}")`);
     s = s.slice(m[0].length);
   }
   return c;
 }
 
-/** Converte "a b, c.d > e" em [{ partes: [{compound, comb}] }]. Suporta descendente (espaço) e filho (>). */
+/** Turns "a b, c.d > e" into [{ parts: [{compound, comb}] }]. Supports descendant (space) and child (>). */
 export function parseSelector(sel) {
   return splitTop(sel, /,/).map((s) => s.trim()).filter(Boolean).map((complex) => {
     const tokens = splitTop(complex.replace(/\s*>\s*/g, ' > '), /\s/).filter(Boolean);
@@ -188,7 +188,7 @@ export function matches(node, sel) {
   return node.type === 'element' && matchesParsed(node, compiled(sel));
 }
 
-/** Verdadeiro se `node` é `anc` ou está dentro dele. */
+/** True when `node` is `anc` or inside it. */
 export function contains(anc, node) {
   for (let n = node; n; n = n.parent) if (n === anc) return true;
   return false;
@@ -201,7 +201,7 @@ export function* walk(node) {
   }
 }
 
-/** Elementos descendentes que casam o seletor, em ordem de documento. */
+/** Descendant elements matching the selector, in document order. */
 export function querySelectorAll(node, sel) {
   const parsed = compiled(sel);
   const out = [];
@@ -213,13 +213,13 @@ export function querySelector(node, sel) {
   return querySelectorAll(node, sel)[0] || null;
 }
 
-/** Ancestral mais próximo (incluindo o próprio nó, como Element.closest) que casa o seletor. */
+/** Nearest ancestor (including the node itself, like Element.closest) matching the selector. */
 export function closest(node, sel) {
   for (let n = node; n && n.type === 'element'; n = n.parent) if (matches(n, sel)) return n;
   return null;
 }
 
-/** Elemento escondido para quem olha a tela (atributo hidden, display:none, visibility:hidden). */
+/** Element hidden from whoever looks at the screen (hidden attribute, display:none, visibility:hidden). */
 export function isHidden(node) {
   for (let n = node; n && n.type === 'element'; n = n.parent) {
     if ('hidden' in n.attrs) return true;
@@ -230,7 +230,7 @@ export function isHidden(node) {
   return false;
 }
 
-/** Texto visível do nó, com espaços normalizados (ignora nós escondidos). */
+/** Visible text of the node, with normalized whitespace (skips hidden nodes). */
 export function textOf(node) {
   const parts = [];
   const rec = (n) => {
@@ -249,7 +249,7 @@ export function textOf(node) {
   return parts.join('').replace(/\s+/g, ' ').trim();
 }
 
-/** Busca por id no documento. */
+/** Looks up an id in the document. */
 export function getById(root, id) {
   for (const n of walk(root)) if (n.type === 'element' && n.attrs.id === id) return n;
   return null;

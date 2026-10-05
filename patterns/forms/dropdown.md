@@ -1,6 +1,6 @@
 ---
 id: dropdown
-title: Quando usar dropdown e quando evitar?
+title: When should you use a dropdown, and when should you avoid it?
 category: forms
 components: [dropdown, select, combobox, radio, autocomplete]
 type: contextual-decision
@@ -11,104 +11,104 @@ wcag: ["1.3.1", "4.1.2", "2.1.1", "2.4.7", "1.4.10", "3.3.2"]
 related: [autofill, label-vs-placeholder, filter-structure, field-order]
 ---
 
-# Quando usar dropdown e quando evitar?
+# When should you use a dropdown, and when should you avoid it?
 
-> **Regra:** Use dropdown apenas para escolha única entre valores predefinidos; poucas opções pedem opções visíveis e listas longas pedem busca.
+> **Rule:** Use a dropdown only for a single choice among predefined values; few options call for visible options and long lists call for search.
 
-## Contexto
+## Context
 
-Dropdown, select e combo box atendem a problemas distintos, ainda que muitas interfaces os tratem como um só controle. A escolha varia com o tamanho da lista, a necessidade de comparar, a probabilidade de a pessoa já saber o valor e o caráter único ou múltiplo da seleção.
+Dropdown, select and combo box solve different problems, even though many interfaces treat them as one control. The choice depends on the size of the list, the need to compare, the likelihood that the person already knows the value, and whether the selection is single or multiple.
 
-Um dropdown esconde as opções até ser aberto: ganha espaço, mas soma uma interação e reduz a comparação. Em lista curta, a pessoa abre só para descobrir o que existe; em lista longa, percorre linhas sem visão geral nem busca.
+A dropdown hides its options until it is opened: it saves space but adds an interaction and reduces comparison. In a short list, the person opens it just to discover what exists; in a long list, they scroll through rows with no overview and no search.
 
-Escolha o controle pela tarefa, não apenas pelo espaço disponível. Limites numéricos de itens são heurísticas, não regras rígidas.
+Choose the control by the task, not only by the available space. Numeric item limits are heuristics, not hard rules.
 
-## Decisão
+## Decision
 
-- **SE** a escolha é única, os valores são predefinidos e exclusivos, e a compactação traz ganho real **ENTÃO** use select ou dropdown.
-- **SE** a lista é curta e comparar ajuda a decidir **ENTÃO** use rádio, cartões ou lista aberta.
-- **SE** a lista é longa ou a pessoa conhece parte do valor **ENTÃO** use autocomplete ou combo box e deixe claro se valores personalizados são aceitos.
-- **SE** mais de um valor pode ser escolhido **ENTÃO** use caixas de seleção ou lista de múltipla escolha com resumo.
-- **SE** a seleção dispara um comando **ENTÃO** use botão com menu, não dropdown de formulário.
-- **SE** o controle é navegação **ENTÃO** use estrutura de navegação.
-- **SE** não existe padrão sensato e neutro **ENTÃO** evite dropdown ou inclua opção explícita de "Selecione".
-- **SE** o select nativo atende à tarefa **ENTÃO** use o nativo.
-- **SE** o componente customizado carece de semântica, foco e teclado completos **ENTÃO** descarte-o.
-- **SENÃO** prefira opções visíveis.
+- **IF** the choice is single, the values are predefined and exclusive, and compactness brings a real gain **THEN** use a select or dropdown.
+- **IF** the list is short and comparing helps decide **THEN** use radio buttons, cards or an open list.
+- **IF** the list is long or the person knows part of the value **THEN** use autocomplete or a combo box and make clear whether custom values are accepted.
+- **IF** more than one value can be chosen **THEN** use checkboxes or a multiple-choice list with a summary.
+- **IF** the selection triggers a command **THEN** use a menu button, not a form dropdown.
+- **IF** the control is navigation **THEN** use a navigation structure.
+- **IF** there is no sensible, neutral default **THEN** avoid a dropdown or include an explicit "Select" option.
+- **IF** the native select serves the task **THEN** use the native one.
+- **IF** the custom component lacks full semantics, focus and keyboard support **THEN** discard it.
+- **ELSE** prefer visible options.
 
-## Quando usar
+## When to use
 
-- Uma única opção deve ser escolhida.
-- Valores predefinidos e mutuamente exclusivos.
-- Ordem previsível ou padrão sensato.
-- Alternativas não precisam ficar visíveis para comparação.
-- Espaço limitado e entrada restrita a valores válidos.
-- Lista média, percorrível sem esforço.
+- Exactly one option must be chosen.
+- Predefined, mutually exclusive values.
+- A predictable order or a sensible default.
+- The alternatives do not need to stay visible for comparison.
+- Limited space and input restricted to valid values.
+- A medium-length list that can be scanned without effort.
 
-## Quando evitar
+## When to avoid
 
-- Poucas opções comparáveis → **use em vez disso:** rádio ou cartões.
-- Lista extensa → **use em vez disso:** autocomplete.
-- Valor conhecido da pessoa → **use em vez disso:** campo com sugestões.
-- Seleção múltipla → **use em vez disso:** caixas de seleção.
-- Ação ou comando → **use em vez disso:** botão com menu.
-- Navegação principal → **use em vez disso:** menu de navegação.
+- Few comparable options → **use instead:** radio buttons or cards.
+- A long list → **use instead:** autocomplete.
+- A value the person already knows → **use instead:** a field with suggestions.
+- Multiple selection → **use instead:** checkboxes.
+- An action or command → **use instead:** a menu button.
+- Main navigation → **use instead:** a navigation menu.
 
-## Faça
+## Do
 
-- Defina se a escolha é única ou múltipla.
-- Verifique se as opções precisam ser comparadas.
-- Mantenha o rótulo persistente, separado do valor selecionado.
-- Agrupe opções relacionadas em listas longas.
-- Mostre o valor selecionado.
-- Valide com teclado, leitor de tela, zoom e telas estreitas.
+- Decide whether the choice is single or multiple.
+- Check whether the options need to be compared.
+- Keep the label persistent and separate from the selected value.
+- Group related options in long lists.
+- Show the selected value.
+- Validate with keyboard, screen reader, zoom and narrow screens.
 
-## Evite
+## Avoid
 
-- Escolher dropdown só para economizar espaço.
-- Esconder alternativas simples.
-- Lista extensa sem busca ou agrupamento.
-- Múltipla seleção sem resumo.
-- Misturar campo de formulário com menu de comando.
-- Placeholder como único rótulo.
-- Combobox customizado sem teclado completo.
-- Tratar limites numéricos como regra rígida.
+- Choosing a dropdown only to save space.
+- Hiding simple alternatives.
+- A long list with no search or grouping.
+- Multiple selection with no summary.
+- Mixing a form field with a command menu.
+- A placeholder as the only label.
+- A custom combobox without full keyboard support.
+- Treating numeric limits as a hard rule.
 
-## Acessibilidade
+## Accessibility
 
-- Use rótulo visível associado ao campo (1.3.1, 3.3.2); não use placeholder como único rótulo.
-- Dê preferência ao select nativo; se customizar, siga o padrão combobox do WAI-ARIA APG: nome acessível, estado expandido, vínculo com o popup, opção ativa e papel listbox (4.1.2).
-- Verifique Tab, Enter ou Espaço, setas, Escape, digitação e filtragem (2.1.1).
-- Foco visível, seleção que não muda silenciosamente, e foco devolvido ao acionador ao fechar (2.4.7).
-- Verifique contraste, zoom de 200% e 400%, áreas de toque e menus que não saiam da viewport (1.4.10).
+- Use a visible label associated with the field (1.3.1, 3.3.2); do not use a placeholder as the only label.
+- Prefer the native select; if you customize, follow the WAI-ARIA APG combobox pattern: accessible name, expanded state, link to the popup, active option and listbox role (4.1.2).
+- Check Tab, Enter or Space, arrow keys, Escape, typing and filtering (2.1.1).
+- Visible focus, a selection that does not change silently, and focus returned to the trigger on close (2.4.7).
+- Check contrast, 200% and 400% zoom, touch areas and menus that do not leave the viewport (1.4.10).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulo | "Estado" |
-| Opção inicial | "Selecione um estado" |
-| Busca em lista longa | "Digite o nome da cidade" |
-| Sem resultado | "Nenhuma cidade encontrada. Confira a grafia." |
-| Resumo de múltipla | "3 categorias selecionadas" |
+| Label | "State" |
+| Initial option | "Select a state" |
+| Search in a long list | "Type the city name" |
+| No result | "No city found. Check the spelling." |
+| Multiple-selection summary | "3 categories selected" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A escolha é única.
-- [ ] Listas curtas e comparáveis usam opções visíveis.
-- [ ] Listas longas têm busca ou agrupamento.
-- [ ] O rótulo é visível e persiste após a seleção.
-- [ ] O valor selecionado permanece visível.
-- [ ] O controle não dispara comando nem navegação.
-- [ ] Funciona com teclado: Tab, setas, Enter, Espaço e Escape.
-- [ ] O componente customizado expõe nome, estado expandido e opção ativa.
-- [ ] Funciona em zoom de 400% e em tela estreita.
+- [ ] The choice is single.
+- [ ] Short, comparable lists use visible options.
+- [ ] Long lists have search or grouping.
+- [ ] The label is visible and persists after the selection.
+- [ ] The selected value stays visible.
+- [ ] The control does not trigger a command or navigation.
+- [ ] It works with the keyboard: Tab, arrows, Enter, Space and Escape.
+- [ ] The custom component exposes name, expanded state and active option.
+- [ ] It works at 400% zoom and on a narrow screen.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute, usabilidade de dropdowns: abertura desnecessária em listas curtas, dificuldade em longas, alternativas como rádio e autocomplete; limites numéricos como heurística de e-commerce.
-- Nielsen Norman Group, listas dropdown e listbox: equilíbrio entre economia de espaço e opções escondidas.
-- W3C WAI-ARIA Authoring Practices, padrão combobox: popup, foco, seleção e teclado.
-- IBM Carbon, dropdown: diferença entre dropdown, filtrável, multiselect e combo box.
-- Adobe Spectrum, combo box: sugestões para localizar valores.
-- Design System GOV.BR, select: estados, comportamento e acessibilidade.
+- Baymard Institute, dropdown usability: unnecessary opening in short lists, difficulty in long ones, alternatives such as radio buttons and autocomplete; numeric limits as an e-commerce heuristic.
+- Nielsen Norman Group, dropdown and listbox lists: the balance between saving space and hiding options.
+- W3C WAI-ARIA Authoring Practices, combobox pattern: popup, focus, selection and keyboard.
+- IBM Carbon, dropdown: the difference between dropdown, filterable, multiselect and combo box.
+- Adobe Spectrum, combo box: suggestions to find values.
+- GOV.BR Design System, select: states, behavior and accessibility.

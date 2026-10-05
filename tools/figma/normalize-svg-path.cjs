@@ -1,26 +1,26 @@
 /**
- * Normaliza um atributo `d` de SVG para o subconjunto que o Figma aceita em
- * `vectorPaths`: apenas M / L / C / Q / Z absolutos.
+ * Normalizes an SVG `d` attribute to the subset Figma accepts in
+ * `vectorPaths`: absolute M / L / C / Q / Z only.
  *
- * Por que existe:
- *   1. O parser do Figma rejeita H, V, S, T (e A) — falha com
+ * Why it exists:
+ *   1. Figma's parser rejects H, V, S, T (and A), failing with
  *      "Failed to convert path. Invalid command at V6.5…".
- *   2. Em SVG, o preenchimento fecha o subpath implicitamente; no Figma, não.
- *      Sem fechar cada subpath com Z, todo ícone com furo (círculo com miolo,
- *      documento com linhas internas) renderiza como um borrão sólido.
+ *   2. In SVG, the fill closes a subpath implicitly; in Figma it does not.
+ *      Without closing each subpath with Z, every icon with a hole (ring,
+ *      document with inner lines) renders as a solid blob.
  *
- * Arcos (A/a) não são convertidos — a função lança. Na prática, quase todo
- * ícone de biblioteca tem uma variante equivalente sem arco (ex.: no MUI,
- * `Edit` usa arco e `EditOutlined` não).
+ * Arcs (A/a) are not converted: the function throws. In practice almost every
+ * library icon has an equivalent variant without arcs (e.g. in MUI,
+ * `Edit` uses an arc and `EditOutlined` does not).
  *
- * CommonJS (.cjs) de propósito: o package.json do DSX é "type": "module", e
- * este arquivo precisa ser carregável com `require` por scripts avulsos.
+ * CommonJS (.cjs) on purpose: the DSX package.json is "type": "module", and
+ * this file must be loadable with `require` by standalone scripts.
  *
- * Uso:
+ * Usage:
  *   const { norm } = require('<DSX>/tools/figma/normalize-svg-path.cjs')
  *   const d = [...src.matchAll(/d: "([^"]*)"/g)].map(m => m[1]).map(norm).join(' ')
  *
- * Pela linha de comando (um `d` por argumento, uma linha normalizada por saída):
+ * From the command line (one `d` per argument, one normalized line per output):
  *   node <DSX>/tools/figma/normalize-svg-path.cjs "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"
  */
 
@@ -90,13 +90,13 @@ function norm(d) {
       r.push(`Q ${f(x1)} ${f(y1)} ${f(x2)} ${f(y2)}`);
       qx = x1; qy = y1; x = x2; y = y2; px = py = null;
     } else if (C === 'A') {
-      throw new Error('arco não suportado — use a variante do ícone sem arco (ex.: EditOutlined)');
+      throw new Error('arc not supported: use the icon variant without arcs (e.g. EditOutlined)');
     } else {
-      throw new Error('comando desconhecido: ' + cmd);
+      throw new Error('unknown command: ' + cmd);
     }
   }
 
-  // Fecha todo subpath: o preenchimento do SVG fecha implicitamente, o Figma não.
+  // Closes every subpath: SVG fill closes implicitly, Figma does not.
   const out = [];
   for (const seg of r) {
     if (seg.startsWith('M') && out.length && out[out.length - 1] !== 'Z') out.push('Z');
@@ -111,7 +111,7 @@ module.exports = { norm };
 if (require.main === module) {
   const args = process.argv.slice(2);
   if (!args.length) {
-    console.error('uso: node normalize-svg-path.cjs "<d do SVG>" ["<outro d>" …]');
+    console.error('usage: node normalize-svg-path.cjs "<SVG d>" ["<another d>" …]');
     process.exit(1);
   }
   for (const d of args) console.log(norm(d));

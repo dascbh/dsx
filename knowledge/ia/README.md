@@ -1,72 +1,81 @@
-# Base de conhecimento: IA
+# Knowledge base: AI
 
-> **Quando consultar este índice**
-> - No início de qualquer tarefa que envolva um recurso com IA no produto (agente, assistente, busca com IA, interface gerada, voz/câmera, conteúdo sintético).
-> - Quando a tarefa usa IA **no processo** de design ou pesquisa (vibe coding, gerador de wireframe, síntese de entrevistas, personas sintéticas).
-> - Para escolher qual documento carregar. Carregue **só** os documentos indicados pela tabela de roteamento; não carregue a pasta inteira.
+> **When to consult this index**
+> - At the start of any task involving an AI feature in the product (agent, assistant, AI search, generated interface, voice/camera, synthetic content).
+> - When the task uses AI **in the process** of design or research (vibe coding, wireframe generator, interview synthesis, synthetic personas).
+> - To choose which document to load. Load **only** the documents indicated by the routing table; do not load the whole folder.
 
-## O que esta pasta cobre
+## What this folder covers
 
-Conhecimento de fundo, escrito para agentes, sobre como projetar, avaliar e documentar experiências com IA. Os documentos explicam **por que** e **quando**; as regras de componente ficam nos cards de padrão em `patterns/ai/`, que estes documentos referenciam em vez de repetir.
+Background knowledge, written for agents, on how to design, evaluate and document AI experiences. The documents explain **why** and **when**; component rules live in the pattern cards under `patterns/ai/`, which these documents reference instead of repeating.
 
-| Arquivo | Assunto | Carregar quando |
+| File | Subject | Load when |
 |---|---|---|
-| [`ux-para-agentes.md`](ux-para-agentes.md) | Seis princípios, matriz de autonomia por risco, confirmação, progresso, recuperação, permissões, handoff, fluxo em fases, métricas | O sistema **age** em nome da pessoa (envia, publica, altera, compra, concede acesso) |
-| [`generative-ui.md`](generative-ui.md) | Interface composta em tempo de uso: níveis de maturidade, invariantes, catálogo declarativo, fallbacks, quando a UI fixa vence | O produto escolhe dinamicamente qual forma de interface mostrar |
-| [`multimodal.md`](multimodal.md) | Tela, toque, texto, voz e câmera numa mesma tarefa com estado único; privacidade de captura; fallback | Adição de voz, câmera, áudio ou alternância de modalidade |
-| [`evals.md`](evals.md) | Quatro camadas, seis passos, tipos de avaliador, métricas de RAG e agentes, scorecard, rubricas, calibração de juiz-LLM, rubrica YAML para UI gerada | Antes de lançar ou alterar recurso com IA; ao julgar saídas geradas |
-| [`rag-e-fontes.md`](rag-e-fontes.md) | Papel de UX em respostas baseadas em documentos: escopo, citações, estados de falha, permissões, latência, contrato de resposta | Assistente de conhecimento, busca com IA, respostas com fontes |
-| [`evidencia-e-fontes.md`](evidencia-e-fontes.md) | Evidência × sinal × previsão, sete perguntas, hierarquia de confiança e tags de nível | Ao escrever ou revisar **qualquer** skill, card ou documento com afirmações |
-| [`pesquisa-com-ia.md`](pesquisa-com-ia.md) | Síntese de pesquisa rastreável, prompt de advogado do diabo, doutrina de personas sintéticas | IA aplicada a entrevistas, testes, feedback; proposta de usuário simulado |
-| [`divida-de-experiencia.md`](divida-de-experiencia.md) | Dívida de experiência com IA, ressaca do vibe coding, geradores de wireframe, controles e papéis do designer | Telas, fluxos ou código gerados por IA; time acelera e qualidade cai |
-| [`conteudo-sintetico.md`](conteudo-sintetico.md) | Rotulagem de conteúdo de IA, metadados (EXIF, IPTC, XMP, ICC), C2PA, marcas d'água, limites da detecção | Exibir conteúdo gerado; fluxos de imagem; recurso de verificação de origem |
+| [`ux-for-agents.md`](ux-for-agents.md) | Six principles, risk-based autonomy matrix, confirmation, progress, recovery, permissions, handoff, phased flow, metrics | The system **acts** on the person's behalf (sends, publishes, changes, buys, grants access) |
+| [`generative-ui.md`](generative-ui.md) | Interface composed at use time: maturity levels, invariants, declarative catalog, fallbacks, when fixed UI wins | The product dynamically chooses which interface form to show |
+| [`multimodal.md`](multimodal.md) | Screen, touch, text, voice and camera in one task with a single state; capture privacy; fallback | Adding voice, camera, audio or modality switching |
+| [`evals.md`](evals.md) | Four layers, six steps, evaluator types, RAG and agent metrics, scorecard, rubrics, LLM-judge calibration, YAML rubric for generated UI | Before launching or changing an AI feature; when judging generated outputs |
+| [`rag-and-sources.md`](rag-and-sources.md) | The UX role in document-grounded answers: scope, citations, failure states, permissions, latency, answer contract | Knowledge assistant, AI search, answers with sources |
+| [`evidence-and-sources.md`](evidence-and-sources.md) | Evidence × signal × prediction, seven questions, confidence hierarchy and level tags | When writing or reviewing **any** skill, card or document that makes claims |
+| [`research-with-ai.md`](research-with-ai.md) | Traceable research synthesis, devil's advocate prompt, synthetic persona doctrine | AI applied to interviews, tests, feedback; a proposal for a simulated user |
+| [`experience-debt.md`](experience-debt.md) | AI experience debt, the vibe coding hangover, wireframe generators, controls and designer roles | Screens, flows or code generated by AI; the team speeds up and quality drops |
+| [`synthetic-content.md`](synthetic-content.md) | Labeling AI content, metadata (EXIF, IPTC, XMP, ICC), C2PA, watermarks, limits of detection | Displaying generated content; image flows; origin verification feature |
 
-## Roteamento rápido (SE → ENTÃO)
+## Quick routing (IF → THEN)
 
-- **SE** a tarefa é "o agente vai fazer X pelo usuário" **ENTÃO** carregue `ux-para-agentes.md` + `evals.md` (seção de agentes).
-- **SE** a resposta da IA cita documentos ou bases **ENTÃO** carregue `rag-e-fontes.md`.
-- **SE** a IA decide entre tabela, formulário, gráfico ou controles **ENTÃO** carregue `generative-ui.md` + `evals.md` (rubrica da seção 8).
-- **SE** entra voz ou câmera **ENTÃO** carregue `multimodal.md`.
-- **SE** um agente de código vai gerar telas a partir do DESIGN.md e do UX.md **ENTÃO** carregue `divida-de-experiencia.md` + `evals.md`.
-- **SE** alguém quer "validar com usuários sintéticos" ou "a IA sintetizou as entrevistas" **ENTÃO** carregue `pesquisa-com-ia.md`.
-- **SE** você está escrevendo uma skill, card ou documento deste framework **ENTÃO** carregue `evidencia-e-fontes.md` e marque o nível de cada afirmação.
-- **SE** a tela exibe conteúdo gerado ou lida com upload/exportação de imagens **ENTÃO** carregue `conteudo-sintetico.md`.
+- **IF** the task is "the agent will do X for the user" **THEN** load `ux-for-agents.md` + `evals.md` (agents section).
+- **IF** the AI answer cites documents or knowledge bases **THEN** load `rag-and-sources.md`.
+- **IF** the AI decides between a table, form, chart or controls **THEN** load `generative-ui.md` + `evals.md` (rubric in section 8).
+- **IF** voice or camera comes in **THEN** load `multimodal.md`.
+- **IF** a coding agent will generate screens from DESIGN.md and UX.md **THEN** load `experience-debt.md` + `evals.md`.
+- **IF** someone wants to "validate with synthetic users" or says "the AI synthesized the interviews" **THEN** load `research-with-ai.md`.
+- **IF** you are writing a skill, card or document for this framework **THEN** load `evidence-and-sources.md` and mark the level of every claim.
+- **IF** the screen displays generated content or handles image upload/export **THEN** load `synthetic-content.md`.
 
-## Cards de padrão relacionados
+## Related pattern cards
 
-Regras de componente, com decisão, faça/evite, acessibilidade e checklist:
+Component rules, with decision, do/avoid, accessibility and checklist:
 
-| Card | Problema |
+| Card | Problem |
 |---|---|
-| [`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md) | Comunicar limites e incerteza de forma acionável |
-| [`ai-sources`](../../patterns/ai/ai-sources.md) | Mostrar fontes e critérios das respostas |
-| [`review-ai-output`](../../patterns/ai/review-ai-output.md) | Revisar e editar o que a IA gerou antes de usar |
-| [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md) | Erros de IA e caminhos de recuperação |
-| [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md) | Confirmar ações executadas pela IA |
-| [`label-ai-content`](../../patterns/ai/label-ai-content.md) | Indicar que um conteúdo foi gerado por IA |
+| [`ai-uncertainty`](../../patterns/ai/ai-uncertainty.md) | Communicate limits and uncertainty in an actionable way |
+| [`ai-sources`](../../patterns/ai/ai-sources.md) | Show the sources and criteria behind answers |
+| [`review-ai-output`](../../patterns/ai/review-ai-output.md) | Review and edit what the AI generated before using it |
+| [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md) | AI errors and recovery paths |
+| [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md) | Confirm actions executed by the AI |
+| [`label-ai-content`](../../patterns/ai/label-ai-content.md) | Indicate that content was generated by AI |
 
-## Princípios transversais
+## Cross-cutting principles
 
-Valem para todos os documentos desta pasta:
+These apply to every document in this folder:
 
-1. **Calibrar confiança, não maximizá-la.** A pessoa precisa saber quando confiar, quando verificar e quando assumir o controle.
-2. **Autonomia proporcional ao risco; reversibilidade por padrão.** Nenhuma automação irreversível em fluxo sensível sem confirmação específica.
-3. **Saída de IA é hipótese até validação.** Vale para síntese de pesquisa, persona, wireframe e código.
-4. **Rastreabilidade.** Insight leva ao trecho de origem; resposta leva à fonte; ação leva a quem aprovou.
-5. **Design system como infraestrutura de governança.** Tokens, catálogo e regras de uso limitam o que é gerado.
-6. **Avaliar em camadas.** Código onde for determinístico, juiz-LLM calibrado onde for semântico, pessoas onde exigir julgamento; gates separados de metas.
-7. **Nível de evidência declarado** em toda afirmação (tags `alta`, `contextual`, `sinal`, `hipótese`).
-8. **Acessibilidade como critério testável**, inclusive em composições geradas e em todas as modalidades.
+1. **Calibrate trust, do not maximize it.** The person needs to know when to trust, when to verify and when to take control.
+2. **Autonomy proportional to risk; reversibility by default.** No irreversible automation in a sensitive flow without specific confirmation.
+3. **AI output is a hypothesis until validated.** This holds for research synthesis, personas, wireframes and code.
+4. **Traceability.** An insight leads to its source excerpt; an answer leads to its source; an action leads to whoever approved it.
+5. **Design system as governance infrastructure.** Tokens, catalog and usage rules constrain what gets generated.
+6. **Evaluate in layers.** Code where it is deterministic, a calibrated LLM judge where it is semantic, people where judgment is required; gates kept separate from targets.
+7. **Declared evidence level** on every claim (tags `high`, `contextual`, `signal`, `hypothesis`).
+8. **Accessibility as a testable criterion**, including in generated compositions and across all modalities.
 
-## Convenções dos documentos
+## Document conventions
 
-- Cabeçalho YAML com `id`, `area`, `titulo`, `evidencia` (nível predominante do documento) e `relacionados`.
-- Bloco **Quando consultar** no topo; regras no imperativo; decisões no formato **SE → ENTÃO**; seções de **anti-padrões** e **checklist** no fim.
-- Exemplos e valores são fictícios e neutros. Limiares numéricos marcados como "exemplo" devem ser definidos e registrados pelo produto.
-- Normas públicas citadas quando aplicável: WCAG (contraste, modalidades de entrada), C2PA (procedência), NIST AI RMF (gestão de risco).
+- YAML header with `id`, `area`, `title`, `evidence` (the document's predominant level) and `related`.
+- **When to consult** block at the top; rules in the imperative; decisions in **IF → THEN** format; **anti-patterns** and **checklist** sections at the end.
+- Examples and values are fictitious and neutral. Numeric thresholds marked as "example" must be defined and recorded by the product.
+- Public standards cited where applicable: WCAG (contrast, input modalities), C2PA (provenance), NIST AI RMF (risk management).
 
-## Manutenção
+## Maintenance
 
-- Áreas como generative UI e agentes estão em evolução rápida; regras apoiadas em `sinal` devem ser revistas quando surgir evidência nova.
-- Ao atualizar um documento, mantenha o vínculo com os cards em vez de copiar suas regras.
-- Falhas observadas em produção devem virar casos em `evals/` e, se mudarem uma regra, atualização aqui.
+- Areas such as generative UI and agents evolve quickly; rules backed by `signal` must be revisited when new evidence appears.
+- When updating a document, keep the link to the cards instead of copying their rules.
+- Failures observed in production should become cases in `evals/` and, if they change a rule, an update here.
+
+## Former file names
+
+- conteudo-sintetico.md is now [synthetic-content.md](synthetic-content.md)
+- divida-de-experiencia.md is now [experience-debt.md](experience-debt.md)
+- evidencia-e-fontes.md is now [evidence-and-sources.md](evidence-and-sources.md)
+- pesquisa-com-ia.md is now [research-with-ai.md](research-with-ai.md)
+- rag-e-fontes.md is now [rag-and-sources.md](rag-and-sources.md)
+- ux-para-agentes.md is now [ux-for-agents.md](ux-for-agents.md)

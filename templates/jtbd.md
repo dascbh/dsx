@@ -1,38 +1,38 @@
-# Ficha de job: <nome curto>
+# Job sheet: <short name>
 
-<!-- Referência: knowledge/pesquisa/discovery-e-estrategia.md §2 -->
-<!-- Jobs nascem de entrevistas reais. Job escrito sem entrevista = hipótese. -->
+<!-- Reference: knowledge/research/discovery-and-strategy.md §2 -->
+<!-- Jobs come from real interviews. A job written without an interview = hypothesis. -->
 
 ## Job statement
-Quando <situação>, quero <motivação>, para <resultado esperado>.
-<!-- Sem nome de funcionalidade. Granularidade: nem micro-clique, nem "ser feliz". -->
+When <situation>, I want <motivation>, so I can <expected outcome>.
+<!-- No feature name. Granularity: neither a micro-click nor "be happy". -->
 
-**Dimensões:** funcional <...> · emocional <...> · social <...>
-**Quem tem este job:** <segmentos/personas>
+**Dimensions:** functional <...> · emotional <...> · social <...>
+**Who has this job:** <segments/personas>
 
-## Linha do tempo da decisão
-| Momento | O que aconteceu | Evidência |
+## Decision timeline
+| Moment | What happened | Evidence |
 |---|---|---|
-| Primeiro pensamento | <...> | <P0x> |
-| Evento passivo (tensão cresce) | <...> | <...> |
-| Evento ativo (decide procurar) | <...> | <...> |
-| Escolha | <...> | <...> |
+| First thought | <...> | <P0x> |
+| Passive event (tension grows) | <...> | <...> |
+| Active event (decides to look) | <...> | <...> |
+| Choice | <...> | <...> |
 
-## Quatro forças
-| Empurrão (status quo) | Atração (nova solução) |
+## Four forces
+| Push (status quo) | Pull (new solution) |
 |---|---|
 | <...> | <...> |
-| **Ansiedades (com a troca)** | **Hábitos (prendem ao antigo)** |
+| **Anxieties (about switching)** | **Habits (hold on to the old)** |
 | <...> | <...> |
 
-## Alternativas atuais
-<!-- Concorrentes reais: produtos, planilha, pessoa, "não fazer nada". -->
+## Current alternatives
+<!-- Real competitors: products, spreadsheet, a person, "do nothing". -->
 - <...>
 
-## Priorização
-- Importância (1–5): <...> · Satisfação com alternativas atuais (1–5): <...>
-<!-- Importância alta + satisfação baixa = maior alavancagem. -->
-- Frequência do job: <...>
+## Prioritization
+- Importance (1–5): <...> · Satisfaction with current alternatives (1–5): <...>
+<!-- High importance + low satisfaction = greatest leverage. -->
+- Job frequency: <...>
 
-## Evidência
-- Entrevistas: <IDs> · Status: <hipótese | sustentado por n entrevistas>
+## Evidence
+- Interviews: <IDs> · Status: <hypothesis | supported by n interviews>

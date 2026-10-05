@@ -1,7 +1,7 @@
 [
   {
     "id": "keyboard-focus",
-    "title": "Como indicar o foco de teclado?",
+    "title": "How should keyboard focus be indicated?",
     "category": "accessibility",
     "components": [
       "button",
@@ -25,12 +25,12 @@
       "close-modal",
       "link-text"
     ],
-    "rule": "Todo controle acionável por teclado deve mostrar indicador de foco visível, com contraste de pelo menos 3:1 frente às cores vizinhas, sem ficar coberto por elementos fixos.",
+    "rule": "Every keyboard-operable control must show a visible focus indicator with at least 3:1 contrast against the adjacent colors, and it must not be covered by fixed elements.",
     "file": "patterns/accessibility/keyboard-focus.md"
   },
   {
     "id": "not-color-alone",
-    "title": "Por que não usar apenas cor para comunicar erros?",
+    "title": "Why not use color alone to communicate errors?",
     "category": "accessibility",
     "components": [
       "form-field",
@@ -55,12 +55,12 @@
       "field-error-position",
       "success-confirmation"
     ],
-    "rule": "Cor reforça o estado, mas nunca é o único sinal: acompanhe-a de texto que diga o problema, perto do elemento afetado.",
+    "rule": "Color reinforces a state but is never the only cue: pair it with text that states the problem, next to the affected element.",
     "file": "patterns/accessibility/not-color-alone.md"
   },
   {
     "id": "touch-target",
-    "title": "Qual deve ser o tamanho mínimo de um alvo de toque?",
+    "title": "What should the minimum size of a touch target be?",
     "category": "accessibility",
     "components": [
       "button",
@@ -86,12 +86,12 @@
       "keyboard-focus",
       "action-placement"
     ],
-    "rule": "Dimensione a área interativa, não o desenho: mínimo de 24 × 24 CSS px (piso AA) e 44–48 unidades para controles de toque, com espaço entre vizinhos.",
+    "rule": "Size the interactive area, not the drawing: at least 24 × 24 CSS px (the AA floor) and 44–48 units for touch controls, with space between neighbors.",
     "file": "patterns/accessibility/touch-target.md"
   },
   {
     "id": "action-placement",
-    "title": "Onde posicionar ações primárias e secundárias?",
+    "title": "Where should primary and secondary actions be placed?",
     "category": "actions",
     "components": [
       "button",
@@ -117,12 +117,12 @@
       "close-modal",
       "keyboard-focus"
     ],
-    "rule": "Defina uma única ação principal pelo objetivo da tarefa, agrupe as alternativas ao lado dela com menor ênfase e mantenha a mesma posição em telas equivalentes.",
+    "rule": "Pick a single primary action from the task's goal, group the alternatives next to it with less emphasis and keep the same position across equivalent screens.",
     "file": "patterns/actions/action-placement.md"
   },
   {
     "id": "button-hierarchy",
-    "title": "Como definir a hierarquia entre botão primário e secundário?",
+    "title": "How do you set the hierarchy between primary and secondary buttons?",
     "category": "actions",
     "components": [
       "button",
@@ -144,12 +144,12 @@
       "disabled-button",
       "link-vs-button"
     ],
-    "rule": "Em cada grupo de ações, dê a maior ênfase a uma única ação principal e trate as alternativas com ênfase menor, sempre visíveis e nunca diferenciadas só por cor.",
+    "rule": "In each action group, give the most emphasis to a single primary action and treat the alternatives with less emphasis, always visible and never distinguished by color alone.",
     "file": "patterns/actions/button-hierarchy.md"
   },
   {
     "id": "confirm-action",
-    "title": "Quando pedir confirmação antes de uma ação?",
+    "title": "When should you ask for confirmation before an action?",
     "category": "actions",
     "components": [
       "confirmation-modal",
@@ -172,12 +172,12 @@
       "destructive-action",
       "when-to-use-modal"
     ],
-    "rule": "Só peça confirmação para ação irreversível ou de alto custo; em ações rotineiras e recuperáveis, execute e ofereça \"Desfazer\".",
+    "rule": "Ask for confirmation only for irreversible or high-cost actions; for routine, recoverable actions, execute and offer \"Undo\".",
     "file": "patterns/actions/confirm-action.md"
   },
   {
     "id": "confirm-deletion",
-    "title": "Quando pedir confirmação antes de excluir?",
+    "title": "When should you ask for confirmation before deleting?",
     "category": "actions",
     "components": [
       "modal",
@@ -200,12 +200,12 @@
       "confirm-action",
       "close-modal"
     ],
-    "rule": "Peça confirmação só quando a exclusão for irreversível, ampla ou difícil de recuperar; nos demais casos, execute e ofereça \"Desfazer\".",
+    "rule": "Ask for confirmation only when the deletion is irreversible, broad or hard to recover from; otherwise, execute it and offer \"Undo\".",
     "file": "patterns/actions/confirm-deletion.md"
   },
   {
     "id": "destructive-action",
-    "title": "Como tratar ações destrutivas?",
+    "title": "How should destructive actions be handled?",
     "category": "actions",
     "components": [
       "button",
@@ -229,12 +229,12 @@
       "close-modal",
       "button-hierarchy"
     ],
-    "rule": "Ajuste a proteção ao impacto, à frequência e à reversibilidade: prefira Desfazer ou arquivar; reserve confirmação com rótulo específico para ações raras, amplas ou irreversíveis.",
+    "rule": "Match protection to impact, frequency and reversibility: prefer Undo or archiving; reserve confirmation with a specific label for rare, broad or irreversible actions.",
     "file": "patterns/actions/destructive-action.md"
   },
   {
     "id": "disabled-button",
-    "title": "Esconder ou desabilitar uma ação indisponível?",
+    "title": "Hide or disable an unavailable action?",
     "category": "actions",
     "components": [
       "button",
@@ -258,12 +258,12 @@
       "helpful-error-message",
       "required-fields"
     ],
-    "rule": "Esconda a ação irrelevante; mantenha visível e explicada a ação central que está temporariamente bloqueada; nunca desabilite sem dizer por quê.",
+    "rule": "Hide the irrelevant action; keep the central action that is temporarily blocked visible and explained; never disable without saying why.",
     "file": "patterns/actions/disabled-button.md"
   },
   {
     "id": "double-submit",
-    "title": "Como evitar cliques múltiplos durante o carregamento de uma ação?",
+    "title": "How do you prevent repeated clicks while an action is loading?",
     "category": "actions",
     "components": [
       "button",
@@ -283,12 +283,12 @@
       "success-confirmation",
       "preserve-data-after-error"
     ],
-    "rule": "Valide primeiro; na primeira submissão válida, mostre o processamento no próprio botão, ignore novas ativações da mesma ação e garanta idempotência no servidor.",
+    "rule": "Validate first; on the first valid submission, show processing on the button itself, ignore further activations of the same action and guarantee idempotency on the server.",
     "file": "patterns/actions/double-submit.md"
   },
   {
     "id": "floating-action-button",
-    "title": "Quando usar botão flutuante?",
+    "title": "When should you use a floating action button?",
     "category": "actions",
     "components": [
       "floating-action-button",
@@ -312,12 +312,12 @@
       "button-hierarchy",
       "touch-target"
     ],
-    "rule": "Use botão flutuante somente para uma única ação primária, frequente e construtiva, sem cobrir conteúdo nem competir com a navegação.",
+    "rule": "Use a floating action button only for a single primary, frequent and constructive action, without covering content or competing with navigation.",
     "file": "patterns/actions/floating-action-button.md"
   },
   {
     "id": "icon-and-text-button",
-    "title": "Botões devem ter ícone e texto?",
+    "title": "Should buttons have an icon and text?",
     "category": "actions",
     "components": [
       "button",
@@ -340,12 +340,12 @@
       "touch-target",
       "button-hierarchy"
     ],
-    "rule": "Use ícone mais texto quando a ação for pouco familiar, importante ou destrutiva; use só ícone apenas em ações muito conhecidas e compactas, sempre com nome acessível.",
+    "rule": "Use icon plus text when the action is unfamiliar, important or destructive; use an icon alone only for very well-known, compact actions, always with an accessible name.",
     "file": "patterns/actions/icon-and-text-button.md"
   },
   {
     "id": "icon-only-button",
-    "title": "Quando um botão pode ter só ícone, sem texto?",
+    "title": "When can a button have only an icon, without text?",
     "category": "actions",
     "components": [
       "button",
@@ -370,12 +370,12 @@
       "touch-target",
       "link-vs-button"
     ],
-    "rule": "Use ícone sozinho apenas para ações universalmente reconhecidas no contexto, sempre com nome acessível; se o ícone precisa de explicação, mantenha o rótulo visível.",
+    "rule": "Use an icon alone only for actions universally recognized in the context, always with an accessible name; if the icon needs explaining, keep the label visible.",
     "file": "patterns/actions/icon-only-button.md"
   },
   {
     "id": "link-vs-button",
-    "title": "Link ou botão: qual usar?",
+    "title": "Link or button, which one should you use?",
     "category": "actions",
     "components": [
       "link",
@@ -398,12 +398,12 @@
       "link-in-new-tab",
       "icon-only-button"
     ],
-    "rule": "Se a pessoa é levada a outro lugar, use link (`<a href>`); se algo acontece no ponto em que ela está, use botão (`<button>`). Defina a semântica antes do visual.",
+    "rule": "If the person is taken somewhere else, use a link (`<a href>`); if something happens where they are, use a button (`<button>`). Settle the semantics before the visuals.",
     "file": "patterns/actions/link-vs-button.md"
   },
   {
     "id": "undo",
-    "title": "Quando oferecer a opção Desfazer?",
+    "title": "When should you offer an Undo option?",
     "category": "actions",
     "components": [
       "toast",
@@ -428,12 +428,12 @@
       "toast-duration",
       "toast-vs-inline-alert"
     ],
-    "rule": "Ofereça \"Desfazer\" logo após uma ação reversível iniciada pela pessoa, com texto que diga o que mudou, e só se a reversão restaurar o estado completo.",
+    "rule": "Offer \"Undo\" right after a reversible action started by the person, with text that says what changed, and only if reverting restores the complete state.",
     "file": "patterns/actions/undo.md"
   },
   {
     "id": "ai-error-recovery",
-    "title": "Como oferecer recuperação quando a IA falha?",
+    "title": "How do you offer recovery when the AI fails?",
     "category": "ai",
     "components": [
       "alert",
@@ -457,12 +457,12 @@
       "technical-error-code",
       "helpful-error-message"
     ],
-    "rule": "Identifique a etapa que falhou, explique a causa em linguagem simples, preserve o pedido e o trabalho, e ofereça ao menos uma ação de recuperação específica no mesmo contexto.",
+    "rule": "Identify the step that failed, explain the cause in plain language, keep the request and the work, and offer at least one specific recovery action in the same context.",
     "file": "patterns/ai/ai-error-recovery.md"
   },
   {
     "id": "ai-sources",
-    "title": "Como mostrar fontes e critérios nas respostas de IA?",
+    "title": "How do you show sources and criteria in AI responses?",
     "category": "ai",
     "components": [
       "citation",
@@ -487,12 +487,12 @@
       "review-ai-output",
       "confirm-ai-action"
     ],
-    "rule": "Ligue cada afirmação relevante à fonte que a sustenta, deixe a fonte abrível e, em saídas de alto impacto, mostre também os critérios, dados e limites usados.",
+    "rule": "Link each relevant claim to the source that supports it, make the source openable and, for high-impact outputs, also show the criteria, data and limits used.",
     "file": "patterns/ai/ai-sources.md"
   },
   {
     "id": "ai-uncertainty",
-    "title": "Como comunicar limites e incerteza de respostas de IA?",
+    "title": "How do you communicate the limits and uncertainty of AI responses?",
     "category": "ai",
     "components": [
       "notice",
@@ -516,12 +516,12 @@
       "confirm-ai-action",
       "ai-error-recovery"
     ],
-    "rule": "Comunique a incerteza perto do resultado, com linguagem proporcional ao desempenho real e ligada a uma ação concreta (conferir, comparar, ver fontes, pedir revisão); mostre número de confiança só se for válido e compreensível.",
+    "rule": "Communicate uncertainty close to the result, in language proportional to actual performance and tied to a concrete action (check, compare, view sources, request review); show a confidence number only if it is valid and understandable.",
     "file": "patterns/ai/ai-uncertainty.md"
   },
   {
     "id": "confirm-ai-action",
-    "title": "Quando pedir confirmação antes de uma ação executada pela IA?",
+    "title": "When should you ask for confirmation before an action executed by AI?",
     "category": "ai",
     "components": [
       "modal",
@@ -545,12 +545,12 @@
       "ai-error-recovery",
       "undo"
     ],
-    "rule": "A IA prepara a ação sem executá-la; peça confirmação explícita imediatamente antes de qualquer efeito relevante, externo, destrutivo, financeiro ou difícil de reverter, mostrando alvo, escopo e consequência.",
+    "rule": "The AI prepares the action without executing it; ask for explicit confirmation immediately before any relevant, external, destructive, financial or hard-to-reverse effect, showing the target, scope and consequence.",
     "file": "patterns/ai/confirm-ai-action.md"
   },
   {
     "id": "label-ai-content",
-    "title": "Como sinalizar que um conteúdo foi gerado por IA?",
+    "title": "How do you indicate that content was generated by AI?",
     "category": "ai",
     "components": [
       "tag",
@@ -573,12 +573,12 @@
       "review-ai-output",
       "confirm-ai-action"
     ],
-    "rule": "Rotule com texto claro, junto ao conteúdo, tudo o que a IA gerou ou transformou de forma material, delimitando o escopo exato e sem sugerir revisão ou exatidão que não existem.",
+    "rule": "Label everything the AI generated or materially transformed with clear text next to the content, scoped exactly, without implying review or accuracy that does not exist.",
     "file": "patterns/ai/label-ai-content.md"
   },
   {
     "id": "review-ai-output",
-    "title": "Como deixar pessoas revisarem e editarem resultados gerados por IA?",
+    "title": "How do you let people review and edit AI-generated results?",
     "category": "ai",
     "components": [
       "text-field",
@@ -603,12 +603,12 @@
       "ai-uncertainty",
       "ai-error-recovery"
     ],
-    "rule": "Apresente todo resultado de IA como proposta que a pessoa pode aceitar, editar, refinar, regenerar ou descartar antes que ele afete uma decisão, comunicação ou fluxo.",
+    "rule": "Present every AI result as a proposal the person can accept, edit, refine, regenerate or discard before it affects a decision, communication or flow.",
     "file": "patterns/ai/review-ai-output.md"
   },
   {
     "id": "confirm-password",
-    "title": "Quando pedir confirmação de senha?",
+    "title": "When should you ask for password confirmation?",
     "category": "authentication",
     "components": [
       "password-field",
@@ -631,12 +631,12 @@
       "password-recovery",
       "preserve-data-after-error"
     ],
-    "rule": "Não repita o campo de senha por padrão; use um único campo com \"mostrar senha\" na criação e reautentique apenas antes de ações sensíveis.",
+    "rule": "Do not repeat the password field by default; use a single field with \"show password\" when creating a password, and reauthenticate only before sensitive actions.",
     "file": "patterns/authentication/confirm-password.md"
   },
   {
     "id": "password-recovery",
-    "title": "Como criar uma recuperação de senha clara?",
+    "title": "How do you build a clear password recovery?",
     "category": "authentication",
     "components": [
       "forgot-password-link",
@@ -662,12 +662,12 @@
       "session-expired",
       "form-errors"
     ],
-    "rule": "Disponibilize \"Esqueci minha senha\" perto do login, dê resposta neutra que não revele se a conta existe, envie link ou código de uso único com validade e descreva o passo seguinte e as alternativas.",
+    "rule": "Put \"Forgot password\" near the sign-in, give a neutral response that does not reveal whether the account exists, send a single-use link or code with an expiry, and describe the next step and the alternatives.",
     "file": "patterns/authentication/password-recovery.md"
   },
   {
     "id": "password-requirements",
-    "title": "Como informar os requisitos de senha?",
+    "title": "How do you communicate password requirements?",
     "category": "authentication",
     "components": [
       "password-field",
@@ -691,12 +691,12 @@
       "password-recovery",
       "validation-timing"
     ],
-    "rule": "Mostre os requisitos junto ao campo antes da digitação, priorize comprimento e bloqueio de senhas comuns em vez de regras de composição arbitrárias, e nunca impeça colar ou gerenciadores de senha.",
+    "rule": "Show the requirements next to the field before typing, favor length and blocking common passwords over arbitrary composition rules, and never prevent paste or password managers.",
     "file": "patterns/authentication/password-requirements.md"
   },
   {
     "id": "session-expired",
-    "title": "Como comunicar sessão expirada?",
+    "title": "How do you communicate an expired session?",
     "category": "authentication",
     "components": [
       "modal-dialog",
@@ -722,12 +722,12 @@
       "password-recovery",
       "when-to-use-modal"
     ],
-    "rule": "Avise antes do vencimento com o tempo restante e uma ação \"Continuar sessão\"; depois do vencimento, explique o motivo, proteja dados sensíveis e leve à reautenticação com retorno ao contexto seguro.",
+    "rule": "Warn before expiry with the remaining time and a \"Stay signed in\" action; after expiry, explain why, protect sensitive data and lead to reauthentication with a return to a safe context.",
     "file": "patterns/authentication/session-expired.md"
   },
   {
     "id": "show-password",
-    "title": "Mostrar ou ocultar senha: como deve funcionar?",
+    "title": "Show or hide password: how should it work?",
     "category": "authentication",
     "components": [
       "password-field",
@@ -751,12 +751,12 @@
       "password-recovery",
       "label-vs-placeholder"
     ],
-    "rule": "Oculte a senha por padrão e ofereça um botão opcional, com nome acessível, que alterna a visibilidade sem apagar o valor, mover o foco ou bloquear colar e gerenciadores de senha.",
+    "rule": "Hide the password by default and offer an optional button, with an accessible name, that toggles visibility without clearing the value, moving focus or blocking paste and password managers.",
     "file": "patterns/authentication/show-password.md"
   },
   {
     "id": "auto-advancing-carousel",
-    "title": "Por que evitar carrossel com rotação automática?",
+    "title": "Why avoid an auto-advancing carousel?",
     "category": "content",
     "components": [
       "carousel",
@@ -779,12 +779,12 @@
       "keyboard-focus",
       "tabs"
     ],
-    "rule": "Não faça o carrossel girar sozinho; prefira controle manual ou seção estática e, se a rotação for inevitável, ofereça pausa visível e pare ao foco ou à interação.",
+    "rule": "Do not let the carousel rotate on its own; prefer manual control or a static section and, if rotation is unavoidable, provide a visible pause and stop on focus or interaction.",
     "file": "patterns/content/auto-advancing-carousel.md"
   },
   {
     "id": "carousel",
-    "title": "Quando usar carrossel?",
+    "title": "When should you use a carousel?",
     "category": "content",
     "components": [
       "carousel",
@@ -809,12 +809,12 @@
       "touch-target",
       "filter-structure"
     ],
-    "rule": "Use carrossel apenas para itens relacionados e de exploração opcional, com controle manual e sem esconder conteúdo essencial.",
+    "rule": "Use a carousel only for related items meant for optional browsing, with manual control and without hiding essential content.",
     "file": "patterns/content/carousel.md"
   },
   {
     "id": "date-range-filter",
-    "title": "Como estruturar filtros de período em dashboards?",
+    "title": "How do you structure date range filters in dashboards?",
     "category": "data",
     "components": [
       "filter",
@@ -840,12 +840,12 @@
       "filter-structure",
       "empty-state"
     ],
-    "rule": "Exiba sempre, em texto, o intervalo ativo, o que ele controla, a data da última atualização dos dados e quais cards ficam fora do recorte.",
+    "rule": "Always show, in text, the active range, what it controls, when the data was last updated and which cards fall outside the range.",
     "file": "patterns/data/date-range-filter.md"
   },
   {
     "id": "responsive-table",
-    "title": "Como tornar tabelas responsivas no mobile?",
+    "title": "How do you make tables responsive on mobile?",
     "category": "data",
     "components": [
       "table",
@@ -868,12 +868,12 @@
       "table-pagination",
       "touch-target"
     ],
-    "rule": "Escolha a adaptação pela tarefa: SE a pessoa compara colunas, mantenha a grade em contêiner com rolagem horizontal própria; SE consulta registros isolados, empilhe ou use lista, sempre preservando a relação cabeçalho-célula.",
+    "rule": "Choose the adaptation by task: IF people compare columns, keep the grid in a container with its own horizontal scroll; IF they look up isolated records, stack or use a list, always preserving the header-cell relationship.",
     "file": "patterns/data/responsive-table.md"
   },
   {
     "id": "table-pagination",
-    "title": "Quando usar e como configurar paginação em tabelas e listas?",
+    "title": "When should you use pagination in tables and lists, and how do you set it up?",
     "category": "data",
     "components": [
       "pagination",
@@ -897,12 +897,12 @@
       "responsive-table",
       "active-filters"
     ],
-    "rule": "Pagine coleções grandes de ordem estável, mostrando a página atual, mantendo página, filtros e ordenação recuperáveis e nomeando todos os controles.",
+    "rule": "Paginate large collections with a stable order, showing the current page, keeping page, filters and sorting recoverable, and naming every control.",
     "file": "patterns/data/table-pagination.md"
   },
   {
     "id": "table-sorting",
-    "title": "Como ordenar dados em tabelas?",
+    "title": "How do you sort data in tables?",
     "category": "data",
     "components": [
       "table",
@@ -926,12 +926,12 @@
       "table-vs-cards",
       "filter-structure"
     ],
-    "rule": "Ofereça ordenação apenas em colunas com ordem significativa, mostre sempre a coluna e a direção ativas, ordene pelo valor real e exponha o estado via botão e `aria-sort`.",
+    "rule": "Offer sorting only on columns with a meaningful order, always show the active column and direction, sort by the real value and expose the state through a button and `aria-sort`.",
     "file": "patterns/data/table-sorting.md"
   },
   {
     "id": "table-vs-cards",
-    "title": "Quando usar tabela em vez de cards?",
+    "title": "When should you use a table instead of cards?",
     "category": "data",
     "components": [
       "table",
@@ -955,12 +955,12 @@
       "table-pagination",
       "filter-structure"
     ],
-    "rule": "Use tabela quando a pessoa precisa comparar atributos entre itens; use cards para resumos independentes e conteúdo heterogêneo.",
+    "rule": "Use a table when people need to compare attributes across items; use cards for independent summaries and heterogeneous content.",
     "file": "patterns/data/table-vs-cards.md"
   },
   {
     "id": "address-by-postal-code",
-    "title": "Como aproveitar o CEP para completar o endereço no checkout?",
+    "title": "How do you use the postal code to complete the address at checkout?",
     "category": "ecommerce",
     "components": [
       "postal-code-field",
@@ -984,12 +984,12 @@
       "guest-checkout",
       "preserve-data-after-error"
     ],
-    "rule": "Peça o CEP primeiro, consulte ao completar o valor, preencha só o que a fonte retornou e mantenha tudo revisável, editável e com fallback manual.",
+    "rule": "Ask for the postal code first, look it up once the value is complete, fill in only what the source returned and keep everything reviewable, editable and with a manual fallback.",
     "file": "patterns/ecommerce/address-by-postal-code.md"
   },
   {
     "id": "cart-edit-items",
-    "title": "Como alterar quantidade e remover itens no carrinho?",
+    "title": "How do you change quantities and remove items in the cart?",
     "category": "ecommerce",
     "components": [
       "cart",
@@ -1014,12 +1014,12 @@
       "confirm-deletion",
       "touch-target"
     ],
-    "rule": "Ofereça stepper (mais e menos) com campo numérico quando a faixa for ampla, atualize totais sem botão \"Atualizar\" e torne a remoção explícita e reversível.",
+    "rule": "Offer a stepper (plus and minus) with a number field when the range is wide, update totals without an \"Update\" button, and make removal explicit and reversible.",
     "file": "patterns/ecommerce/cart-edit-items.md"
   },
   {
     "id": "guest-checkout",
-    "title": "Quando oferecer checkout como convidado?",
+    "title": "When should you offer guest checkout?",
     "category": "ecommerce",
     "components": [
       "checkout",
@@ -1043,12 +1043,12 @@
       "form-steps",
       "password-recovery"
     ],
-    "rule": "Quando a conta não é essencial para concluir a compra, ofereça \"Continuar como convidado\" de forma explícita e destacada no início da seleção de conta, e proponha criar conta só depois da confirmação do pedido.",
+    "rule": "When an account is not essential to complete the purchase, offer \"Continue as guest\" explicitly and prominently at the start of account selection, and suggest creating an account only after the order is confirmed.",
     "file": "patterns/ecommerce/guest-checkout.md"
   },
   {
     "id": "product-variants",
-    "title": "Como exibir variações de produto: tamanho, cor e disponibilidade?",
+    "title": "How do you show product variants: size, color and availability?",
     "category": "ecommerce",
     "components": [
       "picker",
@@ -1074,12 +1074,12 @@
       "disabled-button",
       "not-color-alone"
     ],
-    "rule": "Mostre cada dimensão de variação como grupo rotulado, recalcule a disponibilidade da combinação após cada escolha e atualize imagem, preço, estoque e compra.",
+    "rule": "Show each variant dimension as a labeled group, recalculate the combination's availability after each choice and update the image, price, stock and purchase.",
     "file": "patterns/ecommerce/product-variants.md"
   },
   {
     "id": "empty-state",
-    "title": "Como criar bons estados vazios?",
+    "title": "How do you design good empty states?",
     "category": "feedback",
     "components": [
       "empty-state",
@@ -1106,12 +1106,12 @@
       "skeleton-vs-spinner",
       "retry"
     ],
-    "rule": "Identifique a causa do vazio, explique-a em título curto mais uma frase de contexto e ofereça uma única ação principal coerente com essa causa.",
+    "rule": "Identify why the area is empty, explain it in a short title plus one sentence of context, and offer a single primary action consistent with that cause.",
     "file": "patterns/feedback/empty-state.md"
   },
   {
     "id": "long-loading",
-    "title": "Como tratar carregamentos que demoram muito?",
+    "title": "How do you handle loads that take a long time?",
     "category": "feedback",
     "components": [
       "loading-indicator",
@@ -1133,12 +1133,12 @@
       "skeleton-screen",
       "double-submit"
     ],
-    "rule": "Escolha o indicador pela duração e pelo tipo de espera: nada abaixo de 1 s, indeterminado de 1 a 3 s, progresso real acima de 3 s e, acima de 10 s, preserve a tarefa e ofereça continuar, cancelar ou acompanhar depois.",
+    "rule": "Choose the indicator by duration and type of wait: nothing under 1 s, indeterminate from 1 to 3 s, real progress above 3 s and, above 10 s, preserve the task and offer to continue, cancel or follow up later.",
     "file": "patterns/feedback/long-loading.md"
   },
   {
     "id": "progress-percentage",
-    "title": "Quando mostrar porcentagem de progresso?",
+    "title": "When should you show a progress percentage?",
     "category": "feedback",
     "components": [
       "progress-bar",
@@ -1161,12 +1161,12 @@
       "file-upload",
       "retry"
     ],
-    "rule": "Mostre porcentagem apenas quando o total e o avanço forem medidos de verdade; sem medida confiável, use indicador indeterminado com rótulo.",
+    "rule": "Show a percentage only when the total and the progress are really measured; without a reliable measure, use a labeled indeterminate indicator.",
     "file": "patterns/feedback/progress-percentage.md"
   },
   {
     "id": "retry",
-    "title": "Quando e como oferecer \"Tentar novamente\" após um erro?",
+    "title": "When and how should you offer \"Try again\" after an error?",
     "category": "feedback",
     "components": [
       "alert",
@@ -1188,12 +1188,12 @@
       "preserve-data-after-error",
       "helpful-error-message"
     ],
-    "rule": "Ofereça \"Tentar novamente\" só quando a causa for provavelmente temporária e a repetição for segura; preserve o estado, evite duplicidade e dê uma saída após poucas falhas.",
+    "rule": "Offer \"Try again\" only when the cause is probably temporary and repeating is safe; preserve the state, avoid duplicates and give a way out after a few failures.",
     "file": "patterns/feedback/retry.md"
   },
   {
     "id": "skeleton-screen",
-    "title": "Skeleton screen melhora a percepção de carregamento?",
+    "title": "Does a skeleton screen improve perceived loading?",
     "category": "feedback",
     "components": [
       "skeleton",
@@ -1217,12 +1217,12 @@
       "progress-percentage",
       "empty-state"
     ],
-    "rule": "Use skeleton quando a estrutura do conteúdo for previsível e a espera for perceptível; ele melhora a percepção, não o desempenho real.",
+    "rule": "Use a skeleton when the content's structure is predictable and the wait is noticeable; it improves perception, not actual performance.",
     "file": "patterns/feedback/skeleton-screen.md"
   },
   {
     "id": "skeleton-vs-spinner",
-    "title": "Skeleton ou spinner: quando usar cada um?",
+    "title": "Skeleton or spinner: when should you use each?",
     "category": "feedback",
     "components": [
       "skeleton",
@@ -1246,12 +1246,12 @@
       "long-loading",
       "double-submit"
     ],
-    "rule": "Skeleton para a carga inicial de conteúdo com formato conhecido; spinner inline para ações curtas; barra de progresso só quando houver medida real.",
+    "rule": "A skeleton for the initial load of content with a known shape; an inline spinner for short actions; a progress bar only when there is a real measure.",
     "file": "patterns/feedback/skeleton-vs-spinner.md"
   },
   {
     "id": "success-confirmation",
-    "title": "Como comunicar uma ação concluída com sucesso?",
+    "title": "How do you communicate a successfully completed action?",
     "category": "feedback",
     "components": [
       "toast",
@@ -1276,12 +1276,12 @@
       "temporary-failure",
       "long-loading"
     ],
-    "rule": "Confirme só o resultado real, nomeando a ação e o objeto, perto do contexto, com permanência proporcional ao impacto e sem roubar o foco.",
+    "rule": "Confirm only the real result, naming the action and the object, close to the context, with persistence proportional to the impact and without stealing focus.",
     "file": "patterns/feedback/success-confirmation.md"
   },
   {
     "id": "technical-error-code",
-    "title": "Erros técnicos devem mostrar códigos ao usuário?",
+    "title": "Should technical errors show codes to the user?",
     "category": "feedback",
     "components": [
       "alert",
@@ -1304,12 +1304,12 @@
       "retry",
       "temporary-failure"
     ],
-    "rule": "Explique o impacto e o próximo passo primeiro; mostre um código apenas como referência secundária, rotulada e copiável, quando ele ajudar o suporte a localizar a ocorrência.",
+    "rule": "Explain the impact and the next step first; show a code only as a secondary, labeled and copyable reference, when it helps support locate the occurrence.",
     "file": "patterns/feedback/technical-error-code.md"
   },
   {
     "id": "temporary-failure",
-    "title": "Como comunicar falhas temporárias do sistema?",
+    "title": "How do you communicate temporary system failures?",
     "category": "feedback",
     "components": [
       "alert",
@@ -1335,12 +1335,12 @@
       "toast-vs-inline-alert",
       "long-loading"
     ],
-    "rule": "Informe o que falhou, diga se a operação foi concluída, está em andamento ou não aconteceu, guarde os dados e proponha uma só ação segura.",
+    "rule": "Say what failed, whether the operation completed, is in progress or did not happen, keep the data and propose a single safe action.",
     "file": "patterns/feedback/temporary-failure.md"
   },
   {
     "id": "toast-duration",
-    "title": "Quanto tempo uma notificação temporária deve permanecer?",
+    "title": "How long should a temporary notification stay on screen?",
     "category": "feedback",
     "components": [
       "toast",
@@ -1363,12 +1363,12 @@
       "undo",
       "retry"
     ],
-    "rule": "Notificação com ação, erro importante ou informação única nunca some sozinha; só mensagens curtas de baixo impacto podem desaparecer, começando em 4 a 10 segundos e ajustadas pelo tamanho do texto.",
+    "rule": "A notification with an action, an important error or one-time information never disappears on its own; only short, low-impact messages can disappear, starting at 4 to 10 seconds and adjusted to the length of the text.",
     "file": "patterns/feedback/toast-duration.md"
   },
   {
     "id": "toast-vs-inline-alert",
-    "title": "Toast, alerta ou mensagem inline: qual usar?",
+    "title": "Toast, alert or inline message: which should you use?",
     "category": "feedback",
     "components": [
       "toast",
@@ -1393,12 +1393,12 @@
       "success-confirmation",
       "temporary-failure"
     ],
-    "rule": "Escolha o padrão pelo escopo da mensagem: toast para confirmação breve, inline para algo ligado a um elemento, alerta persistente para condição da página ou do serviço.",
+    "rule": "Choose the pattern by the message's scope: a toast for a brief confirmation, inline for something tied to an element, a persistent alert for a page or service condition.",
     "file": "patterns/feedback/toast-vs-inline-alert.md"
   },
   {
     "id": "autofill",
-    "title": "Quando usar preenchimento automático?",
+    "title": "When should you use autofill?",
     "category": "forms",
     "components": [
       "text-field",
@@ -1423,12 +1423,12 @@
       "required-fields",
       "preserve-data-after-error"
     ],
-    "rule": "Use preenchimento automático para reduzir digitação, mas mantenha todos os campos visíveis, editáveis e confirmáveis pela pessoa.",
+    "rule": "Use autofill to reduce typing, but keep every field visible, editable and confirmable by the person.",
     "file": "patterns/forms/autofill.md"
   },
   {
     "id": "autosave-vs-save",
-    "title": "Autosave ou botão Salvar?",
+    "title": "Autosave or a Save button?",
     "category": "forms",
     "components": [
       "form",
@@ -1451,12 +1451,12 @@
       "retry",
       "confirm-action"
     ],
-    "rule": "Use autosave só para mudanças independentes, de baixo risco e reversíveis, sempre com estado de salvamento visível; use botão explícito quando houver revisão, transação ou efeito externo.",
+    "rule": "Use autosave only for independent, low-risk, reversible changes, always with a visible save state; use an explicit button when there is review, a transaction or an external effect.",
     "file": "patterns/forms/autosave-vs-save.md"
   },
   {
     "id": "dropdown",
-    "title": "Quando usar dropdown e quando evitar?",
+    "title": "When should you use a dropdown, and when should you avoid it?",
     "category": "forms",
     "components": [
       "dropdown",
@@ -1483,12 +1483,12 @@
       "filter-structure",
       "field-order"
     ],
-    "rule": "Use dropdown apenas para escolha única entre valores predefinidos; poucas opções pedem opções visíveis e listas longas pedem busca.",
+    "rule": "Use a dropdown only for a single choice among predefined values; few options call for visible options and long lists call for search.",
     "file": "patterns/forms/dropdown.md"
   },
   {
     "id": "error-placement",
-    "title": "Onde exibir mensagens de erro em formulários?",
+    "title": "Where should error messages appear in forms?",
     "category": "forms",
     "components": [
       "error-message",
@@ -1511,12 +1511,12 @@
       "toast-vs-inline-alert",
       "preserve-data-after-error"
     ],
-    "rule": "Erro de campo fica junto ao campo; vários erros ganham resumo navegável no topo; mensagem global é só para falha que afeta o formulário ou o serviço inteiro.",
+    "rule": "A field error stays next to the field; several errors get a navigable summary at the top; a global message is only for a failure that affects the whole form or service.",
     "file": "patterns/forms/error-placement.md"
   },
   {
     "id": "field-error-position",
-    "title": "A mensagem de erro vai antes ou depois do campo?",
+    "title": "Does the error message go before or after the field?",
     "category": "forms",
     "components": [
       "form-field",
@@ -1540,12 +1540,12 @@
       "validation-timing",
       "preserve-data-after-error"
     ],
-    "rule": "Coloque a mensagem na mesma unidade visual do rótulo e do campo, em posição consistente e ligada programaticamente ao controle; após o envio, repita-a em um resumo no topo.",
+    "rule": "Put the message in the same visual unit as the label and the field, in a consistent position and programmatically tied to the control; after submitting, repeat it in a summary at the top.",
     "file": "patterns/forms/field-error-position.md"
   },
   {
     "id": "field-order",
-    "title": "Como definir a sequência dos campos em um formulário?",
+    "title": "How do you decide the order of fields in a form?",
     "category": "forms",
     "components": [
       "form",
@@ -1570,12 +1570,12 @@
       "label-vs-placeholder",
       "dropdown"
     ],
-    "rule": "Ordene os campos pela tarefa da pessoa, não pelo banco de dados, e faça ordem visual, ordem do HTML e ordem do Tab seguirem a mesma lógica.",
+    "rule": "Order fields by the person's task, not by the database, and make visual order, HTML order and Tab order follow the same logic.",
     "file": "patterns/forms/field-order.md"
   },
   {
     "id": "file-upload",
-    "title": "Como projetar uma boa experiência de envio de arquivos?",
+    "title": "How do you design a good file upload experience?",
     "category": "forms",
     "components": [
       "file-input",
@@ -1601,12 +1601,12 @@
       "progress-percentage",
       "preserve-data-after-error"
     ],
-    "rule": "Mostre formatos e limites antes da seleção, use botão nativo acessível (arrastar e soltar é só alternativa), exiba o estado de cada arquivo e explique como corrigir cada falha.",
+    "rule": "Show formats and limits before selection, use an accessible native button (drag and drop is only an alternative), show the state of each file and explain how to fix each failure.",
     "file": "patterns/forms/file-upload.md"
   },
   {
     "id": "form-errors",
-    "title": "Como estruturar mensagens de erro em formulários?",
+    "title": "How do you structure error messages in forms?",
     "category": "forms",
     "components": [
       "form-field",
@@ -1631,12 +1631,12 @@
       "not-color-alone",
       "required-fields"
     ],
-    "rule": "Toda mensagem de erro de campo nomeia o campo pelo rótulo, descreve o problema, diz como corrigir, fica ligada ao controle e não apaga o que a pessoa digitou.",
+    "rule": "Every field error message names the field by its label, describes the problem, says how to fix it, is tied to the control and does not erase what the person typed.",
     "file": "patterns/forms/form-errors.md"
   },
   {
     "id": "form-steps",
-    "title": "Como estruturar etapas em formulários longos?",
+    "title": "How do you structure steps in long forms?",
     "category": "forms",
     "components": [
       "step-indicator",
@@ -1662,12 +1662,12 @@
       "autosave-vs-save",
       "validation-timing"
     ],
-    "rule": "Organize cada etapa por objetivo, mostre posição e progresso separados da navegação e preserve, permita revisar e recupere os dados ao avançar, voltar ou retomar.",
+    "rule": "Organize each step by goal, show position and progress separately from navigation, and preserve, allow reviewing and recover data when moving forward, going back or resuming.",
     "file": "patterns/forms/form-steps.md"
   },
   {
     "id": "label-vs-placeholder",
-    "title": "Label ou placeholder: o que usar em formulários?",
+    "title": "Label or placeholder: which should forms use?",
     "category": "forms",
     "components": [
       "text-field",
@@ -1692,12 +1692,12 @@
       "form-errors",
       "helpful-error-message"
     ],
-    "rule": "Todo campo tem label visível e associado; o placeholder serve apenas como exemplo curto ou formato, nunca como identificação.",
+    "rule": "Every field has a visible, associated label; the placeholder only serves as a short example or format, never as identification.",
     "file": "patterns/forms/label-vs-placeholder.md"
   },
   {
     "id": "preserve-data-after-error",
-    "title": "Como preservar os dados preenchidos após um erro no formulário?",
+    "title": "How do you preserve entered data after a form error?",
     "category": "forms",
     "components": [
       "form",
@@ -1720,12 +1720,12 @@
       "retry",
       "session-expired"
     ],
-    "rule": "Após um erro, reexiba o formulário com todos os valores válidos mantidos e destaque apenas os campos que precisam de correção; descarte somente segredos, como senha e código de segurança do cartão.",
+    "rule": "After an error, show the form again with every valid value kept and highlight only the fields that need fixing; discard only secrets, such as the password and the card security code.",
     "file": "patterns/forms/preserve-data-after-error.md"
   },
   {
     "id": "required-fields",
-    "title": "Como indicar corretamente campos obrigatórios?",
+    "title": "How do you correctly mark required fields?",
     "category": "forms",
     "components": [
       "text-field",
@@ -1750,12 +1750,12 @@
       "field-order",
       "validation-timing"
     ],
-    "rule": "Marque a obrigatoriedade em texto no rótulo, com uma única convenção por formulário, e exponha o estado também de forma programática.",
+    "rule": "Mark required status in text in the label, with a single convention per form, and expose the state programmatically as well.",
     "file": "patterns/forms/required-fields.md"
   },
   {
     "id": "split-form",
-    "title": "Quando dividir um formulário em várias etapas?",
+    "title": "When should you split a form into several steps?",
     "category": "forms",
     "components": [
       "form",
@@ -1781,12 +1781,12 @@
       "autosave-vs-save",
       "preserve-data-after-error"
     ],
-    "rule": "Reduza campos antes de dividir telas; só crie etapas quando houver grupos com objetivo claro, e então preserve os dados, mostre o progresso e permita voltar e revisar.",
+    "rule": "Cut fields before splitting screens; create steps only when there are groups with a clear goal, and then preserve the data, show progress and allow going back and reviewing.",
     "file": "patterns/forms/split-form.md"
   },
   {
     "id": "validation-timing",
-    "title": "Quando validar campos durante o preenchimento?",
+    "title": "When should fields be validated while the person fills them in?",
     "category": "forms",
     "components": [
       "text-field",
@@ -1810,12 +1810,12 @@
       "password-requirements",
       "preserve-data-after-error"
     ],
-    "rule": "Valide ao avançar ou enviar; antecipe o feedback somente quando o valor estiver completo ou o requisito puder ser mostrado sem interromper a digitação.",
+    "rule": "Validate on moving on or submitting; bring feedback forward only when the value is complete or the requirement can be shown without interrupting typing.",
     "file": "patterns/forms/validation-timing.md"
   },
   {
     "id": "close-modal",
-    "title": "Como fechar um modal corretamente?",
+    "title": "How should a modal be closed correctly?",
     "category": "modals",
     "components": [
       "modal",
@@ -1837,12 +1837,12 @@
       "confirm-action",
       "keyboard-focus"
     ],
-    "rule": "Todo modal tem uma saída visível e nomeada, descarta dados somente com confirmação e devolve o foco ao elemento que o abriu.",
+    "rule": "Every modal has a visible, named exit, discards data only after confirmation and returns focus to the element that opened it.",
     "file": "patterns/modals/close-modal.md"
   },
   {
     "id": "when-to-avoid-modal",
-    "title": "Quando não usar modal?",
+    "title": "When should you not use a modal?",
     "category": "modals",
     "components": [
       "modal",
@@ -1868,12 +1868,12 @@
       "toast-vs-inline-alert",
       "error-placement"
     ],
-    "rule": "Trate o modal como último recurso: use-o só para decisão curta que exige atenção imediata; fluxos longos, mensagens rotineiras e textos extensos ficam na página.",
+    "rule": "Treat the modal as a last resort: use it only for a short decision that needs immediate attention; long flows, routine messages and long texts stay on the page.",
     "file": "patterns/modals/when-to-avoid-modal.md"
   },
   {
     "id": "when-to-use-modal",
-    "title": "Quando usar modal?",
+    "title": "When should you use a modal?",
     "category": "modals",
     "components": [
       "modal",
@@ -1898,12 +1898,12 @@
       "keyboard-focus",
       "confirm-action"
     ],
-    "rule": "Use modal só para decisão ou tarefa curta que exige atenção imediata; se uma página, mensagem inline ou painel lateral resolver, não use modal.",
+    "rule": "Use a modal only for a short decision or task that needs immediate attention; if a page, inline message or side panel would do, do not use a modal.",
     "file": "patterns/modals/when-to-use-modal.md"
   },
   {
     "id": "breadcrumbs",
-    "title": "Quando usar breadcrumbs?",
+    "title": "When should you use breadcrumbs?",
     "category": "navigation",
     "components": [
       "breadcrumbs",
@@ -1926,12 +1926,12 @@
       "pagination-vs-scroll",
       "active-filters"
     ],
-    "rule": "Use breadcrumbs só quando existir hierarquia real de páginas, e trate o retorno aos resultados como uma ação separada da trilha.",
+    "rule": "Use breadcrumbs only when there is a real page hierarchy, and treat returning to the results as an action separate from the trail.",
     "file": "patterns/navigation/breadcrumbs.md"
   },
   {
     "id": "link-in-new-tab",
-    "title": "Links devem abrir em nova aba?",
+    "title": "Should links open in a new tab?",
     "category": "navigation",
     "components": [
       "link",
@@ -1953,12 +1953,12 @@
       "main-navigation",
       "breadcrumbs"
     ],
-    "rule": "Por padrão, abra links na mesma aba; reserve a nova aba para resguardar uma tarefa em curso e avise sempre no próprio link.",
+    "rule": "By default, open links in the same tab; reserve a new tab for protecting a task in progress and always say so in the link itself.",
     "file": "patterns/navigation/link-in-new-tab.md"
   },
   {
     "id": "main-navigation",
-    "title": "Como criar uma navegação principal clara?",
+    "title": "How do you build clear main navigation?",
     "category": "navigation",
     "components": [
       "header",
@@ -1986,12 +1986,12 @@
       "link-in-new-tab",
       "pagination-vs-scroll"
     ],
-    "rule": "Mostre poucos destinos no primeiro nível, com rótulos na linguagem do público, separados de ações, em posição consistente, com a seção atual indicada e operação sem depender de hover.",
+    "rule": "Show few destinations at the first level, with labels in the audience's language, separated from actions, in a consistent position, with the current section indicated and operation that does not depend on hover.",
     "file": "patterns/navigation/main-navigation.md"
   },
   {
     "id": "pagination-vs-scroll",
-    "title": "Paginação, \"Carregar mais\" ou scroll infinito?",
+    "title": "Pagination, \"Load more\" or infinite scroll?",
     "category": "navigation",
     "components": [
       "pagination",
@@ -2016,12 +2016,12 @@
       "skeleton-vs-spinner",
       "active-filters"
     ],
-    "rule": "Se localizar e retornar pesam mais, adote paginação; se explorar e comparar pesam mais, adote \"Carregar mais\"; deixe o scroll infinito para feeds em que seguir rolando é a própria tarefa.",
+    "rule": "If finding and returning matter more, use pagination; if exploring and comparing matter more, use \"Load more\"; leave infinite scroll for feeds where scrolling on is the task itself.",
     "file": "patterns/navigation/pagination-vs-scroll.md"
   },
   {
     "id": "tabs",
-    "title": "Quando usar abas?",
+    "title": "When should you use tabs?",
     "category": "navigation",
     "components": [
       "tabs",
@@ -2045,12 +2045,12 @@
       "main-navigation",
       "filter-structure"
     ],
-    "rule": "Use abas só para poucos conteúdos relacionados, de mesma importância e independentes o bastante para serem vistos um de cada vez.",
+    "rule": "Use tabs only for a few related contents of equal importance that are independent enough to be seen one at a time.",
     "file": "patterns/navigation/tabs.md"
   },
   {
     "id": "active-filters",
-    "title": "Como mostrar os filtros ativos?",
+    "title": "How do you show active filters?",
     "category": "search-filters",
     "components": [
       "filter",
@@ -2073,12 +2073,12 @@
       "no-search-results",
       "date-range-filter"
     ],
-    "rule": "Depois de aplicar filtros, exiba um resumo visível com nome e valor de cada critério, remoção individual e uma ação \"Limpar filtros\", fora de qualquer painel fechado.",
+    "rule": "After applying filters, show a visible summary with the name and value of each criterion, individual removal and a \"Clear filters\" action, outside any closed panel.",
     "file": "patterns/search-filters/active-filters.md"
   },
   {
     "id": "applying-filters",
-    "title": "Filtros devem ser aplicados automaticamente?",
+    "title": "Should filters apply automatically?",
     "category": "search-filters",
     "components": [
       "filter",
@@ -2102,12 +2102,12 @@
       "no-search-results",
       "date-range-filter"
     ],
-    "rule": "Atualize a lista na hora quando a resposta for rápida e a escolha for simples; exija \"Aplicar\" quando houver várias escolhas combinadas, consulta lenta ou painel que cobre os resultados.",
+    "rule": "Update the list right away when the response is fast and the choice is simple; require \"Apply\" when there are several combined choices, a slow query or a panel that covers the results.",
     "file": "patterns/search-filters/applying-filters.md"
   },
   {
     "id": "filter-structure",
-    "title": "Como estruturar filtros em uma interface?",
+    "title": "How do you structure filters in an interface?",
     "category": "search-filters",
     "components": [
       "filter",
@@ -2132,12 +2132,12 @@
       "no-search-results",
       "date-range-filter"
     ],
-    "rule": "Ofereça só filtros que respondem a decisões reais da tarefa, agrupados por significado, com lógica de combinação previsível, estado ativo visível e saída simples (remover um, limpar todos).",
+    "rule": "Offer only filters that answer real decisions in the task, grouped by meaning, with predictable combination logic, a visible active state and a simple way out (remove one, clear all).",
     "file": "patterns/search-filters/filter-structure.md"
   },
   {
     "id": "no-search-results",
-    "title": "O que mostrar quando a busca não retorna resultados?",
+    "title": "What should you show when a search returns no results?",
     "category": "search-filters",
     "components": [
       "search-field",
@@ -2160,12 +2160,12 @@
       "retry",
       "filter-structure"
     ],
-    "rule": "Mantenha a consulta digitada, informe com clareza que não há resultados e aponte o caminho mais provável para seguir, sem deslocar o foco.",
+    "rule": "Keep the typed query, state clearly that there are no results and point to the most likely way forward, without moving focus.",
     "file": "patterns/search-filters/no-search-results.md"
   },
   {
     "id": "button-text",
-    "title": "Como escrever o texto de um botão?",
+    "title": "How do you write button text?",
     "category": "ux-writing",
     "components": [
       "button"
@@ -2184,12 +2184,12 @@
       "icon-only-button",
       "confirm-deletion"
     ],
-    "rule": "Inicie o rótulo com um verbo e nomeie o resultado da ação; se alguém puder indagar \"enviar o quê?\" ou \"continuar para onde?\", inclua o objeto ou o destino.",
+    "rule": "Start the label with a verb and name the result of the action; if someone could ask \"send what?\" or \"continue where?\", include the object or the destination.",
     "file": "patterns/ux-writing/button-text.md"
   },
   {
     "id": "helpful-error-message",
-    "title": "Como escrever mensagens de erro úteis?",
+    "title": "How do you write helpful error messages?",
     "category": "ux-writing",
     "components": [
       "error-message",
@@ -2213,12 +2213,12 @@
       "preserve-data-after-error",
       "technical-error-code"
     ],
-    "rule": "Toda mensagem de erro deve nomear o campo, descrever o problema em texto simples e indicar a correção (formato, limite ou valor esperado), sem culpar a pessoa.",
+    "rule": "Every error message must name the field, describe the problem in plain text and state the fix (format, limit or expected value), without blaming the person.",
     "file": "patterns/ux-writing/helpful-error-message.md"
   },
   {
     "id": "link-text",
-    "title": "Por que evitar \"clique aqui\" em links?",
+    "title": "Why avoid \"click here\" in links?",
     "category": "ux-writing",
     "components": [
       "link"
@@ -2239,7 +2239,7 @@
       "button-text",
       "keyboard-focus"
     ],
-    "rule": "O texto do link deve informar o destino ou o propósito por si só; nunca use \"clique aqui\", \"aqui\" ou \"leia mais\" como único texto clicável.",
+    "rule": "Link text must convey the destination or purpose on its own; never use \"click here\", \"here\" or \"read more\" as the only clickable text.",
     "file": "patterns/ux-writing/link-text.md"
   }
 ]

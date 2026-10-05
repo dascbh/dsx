@@ -1,6 +1,6 @@
 ---
 id: session-expired
-title: Como comunicar sessão expirada?
+title: How do you communicate an expired session?
 category: authentication
 components: [modal-dialog, status-message, timer, button]
 type: recommendation
@@ -11,97 +11,97 @@ wcag: ["2.2.1", "2.2.6", "4.1.3", "2.4.3", "2.1.1"]
 related: [preserve-data-after-error, autosave-vs-save, temporary-failure, password-recovery, when-to-use-modal]
 ---
 
-# Como comunicar sessão expirada?
+# How do you communicate an expired session?
 
-> **Regra:** Avise antes do vencimento com o tempo restante e uma ação "Continuar sessão"; depois do vencimento, explique o motivo, proteja dados sensíveis e leve à reautenticação com retorno ao contexto seguro.
+> **Rule:** Warn before expiry with the remaining time and a "Stay signed in" action; after expiry, explain why, protect sensitive data and lead to reauthentication with a return to a safe context.
 
-## Contexto
+## Context
 
-Uma sessão termina por inatividade, por limite máximo da política de segurança ou por mudança de risco. Para a pessoa, o problema não é só entrar de novo: expiração silenciosa interrompe a tarefa, apaga dados e passa a impressão de que o produto falhou.
+A session ends because of inactivity, because of a maximum limit in the security policy or because the risk changed. For the person, the problem is not only signing in again: silent expiry interrupts the task, wipes data and makes the product look broken.
 
-A experiência trata dois momentos. Antes: avisar com tempo suficiente e permitir continuar quando a política autorizar. Depois: explicar o que houve, proteger informação sensível e oferecer caminho direto para autenticar e retomar.
+The experience handles two moments. Before: warn with enough time and allow continuing when the policy permits. After: explain what happened, protect sensitive information and offer a direct path to authenticate and resume.
 
-Os limites vivem no servidor. Controle só no navegador pode ser contornado ou ficar dessincronizado, inclusive entre abas.
+The limits live on the server. Browser-only control can be bypassed or fall out of sync, including across tabs.
 
-## Decisão
+## Decision
 
-- **SE** a sessão está perto de vencer e pode ser prorrogada **ENTÃO** mostre aviso com tempo restante e ação principal "Continuar sessão".
-- **SE** a decisão precisa interromper a tarefa **ENTÃO** use modal acessível; **SENÃO** use aviso não bloqueante.
-- **SE** o aviso tem contador **ENTÃO** baseie-o no prazo real do servidor, sincronizado entre abas.
-- **SE** a pessoa pede para continuar **ENTÃO** estenda só após confirmação do servidor; movimento passivo do mouse ou aba em segundo plano não renovam.
-- **SE** a sessão já expirou **ENTÃO** troque o aviso por mensagem de estado, oculte dados sensíveis e leve ao login.
-- **SE** há dados não sensíveis não enviados **ENTÃO** preserve-os e restaure a tarefa após autenticar, confirmando o que foi recuperado.
-- **SE** a política proíbe prorrogar **ENTÃO** não ofereça "Continuar"; avise o prazo e oriente a salvar.
-- **SE** o prazo não tem relação com segurança **ENTÃO** remova-o ou permita estender.
-- **SENÃO** ofereça também "Sair agora" quando fizer sentido.
+- **IF** the session is about to expire and can be extended **THEN** show a warning with the remaining time and the primary action "Stay signed in".
+- **IF** the decision needs to interrupt the task **THEN** use an accessible modal; **ELSE** use a non-blocking warning.
+- **IF** the warning has a countdown **THEN** base it on the real server deadline, synchronized across tabs.
+- **IF** the person asks to continue **THEN** extend only after the server confirms; passive mouse movement or a background tab does not renew it.
+- **IF** the session has already expired **THEN** replace the warning with a status message, hide sensitive data and lead to sign-in.
+- **IF** there is unsent non-sensitive data **THEN** preserve it and restore the task after authentication, confirming what was recovered.
+- **IF** the policy forbids extending **THEN** do not offer "Stay signed in"; warn about the deadline and guide the person to save.
+- **IF** the deadline has nothing to do with security **THEN** remove it or allow extending it.
+- **ELSE** also offer "Sign out now" when it makes sense.
 
-## Quando usar
+## When to use
 
-- Áreas autenticadas com limite de inatividade.
-- Dados pessoais, financeiros ou corporativos.
-- Formulários e tarefas longas.
-- Dispositivos compartilhados.
+- Authenticated areas with an inactivity limit.
+- Personal, financial or corporate data.
+- Long forms and tasks.
+- Shared devices.
 
-## Quando evitar
+## When to avoid
 
-- Sem sessão autenticada → **use em vez disso:** nenhum aviso.
-- Prazo sem relação com segurança → **use em vez disso:** remover o limite.
-- Aviso repetitivo longe do vencimento → **use em vez disso:** um aviso no momento certo.
-- Substituir salvamento automático → **use em vez disso:** salvar rascunho e avisar.
+- No authenticated session → **use instead:** no warning.
+- A deadline unrelated to security → **use instead:** remove the limit.
+- Repeated warnings far from expiry → **use instead:** one warning at the right moment.
+- Replacing autosave → **use instead:** save a draft and warn.
 
-## Faça
+## Do
 
-- Explique motivo, consequência e o que cada ação faz.
-- Ofereça "Continuar sessão" como ação principal.
-- Teste com várias abas e tempos de conexão.
-- Dê tempo suficiente para quem precisa de mais tempo para ler ou digitar.
+- Explain the reason, the consequence and what each action does.
+- Offer "Stay signed in" as the primary action.
+- Test with several tabs and connection speeds.
+- Give enough time to people who need longer to read or type.
 
-## Evite
+## Avoid
 
-- Expirar em silêncio ou com erro genérico.
-- Depender só do temporizador local.
-- Anunciar cada segundo.
-- Apagar trabalho seguro.
-- Empilhar modais.
-- Prometer extensão impossível.
+- Expiring silently or with a generic error.
+- Relying only on the local timer.
+- Announcing every second.
+- Wiping work that is safe to keep.
+- Stacking modals.
+- Promising an extension that is impossible.
 
-## Acessibilidade
+## Accessibility
 
-- Modal com nome e descrição, foco inicial em ação segura, foco contido e fundo inerte; ao fechar, devolva o foco a um ponto lógico.
-- Avise limite de tempo e permita estendê-lo (2.2.1); permita reautenticar sem perder dados (2.2.6).
-- Evite que o leitor de tela releia a contagem a cada segundo; anuncie em intervalos relevantes e mais uma vez quando restar pouco tempo (4.1.3).
-- Tudo operável por teclado, sem depender de cor.
-- Quando a sessão expirar, leve o foco à mensagem de estado e deixe claro o botão "Entrar novamente".
+- A modal with a name and description, initial focus on a safe action, focus trapped and an inert background; on close, return focus to a logical point.
+- Warn about the time limit and allow extending it (2.2.1); allow reauthenticating without losing data (2.2.6).
+- Keep the screen reader from rereading the countdown every second; announce at relevant intervals and once more when little time is left (4.1.3).
+- Everything operable by keyboard, with no reliance on color.
+- When the session expires, move focus to the status message and make the "Sign in again" button clear.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Título do aviso | "Sua sessão vai expirar" |
-| Corpo | "Por segurança, você será desconectado em 2 minutos. Continuar?" |
-| Ação principal | "Continuar sessão" |
-| Saída | "Sair agora" |
-| Expirada | "Sua sessão expirou por inatividade. Entre novamente para continuar." |
-| Retorno | "Recuperamos o que você havia preenchido." |
+| Warning title | "Your session is about to expire" |
+| Body | "For your security, you'll be signed out in 2 minutes. Continue?" |
+| Primary action | "Stay signed in" |
+| Exit | "Sign out now" |
+| Expired | "Your session expired due to inactivity. Sign in again to continue." |
+| Return | "We recovered what you had filled in." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O motivo da expiração está explicado.
-- [ ] O aviso aparece antes do vencimento, com tempo para responder.
-- [ ] O contador corresponde ao prazo do servidor.
-- [ ] Há ação para continuar e saída explícita.
-- [ ] Várias abas se comportam de forma consistente.
-- [ ] O estado expirado é diferente do aviso.
-- [ ] Dados sensíveis somem da tela após expirar.
-- [ ] A tarefa retorna após autenticar.
-- [ ] Teclado e foco funcionam no diálogo.
-- [ ] O leitor de tela não anuncia cada segundo.
+- [ ] The reason for expiry is explained.
+- [ ] The warning appears before expiry, with time to respond.
+- [ ] The countdown matches the server deadline.
+- [ ] There is an action to continue and an explicit exit.
+- [ ] Several tabs behave consistently.
+- [ ] The expired state is different from the warning.
+- [ ] Sensitive data disappears from the screen after expiry.
+- [ ] The task comes back after authentication.
+- [ ] Keyboard and focus work in the dialog.
+- [ ] The screen reader does not announce every second.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 2.2.1 (Timing Adjustable): remover, ajustar ou estender limites de tempo não essenciais e avisar a tempo.
-- WCAG 2.2, critério 2.2.6 (Timeouts): reautenticar sem perder dados.
-- OWASP (Session Management Cheat Sheet): limites aplicados no servidor, inatividade mais duração absoluta, aviso prévio.
-- NIST SP 800-63B-4: limites de sessão e reautenticação proporcional ao risco.
-- U.S. Web Design System (Modal): sessão a expirar como caso de modal com consequência e ações claras.
-- Design systems de serviços públicos (timeout de inatividade e modal de timeout): padrão de aviso, extensão e explicação pós-expiração.
+- WCAG 2.2, criterion 2.2.1 (Timing Adjustable): turn off, adjust or extend non-essential time limits and warn in time.
+- WCAG 2.2, criterion 2.2.6 (Timeouts): reauthenticate without losing data.
+- OWASP (Session Management Cheat Sheet): limits enforced on the server, inactivity plus absolute duration, advance warning.
+- NIST SP 800-63B-4: session limits and reauthentication proportional to risk.
+- U.S. Web Design System (Modal): an expiring session as a modal case with a clear consequence and actions.
+- Public-service design systems (inactivity timeout and timeout modal): the warn, extend and explain-after-expiry pattern.

@@ -1,48 +1,47 @@
-// Página de comparação de variações de UX (variations.mjs page), feita para decidir em 2 minutos: primeiro a
-// resposta, depois o detalhe. Topo = a pergunta e um resumo Hoje | A | B | C (ideia, a tela no mesmo momento do
-// fluxo, 4 números contra hoje, o que ganha e o que custa). Depois uma versão por vez, em abas, com os passos do
-// fluxo separados dos estados e comportamentos (tela recortada no conteúdo, legenda, antes/depois lado a lado com o
-// que mudou marcado e "Comparar com hoje" com recorte ampliável). Detalhes recolhidos em linguagem de negócio; o
-// técnico (ids, regras, padrões, comando) só em "Para quem constrói". Decisão no fim, sem terminal para o dono.
-// Mesmos tokens da página de achados (text-page.mjs). Sem dependências e sem navegador: as imagens e a diferença
-// entre antes e depois já vêm prontas (variations.mjs shootCaptures e diffShots).
+// Variations comparison page (variations.mjs page), built to decide in 2 minutes: the answer first, then the detail.
+// Top = the question and a summary Today | A | B | C (idea, the screen at the same moment of the flow, 4 numbers
+// against today, what it gains and what it costs). Then one version at a time, in tabs, with the steps of the flow
+// apart from states and behaviors (screen cropped to the content, caption, before/after side by side with what
+// changed outlined, and "Compare with today" with a zoomable crop). Details folded in business language; the
+// technical part (ids, rules, patterns, command) only under "For builders". Decision at the end, no terminal for the
+// owner. Interface text per page language (lib/variations-strings.mjs, `lang`: en by default, pt-BR).
+// Same tokens as the findings page (text-page.mjs). No dependencies and no browser: images and the difference between
+// before and after come ready (variations.mjs shootCaptures and diffShots).
 import { THEME_TOKENS, pageFileName } from '../text-page.mjs';
 import { embedded, embeddedSize } from './preview-page.mjs';
+import { dataText } from '../../lib/data-text.mjs';
+import { STRINGS, stringsFor, pageLang } from './variations-strings.mjs';
 
 export const PAGE_MAX_BYTES = 10 * 1024 * 1024;
 const AXES = ['screen', 'flow', 'behavior', 'text'];
-const AXIS_PT = { screen: 'Tela', flow: 'Fluxo', behavior: 'Comportamento', text: 'Texto' };
-/** Indicador dos slides que não são passos do fluxo. */
-const PART_PT = { state: 'Estado', dialog: 'Diálogo', behavior: 'Comportamento' };
-/** Nome de cada métrica em português (a página nunca mostra a chave). */
-export const METRIC_PT = { steps: 'telas', clicks_to_done: 'cliques', dialogs: 'diálogos', primary_actions: 'ações principais', words_on_screen: 'palavras por tela', decisions: 'decisões' };
+/** Metric names on the page, per language (the page never shows the key). `METRIC_PT` stays as the pt-BR alias. */
+export const METRIC_NAMES = Object.fromEntries(Object.entries(STRINGS).map(([l, s]) => [l, s.metric]));
+export const METRIC_PT = STRINGS['pt-BR'].metric;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+/** Text-node escape (quotes stay as typed). */
+const escT = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const slug = (s) => String(s).replace(/[^a-zA-Z0-9_-]/g, '-');
-const lowerFirst = (s) => String(s ?? '').replace(/^\p{Lu}(?!\p{Lu})/u, (c) => c.toLowerCase());
 const upperFirst = (s) => String(s ?? '').replace(/^\p{Ll}/u, (c) => c.toUpperCase());
 const r2 = (n) => Math.round(n * 100) / 100;
 /**
- * Legenda limpa: sem "Antes:"/"Depois:" (a página já diz qual é qual) e sem "Passo 1 de 3:" ou "Etapa 1 de 2:" (a
- * página tem uma contagem só, a do indicador).
+ * Clean caption: without "Before:"/"After:" (the page already says which is which) and without "Step 1 of 3:" (the page
+ * has a single count, the indicator's). Both page languages are stripped ("Antes:", "Passo 1 de 3:", "Etapa 1 de 2:").
  */
-export const bare = (s) => upperFirst(String(s ?? '').replace(/^\s*(antes|depois)\s*[:,-]\s*/i, '').replace(/^\s*(passo|etapa)\s+\d+\s+de\s+\d+\s*[:,.-]?\s*/i, ''));
+export const bare = (s) => upperFirst(String(s ?? '')
+  .replace(/^\s*(antes|depois|before|after)\s*[:,-]\s*/i, '')
+  .replace(/^\s*(passo|etapa|step)\s+\d+\s+(de|of)\s+\d+\s*[:,.-]?\s*/i, ''));
 
-/** Letra de exibição: o id quando é uma letra, senão A, B, C pela ordem. */
-export const letterOf = (row, i) => (row.is_current ? 'Hoje' : /^[a-z]$/i.test(row.id) ? row.id.toUpperCase() : String.fromCharCode(65 + i));
+/** Display letter: the id when it is a letter, else A, B, C in order; today is "Today" (or "Hoje"). */
+export const letterOf = (row, i, lang = 'en') => (row.is_current ? stringsFor(lang).today : /^[a-z]$/i.test(row.id) ? row.id.toUpperCase() : String.fromCharCode(65 + i));
+
+/** Forward lenses in plain language for the decision page (ids stay under "For builders"). `LENS_PT`: pt-BR alias. */
+export const LENS_NAMES = Object.fromEntries(Object.entries(STRINGS).map(([l, s]) => [l, s.lens]));
+export const LENS_PT = STRINGS['pt-BR'].lens;
 
 /**
- * Passos de uma linha: frames consecutivos do mesmo `step` formam um grupo. Frame de comportamento vira par
- * antes → ação → depois; os frames citados como antes/depois no mesmo passo não aparecem de novo sozinhos.
+ * Steps of a row: consecutive frames of the same `step` form a group. A behavior frame becomes a pair
+ * before → action → after; frames cited as before/after in the same step do not show up again on their own.
  */
-/** Forward lenses in plain language for the decision page (ids stay in "Para quem constrói"). */
-export const LENS_PT = {
-  subtract: 'Tirar: um passo, campo ou decisão some',
-  invert: 'Inverter: muda quem age ou quando',
-  analogous: 'Emprestar: copia o que funciona em outro lugar',
-  'constraint-first': 'Pior caso primeiro: desenha para o caso difícil',
-  'object-first': 'Pelo objeto: organiza em volta da coisa, não da sequência',
-};
-
 export function groupsOf(row) {
   const frames = row.frames ?? [];
   const byId = new Map(frames.map((f) => [f.id, f]));
@@ -64,10 +63,10 @@ export function groupsOf(row) {
 }
 
 /**
- * Slides da apresentação, em dois grupos: **passos do fluxo** (frames `screen`, numerados: "Passo 2 de 3", a mesma
- * contagem das telas; frame com diálogo aberto não é tela) e **estados e comportamentos** (frames `state`, diálogos e
- * pares antes/depois, sem número). `frames`: medida por frame ({ id: { dialog_open } }). Cada slide:
- * { step, cell, part: 'path' | 'state' | 'dialog' | 'behavior', n (só nos passos) }.
+ * Slides of the presentation, in two groups: **steps of the flow** (`screen` frames, numbered: "Step 2 of 3", the same
+ * count as screens; a frame with an open dialog is not a screen) and **states and behaviors** (`state` frames, dialogs
+ * and before/after pairs, unnumbered). `frames`: measurement per frame ({ id: { dialog_open } }). Each slide:
+ * { step, cell, part: 'path' | 'state' | 'dialog' | 'behavior', n (steps only) }.
  */
 export function slidesOf(row, frames = {}) {
   const all = groupsOf(row).flatMap((g) => g.cells.map((cell) => ({ step: g.step, cell })));
@@ -79,9 +78,9 @@ export function slidesOf(row, frames = {}) {
 }
 
 /**
- * Tela principal da linha (imagem do resumo): `hero` do manifesto; senão o frame que compara com a tela principal de
- * hoje (`compare_to`), para as quatro mostrarem o mesmo momento; senão o frame `screen` sem diálogo aberto com mais
- * palavras (medidas); senão o primeiro.
+ * Main screen of the row (summary image): the manifest's `hero`; else the frame that compares with today's main screen
+ * (`compare_to`), so the four cards show the same moment; else the `screen` frame with no open dialog and the most
+ * (measured) words; else the first.
  */
 export function heroOf(row, frames = {}, todayHero = null) {
   const fs = row.frames ?? [];
@@ -94,8 +93,8 @@ export function heroOf(row, frames = {}, todayHero = null) {
 }
 
 /**
- * Slide de hoje equivalente ao slide `i` de `n` de uma variante: `compare_to` do frame (id de um frame de hoje);
- * senão o mesmo nome de passo; senão a posição proporcional.
+ * Today's slide equivalent to slide `i` of `n` of a variant: the frame's `compare_to` (id of a frame of today); else
+ * the same step name; else the proportional position.
  */
 export function todaySlideFor(slide, i, n, todaySlides) {
   if (!todaySlides.length) return -1;
@@ -109,34 +108,31 @@ export function todaySlideFor(slide, i, n, todaySlides) {
 }
 
 /**
- * Diferença contra hoje, com a palavra visível ("melhor"/"pior": cor e seta nunca são o único sinal).
- * `higher`: mais é melhor (problemas resolvidos); senão menos é melhor.
+ * Difference against today, with the visible word ("better"/"worse": color and arrow are never the only signal).
+ * `higher`: more is better (problems solved); else less is better. `lang`: page language (en | pt-BR).
  */
-export function delta(cur, val, higher = false, { tolerance = 0 } = {}) {
+export function delta(cur, val, higher = false, { tolerance = 0, lang = 'en' } = {}) {
+  const S = stringsFor(lang);
   const c = Number(cur), v = Number(val);
   if (!Number.isFinite(c) || !Number.isFinite(v)) return { kind: 'na', text: '—' };
   const d = Math.round((v - c) * 10) / 10;
-  if (d === 0) return { kind: 'same', text: '=', word: 'igual a hoje', sr: '' };
-  if (tolerance && Math.abs(d) <= Math.abs(c) * tolerance) return { kind: 'same', text: '≈', word: 'praticamente igual a hoje', sr: '' };
+  if (d === 0) return { kind: 'same', text: '=', word: S.delta_same, sr: '' };
+  if (tolerance && Math.abs(d) <= Math.abs(c) * tolerance) return { kind: 'same', text: '≈', word: S.delta_almost, sr: '' };
   const better = higher ? d > 0 : d < 0;
   const n = Math.abs(d);
   const more = d > 0;
-  return { kind: better ? 'better' : 'worse', text: `${more ? '▲' : '▼'} ${n}`, word: better ? 'melhor' : 'pior', sr: `${n} a ${more ? 'mais' : 'menos'} que hoje,` };
+  return { kind: better ? 'better' : 'worse', text: `${more ? '▲' : '▼'} ${n}`, word: better ? S.delta_better : S.delta_worse, sr: S.delta_sr(n, more) };
 }
 
-/** Os quatro números do resumo. */
-export const kpisOf = (m) => [
-  { key: 'steps', label: 'Telas', noun: 'telas' },
-  { key: 'clicks_to_done', label: m.done_label ? `Cliques até ${m.done_label}` : 'Cliques até concluir', noun: m.done_label ? `cliques até ${m.done_label}` : 'cliques até concluir' },
-  { key: 'words_on_screen', label: 'Palavras por tela', noun: 'palavras por tela', tolerance: 0.05 },
-  { key: 'resolved', label: 'Problemas resolvidos', noun: 'problemas resolvidos', higher: true },
-];
+/** The four numbers of the summary. */
+export const kpisOf = (m, lang = 'en') => stringsFor(lang).kpis(m);
 
 /**
- * Valores que a página mostra e compara, um critério só para o número, o líder, o selo e a frase do topo:
- * - palavras por tela: a **medida** nas capturas quando há medição (a declarada só aparece como aviso);
- * - problemas resolvidos: só os **confirmados** (`to_check` = os que precisam de conferência, mostrados ao lado);
- * - `nc`: métrica não comparável (`metrics_detail.not_comparable`), fora do líder e do selo.
+ * Values the page shows and compares, a single criterion for the number, the leader, the badge and the top sentence:
+ * - words per screen: the **measured** value on the captures when there is a measurement (the declared one only shows
+ *   as a warning);
+ * - problems solved: only the **confirmed** ones (`to_check` = the ones that need checking, shown alongside);
+ * - `nc`: non-comparable metric (`metrics_detail.not_comparable`), out of the leader and the badge.
  */
 export function valuesOf(rows, { measured = {}, lint = null } = {}) {
   return Object.fromEntries(rows.map((r) => {
@@ -158,12 +154,13 @@ export function valuesOf(rows, { measured = {}, lint = null } = {}) {
 }
 
 /**
- * Quem lidera cada número entre as variantes (só conta quem é melhor que hoje; métrica não comparável fica de fora;
- * diferença dentro da tolerância não lidera; em "mais é melhor", não há líder se outra versão alcança o topo somando o
- * que ainda está "a conferir").
- * values: rowId → { kpi: número, nc: { kpi: motivo } }. Devolve { best: { kpi: Set(rowId) }, sentence }.
+ * Who leads each number among the variants (only those better than today count; a non-comparable metric stays out; a
+ * difference within the tolerance does not lead; in "more is better", there is no leader if another version reaches
+ * the top by adding what is still "to check").
+ * values: rowId → { kpi: number, nc: { kpi: reason } }. Returns { best: { kpi: Set(rowId) }, sentence }.
  */
-export function leaders(rows, values, kpis, letters) {
+export function leaders(rows, values, kpis, letters, lang = 'en') {
+  const S = stringsFor(lang);
   const [cur, ...vars] = rows;
   const best = {};
   const wins = new Map();
@@ -176,43 +173,30 @@ export function leaders(rows, values, kpis, letters) {
     if (Number.isFinite(c) && (k.higher ? top <= c : top >= c)) continue;
     if (k.tolerance && Number.isFinite(c) && Math.abs(top - c) <= Math.abs(c) * k.tolerance) continue;
     const winners = pool.filter((r) => Number(values[r.id][k.key]) === top);
-    // líder incerto: outra versão alcança o topo com o que ainda falta conferir
+    // uncertain leader: another version reaches the top with what is still left to check
     if (k.higher && pool.some((r) => !winners.includes(r) && Number(values[r.id][k.key]) + Number(values[r.id].to_check ?? 0) >= top)) continue;
     best[k.key] = new Set(winners.map((r) => r.id));
     for (const id of best[k.key]) { if (!wins.has(id)) wins.set(id, []); wins.get(id).push(k.noun); }
   }
-  const list = (xs) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} e ${xs.at(-1)}`);
-  const parts = [...wins.entries()].sort((a, b) => b[1].length - a[1].length).map(([id, ks]) => `${letters.get(id)} em ${list(ks)}`);
-  const sentence = parts.length ? `Quem lidera cada número: ${parts.join('; ')}.` : 'Nenhuma versão melhora os números de hoje.';
+  const parts = [...wins.entries()].sort((a, b) => b[1].length - a[1].length).map(([id, ks]) => S.leads_in(letters.get(id), S.list(ks)));
+  const sentence = parts.length ? S.leaders_sentence(parts.join('; ')) : S.leaders_none;
   return { best, sentence };
 }
 
-// Problemas em português: regra → frase simples (sem nome de regra nem termo de ferramenta). Regra fora daqui usa o
-// resumo da regra no catálogo (data/ux-dimensions.json, rules_index).
-const PLAIN = {
-  X1: 'Travessão usado como pausa no texto', X1b: 'Travessão no lugar de um valor vazio', X2: 'Dois textos colados por um separador',
-  X3: 'Texto de apoio que só repete o título', X4: 'Abertura vazia, que não diz nada', X5: 'Ponto final em rótulo, botão ou título',
-  X6: 'Botão com texto longo ou sem verbo', X7: 'Dica que repete o texto visível', X8: 'Campo com exemplo que só repete o rótulo',
-  X9: 'Explicação entre parênteses em título ou botão', X10: 'Maiúsculas Em Todas As Palavras', X11: 'Termo técnico na tela',
-  T1: 'Mais de um botão principal na mesma área', T2: 'Botões do diálogo na ordem trocada', T3: 'Tela sem um título principal',
-  T4: 'Campo sem rótulo', T5: 'Ação que apaga com rótulo vago (OK, Sim)', T6: 'Palavra que o produto proíbe na tela', T7: 'Botão que não diz o que faz',
-  F1: 'Tela sem saída', F2: 'Tela fora dos caminhos conhecidos', F3: 'Passos demais até concluir', F4: 'Diálogo aberto sobre outro diálogo', F5: 'Tela sem caminho de volta',
-  L1: 'O botão principal fica fora do lugar esperado', L2: 'Muitos elementos disputando atenção no topo', L3: 'Títulos em tamanhos fora de ordem',
-  L4: 'Campos e colunas desalinhados', L5: 'Rótulo longe do campo ou grupo espalhado', L6: 'O botão principal só aparece rolando a página',
-  L7: 'Linha de texto longa demais para ler', L8: 'Área de clique pequena demais', L9: 'Falta uma área esperada para este tipo de tela',
-  S1: 'Falta a tela de um estado (vazio, erro, carregando)', S2: 'Tela vazia ou de erro sem saída', S3: 'Erro que não diz o que fazer',
-  C1: 'A mesma ação com nomes diferentes entre telas', C2: 'O mesmo botão com aparências diferentes', C3: 'O mesmo conceito com nomes diferentes',
-};
+// Plain-language problems (rule → simple sentence, with no rule name or tool term) live in lib/variations-strings.mjs
+// (`plain`, per page language). A rule missing there uses the rule summary from the catalog (data/ux-dimensions.json,
+// rules_index).
 const quoted = (s) => /"([^"]+)"/.exec(String(s ?? ''))?.[1] ?? null;
 const fill = (s) => String(s ?? '').replace(/\{\}/g, '…').trim();
 
-/** Frase em português de um achado do registro (ou de um achado novo do lint). `rules`: rules_index do catálogo. */
-export function plainFinding(it, { rules = {}, where = '' } = {}) {
-  if (!it) return 'Problema fora do registro';
+/** Plain sentence for a registry finding (or a new lint finding). `rules`: the catalog's rules_index. */
+export function plainFinding(it, { rules = {}, where = '', lang = 'en' } = {}) {
+  const S = stringsFor(lang);
+  if (!it) return S.out_of_registry;
   let s;
   if (it.origin === 'review' || it.rule === 'desc' || /^H\d/.test(String(it.rule))) s = it.message || fill(it.text);
   else {
-    const base = PLAIN[it.rule] ?? rules[it.rule]?.summary_pt ?? it.message ?? fill(it.text);
+    const base = S.plain[it.rule] ?? dataText(rules[it.rule], 'summary') ?? it.message ?? fill(it.text);
     const q = it.rule === 'L9' ? null : it.family === 'text' ? fill(it.anchor ?? it.text) : quoted(it.anchor ?? it.text) ?? quoted(it.message);
     const cut = q && it.rule === 'L7' ? `${q.trim()}…` : q;
     s = cut ? `${base}: "${fill(cut)}"` : base;
@@ -221,22 +205,23 @@ export function plainFinding(it, { rules = {}, where = '' } = {}) {
   return where ? `${s} (${where})` : s;
 }
 
-/** Selo de um achado que a variante diz resolver: resolvido, continua ou precisa conferir (com o que conferir). */
-export function badgeOf(st, { similar = [] } = {}) {
-  if (!st) return { kind: 'check', label: 'precisa conferir', why: 'Sem medição automática: confira na tela.' };
-  if (st.status === 'resolved' && !st.suspect) return { kind: 'ok', label: 'resolvido', why: '' };
+/** Badge of a finding the variant claims to solve: solved, still there or needs checking (with what to check). */
+export function badgeOf(st, { similar = [], lang = 'en' } = {}) {
+  const S = stringsFor(lang);
+  if (!st) return { kind: 'check', label: S.badge_check, why: S.why_no_measure };
+  if (st.status === 'resolved' && !st.suspect) return { kind: 'ok', label: S.badge_ok, why: '' };
   if (st.status === 'resolved') {
     const q = [...new Set(similar.map((x) => quoted(x.anchor) ?? fill(x.anchor)).filter(Boolean))].slice(0, 2);
-    return { kind: 'check', label: 'precisa conferir', why: q.length ? `Saiu daqui, mas o mesmo tipo de problema aparece nesta versão em "${q.join('", "')}": confira se é aceitável.` : 'O mesmo tipo de problema aparece em outro ponto desta versão: confira na tela.' };
+    return { kind: 'check', label: S.badge_check, why: q.length ? S.why_suspect_quoted(q) : S.why_suspect };
   }
-  if (st.status === 'persists') return { kind: 'bad', label: 'continua', why: 'Ainda aparece nesta versão.' };
+  if (st.status === 'persists') return { kind: 'bad', label: S.badge_bad, why: S.why_persists };
   const fam = st.family;
-  const why = /fora do registro/.test(st.reason ?? '') ? 'Este problema não está no registro do módulo.'
-    : fam === 'flow' ? 'Depende do caminho entre as telas: confira no passo a passo.'
-    : fam === 'consistency' ? 'Depende de comparar telas entre si: confira no passo a passo.'
-    : fam === 'layout' ? 'A posição na tela não foi medida: confira na imagem.'
-    : 'Apontado em revisão: confira lendo a tela.';
-  return { kind: 'check', label: 'precisa conferir', why };
+  const why = /fora do registro|not in the registry/.test(st.reason ?? '') ? S.why_not_registered
+    : fam === 'flow' ? S.why_flow
+    : fam === 'consistency' ? S.why_consistency
+    : fam === 'layout' ? S.why_layout
+    : S.why_review;
+  return { kind: 'check', label: S.badge_check, why };
 }
 
 const firstSentence = (s) => {
@@ -246,13 +231,12 @@ const firstSentence = (s) => {
 };
 const clip = (s, n = 110) => { const t = String(s ?? '').trim(); if (t.length <= n) return t; const c = t.slice(0, n); return `${c.slice(0, c.lastIndexOf(' ') > 40 ? c.lastIndexOf(' ') : n).replace(/[,;:]$/, '')}…`; };
 
-// ---------- recortes ----------
+// ---------- crops ----------
 
 const clamp01 = (v) => Math.min(1, Math.max(0, Number(v) || 0));
 /**
- * Recorte de uma imagem, em frações (0–1): `compare_focus` do frame; senão o canto superior esquerdo com 62% da
- * largura. A altura sai da proporção (`ratio` = altura ÷ largura, 3:4 por padrão), para os recortes lado a lado
- * terem o mesmo formato.
+ * Crop of an image, in fractions (0–1): the frame's `compare_focus`; else the top-left corner with 62% of the width.
+ * The height comes from the ratio (`ratio` = height ÷ width, 3:4 by default), so side-by-side crops share a shape.
  */
 export function focusOf(f, shot, { width = 0.62, ratio = 0.75 } = {}) {
   const W = shot?.width || 1220, H = shot?.height || 800;
@@ -264,8 +248,8 @@ export function focusOf(f, shot, { width = 0.62, ratio = 0.75 } = {}) {
 }
 
 /**
- * Retângulo (px) que mostra o que mudou entre antes e depois: a caixa da diferença com margem, no mínimo metade da
- * largura e proporção de no máximo 2:1. Sem diferença, ou com mais de 60% da tela mudada, null (mostra a tela inteira).
+ * Rectangle (px) that shows what changed between before and after: the difference box with a margin, at least half the
+ * width and at most a 2:1 ratio. No difference, or more than 60% of the screen changed: null (shows the whole screen).
  */
 export function changeRect(box, before, after, { margin = 48, minWidth = 0.5 } = {}) {
   if (!box || !before || !after) return null;
@@ -281,14 +265,14 @@ export function changeRect(box, before, after, { margin = 48, minWidth = 0.5 } =
   return { x: Math.round(x0), y: Math.round(y0), w: Math.round(x1 - x0), h: Math.round(y1 - y0) };
 }
 
-/** Frações de um retângulo px numa imagem (a mais baixa das duas pode não alcançar o retângulo inteiro). */
+/** Fractions of a px rectangle in an image (the shorter of the two may not reach the whole rectangle). */
 const rectFocus = (rect, shot) => {
   const W = shot.width || 1220, H = shot.height || 800;
   if (rect.y >= H - 20) return null;
   return { x: rect.x / W, y: rect.y / H, w: rect.w / W, h: Math.min(rect.h, H - rect.y) / H };
 };
 
-// ---------- páginas ----------
+// ---------- pages ----------
 
 function imagesOf(row, shots) {
   const keys = [];
@@ -296,7 +280,7 @@ function imagesOf(row, shots) {
   return [...new Set(keys)];
 }
 
-/** Páginas: todas as linhas numa só; se passar de `maxBytes`, Hoje em todas e as variantes distribuídas. */
+/** Pages: every row on one; past `maxBytes`, Today on every page and the variants spread out. */
 export function paginateRows(rows, { shots = new Map(), sizeOf = () => 0, maxBytes = PAGE_MAX_BYTES, baseBytes = 160 * 1024 } = {}) {
   const size = (r, seen) => imagesOf(r, shots).reduce((n, k) => (seen.has(k) ? n : (seen.add(k), n + sizeOf(k))), 0);
   const [cur, ...vars] = rows;
@@ -318,13 +302,17 @@ export function paginateRows(rows, { shots = new Map(), sizeOf = () => 0, maxByt
 }
 
 /**
- * Gera as páginas. Devolve [{ file, html, bytes }].
- * opts: { lint, measured: { rowId: { metrics, divergences, frames } }, registry (Map), shots (Map captura →
- *         { content, width, height }), diffs (Map "<antes>|<depois>" → caixa px da diferença), shotsDir, file,
- *         product, findings_page, warnings, maxBytes, dsx_rel, fragment (página 1 sem esqueleto, para artefato),
- *         catalogs ({ archetype_cards, pattern_cards, law_cards, rules }), rows (opcional, para testes) }.
+ * Builds the pages. Returns [{ file, html, bytes }].
+ * opts: { lint, measured: { rowId: { metrics, divergences, frames } }, registry (Map), shots (Map capture →
+ *         { content, width, height }), diffs (Map "<before>|<after>" → px box of the difference), shotsDir, file,
+ *         product, findings_page, warnings, maxBytes, dsx_rel, fragment (page 1 without the skeleton, for an artifact),
+ *         catalogs ({ archetype_cards, pattern_cards, law_cards, rules }), rows (optional, for tests),
+ *         lang ('en' | 'pt-BR', default 'en'; an unknown tag throws) }.
  */
 export function renderVariationsPages(m, opts = {}) {
+  const lang = pageLang(opts.lang);
+  if (!lang) throw new Error(`unknown page language ${JSON.stringify(opts.lang)} (use en or pt-BR)`);
+  const S = STRINGS[lang];
   const rows = opts.rows ?? [{ ...(m.current ?? {}), id: m.current?.id ?? 'current', is_current: true }, ...(m.variants ?? []).map((v) => ({ ...v, is_current: false }))];
   const shots = opts.shots ?? new Map();
   const diffs = opts.diffs ?? new Map();
@@ -334,23 +322,23 @@ export function renderVariationsPages(m, opts = {}) {
   const lint = opts.lint ?? null;
   const cat = opts.catalogs ?? {};
   const rules = cat.rules ?? {};
-  const letters = new Map(rows.map((r, i) => [r.id, letterOf(r, i - 1)]));
+  const letters = new Map(rows.map((r, i) => [r.id, letterOf(r, i - 1, lang)]));
   const cur = rows[0];
   const chunks = paginateRows(rows, { shots, sizeOf: (k) => embeddedSize(dir, k), maxBytes: opts.maxBytes ?? PAGE_MAX_BYTES });
   const storeKey = `dsx-variations:${m.module}:${m.flow}`;
   const cited = [...new Set(rows.flatMap((r) => r.resolves ?? []))];
-  const kpis = kpisOf(m);
-  const question = m.question || `Como ${lowerFirst(m.title)} com menos trabalho?`;
-  // passo de hoje onde cada tela capturada aparece (para dizer "hoje em Destinatários")
+  const kpis = kpisOf(m, lang);
+  const question = m.question || S.question(m.title);
+  // today's step where each captured screen appears (to say "today in Recipients")
   const stepOfScreen = new Map((cur.frames ?? []).map((f) => [String(f.capture ?? '').split('/').pop().replace(/\..*$/, ''), f.step]));
-  const whereToday = (it) => { const s = [...new Set((it?.screens ?? []).map((x) => stepOfScreen.get(x)).filter(Boolean))]; return s.length ? `hoje em ${s.join(', ')}` : ''; };
+  const whereToday = (it) => { const s = [...new Set((it?.screens ?? []).map((x) => stepOfScreen.get(x)).filter(Boolean))]; return s.length ? S.where_today(s.join(', ')) : ''; };
   const values = valuesOf(rows, { measured: opts.measured ?? {}, lint });
-  const lead = leaders(rows, values, kpis, letters);
+  const lead = leaders(rows, values, kpis, letters, lang);
   const curHero = heroOf(cur, opts.measured?.[cur.id]?.frames ?? {});
   const heroes = new Map(rows.map((r) => [r.id, r.is_current ? curHero : heroOf(r, opts.measured?.[r.id]?.frames ?? {}, curHero?.id)]));
   const sameMoment = curHero && rows.slice(1).every((r) => heroes.get(r.id)?.compare_to === curHero.id);
   const todaySlides = slidesOf(cur, opts.measured?.[cur.id]?.frames ?? {});
-  const doneNoun = m.done_label ? `até ${m.done_label}` : 'até concluir';
+  const doneNoun = S.done_noun(m.done_label);
 
   return chunks.map((pageRows, idx) => {
     const n = idx + 1;
@@ -360,21 +348,21 @@ export function renderVariationsPages(m, opts = {}) {
     const crops = new Map();
     const use = (k) => { if (!used.has(k)) { const e = embedded(dir, k); if (e?.uri) used.set(k, e.uri); } return k; };
     const shotOf = (f) => (f ? shots.get(f.capture) : null);
-    const whoOf = (r) => (r.is_current ? 'de hoje' : `da versão ${letters.get(r.id)}`);
-    const nameOf = (r) => (r.is_current ? 'Como é hoje' : r.name);
-    const labelOf = (r) => (r.is_current ? 'Hoje' : `${letters.get(r.id)} · ${r.name}`);
-    /** Nome acessível do botão de ampliar, em frase (sem caixa de título nem separador). */
-    const zoomName = (r, step, phase = '') => `Ampliar a tela ${whoOf(r)} no passo ${step}${phase ? `, ${phase}` : ''}`;
-    const altOf = (z) => z.aria.replace(/^Ampliar a tela/, 'Tela');
-    const zoomAttrs = (s, { name, cap = '', unit = 'Imagem', aria }) => `data-full="${esc(use(s.content))}" data-name="${esc(name)}" data-cap="${esc(cap)}" data-unit="${esc(unit)}" aria-label="${esc(aria)}"`;
-    const missing = (f, aria, cls) => `<span class="${cls} sem" role="img" aria-label="${esc(aria)}"><span>${esc(bare(f?.caption ?? f?.id ?? ''))}</span><small>sem imagem</small></span>`;
-    /** Imagem inteira, ampliável. */
+    const whoOf = (r) => S.who(r.is_current ? null : letters.get(r.id));
+    const nameOf = (r) => (r.is_current ? S.current_name : r.name);
+    const labelOf = (r) => (r.is_current ? S.today : `${letters.get(r.id)} · ${r.name}`);
+    /** Accessible name of the zoom button, as a sentence (no title case, no separator). */
+    const zoomName = (r, step, phase = '') => S.zoom_name(whoOf(r), step, phase);
+    const altOf = (z) => z.aria.replace(S.zoom_prefix, S.zoom_alt_prefix);
+    const zoomAttrs = (s, { name, cap = '', unit = S.unit_image, aria }) => `data-full="${esc(use(s.content))}" data-name="${esc(name)}" data-cap="${esc(cap)}" data-unit="${esc(unit)}" aria-label="${esc(aria)}"`;
+    const missing = (f, aria, cls) => `<span class="${cls} sem" role="img" aria-label="${esc(aria)}"><span>${esc(bare(f?.caption ?? f?.id ?? ''))}</span><small>${esc(S.no_image)}</small></span>`;
+    /** Whole image, zoomable. */
     const fullImg = (f, z, cls = 'shot') => {
       const s = shotOf(f);
       if (!s) return missing(f, z.aria, cls);
       return `<button type="button" class="z ${cls}" ${zoomAttrs(s, z)}><img data-k="${esc(s.content)}" alt="${esc(altOf(z))}" width="${esc(s.width ?? 1220)}" height="${esc(s.height ?? 800)}" loading="lazy" decoding="async"></button>`;
     };
-    /** Recorte ampliável (`focus` em frações), com o contorno do que mudou (`marks`, frações do recorte). */
+    /** Zoomable crop (`focus` in fractions), with the outline of what changed (`marks`, fractions of the crop). */
     const cropImg = (f, z, focus, { marks = [], cls = '', tag = false } = {}) => {
       const s = shotOf(f);
       if (!s) return missing(f, z.aria, `crop ${cls}`);
@@ -388,11 +376,11 @@ export function renderVariationsPages(m, opts = {}) {
         if (!crops.has(mcss)) crops.set(mcss, `m${crops.size + 1}`);
         return `<span class="mk ${crops.get(mcss)}" aria-hidden="true"></span>`;
       }).join('');
-      return `<button type="button" class="z crop ${cls}" ${zoomAttrs(s, z)}><span class="kb ${k}"><img data-k="${esc(s.content)}" alt="${esc(altOf(z))}" loading="lazy" decoding="async">${mk}</span>${tag ? '<span class="z-tag" aria-hidden="true">Ampliar</span>' : ''}</button>`;
+      return `<button type="button" class="z crop ${cls}" ${zoomAttrs(s, z)}><span class="kb ${k}"><img data-k="${esc(s.content)}" alt="${esc(altOf(z))}" loading="lazy" decoding="async">${mk}</span>${tag ? `<span class="z-tag" aria-hidden="true">${esc(S.zoom_tag)}</span>` : ''}</button>`;
     };
     const heroFocus = (f) => { const s = shotOf(f); return s ? focusOf(f, s, { ratio: 0.62 }) : null; };
 
-    // ---------- resumo ----------
+    // ---------- summary ----------
     const deltaHtml = (d) => (d.kind === 'na' ? '' : d.kind === 'same' ? ` <span class="d d-same">${esc(d.word)}</span>`
       : ` <span class="d d-${d.kind}"><span aria-hidden="true">${esc(d.text)} · </span><span class="sr">${esc(d.sr)} </span>${esc(d.word)}</span>`);
     const kpiHtml = (r) => kpis.map((k) => {
@@ -400,30 +388,30 @@ export function renderVariationsPages(m, opts = {}) {
       const v = x[k.key];
       const nc = x.nc?.[k.key];
       const lid = !nc && lead.best[k.key]?.has(r.id);
-      const d = r.is_current || nc ? null : delta(values[cur.id]?.[k.key], v, k.higher, { tolerance: k.tolerance ?? 0 });
-      const of = k.key === 'resolved' && cited.length ? `<small> de ${cited.length}</small>` : '';
-      const check = k.key === 'resolved' && x.to_check ? `<span class="mais">+ ${x.to_check} a conferir</span>` : '';
-      const off = k.key === 'words_on_screen' && x.words_declared_off !== null && x.words_declared_off !== undefined ? `<span class="mais">medido nas telas (estimativa inicial: ${esc(x.words_declared_off)})</span>` : '';
-      const ncHtml = nc ? `<span class="nc">não comparável</span><span class="nc-why">${esc(nc)}</span>` : '';
-      return `<div class="kpi${lid ? ' lidera' : ''}${nc ? ' is-nc' : ''}"><dt>${esc(k.label)}</dt><dd><b>${esc(v ?? '—')}</b>${of}${d ? deltaHtml(d) : ''}${lid ? ' <span class="best">lidera</span>' : ''}${check}${off}${ncHtml}</dd></div>`;
+      const d = r.is_current || nc ? null : delta(values[cur.id]?.[k.key], v, k.higher, { tolerance: k.tolerance ?? 0, lang });
+      const of = k.key === 'resolved' && cited.length ? `<small>${esc(S.of_total(cited.length))}</small>` : '';
+      const check = k.key === 'resolved' && x.to_check ? `<span class="mais">${esc(S.to_check(x.to_check))}</span>` : '';
+      const off = k.key === 'words_on_screen' && x.words_declared_off !== null && x.words_declared_off !== undefined ? `<span class="mais">${esc(S.measured_off(x.words_declared_off))}</span>` : '';
+      const ncHtml = nc ? `<span class="nc">${esc(S.not_comparable)}</span><span class="nc-why">${esc(nc)}</span>` : '';
+      return `<div class="kpi${lid ? ' lidera' : ''}${nc ? ' is-nc' : ''}"><dt>${esc(k.label)}</dt><dd><b>${esc(v ?? '—')}</b>${of}${d ? deltaHtml(d) : ''}${lid ? ` <span class="best">${esc(S.leads)}</span>` : ''}${check}${off}${ncHtml}</dd></div>`;
     }).join('');
-    const gainOf = (r) => r.gain || (r.is_current ? 'Já existe: nada a construir.' : clip(firstSentence(r.hypothesis)[0]));
-    const costOf = (r) => r.cost || (r.is_current ? `${cited.length} problema${cited.length === 1 ? '' : 's'} de hoje continua${cited.length === 1 ? '' : 'm'}.` : clip((r.tradeoffs ?? [])[0] ?? ''));
+    const gainOf = (r) => r.gain || (r.is_current ? S.gain_current : clip(firstSentence(r.hypothesis)[0]));
+    const costOf = (r) => r.cost || (r.is_current ? S.cost_current(cited.length) : clip((r.tradeoffs ?? [])[0] ?? ''));
     const summaryCard = (r) => {
       const h = heroes.get(r.id);
-      const hero = h ? cropImg(h, { name: labelOf(r), cap: h.step, unit: 'Versão', aria: zoomName(r, h.step) }, heroFocus(h), { cls: 'hero', tag: true }) : '';
+      const hero = h ? cropImg(h, { name: labelOf(r), cap: h.step, unit: S.unit_version, aria: zoomName(r, h.step) }, heroFocus(h), { cls: 'hero', tag: true }) : '';
       const link = onPage.has(r.id) ? `#v-${slug(r.id)}` : `${pageFileName(file, chunks.findIndex((c) => c.some((x) => x.id === r.id)) + 1)}#v-${slug(r.id)}`;
       return `<article class="rc${r.is_current ? ' hoje' : ''}" aria-labelledby="rc-${esc(slug(r.id))}">
-  <header><span class="letra">${esc(letters.get(r.id))}</span><div><h2 id="rc-${esc(slug(r.id))}">${esc(nameOf(r))}</h2><p class="ideia">${esc(r.is_current ? (r.concept || `${slidesOf(r, opts.measured?.[r.id]?.frames ?? {}).filter((s) => s.part === 'path').length} telas, do jeito que funciona hoje.`) : r.concept)}</p></div></header>
+  <header><span class="letra">${esc(letters.get(r.id))}</span><div><h2 id="rc-${esc(slug(r.id))}">${esc(nameOf(r))}</h2><p class="ideia">${esc(r.is_current ? (r.concept || S.current_concept(slidesOf(r, opts.measured?.[r.id]?.frames ?? {}).filter((s) => s.part === 'path').length)) : r.concept)}</p></div></header>
   ${hero || '<span class="hero sem"></span>'}
   <dl class="kpis">${kpiHtml(r)}</dl>
-  <p class="gc ganha"><strong>Ganha</strong> ${esc(gainOf(r))}</p>
-  <p class="gc custa"><strong>Custa</strong> ${esc(costOf(r))}</p>
-  <a class="ver" href="${esc(link)}" data-goto="${esc(r.id)}">Ver passo a passo</a>
+  <p class="gc ganha"><strong>${esc(S.gains)}</strong> ${esc(gainOf(r))}</p>
+  <p class="gc custa"><strong>${esc(S.costs)}</strong> ${esc(costOf(r))}</p>
+  <a class="ver" href="${esc(link)}" data-goto="${esc(r.id)}">${esc(S.see_steps)}</a>
 </article>`;
     };
 
-    // ---------- passo a passo ----------
+    // ---------- step by step ----------
     const behaviorHtml = (r, s, c) => {
       const sb = shotOf(c.before), sa = shotOf(c.after);
       const d = sb && sa ? diffs.get(`${sb.content}|${sa.content}`) ?? null : null;
@@ -433,7 +421,7 @@ export function renderVariationsPages(m, opts = {}) {
       const fig = (f, shot, phase) => {
         const z = { name: `${labelOf(r)} · ${s.step}`, cap: phase, aria: zoomName(r, s.step, phase) };
         if (!shot || !boxes.length) return fullImg(f, z);
-        // mudança concentrada: recorte em volta dela; espalhada: a tela inteira com cada região contornada
+        // concentrated change: crop around it; spread out: the whole screen with each region outlined
         const fo = (rect && rectFocus(rect, shot)) || { x: 0, y: 0, w: 1, h: 1 };
         const W = shot.width || 1220, H = shot.height || 800;
         const fx = fo.x * W, fy = fo.y * H, fw = fo.w * W, fh = fo.h * H;
@@ -443,9 +431,9 @@ export function renderVariationsPages(m, opts = {}) {
         }).filter((k) => k.w > 0.005 && k.h > 0.005);
         return cropImg(f, z, fo, { marks });
       };
-      const before = c.before ? `<figure><figcaption class="tag">Antes</figcaption>${fig(c.before, sb, 'antes')}${c.before.caption ? `<p class="sub">${esc(bare(c.before.caption))}</p>` : ''}</figure>` : '';
-      const after = `<figure><figcaption class="tag tag-depois">Depois</figcaption>${fig(c.after, sa, 'depois')}</figure>`;
-      return `<div class="par${c.before ? '' : ' so'}">${before}<p class="acao"><span class="seta" aria-hidden="true"></span><span>${esc(c.action || 'ação')}</span></p>${after}</div>${boxes.length ? `<p class="par-nota">${rect ? 'O recorte mostra a parte que mudou, contornada.' : 'Os contornos marcam o que mudou entre antes e depois.'} Clique numa imagem para ver a tela inteira, no tamanho real.</p>` : ''}`;
+      const before = c.before ? `<figure><figcaption class="tag">${esc(S.before)}</figcaption>${fig(c.before, sb, S.phase_before)}${c.before.caption ? `<p class="sub">${esc(bare(c.before.caption))}</p>` : ''}</figure>` : '';
+      const after = `<figure><figcaption class="tag tag-depois">${esc(S.after)}</figcaption>${fig(c.after, sa, S.phase_after)}</figure>`;
+      return `<div class="par${c.before ? '' : ' so'}">${before}<p class="acao"><span class="seta" aria-hidden="true"></span><span>${esc(c.action || S.action_fallback)}</span></p>${after}</div>${boxes.length ? `<p class="par-nota">${esc(rect ? S.crop_note : S.marks_note)} ${esc(S.click_note)}</p>` : ''}`;
     };
     const slideHtml = (r, s, i, total, nPath) => {
       const c = s.cell;
@@ -459,14 +447,14 @@ export function renderVariationsPages(m, opts = {}) {
         const tf = t ? (t.cell.type === 'behavior' ? t.cell.after : t.cell.frame) : null;
         const vf = c.type === 'behavior' ? c.after : c.frame;
         const ts = shotOf(tf), vs = shotOf(vf);
-        const tName = t ? `Hoje · ${t.step}` : 'Hoje';
+        const tName = t ? S.today_step(t.step) : S.today;
         const vName = `${letters.get(r.id)} · ${s.step}`;
-        const pair = ts && vs ? `<p class="cmp-acoes"><button type="button" class="z par-z" data-pair="${esc(use(ts.content))}|${esc(use(vs.content))}" data-names="${esc(tName)}|${esc(vName)}" data-name="${esc(`Hoje e ${letters.get(r.id)} lado a lado`)}" data-cap="${esc(s.step)}" data-unit="Imagem">Ampliar as duas lado a lado</button><span class="nota">Os recortes mostram a parte principal de cada tela; ampliadas, aparecem inteiras.</span></p>` : '';
-        cmp = `<div class="cmp" hidden><figure><figcaption class="tag tag-hoje">${esc(tName)}</figcaption>${tf ? cropImg(tf, { name: tName, aria: zoomName(cur, t.step) }, ts ? focusOf(tf, ts) : null) : '<p class="nota">Hoje não tem passo equivalente.</p>'}${tf?.caption ? `<p class="sub">${esc(bare(tf.caption))}</p>` : ''}</figure>
+        const pair = ts && vs ? `<p class="cmp-acoes"><button type="button" class="z par-z" data-pair="${esc(use(ts.content))}|${esc(use(vs.content))}" data-names="${esc(tName)}|${esc(vName)}" data-name="${esc(S.pair_name(letters.get(r.id)))}" data-cap="${esc(s.step)}" data-unit="${esc(S.unit_image)}">${esc(S.zoom_pair)}</button><span class="nota">${esc(S.pair_note)}</span></p>` : '';
+        cmp = `<div class="cmp" hidden><figure><figcaption class="tag tag-hoje">${esc(tName)}</figcaption>${tf ? cropImg(tf, { name: tName, aria: zoomName(cur, t.step) }, ts ? focusOf(tf, ts) : null) : `<p class="nota">${esc(S.no_equivalent)}</p>`}${tf?.caption ? `<p class="sub">${esc(bare(tf.caption))}</p>` : ''}</figure>
           <figure><figcaption class="tag">${esc(vName)}</figcaption>${cropImg(vf, { name: vName, aria: zoomName(r, s.step) }, vs ? focusOf(vf, vs) : null)}${vf?.caption ? `<p class="sub">${esc(bare(vf.caption))}</p>` : ''}</figure>${pair}</div>`;
       }
       const legend = bare(c.type === 'behavior' ? (c.frame.caption ?? c.after?.caption) : c.frame.caption);
-      const ind = PART_PT[s.part] ? PART_PT[s.part] : `Passo ${s.n} de ${nPath}`;
+      const ind = S.part[s.part] ? S.part[s.part] : S.step_of(s.n, nPath);
       return `<li class="slide" data-i="${i}" data-step="${esc(s.step)}" data-ind="${esc(ind)}"${i ? ' hidden' : ''}><div class="palco">${main}</div>${cmp}${legend ? `<p class="legenda">${esc(legend)}</p>` : ''}</li>`;
     };
     const deck = (r) => {
@@ -475,7 +463,7 @@ export function renderVariationsPages(m, opts = {}) {
       const total = slides.length;
       const nPath = slides.filter((s) => s.part === 'path').length;
       const first = slides[0];
-      const ind0 = first ? (PART_PT[first.part] ?? `Passo 1 de ${nPath}`) : '';
+      const ind0 = first ? (S.part[first.part] ?? S.step_of(1, nPath)) : '';
       const btn = (s, i) => `<li><button type="button" data-go="${i}"${i ? '' : ' aria-current="step"'}>${s.part === 'path' ? `<span>${s.n}</span> ` : ''}${esc(s.step)}</button></li>`;
       const indexed = slides.map((s, i) => [s, i]);
       const path = indexed.filter(([s]) => s.part === 'path');
@@ -484,62 +472,58 @@ export function renderVariationsPages(m, opts = {}) {
       return `<div class="deck" data-row="${esc(r.id)}" data-n="${total}">
   <div class="barra">
     <p class="ind" aria-live="polite"><span class="ind-n">${esc(ind0)}</span> · <b class="ind-s">${esc(first?.step ?? '')}</b></p>
-    <div class="bts"><button type="button" data-mv="-1" aria-label="Passo anterior">← Anterior</button><button type="button" data-mv="1" aria-label="Próximo passo">Próximo →</button>${r.is_current ? '' : `<button type="button" class="bt-cmp" aria-pressed="false" aria-describedby="cmp-nota-${esc(id)}">Comparar com hoje</button>`}</div>
-    ${r.is_current ? '' : `<p class="nota cmp-nota" id="cmp-nota-${esc(id)}">"Comparar com hoje" vale para todas as versões ao mesmo tempo.</p>`}
+    <div class="bts"><button type="button" data-mv="-1" aria-label="${esc(S.prev_step)}">${esc(S.prev)}</button><button type="button" data-mv="1" aria-label="${esc(S.next_step)}">${esc(S.next)}</button>${r.is_current ? '' : `<button type="button" class="bt-cmp" aria-pressed="false" aria-describedby="cmp-nota-${esc(id)}">${esc(S.compare_today)}</button>`}</div>
+    ${r.is_current ? '' : `<p class="nota cmp-nota" id="cmp-nota-${esc(id)}">${escT(S.compare_note)}</p>`}
   </div>
-  <div class="trilha">${group(path, 'Passos do fluxo', 'p')}${group(other, 'Estados e comportamentos', 'e')}</div>
+  <div class="trilha">${group(path, esc(S.path_steps), 'p')}${group(other, esc(S.states_behaviors), 'e')}</div>
   <ol class="slides">${slides.map((s, i) => slideHtml(r, s, i, total, nPath)).join('')}</ol>
 </div>`;
     };
 
     const problemItem = (id, st, fresh = []) => {
       const it = registry.get(id);
-      const b = badgeOf(st, { similar: st?.suspect ? fresh.filter((x) => x.family === st.family && x.rule === st.rule) : [] });
-      const more = opts.findings_page && it ? ` <a href="${esc(opts.findings_page)}#case-${esc(id)}">ver na página de achados</a>` : '';
-      return `<li id="p-${esc(slug(id))}"><span class="selo selo-${b.kind}">${esc(b.label)}</span> ${esc(plainFinding(it, { rules, where: whereToday(it) }))}${b.why ? `<span class="why">${esc(b.why)}</span>` : ''}${more}</li>`;
+      const b = badgeOf(st, { similar: st?.suspect ? fresh.filter((x) => x.family === st.family && x.rule === st.rule) : [], lang });
+      const more = opts.findings_page && it ? ` <a href="${esc(opts.findings_page)}#case-${esc(id)}">${esc(S.see_findings)}</a>` : '';
+      return `<li id="p-${esc(slug(id))}"><span class="selo selo-${b.kind}">${esc(b.label)}</span> ${esc(plainFinding(it, { rules, where: whereToday(it), lang }))}${b.why ? `<span class="why">${esc(b.why)}</span>` : ''}${more}</li>`;
     };
     const clicksBlock = (r) => {
       const list = r.metrics_detail?.clicks_to_done;
       if (!Array.isArray(list) || !list.length) return '';
       const nc = r.metrics_detail?.not_comparable?.clicks_to_done;
       const declared = Number(r.metrics?.clicks_to_done);
-      const diff = Number.isFinite(declared) && declared !== list.length ? `<p class="aviso">A lista tem ${list.length} e o número do resumo diz ${declared}.</p>` : '';
-      return `<details class="det"><summary>Os ${list.length} cliques ${esc(doneNoun)}</summary><ol class="cliques">${list.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>${nc ? `<p class="aviso">Não comparável: ${esc(nc)}</p>` : ''}${diff}</details>`;
+      const diff = Number.isFinite(declared) && declared !== list.length ? `<p class="aviso">${esc(S.clicks_mismatch(list.length, declared))}</p>` : '';
+      return `<details class="det"><summary>${esc(S.clicks_summary(list.length, doneNoun))}</summary><ol class="cliques">${list.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>${nc ? `<p class="aviso">${esc(S.not_comparable_why(nc))}</p>` : ''}${diff}</details>`;
     };
     const techBlock = (r) => {
       const arch = r.archetype ? cat.archetype_cards?.[r.archetype]?.title ?? null : null;
       const pats = (r.patterns ?? []).map((p) => { const t = cat.pattern_cards?.[String(p).split('/').pop()]?.title; return t ? `${t} (${p})` : p; });
       const laws = (r.laws ?? []).map((l) => (cat.law_cards?.[l] ? `${cat.law_cards[l]} (${l})` : l));
-      const tech = AXES.filter((a) => String(r.changes_tech?.[a] ?? '').trim()).map((a) => `<div><dt>${AXIS_PT[a]}</dt><dd>${esc(r.changes_tech[a])}</dd></div>`).join('');
+      const tech = AXES.filter((a) => String(r.changes_tech?.[a] ?? '').trim()).map((a) => `<div><dt>${esc(S.axis[a])}</dt><dd>${esc(r.changes_tech[a])}</dd></div>`).join('');
       const ids = (r.resolves ?? []).map((id) => { const it = registry.get(id); return `${id}${it?.rule ? ` (${it.rule})` : ''}`; });
       const parts = [
         tech ? `<dl class="muda">${tech}</dl>` : '',
-        arch ? `<p>Arquétipo: ${esc(arch)} (${esc(r.archetype)}).</p>` : '',
-        pats.length ? `<p>Padrões do catálogo: ${esc(pats.join(' · '))}.</p>` : '',
-        laws.length ? `<p>Princípios: ${esc(laws.join(', '))}.</p>` : '',
-        r.lens ? `<p>Lente (Forward, USE-10): ${esc(r.lens)}.</p>` : '',
-        ids.length ? `<p>Achados citados: ${esc(ids.join(', '))}.</p>` : '',
-        (r.code ?? []).length ? `<p>Código da versão: ${(r.code ?? []).map((c) => `<code>${esc(c)}</code>`).join(' ')}</p>` : '',
+        arch ? `<p>${esc(S.archetype(arch, r.archetype))}</p>` : '',
+        pats.length ? `<p>${esc(S.catalog_patterns(pats.join(' · ')))}</p>` : '',
+        laws.length ? `<p>${esc(S.principles(laws.join(', ')))}</p>` : '',
+        r.lens ? `<p>${esc(S.lens_line(r.lens))}</p>` : '',
+        ids.length ? `<p>${esc(S.cited_findings(ids.join(', ')))}</p>` : '',
+        (r.code ?? []).length ? `<p>${esc(S.version_code)} ${(r.code ?? []).map((c) => `<code>${esc(c)}</code>`).join(' ')}</p>` : '',
       ].filter(Boolean);
-      return parts.length ? `<details class="det tec"><summary>Para quem constrói</summary>${parts.join('')}</details>` : '';
+      return parts.length ? `<details class="det tec"><summary>${esc(S.for_builders)}</summary>${parts.join('')}</details>` : '';
     };
     // Falsifiable hypothesis (manifest format 2), in plain language; the lens id only appears for builders.
     const chosenId = typeof m.choice === 'string' ? m.choice : m.choice?.variant ?? null;
     const betBlock = (r) => {
-      const rows = [
-        ['Para quem', r.audience], ['A aposta', r.causal_bet], ['O que provaria o contrário', r.counter_hypothesis],
-        ['Como testar se está errada', r.falsification_test], ['Número que deve melhorar', r.expected_metric], ['O que não pode piorar', r.guardrail],
-        ['Ângulo da ideia', LENS_PT[r.lens] ?? null],
-      ].filter(([, v]) => String(v ?? '').trim());
-      const rec = chosenId === r.id ? `<p>Recomendada por quem desenhou${m.choice?.why ? `: ${esc(m.choice.why)}` : '.'}</p>` : '';
-      const traded = m.rejected_tradeoffs?.[r.id] ? `<p>Por que não é a recomendada: ${esc(m.rejected_tradeoffs[r.id])}</p>` : '';
+      const rows = S.bet_rows(r, S.lens[r.lens] ?? null).filter(([, v]) => String(v ?? '').trim());
+      const rec = chosenId === r.id ? `<p>${esc(S.recommended(m.choice?.why))}</p>` : '';
+      const traded = m.rejected_tradeoffs?.[r.id] ? `<p>${esc(S.why_not_recommended(m.rejected_tradeoffs[r.id]))}</p>` : '';
       if (!rows.length && !rec && !traded) return '';
-      return `<details class="det"><summary>Como saber se funciona</summary>${rec}${traded}${rows.length ? `<dl class="muda">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}</details>`;
+      return `<details class="det"><summary>${esc(S.how_to_know)}</summary>${rec}${traded}${rows.length ? `<dl class="muda">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}</details>`;
     };
     const details = (r) => {
       if (r.is_current) {
-        const probs = cited.length ? `<details class="det"><summary>Problemas de hoje (${cited.length})</summary><ul class="probs">${cited.map((id) => { const it = registry.get(id); return `<li>${esc(plainFinding(it, { rules, where: whereToday(it) }))}</li>`; }).join('')}</ul></details>` : '';
-        const tech = cited.length ? `<details class="det tec"><summary>Para quem constrói</summary><p>Achados citados pelas versões: ${esc(cited.map((id) => `${id}${registry.get(id)?.rule ? ` (${registry.get(id).rule})` : ''}`).join(', '))}.</p></details>` : '';
+        const probs = cited.length ? `<details class="det"><summary>${esc(S.today_problems(cited.length))}</summary><ul class="probs">${cited.map((id) => { const it = registry.get(id); return `<li>${esc(plainFinding(it, { rules, where: whereToday(it), lang }))}</li>`; }).join('')}</ul></details>` : '';
+        const tech = cited.length ? `<details class="det tec"><summary>${esc(S.for_builders)}</summary><p>${esc(S.cited_by_versions(cited.map((id) => `${id}${registry.get(id)?.rule ? ` (${registry.get(id).rule})` : ''}`).join(', ')))}</p></details>` : '';
         const blocks = [probs, clicksBlock(r), tech].filter(Boolean).join('');
         return blocks ? `<div class="dets">${blocks}</div>` : '';
       }
@@ -549,16 +533,16 @@ export function renderVariationsPages(m, opts = {}) {
       const baseKeys = new Set((lint?.current?.findings ?? []).map((y) => y.key));
       const allFresh = (x?.findings ?? []).filter((y) => !baseKeys.has(y.key));
       const stepOfFrame = new Map((r.frames ?? []).map((f) => [f.id, f.step]));
-      const changes = AXES.filter((a) => String(r.changes?.[a] ?? '').trim()).map((a) => `<div><dt>${AXIS_PT[a]}</dt><dd>${esc(r.changes[a])}</dd></div>`).join('');
+      const changes = AXES.filter((a) => String(r.changes?.[a] ?? '').trim()).map((a) => `<div><dt>${esc(S.axis[a])}</dt><dd>${esc(r.changes[a])}</dd></div>`).join('');
       const resolves = r.resolves ?? [];
       const v = values[r.id];
       return `<div class="dets">
-  <details class="det"><summary>O que muda</summary><dl class="muda">${changes}</dl></details>
-  <details class="det"><summary>Por que pode funcionar</summary><p>${esc(r.hypothesis)}</p></details>
+  <details class="det"><summary>${esc(S.what_changes)}</summary><dl class="muda">${changes}</dl></details>
+  <details class="det"><summary>${esc(S.why_may_work)}</summary><p>${esc(r.hypothesis)}</p></details>
   ${betBlock(r)}
-  <details class="det"><summary>Riscos (${(r.tradeoffs ?? []).length})</summary><ul>${(r.tradeoffs ?? []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>
-  <details class="det"><summary>Problemas que resolve (${v.resolved} confirmado${v.resolved === 1 ? '' : 's'}${v.to_check ? `, ${v.to_check} a conferir` : ''})</summary>${resolves.length ? `<ul class="probs">${resolves.map((id) => problemItem(id, st.get(id), allFresh)).join('')}</ul>` : '<p>Esta versão não diz quais problemas resolve.</p>'}</details>
-  ${fresh.length ? `<details class="det"><summary>Novos pontos de atenção (${fresh.length})</summary><ul class="probs">${fresh.map((f) => { const steps = [...new Set((f.frames ?? []).map((id) => stepOfFrame.get(id)).filter(Boolean))]; return `<li><span class="selo selo-${f.severity >= 3 ? 'bad' : 'check'}">${f.severity >= 3 ? 'grave' : 'atenção'}</span> ${esc(plainFinding(f, { rules, where: steps.length ? `em ${steps.join(', ')}` : '' }))}</li>`; }).join('')}</ul></details>` : ''}
+  <details class="det"><summary>${esc(S.risks((r.tradeoffs ?? []).length))}</summary><ul>${(r.tradeoffs ?? []).map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>
+  <details class="det"><summary>${esc(S.solves(v.resolved, v.to_check))}</summary>${resolves.length ? `<ul class="probs">${resolves.map((id) => problemItem(id, st.get(id), allFresh)).join('')}</ul>` : `<p>${esc(S.solves_none)}</p>`}</details>
+  ${fresh.length ? `<details class="det"><summary>${esc(S.new_attention(fresh.length))}</summary><ul class="probs">${fresh.map((f) => { const steps = [...new Set((f.frames ?? []).map((id) => stepOfFrame.get(id)).filter(Boolean))]; return `<li><span class="selo selo-${f.severity >= 3 ? 'bad' : 'check'}">${esc(f.severity >= 3 ? S.severe : S.attention)}</span> ${esc(plainFinding(f, { rules, where: steps.length ? S.in_steps(steps.join(', ')) : '', lang }))}</li>`; }).join('')}</ul></details>` : ''}
   ${clicksBlock(r)}
   ${techBlock(r)}
 </div>`;
@@ -568,70 +552,70 @@ export function renderVariationsPages(m, opts = {}) {
   ${deck(r)}
   ${details(r)}
 </section>`;
-    const tabs = `<div class="abas" role="tablist" aria-label="Versões">${pageRows.map((r, i) => `<button type="button" role="tab" id="tab-${esc(slug(r.id))}" aria-controls="v-${esc(slug(r.id))}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-tab="${esc(r.id)}"><span class="letra">${esc(letters.get(r.id))}</span> ${esc(r.is_current ? 'Como é hoje' : r.name)}</button>`).join('')}</div>
-  <label class="sel-aba">Versão <select id="aba-sel">${pageRows.map((r) => `<option value="${esc(r.id)}">${esc(labelOf(r))}</option>`).join('')}</select></label>
+    const tabs = `<div class="abas" role="tablist" aria-label="${esc(S.versions)}">${pageRows.map((r, i) => `<button type="button" role="tab" id="tab-${esc(slug(r.id))}" aria-controls="v-${esc(slug(r.id))}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-tab="${esc(r.id)}"><span class="letra">${esc(letters.get(r.id))}</span> ${esc(r.is_current ? S.current_name : r.name)}</button>`).join('')}</div>
+  <label class="sel-aba">${esc(S.version)} <select id="aba-sel">${pageRows.map((r) => `<option value="${esc(r.id)}">${esc(labelOf(r))}</option>`).join('')}</select></label>
 `;
 
-    // ---------- decisão ----------
-    const opt = (id) => `<option value="${esc(id)}">${esc(id === cur.id ? 'Hoje' : `${letters.get(id)} · ${rows.find((r) => r.id === id)?.name ?? ''}`)}</option>`;
-    const choice = (r) => `<label class="op"><input type="radio" name="variante" value="${esc(r.id)}"><span class="letra${r.is_current ? ' letra-hoje' : ''}">${esc(letters.get(r.id))}</span><span>${esc(r.is_current ? 'Nenhuma, manter como está' : r.name)}</span></label>`;
+    // ---------- decision ----------
+    const opt = (id) => `<option value="${esc(id)}">${esc(id === cur.id ? S.today : `${letters.get(id)} · ${rows.find((r) => r.id === id)?.name ?? ''}`)}</option>`;
+    const choice = (r) => `<label class="op"><input type="radio" name="variante" value="${esc(r.id)}"><span class="letra${r.is_current ? ' letra-hoje' : ''}">${esc(letters.get(r.id))}</span><span>${esc(r.is_current ? S.keep_as_is : r.name)}</span></label>`;
     const importCmd = `node ${opts.dsx_rel ?? '<DSX>'}/tools/ux-lint/variations.mjs import --root . decision.json`;
     const decision = `<section class="dec" id="decisao" aria-labelledby="dec-t">
-  <h2 id="dec-t">Qual seguir?</h2>
-  <p class="retomada" id="retomada" role="status" hidden><span>Retomamos sua escolha anterior, salva neste navegador.</span> <button type="button" id="limpar">Limpar</button></p>
-  <fieldset class="escolha" id="escolha" aria-describedby="escolha-erro"><legend class="sr">Versão escolhida</legend>${rows.map(choice).join('')}</fieldset>
-  <p class="erro erro-grupo" id="escolha-erro" hidden>Escolha uma versão antes de copiar.</p>
-  <p class="nota" id="escolha-nota" hidden>Com a mistura ligada, a escolha vem das partes escolhidas abaixo. Desligue a mistura para escolher uma versão inteira.</p>
-  <label class="campo">Comentário <textarea name="comentario" rows="3" placeholder="Por que esta escolha; o que ajustar ao construir"></textarea></label>
-  <label class="campo">Quem decide (obrigatório) <input name="por" autocomplete="name" required aria-required="true" aria-describedby="por-erro"></label>
-  <p class="erro" id="por-erro" hidden>Diga quem decide antes de copiar.</p>
-  <details class="mistura" id="mistura"><summary>Misturar partes de versões diferentes</summary>
-    <label class="chk"><input type="checkbox" name="misturar"> Usar a mistura abaixo em vez de uma versão inteira</label>
-    <div class="eixos">${AXES.map((a) => `<label class="eixo">${AXIS_PT[a]} <select name="eixo-${a}">${rows.map((r) => opt(r.id)).join('')}</select><span class="nota" data-eixo-nota="${a}"></span></label>`).join('')}</div>
-    <p class="nota">Misturar pode dar uma combinação incoerente (o texto de uma versão falando de um passo que outra tirou): descreva a mistura no comentário.</p>
+  <h2 id="dec-t">${esc(S.which)}</h2>
+  <p class="retomada" id="retomada" role="status" hidden><span>${esc(S.resumed)}</span> <button type="button" id="limpar">${esc(S.clear)}</button></p>
+  <fieldset class="escolha" id="escolha" aria-describedby="escolha-erro"><legend class="sr">${esc(S.chosen_version)}</legend>${rows.map(choice).join('')}</fieldset>
+  <p class="erro erro-grupo" id="escolha-erro" hidden>${esc(S.choose_error)}</p>
+  <p class="nota" id="escolha-nota" hidden>${esc(S.mix_note)}</p>
+  <label class="campo">${esc(S.comment)} <textarea name="comentario" rows="3" placeholder="${esc(S.comment_ph)}"></textarea></label>
+  <label class="campo">${esc(S.who_decides)} <input name="por" autocomplete="name" required aria-required="true" aria-describedby="por-erro"></label>
+  <p class="erro" id="por-erro" hidden>${esc(S.by_error)}</p>
+  <details class="mistura" id="mistura"><summary>${esc(S.mix_summary)}</summary>
+    <label class="chk"><input type="checkbox" name="misturar"> ${esc(S.mix_check)}</label>
+    <div class="eixos">${AXES.map((a) => `<label class="eixo">${esc(S.axis[a])} <select name="eixo-${a}">${rows.map((r) => opt(r.id)).join('')}</select><span class="nota" data-eixo-nota="${a}"></span></label>`).join('')}</div>
+    <p class="nota">${esc(S.mix_warn)}</p>
   </details>
-  <div class="acoes"><button type="button" id="copiar">Copiar decisão</button><span id="dec-resumo"></span></div>
+  <div class="acoes"><button type="button" id="copiar">${esc(S.copy_decision)}</button><span id="dec-resumo"></span></div>
   <p role="status" id="copiado"></p>
-  <p class="nota">Depois de copiar, cole na conversa com quem conduz o projeto (ou envie por e-mail). Sua escolha fica salva só neste navegador.</p>
-  <details class="json tec" id="tec-dec"><summary>Para quem constrói</summary>
-    <p>Arquivo da decisão (o mesmo texto que "Copiar decisão" copia):</p><pre id="dec-json" aria-label="Arquivo da decisão"></pre>
-    <p>Para gravar no projeto, salve como <code>decision.json</code> e rode <code>${esc(importCmd)}</code>.</p></details>
+  <p class="nota">${esc(S.after_copy)}</p>
+  <details class="json tec" id="tec-dec"><summary>${esc(S.for_builders)}</summary>
+    <p>${escT(S.decision_file)}</p><pre id="dec-json" aria-label="${esc(S.decision_file_label)}"></pre>
+    <p>${S.save_as(esc(importCmd))}</p></details>
 </section>`;
 
-    // ---------- como contamos ----------
-    const div = rows.flatMap((r) => (opts.measured?.[r.id]?.divergences ?? []).map((x) => `${letters.get(r.id)}: ${METRIC_PT[x.metric] ?? x.metric} medido ${x.measured}, declarado ${x.declared}`));
-    const ncs = rows.flatMap((r) => Object.entries(r.metrics_detail?.not_comparable ?? {}).map(([k, why]) => `${letters.get(r.id)}, ${METRIC_PT[k] ?? k}: ${why}`));
+    // ---------- how we counted ----------
+    const div = rows.flatMap((r) => (opts.measured?.[r.id]?.divergences ?? []).map((x) => S.measured_vs_declared(letters.get(r.id), S.metric[x.metric] ?? x.metric, x.measured, x.declared)));
+    const ncs = rows.flatMap((r) => Object.entries(r.metrics_detail?.not_comparable ?? {}).map(([k, why]) => `${letters.get(r.id)}, ${S.metric[k] ?? k}: ${why}`));
     const techAbout = m.metrics_method_tech || (opts.warnings ?? []).length
-      ? `<details class="det tec"><summary>Para quem constrói</summary>${m.metrics_method_tech ? `<p>${esc(m.metrics_method_tech)}</p>` : ''}${(opts.warnings ?? []).length ? `<p>Avisos da preparação: ${esc(opts.warnings.join(' · '))}</p>` : ''}</details>` : '';
-    const about = `<details class="sobre"><summary>Como os números foram contados</summary>
-  <p><b>Telas:</b> telas diferentes do começo ao fim do caminho principal; diálogo não conta como tela.</p>
-  <p><b>Cliques ${esc(doneNoun)}:</b> cliques no caminho principal até o fim da tarefa. A lista de cada versão está nos detalhes dela.</p>
-  <p><b>Palavras por tela:</b> média das palavras visíveis no conteúdo, medida nas telas (sem o menu e o cabeçalho do produto).</p>
-  <p><b>Problemas resolvidos:</b> dos ${cited.length} problemas de hoje citados pelas versões, quantos a verificação confirma como resolvidos. São achados de texto, de tela e de posição, contados um a um e sem peso (um problema que se repete em várias telas conta várias vezes). Os que ainda precisam de conferência aparecem ao lado e os que continuam não contam; quando o que falta conferir pode mudar quem lidera, nenhuma versão leva o selo.</p>
-  <p>Menos é melhor, exceto em problemas resolvidos.</p>
-  ${m.persona ? `<p><b>Para quem:</b> ${esc(m.persona)}</p>` : ''}
-  ${m.task ? `<p><b>Tarefa:</b> ${esc(m.task)}</p>` : ''}
-  ${m.metrics_method ? `<p><b>Como esta comparação contou:</b> ${esc(m.metrics_method)}</p>` : ''}
-  ${div.length ? `<p><b>Medido diferente do declarado:</b> ${esc(div.join(' · '))}.</p>` : ''}
-  ${ncs.length ? `<p><b>Números não comparáveis:</b> ${esc(ncs.join(' · '))}.</p>` : ''}
-  ${lint && !lint.layout ? '<p>A posição dos elementos na tela não foi medida nesta geração: problemas de posição aparecem como "precisa conferir".</p>' : ''}
+      ? `<details class="det tec"><summary>${esc(S.for_builders)}</summary>${m.metrics_method_tech ? `<p>${esc(m.metrics_method_tech)}</p>` : ''}${(opts.warnings ?? []).length ? `<p>${esc(S.prep_warnings(opts.warnings.join(' · ')))}</p>` : ''}</details>` : '';
+    const about = `<details class="sobre"><summary>${esc(S.how_counted)}</summary>
+  <p>${S.about_screens}</p>
+  <p>${S.about_clicks(esc(doneNoun))}</p>
+  <p>${S.about_words}</p>
+  <p>${S.about_resolved(cited.length)}</p>
+  <p>${esc(S.about_less)}</p>
+  ${m.persona ? `<p><b>${esc(S.for_whom)}</b> ${esc(m.persona)}</p>` : ''}
+  ${m.task ? `<p><b>${esc(S.task)}</b> ${esc(m.task)}</p>` : ''}
+  ${m.metrics_method ? `<p><b>${esc(S.how_this_counted)}</b> ${esc(m.metrics_method)}</p>` : ''}
+  ${div.length ? `<p><b>${esc(S.measured_diff)}</b> ${esc(div.join(' · '))}.</p>` : ''}
+  ${ncs.length ? `<p><b>${esc(S.nc_numbers)}</b> ${esc(ncs.join(' · '))}.</p>` : ''}
+  ${lint && !lint.layout ? `<p>${escT(S.no_layout)}</p>` : ''}
   ${techAbout}
 </details>`;
 
-    const nav = chunks.length < 2 ? '' : `<nav class="paginas" aria-label="Páginas">${chunks.map((c, i) => `<a href="${esc(pageFileName(file, i + 1))}"${i + 1 === n ? ' aria-current="page"' : ''}>${i + 1} · ${esc(c.slice(1).map((r) => letters.get(r.id)).join(', '))}</a>`).join('')}</nav>`;
+    const nav = chunks.length < 2 ? '' : `<nav class="paginas" aria-label="${esc(S.pages)}">${chunks.map((c, i) => `<a href="${esc(pageFileName(file, i + 1))}"${i + 1 === n ? ' aria-current="page"' : ''}>${i + 1} · ${esc(c.slice(1).map((r) => letters.get(r.id)).join(', '))}</a>`).join('')}</nav>`;
     const summary = rows.map(summaryCard).join('');
-    const moment = sameMoment ? `<p class="momento">As telas dos cartões mostram o mesmo momento do fluxo: o passo ${esc(curHero.step)} de hoje e o equivalente em cada versão.</p>` : '';
+    const moment = sameMoment ? `<p class="momento">${esc(S.same_moment(curHero.step))}</p>` : '';
     const panels = pageRows.map(panel).join('');
     const data = `<script type="application/json" id="vx-data">${JSON.stringify(Object.fromEntries(used)).replace(/</g, '\\u003c')}</script>`;
     const model = { key: storeKey, module: m.module, flow: m.flow, ids: rows.map((r) => r.id), current: cur.id, names: Object.fromEntries(rows.map((r) => [r.id, labelOf(r)])), changes: Object.fromEntries(rows.map((r) => [r.id, r.changes ?? {}])) };
     const cropCss = [...crops].map(([css, k]) => (k.startsWith('k') ? `.${k}{${css.replace(/\.KEY/g, `.${k}`)}}` : `.${k}{${css}}`)).join('\n');
-    const head = full ? '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' : '';
-    const html = `${head}<title>Variações · ${esc(m.title)}${n > 1 ? ` · página ${n} de ${chunks.length}` : ''}</title>
+    const head = full ? `<!doctype html>\n<html lang="${S.html_lang}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n` : '';
+    const html = `${head}<title>${esc(S.title(m.title, n, chunks.length))}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
 <style>
-/* Primeiro a resposta, depois o detalhe: pergunta + resumo Hoje | A | B | C na primeira dobra; uma versão por vez
-   (abas) com passo a passo; detalhes recolhidos; decisão no fim. */
+/* Answer first, then the detail: question + summary Today | A | B | C above the fold; one version at a time
+   (tabs) with step by step; details folded; decision at the end. */
 ${THEME_TOKENS}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--sans);margin:0;overflow-x:hidden}
 [hidden]{display:none!important}
@@ -644,7 +628,7 @@ button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible
 .hoje .letra,.letra-hoje{background:var(--fg);color:var(--surface)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .nota{color:var(--muted);font-size:13px;margin:0}
-/* resumo */
+/* summary */
 .momento{margin:0 0 -14px;color:var(--muted);font-size:13px;max-width:72ch}
 .resumo{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:14px;align-items:stretch}
 .rc{display:grid;grid-template-rows:subgrid;grid-row:span 6;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
@@ -666,7 +650,7 @@ button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible
 .nc{font-size:12px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:999px;padding:0 8px}
 .gc{margin:0;font-size:13px;line-height:1.4}.gc strong{display:inline-block;min-width:44px;font-weight:700}.ganha strong{color:var(--ok)}.custa strong{color:var(--bad)}
 .ver{color:var(--accent);font-weight:600;text-decoration:none;align-self:end;padding:10px 0;min-height:44px}.ver:hover{text-decoration:underline}
-/* versões */
+/* versions */
 .versoes{display:grid;gap:14px;min-width:0}.versoes>h2,.dec h2{margin:0;font:600 22px var(--serif)}
 .abas{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
 .abas button{font:600 14px var(--sans);display:inline-flex;gap:8px;align-items:center;border:1px solid transparent;border-bottom:0;background:none;color:var(--muted);padding:8px 14px;min-height:44px;border-radius:10px 10px 0 0;cursor:pointer;margin-bottom:-1px}
@@ -713,7 +697,7 @@ button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible
 .selo{display:inline-block;border-radius:999px;padding:0 8px;font-size:12px;font-weight:700;margin-right:4px}
 .selo-ok{background:var(--ok-soft);color:var(--ok)}.selo-bad{background:var(--bad-soft);color:var(--bad)}.selo-check{background:var(--warn-soft);color:var(--warn)}
 .tec code,.tec pre{font:12px var(--mono);overflow-wrap:anywhere}
-/* decisão */
+/* decision */
 .dec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;max-width:1100px;width:100%;justify-self:center}
 .dec>p{max-width:72ch}
 .retomada{margin:0;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;background:var(--accent-soft);border-radius:10px;padding:8px 12px}
@@ -767,17 +751,17 @@ button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible
 ${cropCss}
 .resumo{--cols:${rows.length}}
 </style>
-${full ? '</head>\n<body>\n' : ''}<div class="pg" lang="pt-BR">
+${full ? '</head>\n<body>\n' : ''}<div class="pg" lang="${S.html_lang}">
   <header class="topo">
-    <div class="eyebrow">${opts.product ? `${esc(opts.product)} · ` : ''}${esc(m.title)} · ${rows.length - 1} versões</div>
+    <div class="eyebrow">${opts.product ? `${esc(opts.product)} · ` : ''}${esc(m.title)} · ${esc(S.eyebrow_versions(rows.length - 1))}</div>
     <h1>${esc(question)}</h1>
     <p class="lede">${esc(lead.sentence)}</p>
     ${nav}
   </header>
   ${moment}
-  <section class="resumo" aria-label="Resumo das versões">${summary}</section>
+  <section class="resumo" aria-label="${esc(S.summary_label)}">${summary}</section>
   <section class="versoes" aria-labelledby="ver-t">
-    <h2 id="ver-t">Passo a passo</h2>
+    <h2 id="ver-t">${esc(S.step_by_step)}</h2>
     ${tabs}
     ${panels}
   </section>
@@ -785,11 +769,12 @@ ${full ? '</head>\n<body>\n' : ''}<div class="pg" lang="pt-BR">
   ${about}
   ${nav}
 </div>
-<dialog id="zoom" aria-label="Tela ampliada"><div class="z-cab"><span id="z-cap"></span><div><button type="button" data-z="-1" aria-label="Imagem anterior">←</button><button type="button" data-z="1" aria-label="Próxima imagem">→</button><button type="button" id="z-real" aria-pressed="false">Tamanho real</button><button type="button" data-z="0">Fechar</button></div></div><div class="z-corpo"><div id="z-body"></div></div></dialog>
+<dialog id="zoom" aria-label="${esc(S.zoomed)}"><div class="z-cab"><span id="z-cap"></span><div><button type="button" data-z="-1" aria-label="${esc(S.prev_image)}">←</button><button type="button" data-z="1" aria-label="${esc(S.next_image)}">→</button><button type="button" id="z-real" aria-pressed="false">${esc(S.actual_size)}</button><button type="button" data-z="0">${esc(S.close)}</button></div></div><div class="z-corpo"><div id="z-body"></div></div></dialog>
 ${data}
 <script type="application/json" id="vx-model">${JSON.stringify(model).replace(/</g, '\\u003c')}</script>
 <script>
 (function(){
+const T=${JSON.stringify({ ...S.js, unit: S.unit_image }).replace(/</g, '\\u003c')};
 let D={},M={};try{D=JSON.parse(document.getElementById('vx-data').textContent);M=JSON.parse(document.getElementById('vx-model').textContent);}catch(e){}
 document.querySelectorAll('img[data-k]').forEach(i=>{if(D[i.dataset.k])i.src=D[i.dataset.k];});
 const load=()=>{try{return JSON.parse(localStorage.getItem(M.key)||'{}')||{};}catch(e){return {};}};
@@ -817,7 +802,7 @@ const z=document.getElementById('zoom'),zb=document.getElementById('z-body'),zc=
 const fig=(k,name,cap)=>{const f=document.createElement('figure');if(cap){const c=document.createElement('figcaption');c.textContent=cap;f.append(c);}const im=new Image();im.src=D[k]||'';im.alt=name||'';f.append(im);return f;};
 const show=(i)=>{at=(i+list.length)%list.length;const b=list[at];
 zb.classList.toggle('z-par',!!b.dataset.pair);if(b.dataset.pair){const ks=b.dataset.pair.split('|'),ns=(b.dataset.names||'').split('|');zb.replaceChildren(...ks.map((k,j)=>fig(k,ns[j],ns[j])));}else zb.replaceChildren(fig(b.dataset.full,[b.dataset.name,b.dataset.cap].filter(Boolean).join(' · '),''));
-const s=document.createElement('b');s.textContent=b.dataset.name||'';const rest=[b.dataset.cap,list.length>1?(b.dataset.unit||'Imagem')+' '+(at+1)+' de '+list.length:''].filter(Boolean).join(' · ');zc.replaceChildren(s,rest?' · '+rest:'');
+const s=document.createElement('b');s.textContent=b.dataset.name||'';const rest=[b.dataset.cap,list.length>1?(b.dataset.unit||T.unit)+' '+(at+1)+T.of+list.length:''].filter(Boolean).join(' · ');zc.replaceChildren(s,rest?' · '+rest:'');
 z.querySelectorAll('[data-z="-1"],[data-z="1"]').forEach(x=>x.hidden=list.length<2);z.querySelector('.z-corpo').scrollTo(0,0);};
 document.querySelectorAll('.z[data-full],.z[data-pair]').forEach(b=>b.addEventListener('click',()=>{const scope=b.dataset.pair?null:(b.closest('.slide')||b.closest('.resumo'));list=scope?[...scope.querySelectorAll('.z[data-full]')].filter(x=>x.offsetParent!==null):[b];if(!list.includes(b))list=[b];show(list.indexOf(b));if(z.showModal)z.showModal();else z.setAttribute('open','');}));
 const zr=document.getElementById('z-real');zr.addEventListener('click',()=>{const on=zr.getAttribute('aria-pressed')!=='true';zr.setAttribute('aria-pressed',String(on));zb.classList.toggle('real',on);});
@@ -833,13 +818,13 @@ const mixing=()=>f.querySelector('[name=misturar]').checked;
 const read=()=>{const mode=mixing()?'compose':'variant';const d={format:1,module:M.module,flow:M.flow,mode};
 if(mode==='variant')d.variant=val('variante');else{d.compose={};AX.forEach(a=>{d.compose[a]=f.querySelector('[name="eixo-'+a+'"]').value;});}
 d.comment=f.querySelector('[name=comentario]').value.trim();d.by=por.value.trim();d.at=new Date().toISOString().slice(0,10);return d;};
-const notes=()=>{AX.forEach(a=>{const v=f.querySelector('[name="eixo-'+a+'"]').value;const t=(M.changes[v]||{})[a]||(v===M.current?'como hoje':'');f.querySelector('[data-eixo-nota="'+a+'"]').textContent=t;});};
-const AXN={screen:'tela',flow:'fluxo',behavior:'comportamento',text:'texto'};
-const summ=(d)=>d.mode==='compose'?'Sua escolha: mistura ('+AX.map(a=>AXN[a]+' '+(d.compose[a]===M.current?'de hoje':'de '+String(M.names[d.compose[a]]||'').split(' · ')[0])).join(', ')+').':d.variant?'Sua escolha: '+(d.variant===M.current?'nenhuma, manter como está':M.names[d.variant])+'.':'Nenhuma escolha ainda.';
+const notes=()=>{AX.forEach(a=>{const v=f.querySelector('[name="eixo-'+a+'"]').value;const t=(M.changes[v]||{})[a]||(v===M.current?T.as_today:'');f.querySelector('[data-eixo-nota="'+a+'"]').textContent=t;});};
+const AXN=${JSON.stringify(S.axis_lower)};
+const summ=(d)=>d.mode==='compose'?T.your_mix+AX.map(a=>AXN[a]+' '+(d.compose[a]===M.current?T.of_today:T.of_prefix+String(M.names[d.compose[a]]||'').split(' · ')[0])).join(', ')+').':d.variant?T.your_choice+(d.variant===M.current?T.keep:M.names[d.variant])+'.':T.no_choice;
 const lockChoice=()=>{const on=mixing();fs.disabled=on;document.getElementById('escolha-nota').hidden=!on;};
 const sync=()=>{notes();lockChoice();const d=read();if(d.variant||d.mode==='compose')document.getElementById('escolha-erro').hidden=true;out.textContent=JSON.stringify(d,null,2);document.getElementById('dec-resumo').textContent=summ(d);if(d.by){perr.hidden=true;por.removeAttribute('aria-invalid');}S.decision=d;save(S);};
 const fill=(d)=>{f.querySelectorAll('[name=variante]').forEach(x=>x.checked=!!d&&x.value===d.variant);f.querySelector('[name=misturar]').checked=!!d&&d.mode==='compose';mx.open=!!d&&d.mode==='compose';
-AX.forEach(a=>{const s=f.querySelector('[name="eixo-'+a+'"]');const v=d&&d.compose&&d.compose[a];s.value=v&&[...s.options].some(o=>o.value===v)?v:M.current;});f.querySelector('[name=comentario]').value=(d&&d.comment)||'';por.value=(d&&d.by&&d.by!=='dono')?d.by:'';};
+AX.forEach(a=>{const s=f.querySelector('[name="eixo-'+a+'"]');const v=d&&d.compose&&d.compose[a];s.value=v&&[...s.options].some(o=>o.value===v)?v:M.current;});f.querySelector('[name=comentario]').value=(d&&d.comment)||'';por.value=(d&&d.by&&d.by!=='dono'&&d.by!=='owner')?d.by:'';};
 const had=S.decision&&(S.decision.variant||S.decision.mode==='compose'||S.decision.comment||S.decision.by);
 if(had){fill(S.decision);ret.hidden=false;}
 document.getElementById('limpar').addEventListener('click',()=>{fill(null);S.decision=null;save(S);ret.hidden=true;document.getElementById('copiado').textContent='';sync();});
@@ -847,7 +832,7 @@ f.addEventListener('input',sync);f.addEventListener('change',sync);sync();
 document.getElementById('copiar').addEventListener('click',async()=>{const d=read();const st=document.getElementById('copiado');
 const ge=document.getElementById('escolha-erro');if(d.mode==='variant'&&!d.variant){ge.hidden=false;st.textContent='';f.querySelector('[name=variante]').focus();return;}ge.hidden=true;
 if(!d.by){perr.hidden=false;por.setAttribute('aria-invalid','true');por.focus();st.textContent='';return;}
-const t=JSON.stringify(d,null,2);try{await navigator.clipboard.writeText(t);st.textContent='Decisão copiada. Cole na conversa com quem conduz o projeto (ou envie por e-mail).';}catch(e){document.getElementById('tec-dec').open=true;const r=document.createRange();r.selectNodeContents(out);const s=getSelection();s.removeAllRanges();s.addRange(r);st.textContent='Não deu para copiar sozinho: o texto da decisão está selecionado abaixo; copie e cole na conversa com quem conduz o projeto.';}});
+const t=JSON.stringify(d,null,2);try{await navigator.clipboard.writeText(t);st.textContent=T.copied;}catch(e){document.getElementById('tec-dec').open=true;const r=document.createRange();r.selectNodeContents(out);const s=getSelection();s.removeAllRanges();s.addRange(r);st.textContent=T.copy_failed;}});
 })();
 </script>${full ? '\n</body>\n</html>\n' : ''}`;
     return { file: pageFileName(file, n), html, bytes: Buffer.byteLength(html) };

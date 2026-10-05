@@ -1,6 +1,6 @@
 ---
 id: link-text
-title: Por que evitar "clique aqui" em links?
+title: Why avoid "click here" in links?
 category: ux-writing
 components: [link]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["2.4.4", "2.4.9", "2.5.3", "1.4.1"]
 related: [link-vs-button, link-in-new-tab, button-text, keyboard-focus]
 ---
 
-# Por que evitar "clique aqui" em links?
+# Why avoid "click here" in links?
 
-> **Regra:** O texto do link deve informar o destino ou o propósito por si só; nunca use "clique aqui", "aqui" ou "leia mais" como único texto clicável.
+> **Rule:** Link text must convey the destination or purpose on its own; never use "click here", "here" or "read more" as the only clickable text.
 
-## Contexto
+## Context
 
-Links levam a outra página, seção, documento ou recurso. As pessoas os localizam por varredura visual, pelo teclado ou pela lista de links do leitor de tela. Se vários dizem só "clique aqui" ou "saiba mais", o destino se perde longe da frase ao redor.
+Links lead to another page, section, document or resource. People find them by visual scanning, by keyboard or through the screen reader's links list. If several say only "click here" or "learn more", the destination is lost away from the surrounding sentence.
 
-Esta regra cobre a redação. Escolher entre link e botão, abrir em nova aba, foco e contraste têm padrões próprios.
+This rule covers the wording. Choosing between link and button, opening in a new tab, focus and contrast have their own patterns.
 
-Um benchmark de 33 sites de e-commerce relatou descrição insuficiente do destino em 67% deles; o número vale para aquela amostra e setor, mas mostra que o problema é recorrente.
+A benchmark of 33 e-commerce sites reported insufficient description of the destination on 67% of them; the figure applies to that sample and sector, but shows that the problem is recurrent.
 
-## Decisão
+## Decision
 
-- **SE** o link leva a um destino **ENTÃO** nomeie a página, seção, arquivo ou recurso no próprio texto ("Consultar os critérios WCAG 2.2").
-- **SE** o texto é "aqui", "clique aqui" ou "leia mais" isolado **ENTÃO** reescreva com as palavras informativas dentro do link.
-- **SE** links próximos levam a destinos diferentes **ENTÃO** use textos diferentes.
-- **SE** links têm a mesma função e destino **ENTÃO** use o mesmo texto.
-- **SE** o contexto é indispensável **ENTÃO** mantenha-o na mesma frase, parágrafo, item ou célula e associe-o programaticamente.
-- **SE** o link baixa arquivo ou muda de contexto **ENTÃO** informe formato e, se relevante, tamanho ("Baixar contrato (PDF, 2 MB)").
-- **SE** o link é só imagem ou ícone **ENTÃO** forneça nome acessível que descreva o destino.
-- **SE** é navegação **ENTÃO** use `<a href>` nativo; **SE** é ação **ENTÃO** use botão.
-- **SENÃO** escreva texto curto, em sentence case, coerente com o título da página de destino.
+- **IF** the link leads to a destination **THEN** name the page, section, file or resource in the text itself ("Read the WCAG 2.2 criteria").
+- **IF** the text is "here", "click here" or "read more" on its own **THEN** rewrite it with the informative words inside the link.
+- **IF** nearby links lead to different destinations **THEN** use different texts.
+- **IF** links have the same function and destination **THEN** use the same text.
+- **IF** context is indispensable **THEN** keep it in the same sentence, paragraph, item or cell and associate it programmatically.
+- **IF** the link downloads a file or changes context **THEN** state the format and, if relevant, the size ("Download contract (PDF, 2 MB)").
+- **IF** the link is only an image or icon **THEN** provide an accessible name that describes the destination.
+- **IF** it is navigation **THEN** use a native `<a href>`; **IF** it is an action **THEN** use a button.
+- **ELSE** write short text, in sentence case, consistent with the title of the destination page.
 
-## Quando usar
+## When to use
 
-- Listas de recursos, artigos, documentos e resultados.
-- Cards que repetem a mesma ação para conteúdos distintos.
-- Downloads em que formato ou tamanho influenciam a decisão.
-- Navegação por teclado ou por lista de links.
+- Lists of resources, articles, documents and results.
+- Cards that repeat the same action for different content.
+- Downloads where format or size affects the decision.
+- Navigation by keyboard or through a links list.
 
-## Quando evitar
+## When to avoid
 
-- "Clique aqui", "aqui", "este link" como único texto → **use em vez disso:** nome do destino.
-- "Leia mais" repetido para destinos distintos → **use em vez disso:** "Ler sobre <assunto>".
-- Parágrafo inteiro dentro do link → **use em vez disso:** poucas palavras informativas.
-- URL longa como rótulo → **use em vez disso:** nome do recurso.
-- "Link para…" → **use em vez disso:** direto o destino (o leitor de tela já anuncia "link").
+- "Click here", "here", "this link" as the only text → **use instead:** the name of the destination.
+- "Read more" repeated for different destinations → **use instead:** "Read about <subject>".
+- A whole paragraph inside the link → **use instead:** a few informative words.
+- A long URL as the label → **use instead:** the name of the resource.
+- "Link to…" → **use instead:** the destination directly (the screen reader already announces "link").
 
-## Faça
+## Do
 
-- Nomeie o destino.
-- Informe downloads e mudanças de contexto.
-- Diferencie links repetidos acrescentando o objeto.
-- Teste o texto numa lista isolada de links.
+- Name the destination.
+- Flag downloads and changes of context.
+- Tell repeated links apart by adding the object.
+- Test the text in an isolated list of links.
 
-## Evite
+## Avoid
 
-- Depender só de posição, cor, ícone ou imagem vizinha.
-- Esconder o destino.
-- Frases longas como texto do link.
+- Relying only on position, color, icon or a neighboring image.
+- Hiding the destination.
+- Long sentences as link text.
 
-## Acessibilidade
+## Accessibility
 
-- WCAG 2.4.4 (A): propósito determinável pelo texto ou pelo contexto programaticamente associado.
-- Teste em lista isolada com teclado e leitor de tela; se vários forem anunciados como "saiba mais", acrescente o objeto.
-- Não esconda texto visível claro atrás de `aria-label` diferente (WCAG 2.5.3).
-- Link só de imagem ou ícone precisa de nome acessível.
-- Foco visível e diferenciação além da cor (WCAG 1.4.1) complementam esta regra.
+- WCAG 2.4.4 (A): purpose determinable from the text or from programmatically associated context.
+- Test in an isolated list with keyboard and screen reader; if several are announced as "learn more", add the object.
+- Do not hide clear visible text behind a different `aria-label` (WCAG 2.5.3).
+- An image-only or icon-only link needs an accessible name.
+- Visible focus and differentiation beyond color (WCAG 1.4.1) complement this rule.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Documento | "Consultar a política de privacidade" |
-| Download | "Baixar relatório de acessibilidade (PDF)" |
-| Planos | "Saiba mais sobre o plano empresarial" |
-| Nova aba | "Abrir documentação em nova aba" |
+| Document | "Read the privacy policy" |
+| Download | "Download accessibility report (PDF)" |
+| Plans | "Learn more about the business plan" |
+| New tab | "Open documentation in a new tab" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O texto informa o destino ou propósito?
-- [ ] O link faz sentido fora da frase?
-- [ ] Links próximos com destinos diferentes têm textos diferentes?
-- [ ] Links para o mesmo destino usam o mesmo texto?
-- [ ] Nenhum link usa "clique aqui", "aqui" ou "leia mais" isolado?
-- [ ] Downloads e mudanças de contexto são informados?
-- [ ] O link usa `<a>` com `href` válido?
-- [ ] O texto foi testado em lista de links com leitor de tela?
+- [ ] Does the text convey the destination or purpose?
+- [ ] Does the link make sense outside the sentence?
+- [ ] Do nearby links with different destinations have different texts?
+- [ ] Do links to the same destination use the same text?
+- [ ] Does no link use "click here", "here" or "read more" on its own?
+- [ ] Are downloads and changes of context flagged?
+- [ ] Does the link use `<a>` with a valid `href`?
+- [ ] Was the text tested in a links list with a screen reader?
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, 2.4.4 (Link Purpose in Context): propósito pelo texto ou contexto associado.
-- GOV.UK Service Manual (escrita para interfaces): propósito no próprio texto; leitores de tela listam links isolados.
-- Baymard Institute (links de navegação em e-commerce): textos genéricos e dependência de contexto (benchmark de 33 sites).
-- Nielsen Norman Group (padrão F de leitura): palavras informativas em links apoiam a varredura.
-- MDN (elemento `<a>`): link nativo com `href`.
-- Adobe Spectrum e IBM Carbon (Link) e U.S. Web Design System: texto significativo e único.
+- WCAG 2.2, 2.4.4 (Link Purpose in Context): purpose from the text or associated context.
+- GOV.UK Service Manual (writing for interfaces): purpose in the text itself; screen readers list links in isolation.
+- Baymard Institute (navigation links in e-commerce): generic texts and context dependence (benchmark of 33 sites).
+- Nielsen Norman Group (F-shaped reading pattern): informative words in links support scanning.
+- MDN (`<a>` element): native link with `href`.
+- Adobe Spectrum and IBM Carbon (Link) and U.S. Web Design System: meaningful, unique text.

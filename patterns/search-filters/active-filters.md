@@ -1,6 +1,6 @@
 ---
 id: active-filters
-title: Como mostrar os filtros ativos?
+title: How do you show active filters?
 category: search-filters
 components: [filter, chip, list]
 type: recommendation
@@ -11,89 +11,89 @@ wcag: ["4.1.2", "4.1.3", "1.4.1", "2.1.1"]
 related: [filter-structure, applying-filters, no-search-results, date-range-filter]
 ---
 
-# Como mostrar os filtros ativos?
+# How do you show active filters?
 
-> **Regra:** Depois de aplicar filtros, exiba um resumo visível com nome e valor de cada critério, remoção individual e uma ação "Limpar filtros", fora de qualquer painel fechado.
+> **Rule:** After applying filters, show a visible summary with the name and value of each criterion, individual removal and a "Clear filters" action, outside any closed panel.
 
-## Contexto
+## Context
 
-Aplicar um filtro altera os resultados, mas a tarefa continua: a pessoa precisa entender por que a lista encolheu, quais critérios restringem e como ampliar de novo.
+Applying a filter changes the results, but the task goes on: the person needs to understand why the list shrank, which criteria restrict it and how to widen it again.
 
-Um contador como "3 filtros" prova que há um recorte, mas não revela qual. O resumo deve exibir os valores aplicados junto à lista ou ao controle de filtros.
+A counter such as "3 filters" proves there is a cut, but does not reveal which one. The summary must show the applied values next to the list or the filter control.
 
-Sem esse resumo, uma lista reduzida pode parecer o catálogo inteiro, e remover critérios exige reabrir o painel e caçar cada controle.
+Without that summary, a reduced list can look like the whole catalog, and removing criteria means reopening the panel and hunting for each control.
 
-## Decisão
+## Decision
 
-- **SE** há um ou mais filtros aplicados **ENTÃO** mostre o resumo ao lado dos resultados.
-- **SE** o painel de filtros está fechado ou em gaveta **ENTÃO** o resumo e a contagem continuam visíveis fora dele.
-- **SE** exibe cada item **ENTÃO** use "Atributo: valor" ("Marca: Nike", "Preço: até R$ 300"); contador apenas complementa.
-- **SE** o usuário quer desfazer um critério **ENTÃO** cada item tem ação própria de remoção, sem reabrir o painel.
-- **SE** há dois ou mais filtros **ENTÃO** ofereça "Limpar filtros" explícito, sem escondê-lo em menus.
-- **SE** o painel usa botão "Aplicar" **ENTÃO** escolhas pendentes não aparecem como aplicadas até a confirmação.
-- **SE** o usuário volta de uma página de detalhe **ENTÃO** mantenha os filtros (estado na URL ou no histórico).
-- **SE** não há resultado **ENTÃO** explique e ofereça relaxar ou limpar o recorte.
-- **SENÃO** em mobile use lista horizontal ou empilhada que indique itens além da área visível.
+- **IF** one or more filters are applied **THEN** show the summary next to the results.
+- **IF** the filter panel is closed or in a drawer **THEN** the summary and the count stay visible outside it.
+- **IF** you show each item **THEN** use "Attribute: value" ("Brand: Nike", "Price: up to $300"); a counter only complements it.
+- **IF** the user wants to undo a criterion **THEN** each item has its own remove action, without reopening the panel.
+- **IF** there are two or more filters **THEN** offer an explicit "Clear filters", not hidden in menus.
+- **IF** the panel uses an "Apply" button **THEN** pending choices do not appear as applied until confirmed.
+- **IF** the user comes back from a detail page **THEN** keep the filters (state in the URL or the history).
+- **IF** there is no result **THEN** explain and offer to relax or clear the cut.
+- **ELSE** on mobile use a horizontal or stacked list that signals items beyond the visible area.
 
-## Quando usar
+## When to use
 
-- Listas com mais de um filtro.
-- Catálogos e resultados de busca.
-- Filtros escondidos em gaveta ou menu.
-- Fluxos com ida e volta a páginas de detalhe.
+- Lists with more than one filter.
+- Catalogs and search results.
+- Filters hidden in a drawer or menu.
+- Flows that go back and forth to detail pages.
 
-## Quando evitar
+## When to avoid
 
-- Lista sem filtros aplicados → **use em vez disso:** não exibir o resumo.
-- Chips sem ação de remover → **use em vez disso:** chips removíveis ou texto simples.
-- Contador sem nome ou valor → **use em vez disso:** "Atributo: valor".
+- A list with no filters applied → **use instead:** do not show the summary.
+- Chips with no remove action → **use instead:** removable chips or plain text.
+- A counter with no name or value → **use instead:** "Attribute: value".
 
-## Faça
+## Do
 
-- Informe quantos resultados restam e atualize a cada mudança.
-- Sincronize resumo, controles, contagem e URL.
-- Posicione o resumo em local previsível acima da lista.
-- Preserve o estado ao usar Voltar.
+- Say how many results remain and update on every change.
+- Keep summary, controls, count and URL in sync.
+- Place the summary in a predictable spot above the list.
+- Preserve the state when using Back.
 
-## Evite
+## Avoid
 
-- Mostrar só um contador.
-- Obrigar a reabrir o painel para remover.
-- Apagar filtros sem aviso.
-- Perder o recorte na navegação.
+- Showing only a counter.
+- Forcing the panel to be reopened to remove a filter.
+- Clearing filters without warning.
+- Losing the cut while navigating.
 
-## Acessibilidade
+## Accessibility
 
-- Cada remoção é uma ação nomeada, como "Remover filtro Marca: Nike", com foco visível e uso por teclado e toque (WCAG 4.1.2, 2.1.1).
-- Agrupe o resumo com título ou nome acessível.
-- Anuncie nova quantidade de resultados em região de status sem mover o foco (WCAG 4.1.3).
-- Após remover, mantenha o foco em ponto previsível se o controle sumir.
-- Não dependa só de cor (WCAG 1.4.1); lista horizontal precisa ser navegável por teclado.
+- Each removal is a named action, such as "Remove filter Brand: Nike", with visible focus and usable by keyboard and touch (WCAG 4.1.2, 2.1.1).
+- Group the summary with a heading or an accessible name.
+- Announce the new number of results in a status region without moving focus (WCAG 4.1.3).
+- After removing, keep focus at a predictable point if the control disappears.
+- Do not rely only on color (WCAG 1.4.1); a horizontal list must be keyboard-navigable.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Item removível | "Marca: Nike" com ação "Remover filtro Marca: Nike" |
-| Limpar tudo | "Limpar filtros" |
-| Contagem | "12 resultados" |
-| Painel fechado | "Filtros (3)" |
+| Removable item | "Brand: Nike" with the action "Remove filter Brand: Nike" |
+| Clear all | "Clear filters" |
+| Count | "12 results" |
+| Closed panel | "Filters (3)" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O resumo mostra atributo e valor de cada filtro?
-- [ ] Cada filtro pode ser removido individualmente?
-- [ ] Existe "Limpar filtros" visível?
-- [ ] O resumo aparece com o painel fechado?
-- [ ] A contagem de resultados acompanha o estado?
-- [ ] Os filtros persistem ao usar Voltar?
-- [ ] A remoção funciona por teclado, toque e leitor de tela?
-- [ ] Escolhas não confirmadas não aparecem como aplicadas?
+- [ ] Does the summary show the attribute and value of each filter?
+- [ ] Can each filter be removed individually?
+- [ ] Is there a visible "Clear filters"?
+- [ ] Does the summary appear with the panel closed?
+- [ ] Does the result count follow the state?
+- [ ] Do the filters persist when using Back?
+- [ ] Does removal work by keyboard, touch and screen reader?
+- [ ] Do unconfirmed choices stay out of the applied state?
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute (filtros aplicados em visão geral e boas práticas de listas): problemas de confirmação, remoção e contexto sem resumo; soluções para desktop e mobile.
-- IBM Carbon (Filtering): indicador de quantidade e limpeza sem reabrir o contêiner.
-- Red Hat PatternFly (Filters): chips removíveis, limpar todos, contagem.
-- WCAG 2.2, 4.1.2 (Name, Role, Value): nome e estado dos controles de remoção.
-- WCAG 2.2, 4.1.3 e técnica ARIA22: anúncios de status sem mover foco.
+- Baymard Institute (applied filters overview and list best practices): confirmation, removal and context problems without a summary; solutions for desktop and mobile.
+- IBM Carbon (Filtering): a quantity indicator and clearing without reopening the container.
+- Red Hat PatternFly (Filters): removable chips, clear all, count.
+- WCAG 2.2, 4.1.2 (Name, Role, Value): name and state of the remove controls.
+- WCAG 2.2, 4.1.3 and technique ARIA22: status announcements without moving focus.

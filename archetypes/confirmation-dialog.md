@@ -1,10 +1,10 @@
 ---
 id: confirmation-dialog
-title: Diálogo de confirmação
-summary: Interrupção curta que pede uma decisão explícita antes de uma ação de consequência séria, dizendo o que vai acontecer e com o quê.
+title: Confirmation dialog
+summary: Short interruption that asks for an explicit decision before an action with serious consequences, saying what will happen and to what.
 register: [operational, consumer]
-when-to-use: SE a ação é irreversível, afeta outras pessoas ou tem custo alto e não pode ser desfeita depois ENTÃO use diálogo de confirmação
-avoid-when: a ação é reversível (ofereça desfazer), é frequente e de baixo risco ou a confirmação seria só um hábito de clicar em sim
+when-to-use: IF the action is irreversible, affects other people or has a high cost and cannot be undone afterwards THEN use a confirmation dialog
+avoid-when: the action is reversible (offer undo), is frequent and low-risk, or the confirmation would just be a habit of clicking yes
 regions: [dialog-header, dialog-body, dialog-footer]
 primary-action: { region: dialog-footer, position: bottom-right, max: 1 }
 states: [open, running, error, success]
@@ -13,94 +13,94 @@ variations: [simple-confirmation, type-to-confirm, undo-instead-of-confirm, conf
 rules: [T1, T2, T5, T6, T7, F4]
 ---
 
-# Diálogo de confirmação
+# Confirmation dialog
 
-"Excluir projeto", "Enviar 12 pedidos aos fornecedores", "Revogar acesso de Ana", "Aplicar sugestões do agente a 300 itens". Confirmação existe para dar uma última chance consciente — e só funciona se for rara. Confirmar tudo treina a pessoa a clicar sem ler, e a confirmação que importava passa batida.
+"Delete project", "Send 12 orders to suppliers", "Revoke Ana's access", "Apply the agent's suggestions to 300 items". Confirmation exists to give one last conscious chance, and it only works if it is rare. Confirming everything trains the person to click without reading, and the confirmation that mattered slips by.
 
-## Quando usar
+## When to use
 
-- **SE** a ação não pode ser desfeita (exclusão definitiva, envio a terceiros, cobrança) **ENTÃO** use diálogo de confirmação.
-- **SE** a ação pode ser desfeita **ENTÃO** não confirme: execute e ofereça desfazer (variação `undo-instead-of-confirm`).
-- **SE** o alvo é de grande impacto (organização inteira, projeto com dados de muitas pessoas) **ENTÃO** use `type-to-confirm`.
-- **SE** a ação afeta vários itens ou tem efeitos colaterais **ENTÃO** use `confirmation-with-consequences`, com contagem e exemplos.
-- **SE** a ação foi proposta por um agente de IA **ENTÃO** a confirmação mostra exatamente o que será feito e em quais itens, e a pessoa decide; nunca execute por padrão.
-- **SENÃO** (ação comum e de baixo risco) **ENTÃO** execute direto com feedback.
+- **IF** the action cannot be undone (permanent deletion, sending to third parties, charging) **THEN** use a confirmation dialog.
+- **IF** the action can be undone **THEN** do not confirm: run it and offer undo (`undo-instead-of-confirm` variation).
+- **IF** the target has a large impact (a whole organization, a project with many people's data) **THEN** use `type-to-confirm`.
+- **IF** the action affects several items or has side effects **THEN** use `confirmation-with-consequences`, with a count and examples.
+- **IF** the action was proposed by an AI agent **THEN** the confirmation shows exactly what will be done and to which items, and the person decides; never run it by default.
+- **ELSE** (a common, low-risk action) **THEN** run it directly with feedback.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────┐
 │ dialog-header                             │
-│  Excluir o projeto "Aquisição Beta"? (h2) │
+│  Delete the project "Acquisition Beta"?   │
+│  (h2)                                     │
 ├──────────────────────────────────────────┤
 │ dialog-body                               │
-│  Os 48 documentos e o checklist serão     │
-│  excluídos. Esta ação não pode ser        │
-│  desfeita.                                │
+│  The 48 documents and the checklist will  │
+│  be deleted. This action cannot be        │
+│  undone.                                  │
 ├──────────────────────────────────────────┤
-│ dialog-footer  [Cancelar] [Excluir        │
-│                                 projeto]  │
+│ dialog-footer  [Cancel] [Delete project]  │
 └──────────────────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **dialog-header** — pergunta com o verbo e o alvo nomeado ("Excluir o projeto Aquisição Beta?"), nunca "Tem certeza?" ou "Atenção".
-- **dialog-body** — consequência concreta em uma ou duas frases: o que some, quem é afetado, se pode ser desfeito; quando houver, o campo de digitar o nome, com rótulo visível.
-- **dialog-footer** — "Cancelar" antes da ação, na ordem do produto; a ação repete o verbo e o objeto ("Excluir projeto") e usa o estilo destrutivo quando apaga ou revoga.
+- **dialog-header**: a question with the verb and the named target ("Delete the project Acquisition Beta?"), never "Are you sure?" or "Attention".
+- **dialog-body**: the concrete consequence in one or two sentences: what disappears, who is affected, whether it can be undone; when there is one, the type-the-name field, with a visible label.
+- **dialog-footer**: "Cancel" before the action, in the product's order; the action repeats the verb and object ("Delete project") and uses the destructive style when it erases or revokes.
 
-## Ações
+## Actions
 
-- **Primária:** uma, no `dialog-footer`, bottom-right — o próprio verbo da ação com objeto; destrutiva com estilo de perigo. Nunca "Confirmar", "Sim" ou "OK".
-- **Foco inicial:** em "Cancelar" (ou no campo de digitar) quando a ação é destrutiva; Enter não deve executar a destrutiva por acidente.
-- **Cancelar / Esc / ✕:** fecham sem efeito e devolvem o foco ao controle de origem.
-- **Execução:** bloqueia clique duplo; o diálogo só fecha depois do resultado.
+- **Primary:** one, in the `dialog-footer`, bottom-right: the action's own verb with an object; destructive with the danger style. Never "Confirm", "Yes" or "OK".
+- **Initial focus:** on "Cancel" (or on the type field) when the action is destructive; Enter must not run the destructive action by accident.
+- **Cancel / Esc / ✕:** close with no effect and return focus to the originating control.
+- **Execution:** blocks double clicks; the dialog only closes after the result.
 
-## Estados
+## States
 
-- **open** — pergunta, consequência e ações; na variação de digitar, a ação fica desabilitada até o texto conferir, com a regra dita no rótulo.
-- **running** — ação com indicador, ambos os botões bloqueados; para lotes longos, progresso.
-- **error** — falha: mensagem no corpo dizendo o que não aconteceu (e, em lote, quantos itens foram e quantos não), opção de tentar de novo.
-- **success** — diálogo fecha, confirmação breve na tela de origem com o resultado ("Projeto excluído"); em lote, resumo com contagem.
+- **open**: question, consequence and actions; in the type variation, the action stays disabled until the text matches, with the rule stated in the label.
+- **running**: the action with an indicator, both buttons locked; for long batches, progress.
+- **error**: failure: a message in the body saying what did not happen (and, in a batch, how many items went through and how many did not), an option to try again.
+- **success**: the dialog closes, a brief confirmation on the originating screen with the result ("Project deleted"); in a batch, a summary with a count.
 
-## Variações
+## Variations
 
 ### simple-confirmation
-Pergunta, consequência, Cancelar e ação.
-**Favorece:** irreversíveis de alvo único e impacto moderado.
-**Piora:** se usada para tudo, vira clique automático.
+Question, consequence, Cancel and the action.
+**Favors:** irreversible actions on a single target with moderate impact.
+**Worsens:** if used for everything, it becomes an automatic click.
 
 ### type-to-confirm
-A pessoa digita o nome do alvo para habilitar a ação.
-**Favorece:** alvos de grande impacto; impede confirmação por reflexo.
-**Piora:** atrito alto; usada em ações comuns, irrita e é contornada com copiar e colar.
+The person types the target's name to enable the action.
+**Favors:** high-impact targets; prevents reflex confirmation.
+**Worsens:** high friction; used on common actions, it annoys and gets bypassed with copy and paste.
 
 ### undo-instead-of-confirm
-Sem diálogo: a ação executa e uma notificação oferece "Desfazer" por alguns segundos.
-**Favorece:** ações reversíveis e frequentes (arquivar, mover); fluxo sem interrupção.
-**Piora:** exige que o sistema realmente consiga desfazer; a notificação precisa durar o bastante e ser alcançável por teclado.
+No dialog: the action runs and a notification offers "Undo" for a few seconds.
+**Favors:** reversible, frequent actions (archive, move); a flow without interruption.
+**Worsens:** requires that the system can truly undo; the notification must last long enough and be reachable by keyboard.
 
 ### confirmation-with-consequences
-Corpo com contagem, lista resumida dos itens afetados (os primeiros e "mais N") e efeitos colaterais.
-**Favorece:** ações em lote e propostas de agente; a pessoa vê o alcance real.
-**Piora:** diálogo maior; lista longa precisa de rolagem própria e resumo no topo.
+A body with a count, a short list of the affected items (the first ones and "N more") and side effects.
+**Favors:** bulk actions and agent proposals; the person sees the real reach.
+**Worsens:** a larger dialog; a long list needs its own scrolling and a summary at the top.
 
-## Anti-padrões
+## Anti-patterns
 
-- "Tem certeza?" com botões "Sim" e "Não".
-- Confirmação para ação reversível e frequente.
-- Foco inicial no botão destrutivo.
-- Botão destrutivo com estilo de primária comum.
-- Confirmação que não diz o que será perdido.
-- Confirmação aberta sobre outro diálogo.
-- Ação de agente executada antes de a pessoa ver o alcance.
+- "Are you sure?" with "Yes" and "No" buttons.
+- Confirmation for a reversible, frequent action.
+- Initial focus on the destructive button.
+- A destructive button styled like a common primary.
+- A confirmation that does not say what will be lost.
+- A confirmation opened over another dialog.
+- An agent action run before the person sees its reach.
 
 ## Checklist
 
-- [ ] Usada só para irreversível, de alto custo ou que afeta terceiros.
-- [ ] Título com verbo e alvo nomeado; corpo com a consequência concreta.
-- [ ] Ação com verbo + objeto, estilo destrutivo quando apaga; nunca rótulo genérico.
-- [ ] "Cancelar" antes da ação; foco inicial seguro.
-- [ ] Execução protegida contra clique duplo; diálogo fecha só com o resultado.
-- [ ] Em lote, contagem antes e resumo depois.
-- [ ] Nenhum diálogo empilhado.
+- [ ] Used only for irreversible, high-cost actions or ones that affect others.
+- [ ] A title with the verb and the named target; a body with the concrete consequence.
+- [ ] An action with verb + object, destructive style when it erases; never a generic label.
+- [ ] "Cancel" before the action; a safe initial focus.
+- [ ] Execution protected against double clicks; the dialog closes only with the result.
+- [ ] In a batch, a count before and a summary after.
+- [ ] No stacked dialogs.

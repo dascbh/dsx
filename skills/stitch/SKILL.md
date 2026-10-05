@@ -1,160 +1,160 @@
 ---
 name: stitch
-description: "Usa o Google Stitch sem edição manual: sincroniza o DESIGN.md, gera telas e variantes, critica com os gates do DSX, itera por instrução e traz para o código. Use para ver uma tela antes de codar, explorar opções ou quando mencionarem Stitch."
+description: "Uses Google Stitch with no manual editing: syncs the DESIGN.md, generates screens and variants, critiques them with the DSX gates, iterates by instruction and brings the result into code. Use to see a screen before coding it, to explore options, or when Stitch is mentioned."
 ---
 
-# Stitch no DSX: gerar, criticar, iterar, trazer
+# Stitch in DSX: generate, critique, iterate, bring back
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`DESIGN.md`, `UX.md`, `.stitch/`, `src/`) são do projeto do usuário.
+> **DSX root:** two levels above this skill's base directory. Paths `knowledge/`, `patterns/`, `tools/`, `templates/` are relative to it; unprefixed paths (`DESIGN.md`, `UX.md`, `.stitch/`, `src/`) belong to the user's project.
 
-**Papel do Stitch:** espaço de **exploração gerada**. O código continua sendo a fonte de verdade. Nada do Stitch entra no projeto sem passar pelos gates do DSX, e o HTML dele é referência de layout, **nunca código colado**.
+**Stitch's role:** a space for **generated exploration**. The code remains the source of truth. Nothing from Stitch enters the project without passing the DSX gates, and its HTML is a layout reference, **never pasted code**.
 
-**Pré-requisitos:** MCP `stitch` conectado e as skills oficiais do Google (`stitch-design`, `stitch-utilities`, `stitch-build`). Esta skill usa as oficiais para a mecânica e acrescenta o critério do DSX.
+**Prerequisites:** the `stitch` MCP connected and Google's official skills (`stitch-design`, `stitch-utilities`, `stitch-build`). This skill uses the official ones for the mechanics and adds the DSX criteria.
 
-## Estado no projeto (`.stitch/`, mesma convenção das skills oficiais)
+## State in the project (`.stitch/`, same convention as the official skills)
 
 ```
 .stitch/
-├── DESIGN.md          # export do DESIGN.md do projeto para o Stitch (gerado — não edite)
-├── metadata.json      # projectId, título, telas, design system (formato da skill oficial manage-design-system)
-├── check.json         # última saída de `tools/stitch/design-system.mjs check --json`
+├── DESIGN.md          # export of the project's DESIGN.md for Stitch (generated — do not edit)
+├── metadata.json      # projectId, title, screens, design system (format of the official manage-design-system skill)
+├── check.json         # latest output of `tools/stitch/design-system.mjs check --json`
 ├── designs/<slug>.html|png
-└── reviews/<slug>.md  # crítica de cada rodada: achados, aceitos, recusados (com motivo)
+└── reviews/<slug>.md  # critique of each round: findings, accepted, rejected (with reason)
 ```
 
-Projeto com nomes antigos (`conferencia.json`, `conferencia-bruta.json`, `revisoes/`, `"conferido"`, `"checkedAt"`, `conforme|divergente`): leia-os, avise "nome antigo, renomeie para X" e grave só com os nomes novos.
+Project with old names (`conferencia.json`, `conferencia-bruta.json`, `revisoes/`, `"conferido"`, `"checkedAt"`, `conforme|divergente`): read them, warn "old name, rename to X" and write only with the new names.
 
-Em `metadata.json`, acrescente ao formato oficial (as chaves da API do Stitch, como `designSystem` e `assetId`, ficam como na API): `"designSystem": { "assetId", "checked_at": "<data>", "status": "compliant|divergent" }`.
+In `metadata.json`, add to the official format (the Stitch API keys, such as `designSystem` and `assetId`, stay as in the API): `"designSystem": { "assetId", "checked_at": "<date>", "status": "compliant|divergent" }`.
 
-## Escolha o modo
+## Pick the mode
 
-| Pedido | Modo |
+| Request | Mode |
 |---|---|
-| Ainda não há design system / quer comparar estilos antes de sincronizar | skill `escolher-ds` (referências curadas, opções aplicadas às telas) |
-| Levar ao Stitch uma tela que **já existe no código** | **capture do código** (skill `capture-from-code` do DSX, ou o harness do projeto): nunca `generate_screen_from_text` — texto reinterpreta bordas, ícones e espaçamentos |
-| Primeira vez no projeto, ou o DESIGN.md/tokens mudaram | **1. Sincronizar** |
-| "Gera a tela de X", "como ficaria X" | **2. Gerar** (sincronize antes, se preciso) |
-| "Me mostra opções", "outras versões" | **3. Variantes** |
-| "Revisa/critica essa tela" (gerada ou já existente no Stitch) | **4. Criticar** |
-| Aplicar as críticas aceitas | **5. Iterar** |
-| "Implementa essa", "traz pro código" | **6. Trazer** |
+| No design system yet / want to compare styles before syncing | skill `choose-ds` (curated references, options applied to the screens) |
+| Take to Stitch a screen that **already exists in the code** | **capture from the code** (DSX `capture-from-code` skill, or the project's harness): never `generate_screen_from_text` — text reinterprets borders, icons and spacing |
+| First time in the project, or the DESIGN.md/tokens changed | **1. Sync** |
+| "Generate the X screen", "what would X look like" | **2. Generate** (sync first, if needed) |
+| "Show me options", "other versions" | **3. Variants** |
+| "Review/critique this screen" (generated or already in Stitch) | **4. Critique** |
+| Apply the accepted critiques | **5. Iterate** |
+| "Implement this one", "bring it into the code" | **6. Bring back** |
 
-O ciclo completo é **sincronizar → gerar → criticar → (você decide) → iterar → criticar → trazer**.
+The full cycle is **sync → generate → critique → (you decide) → iterate → critique → bring back**.
 
 ---
 
-## 1. Sincronizar o design system
+## 1. Sync the design system
 
-1. `node <DSX>/tools/lint-design-md.mjs DESIGN.md`. Se houver erro, conserte antes (skill `design-md`). O Stitch não vai consertar o seu sistema por você.
-2. Exporte a versão para o Stitch:
+1. `node <DSX>/tools/lint-design-md.mjs DESIGN.md`. If there are errors, fix them first (skill `design-md`). Stitch will not fix your system for you.
+2. Export the Stitch version:
    ```bash
    node <DSX>/tools/stitch/design-system.mjs export DESIGN.md -o .stitch/DESIGN.md
    ```
-   Leia os AVISOS: raio quantizado e fontes que o Stitch não tem.
-3. **Pare e confirme com o usuário** (checkpoint da skill oficial): nome, cor da marca, fontes, nível de raio e avisos.
-4. Projeto: `list_projects`. Se não existir um projeto para este produto, use `create_project` e guarde o `projectId` em `.stitch/metadata.json`.
-5. Importe **pelo DESIGN.md**: `upload_design_md` (base64 de `.stitch/DESIGN.md`) e, logo depois, `create_design_system_from_design_md` com o `{id, sourceScreen}` devolvido. Para arquivos grandes, use o script da skill oficial `upload-to-stitch`.
-   - **Nunca use `update_design_system` para sincronizar.** Ele só aceita o modelo Material 3 (cor-semente) e apaga as cores nomeadas do DSX. Para mudar o sistema, reimporte o export.
-6. Espere ~10s (o processamento é assíncrono), chame `list_design_systems`, salve a resposta em `.stitch/check-raw.json` e confira:
+   Read the WARNINGS: quantized radius and fonts Stitch does not have.
+3. **Stop and confirm with the user** (checkpoint from the official skill): name, brand color, fonts, radius level and warnings.
+4. Project: `list_projects`. If there is no project for this product, use `create_project` and store the `projectId` in `.stitch/metadata.json`.
+5. Import **through the DESIGN.md**: `upload_design_md` (base64 of `.stitch/DESIGN.md`) and, right after, `create_design_system_from_design_md` with the returned `{id, sourceScreen}`. For large files, use the script from the official `upload-to-stitch` skill.
+   - **Never use `update_design_system` to sync.** It only accepts the Material 3 model (seed color) and wipes the DSX's named colors. To change the system, reimport the export.
+6. Wait ~10s (processing is asynchronous), call `list_design_systems`, save the response to `.stitch/check-raw.json` and check:
    ```bash
    node <DSX>/tools/stitch/design-system.mjs check DESIGN.md .stitch/check-raw.json --asset <assetId> --json > .stitch/check.json
    ```
-   - **DIVERGENTE** → corrija pela causa apontada e reimporte. Não gere telas sobre um sistema divergente.
-   - **CONFORME com avisos** → normal. A marca fica em `primary-container` e `primary` recebe um tom derivado; os papéis Material 3 extras têm destino definido em `mapping`.
-   - **Limite conhecido:** mesmo com o design system em `ROUND_EIGHT`, a config Tailwind de cada tela gerada pode declarar outro raio (observado: 4px). Por isso o raio da tela do Stitch **nunca** é referência: no código, valem os tokens `radius.*` do DSX.
+   - **DIVERGES** (`DIVERGENTE` in older tool output) → fix the indicated cause and reimport. Do not generate screens on top of a divergent system.
+   - **CONFORMS with warnings** (`CONFORME` in older tool output) → normal. The brand sits in `primary-container` and `primary` gets a derived tone; the extra Material 3 roles have a defined destination in `mapping`.
+   - **Known limit:** even with the design system on `ROUND_EIGHT`, the Tailwind config of each generated screen may declare another radius (observed: 4px). That is why the radius of a Stitch screen is **never** a reference: in the code, the DSX `radius.*` tokens apply.
 
-## 2. Gerar uma tela
+## 2. Generate a screen
 
-1. **Contexto antes do prompt.** Se a tela não tem problema declarado, use a skill `discovery` primeiro. Reúna:
-   - persona e tarefa principal;
-   - de onde a tela é alcançada e para onde leva (`.dsx/maps/flows.json`, se existir);
-   - entidades e dados (`.dsx/maps/domain.json`);
-   - **o arquétipo da tela no `UX.md`** (seção "Arquétipos de tela" e cartão `archetypes/<id>.md`): regiões, onde fica a primária, estados obrigatórios, desvios que valem para ela. Tela nova sem arquétipo: escolha um e registre no `UX.md` antes de gerar. O Stitch não conhece o `UX.md` (só importa o `DESIGN.md`), então o comportamento vai **descrito no prompt**.
-2. **Padrões que se aplicam:** primeiro as políticas que o `UX.md` fixou (posição da primária, ordem do diálogo, feedback, confirmação); depois o catálogo: consulte `patterns/index.json`, por exemplo `table-vs-cards`, `active-filters`, `table-pagination`, `empty-state`, `button-hierarchy`. Traduza cada regra em **comportamento descrito**, sem o id. Exemplo: "filtros ativos visíveis como chips removíveis, com 'Limpar filtros'".
-3. **Monte o prompt** no template da skill oficial `stitch-design:generate-design`: propósito e intenção, plataforma e estrutura da página numerada.
-   - **Sem cores, fontes, raios ou hex.** O design system do projeto cuida disso; repetir causa conflito. Vale a regra da skill oficial `generate-design`. A `enhance-prompt` injeta o design system no prompt, então **não** siga essa parte dela.
-   - **Texto em pt-BR, no glossário do produto,** com botões no formato verbo + objeto (skill `ux-writing`).
-   - **Dados fictícios realistas.** **Nunca** use dados reais de clientes ou pessoas: o prompt sai para um serviço externo.
-   - **Uma ação primária por região,** dita explicitamente, na posição de `actions.primary-position` do `UX.md` (ou a do cartão do arquétipo).
-   - **Termos de `content.forbidden` do `UX.md` nunca aparecem** no texto pedido.
-4. Chame `generate_screen_from_text` com o `projectId`, o prompt, `deviceType` e `designSystem: "assets/<assetId>"`.
-   - A geração leva de 1 a 3 minutos.
-   - **Não repita a chamada:** se der timeout, consulte `get_screen` a cada 30s, até 10 vezes.
-5. Baixe para `.stitch/designs/<slug>`:
-   - o HTML (`htmlCode.downloadUrl`);
-   - o screenshot com `=w<width>` no fim da URL, porque sem isso vem uma miniatura.
-6. Mostre ao usuário o texto e as sugestões que vêm em `outputComponents` (regra das skills oficiais).
-7. **Estados:** o Stitch gera o estado ideal. Para vazio, erro e carregando, gere telas irmãs com `edit_screens` ou `generate_screen_from_text`, ou registre que esses estados serão construídos direto no código. Não esqueça deles.
+1. **Context before the prompt.** If the screen has no declared problem, use the `discovery` skill first. Gather:
+   - persona and main task;
+   - where the screen is reached from and where it leads (`.dsx/maps/flows.json`, if it exists);
+   - entities and data (`.dsx/maps/domain.json`);
+   - **the screen's archetype in the `UX.md`** (the screen-archetypes section and the `archetypes/<id>.md` card): regions, where the primary sits, required states, deviations that apply to it. New screen without an archetype: pick one and record it in the `UX.md` before generating. Stitch does not know the `UX.md` (it only imports the `DESIGN.md`), so the behavior goes **described in the prompt**.
+2. **Patterns that apply:** first the policies the `UX.md` fixed (primary position, dialog order, feedback, confirmation); then the catalog: check `patterns/index.json`, for example `table-vs-cards`, `active-filters`, `table-pagination`, `empty-state`, `button-hierarchy`. Translate each rule into **described behavior**, without the id. Example: "active filters visible as removable chips, with 'Clear filters'".
+3. **Build the prompt** on the template of the official `stitch-design:generate-design` skill: purpose and intent, platform and numbered page structure.
+   - **No colors, fonts, radii or hex.** The project's design system handles that; repeating it causes conflicts. The official `generate-design` skill's rule applies. `enhance-prompt` injects the design system into the prompt, so do **not** follow that part of it.
+   - **Text in the product's language (pt-BR for a Brazilian product), in the product glossary,** with buttons in verb + object form (skill `ux-writing`).
+   - **Realistic fictional data.** **Never** use real customer or personal data: the prompt goes out to an external service.
+   - **One primary action per region,** stated explicitly, at the `actions.primary-position` of the `UX.md` (or the archetype card's).
+   - **Terms in the `UX.md`'s `content.forbidden` never appear** in the requested text.
+4. Call `generate_screen_from_text` with the `projectId`, the prompt, `deviceType` and `designSystem: "assets/<assetId>"`.
+   - Generation takes 1 to 3 minutes.
+   - **Do not repeat the call:** on timeout, poll `get_screen` every 30s, up to 10 times.
+5. Download to `.stitch/designs/<slug>`:
+   - the HTML (`htmlCode.downloadUrl`);
+   - the screenshot with `=w<width>` at the end of the URL, because without it you get a thumbnail.
+6. Show the user the text and suggestions that come in `outputComponents` (rule from the official skills).
+7. **States:** Stitch generates the ideal state. For empty, error and loading, generate sibling screens with `edit_screens` or `generate_screen_from_text`, or record that those states will be built directly in code. Do not forget them.
 
-## 3. Variantes
+## 3. Variants
 
-`generate_variants` sobre a tela-base, com `variantCount` de 2 a 3 e `creativeRange`:
-- `REFINE`: polimento;
-- `EXPLORE`: alternativas reais de layout;
-- `REIMAGINE`: só quando o problema é a abordagem.
+`generate_variants` on the base screen, with `variantCount` from 2 to 3 and `creativeRange`:
+- `REFINE`: polish;
+- `EXPLORE`: real layout alternatives;
+- `REIMAGINE`: only when the problem is the approach.
 
-Use `aspects: ["LAYOUT"]` para comparar estruturas. Cada variante é uma **hipótese**: escreva qual tarefa ela favorece e qual piora. Critique todas pelo modo 4 antes de pedir a escolha. Propostas são hipóteses, não evidência; para decisões caras, sugira teste com pessoas (skill `pesquisa`).
+Use `aspects: ["LAYOUT"]` to compare structures. Each variant is a **hypothesis**: write which task it favors and which it worsens. Critique all of them with mode 4 before asking for a choice. Proposals are hypotheses, not evidence; for costly decisions, suggest testing with people (skill `research`).
 
-## 4. Criticar (sempre antes de iterar ou trazer)
+## 4. Critique (always before iterating or bringing back)
 
-1. **Gates objetivos:**
+1. **Objective gates:**
    ```bash
    node <DSX>/tools/stitch/analyze-html.mjs .stitch/designs/<slug>.html --design-md DESIGN.md
    ```
-   A ferramenta mede:
-   - papéis de cor do DSX × papéis só do Stitch, com o destino de cada um;
-   - contraste;
-   - valores arbitrários;
-   - triagem de acessibilidade: nome acessível, rótulos, teclado, h1, lang, `aria-sort`.
+   The tool measures:
+   - DSX color roles × Stitch-only roles, with each one's destination;
+   - contrast;
+   - arbitrary values;
+   - accessibility triage: accessible name, labels, keyboard, h1, lang, `aria-sort`.
 
-   **REPROVADO vira achado de severidade ≥ 3.**
+   **A `FAILED` result (`REPROVADO` in older tool output) becomes a finding of severity ≥ 3.**
 
-   Se o projeto tem `UX.md`, rode também o gate de comportamento sobre o HTML gerado: `node <DSX>/tools/ux-lint/screen.mjs .stitch/designs/<slug>.html --ux UX.md` (primárias por região, ordem do diálogo, h1, rótulos, destrutiva, termos proibidos). A tela gerada que fere uma política do `UX.md` é achado, salvo se o dono decidir mudar a política (aí o `UX.md` sobe de versão antes de trazer).
-2. **Olhe o screenshot.** Leia a imagem; não critique só pelo HTML.
-3. **Lentes do DSX,** citando a fonte de cada achado:
-   - `revisar-ux`: tese da tela, walkthrough da tarefa, heurísticas, severidade 0–4;
-   - padrões do catálogo: cada decisão de interação;
-   - `ux-writing`: termos, verbo + objeto, consistência. Contagens repetidas com palavras diferentes ("Exibindo" × "Mostrando") são comuns no Stitch;
-   - `acessibilidade`: o que a triagem estática não pega.
-4. **Revisão independente:** para telas importantes, dispare o subagente `revisor-ux` passando **só** o PNG, o HTML e o público. Não passe o prompt nem a sua crítica.
-5. **Registre** em `.stitch/reviews/<slug>.md` (formato de `templates/relatorio-heuristico.md`).
-6. **Apresente ao usuário:** liste os achados por severidade e peça para ele escolher o que entra. Achados de token (cor, raio, fonte) **não** entram por tela; voltam para o modo 1.
+   If the project has a `UX.md`, also run the behavior gate on the generated HTML: `node <DSX>/tools/ux-lint/screen.mjs .stitch/designs/<slug>.html --ux UX.md` (primaries per region, dialog order, h1, labels, destructive, forbidden terms). A generated screen that breaks a `UX.md` policy is a finding, unless the owner decides to change the policy (then the `UX.md` gets a new version before bringing it back).
+2. **Look at the screenshot.** Read the image; do not critique from the HTML alone.
+3. **DSX lenses,** citing the source of each finding:
+   - `review-ux`: the screen's thesis, task walkthrough, heuristics, severity 0–4;
+   - catalog patterns: each interaction decision;
+   - `ux-writing`: terms, verb + object, consistency. Repeated counts with different words ("Exibindo" × "Mostrando", pt-BR example) are common in Stitch;
+   - `accessibility`: what the static triage does not catch.
+4. **Independent review:** for important screens, dispatch the `ux-reviewer` subagent passing **only** the PNG, the HTML and the audience. Do not pass the prompt or your critique.
+5. **Record** in `.stitch/reviews/<slug>.md` (format of `templates/heuristic-report.md`).
+6. **Present to the user:** list the findings by severity and ask them to choose what goes in. Token findings (color, radius, font) do **not** go in per screen; they go back to mode 1.
 
-## 5. Iterar
+## 5. Iterate
 
-1. Transforme só os achados **aceitos** num prompt de `edit_screens`, numerado e específico em **local + mudança**. Em edição, hex é permitido só para cor exata, segundo a skill oficial.
-2. Prefira 1 rodada com tudo o que foi aceito, ou uma por tema. Não refaça a tela do zero, a menos que o layout inteiro esteja errado.
-3. Baixe a nova versão (ela ganha outro id; a original fica preservada) e **rode o modo 4 de novo**, inclusive a ferramenta de HTML.
-   - A edição pode resolver só na aparência. Exemplo observado: uma linha "clicável" que ganhou só `cursor-pointer`, sem teclado. A ferramenta acusa isso.
-4. Registre aceitos e recusados, com motivo, em `.stitch/reviews/<slug>.md`.
+1. Turn only the **accepted** findings into an `edit_screens` prompt, numbered and specific in **location + change**. In edits, hex is allowed only for an exact color, per the official skill.
+2. Prefer 1 round with everything accepted, or one per theme. Do not redo the screen from scratch unless the whole layout is wrong.
+3. Download the new version (it gets another id; the original is preserved) and **run mode 4 again**, including the HTML tool.
+   - The edit may fix things only on the surface. Observed example: a "clickable" row that only got `cursor-pointer`, with no keyboard support. The tool flags this.
+4. Record accepted and rejected items, with reasons, in `.stitch/reviews/<slug>.md`.
 
-## 6. Trazer para o código
+## 6. Bring back into the code
 
-**Para projetos existentes, a volta é pelo `construir-ui`, nunca pelo HTML do Stitch.**
+**For existing projects, the way back is through `build-ui`, never through Stitch's HTML.**
 
-1. Use o screenshot e o HTML como **referência de layout e conteúdo**.
-2. **Mapeie cores pelo papel:**
-   - papéis do DSX → os mesmos tokens semânticos;
-   - papéis Material 3 → o destino em `mapping` (saída do `check`) ou em `map_to` (saída do `analyze-html`) (ex.: `primary-container` → `color.action.primary`).
-3. **Use componentes do projeto.** O Stitch inventa a estrutura; você reusa o kit (`construir-ui`, seção 1).
-4. **Corrija o que a crítica apontou e o Stitch não resolveu:** acesso por teclado, `href="#"` → rotas reais, `aria-sort` e estados vazio, erro e carregando.
-5. **Gates de entrega:**
-   - `lint-raw-values` com zero ocorrências;
-   - contraste;
-   - teclado;
+1. Use the screenshot and the HTML as a **layout and content reference**.
+2. **Map colors by role:**
+   - DSX roles → the same semantic tokens;
+   - Material 3 roles → the destination in `mapping` (output of `check`) or in `map_to` (output of `analyze-html`) (e.g. `primary-container` → `color.action.primary`).
+3. **Use the project's components.** Stitch invents the structure; you reuse the kit (`build-ui`, section 1).
+4. **Fix what the critique pointed out and Stitch did not solve:** keyboard access, `href="#"` → real routes, `aria-sort` and empty, error and loading states.
+5. **Delivery gates:**
+   - `lint-raw-values` with zero occurrences;
+   - contrast;
+   - keyboard;
    - 320px;
-   - ux-lint da captura da tela construída sem severidade ≥ 3 e, se a tela é nova ou mudou de arquétipo, `UX.md` atualizado no mesmo commit (skill `construir-ui`, seção 4).
+   - ux-lint of the built screen's capture with no severity ≥ 3 and, if the screen is new or changed archetype, `UX.md` updated in the same commit (skill `build-ui`, section 4).
 
-   Depois, revisão independente.
+   Then, independent review.
 
-**Para protótipo novo, sem projeto ainda:** as skills oficiais `stitch-build:react-components` e `stitch-build:shadcn-ui` geram o app. Rode os gates do DSX no resultado e lembre que os tokens vêm da config do Stitch: troque-os pelos tokens DTCG do DSX (skill `tokens`) antes de o protótipo virar produto.
+**For a new prototype, with no project yet:** the official skills `stitch-build:react-components` and `stitch-build:shadcn-ui` generate the app. Run the DSX gates on the result and remember the tokens come from the Stitch config: swap them for the DSX DTCG tokens (skill `tokens`) before the prototype becomes a product.
 
-## Saída de cada rodada
+## Output of each round
 
 ```
-Projeto: <título> (<projectId>) · design system: <assetId> — CONFORME/DIVERGENTE
-Tela: <slug> (<screenId>) · versão N
-Gates (analyze-html): papéis DSX NN% · contraste X/Y · a11y: <falhas>
-Achados (sev ≥ 3): …   Aceitos: …   Recusados (motivo): …
-Próximo passo: iterar | trazer | gerar variantes
+Project: <title> (<projectId>) · design system: <assetId> — CONFORMS/DIVERGES
+Screen: <slug> (<screenId>) · version N
+Gates (analyze-html): DSX roles NN% · contrast X/Y · a11y: <failures>
+Findings (sev ≥ 3): …   Accepted: …   Rejected (reason): …
+Next step: iterate | bring back | generate variants
 ```

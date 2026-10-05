@@ -1,6 +1,6 @@
 ---
 id: double-submit
-title: Como evitar cliques múltiplos durante o carregamento de uma ação?
+title: How do you prevent repeated clicks while an action is loading?
 category: actions
 components: [button, form]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["4.1.3", "2.1.1"]
 related: [disabled-button, retry, success-confirmation, preserve-data-after-error]
 ---
 
-# Como evitar cliques múltiplos durante o carregamento de uma ação?
+# How do you prevent repeated clicks while an action is loading?
 
-> **Regra:** Valide primeiro; na primeira submissão válida, mostre o processamento no próprio botão, ignore novas ativações da mesma ação e garanta idempotência no servidor.
+> **Rule:** Validate first; on the first valid submission, show processing on the button itself, ignore further activations of the same action and guarantee idempotency on the server.
 
-## Contexto
+## Context
 
-Quando uma ação demora, a pessoa clica de novo para confirmar que o primeiro clique funcionou. Em compras, pagamentos e gravações isso pode duplicar registros ou cobrar duas vezes.
+When an action takes time, people click again to make sure the first click worked. In purchases, payments and saves this can duplicate records or charge twice.
 
-A solução combina três camadas: retorno imediato, bloqueio temporário daquela mesma ativação e proteção no servidor. Só o bloqueio visual não evita reenvio por rede, recarga da página ou concorrência.
+The solution combines three layers: immediate feedback, a temporary block of that same activation and protection on the server. A visual block alone does not prevent resubmission through the network, a page reload or concurrency.
 
-O padrão serve para ações com efeito colateral. Não é necessário travar toda interação depois de qualquer clique.
+The pattern applies to actions with side effects. There is no need to lock every interaction after any click.
 
-## Decisão
+## Decision
 
-- **SE** a ação cria, grava, paga ou publica **ENTÃO** aplique o padrão completo (feedback + bloqueio + idempotência).
-- **SE** os dados ainda são inválidos **ENTÃO** mostre os erros e não entre em estado de processamento.
-- **SE** a submissão é válida **ENTÃO** marque a operação como pendente e ignore novas ativações até o fim do ciclo.
-- **SE** o envio é feito por clique, Enter ou Space **ENTÃO** bloqueie no evento de submissão do formulário, não só no clique.
-- **SE** a ação é filtro, aba, navegação ou reversível sem efeito duplicado **ENTÃO** mantenha o controle interativo.
-- **SE** a operação falha **ENTÃO** informe o erro, preserve os dados e reabilite a nova tentativa quando for seguro.
-- **SE** a operação pode ser realmente interrompida **ENTÃO** ofereça "Cancelar"; **SENÃO** não ofereça (parar de esperar não desfaz o que foi enviado).
-- **SENÃO** gere uma chave de idempotência por tentativa de operação e envie ao servidor.
+- **IF** the action creates, saves, pays or publishes **THEN** apply the full pattern (feedback + block + idempotency).
+- **IF** the data is still invalid **THEN** show the errors and do not enter the processing state.
+- **IF** the submission is valid **THEN** mark the operation as pending and ignore further activations until the cycle ends.
+- **IF** submission happens by click, Enter or Space **THEN** block on the form's submit event, not only on click.
+- **IF** the action is a filter, tab, navigation or reversible without a duplicated effect **THEN** keep the control interactive.
+- **IF** the operation fails **THEN** report the error, keep the data and re-enable retrying when it is safe.
+- **IF** the operation can truly be interrupted **THEN** offer "Cancel"; **ELSE** do not offer it (stopping the wait does not undo what was sent).
+- **ELSE** generate an idempotency key per operation attempt and send it to the server.
 
-## Quando usar
+## When to use
 
-- Envio de formulários e criação de registros.
-- Salvar, publicar, comprar, pagar, confirmar.
-- Importações e exportações.
-- Qualquer ação cuja resposta pode parecer silenciosa.
+- Form submission and record creation.
+- Save, publish, buy, pay, confirm.
+- Imports and exports.
+- Any action whose response may look silent.
 
-## Quando evitar
+## When to avoid
 
-- Bloquear antes da validação → **use em vez disso:** validar e só então bloquear.
-- Desabilitar permanentemente sem explicar → **use em vez disso:** estado de carregamento com texto.
-- Só travar o botão sem proteção no servidor → **use em vez disso:** idempotência ou deduplicação.
+- Blocking before validation → **use instead:** validate and only then block.
+- Disabling permanently without explaining → **use instead:** a loading state with text.
+- Only locking the button with no server protection → **use instead:** idempotency or deduplication.
 
-## Faça
+## Do
 
-- Mantenha o botão no mesmo lugar, mostrando o estado de loading.
-- Bloqueie apenas a ação em andamento.
-- Preserve os dados digitados durante o envio.
-- Encerre o ciclo com sucesso ou erro explícito.
+- Keep the button in the same place, showing the loading state.
+- Block only the action in progress.
+- Keep the typed data during submission.
+- End the cycle with explicit success or error.
 
-## Evite
+## Avoid
 
-- Usar atraso fixo (debounce cego) como única proteção.
-- Limpar o formulário durante o envio.
-- Remover o foco do botão sem motivo.
-- Comunicar o estado só por cor.
+- Using a fixed delay (blind debounce) as the only protection.
+- Clearing the form during submission.
+- Removing focus from the button for no reason.
+- Conveying the state by color alone.
 
-## Acessibilidade
+## Accessibility
 
-- Use `<form>` e `<button>` semânticos com um único caminho de submissão.
-- Anuncie o estado em região `role="status"` ou `aria-live="polite"` sem mover o foco (WCAG 4.1.3).
-- `disabled` nativo pode tirar o botão da tabulação; `aria-disabled="true"` mantém o foco mas exige bloqueio no código.
-- Não bloqueie só com `pointer-events: none`, cor ou opacidade.
-- Teste Enter, Space, leitor de tela, zoom e movimento reduzido.
+- Use semantic `<form>` and `<button>` with a single submission path.
+- Announce the state in a `role="status"` or `aria-live="polite"` region without moving focus (WCAG 4.1.3).
+- Native `disabled` can take the button out of the tab order; `aria-disabled="true"` keeps focus but requires blocking in code.
+- Do not block with `pointer-events: none`, color or opacity alone.
+- Test Enter, Space, screen reader, zoom and reduced motion.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Processando | "Salvando…" |
-| Pagamento | "Processando pagamento…" |
-| Erro | "Não foi possível salvar. Seus dados foram mantidos. Tente novamente." |
-| Sucesso | "Alterações salvas." |
+| Processing | "Saving…" |
+| Payment | "Processing payment…" |
+| Error | "We couldn't save. Your data was kept. Try again." |
+| Success | "Changes saved." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A validação ocorre antes do bloqueio?
-- [ ] O primeiro acionamento mostra feedback imediato?
-- [ ] Clique, Enter e Space repetidos são ignorados durante a operação?
-- [ ] O botão permanece na mesma posição?
-- [ ] Os dados continuam preenchidos?
-- [ ] O servidor rejeita ou deduplica a repetição?
-- [ ] O estado é anunciado sem mover o foco?
-- [ ] Após erro, é possível tentar de novo?
+- [ ] Does validation happen before blocking?
+- [ ] Does the first activation show immediate feedback?
+- [ ] Are repeated clicks, Enter and Space ignored during the operation?
+- [ ] Does the button stay in the same position?
+- [ ] Does the data stay filled in?
+- [ ] Does the server reject or deduplicate the repetition?
+- [ ] Is the state announced without moving focus?
+- [ ] After an error, can the person try again?
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute: duplo clique gera envios idênticos; combinar bloqueio imediato e proteção no back-end (contexto de formulários e e-commerce).
-- Baymard Institute (Button Design): estados de progresso e desabilitado.
-- IBM Carbon: inline loading com botão desabilitado durante a ação.
-- Padrão Digital GOV.BR: estado loading no botão.
-- Adobe React Spectrum: estado pendente que bloqueia ativações e é anunciado.
-- WCAG 2.2, 4.1.3 (Status Messages): espera, progresso e erro como mensagens de status.
-- W3C WAI-ARIA APG (Button) e MDN (aria-disabled): semântica e limites do aria-disabled.
-- Stripe (requisições idempotentes): chave de idempotência contra efeitos duplicados.
+- Baymard Institute: double clicks produce identical submissions; combine an immediate block with back-end protection (forms and e-commerce context).
+- Baymard Institute (Button Design): progress and disabled states.
+- IBM Carbon: inline loading with the button disabled during the action.
+- GOV.BR Digital Standard: loading state on the button.
+- Adobe React Spectrum: a pending state that blocks activations and is announced.
+- WCAG 2.2, 4.1.3 (Status Messages): waiting, progress and error as status messages.
+- W3C WAI-ARIA APG (Button) and MDN (aria-disabled): semantics and limits of aria-disabled.
+- Stripe (idempotent requests): an idempotency key against duplicated effects.

@@ -1,89 +1,89 @@
-# Paridade UX.md × DESIGN.md (DSX 0.7)
+# UX.md × DESIGN.md parity (DSX 0.7)
 
-Decisão do dono: o `UX.md` tem a mesma importância e a mesma dinâmica de atualização do `DESIGN.md`. O `DESIGN.md` diz como a interface **parece**; o `UX.md` diz **que tipo de tela é cada uma, onde fica cada coisa e como ela se comporta**. Este inventário parte de `grep -rn "DESIGN.md"` (fora de `references/`) e registra, para cada lugar onde o `DESIGN.md` é tratado, o equivalente do `UX.md`.
+Owner's decision: `UX.md` has the same importance and the same update dynamics as `DESIGN.md`. `DESIGN.md` says how the interface **looks**; `UX.md` says **what kind of screen each one is, where each thing goes and how it behaves**. This inventory starts from `grep -rn "DESIGN.md"` (outside `references/`) and records, for every place where `DESIGN.md` is handled, the `UX.md` equivalent.
 
-Legenda: **já existia** (o equivalente estava lá antes da 0.7) · **criado agora** (entrou na 0.7) · **não se aplica** (com o motivo).
+Legend: **already existed** (the equivalent was there before 0.7) · **created now** (added in 0.7) · **not applicable** (with the reason).
 
-## Peças centrais
+## Core pieces
 
-| Onde o DESIGN.md é tratado | Equivalente do UX.md | Situação |
+| Where DESIGN.md is handled | UX.md equivalent | Status |
 |---|---|---|
-| Skill `design-md` (Modos A/B/C, rubrica, gates) | Skill `ux-md`: Modos A/B/C; Modo C ganhou nota de 100, gates, drift, geração controlada e saída no mesmo formato | já existia; atualizado agora |
-| Rubrica de 100 pontos + 5 gates (`evals/rubrics/design-md.yaml`) | `evals/rubrics/ux-md.yaml`: 9 critérios calculados por código (somam 100), 5 gates (`lint`, `essential-coverage`, `policy-fidelity`, `connected-to-agent`, `no-conflict`) e `judge-criteria` para o juiz | criado agora |
-| Linter `tools/lint-design-md.mjs` | `tools/lint-ux-md.mjs` (já validava formato); agora também `--score` (nota por critério, faixas e gates) e validação de `deviations`, `version` semver e glossário por módulo. O DESIGN.md não tem cálculo de nota por código: a do UX.md vai além | já existia; `--score` criado agora |
-| Conferência de drift (código × front matter: `lint-raw-values`, `hazards[]` do `extrator-design-system`) | `tools/ux-lint/ux-md-drift.mjs` (U1–U6: tela sem arquétipo, arquétipo de tela que sumiu, política que a maioria das telas não segue, estado sem captura, `updated` velho, desvio vencido); pré-requisito com aviso no `audit.mjs` | criado agora |
-| `owner`/`updated`/`version: alpha` (formato) | `version` vira semver do documento (menor: política, arquétipo, desvio; patch: texto; maior: navegação/register), `format: alpha` para o formato, `updated` obrigatório na prática (frescor na nota e no drift). `version: alpha` é aceito com aviso | criado agora |
-| `templates/DESIGN.md` | `templates/UX.md`: version/format, comentário de quando subir, bloco `deviations`, tabela "Desvios declarados", glossário por módulo, instrução "mesma mudança, mesmo commit" | já existia; atualizado agora |
-| `examples/DESIGN.md` | `examples/UX.md`: `version: 1.4.0`, `format: alpha`, glossário inline, `deviations` D1–D3 e padrões citados como evidência | já existia; atualizado agora |
-| `knowledge/design-system/design-md.md` | `knowledge/fundamentos/ux-md.md`: seções novas "Versão e frescor", "Desvios declarados", "Nota e gates", "Drift UX.md × produto", "Glossário por módulo"; o `design-md.md` agora aponta para o par | já existia; atualizado agora |
-| Registro de achados (o DESIGN.md não tem) | Desvio declarado no `UX.md` silencia o achado coberto: status `accepted-deviation` em `findings.mjs` (não conta em abertos nem na trava, aparece na página com o motivo, reabre se o desvio sai ou vence); `knowledge/fundamentos/achados-de-ux.md` atualizado | criado agora |
+| `design-md` skill (Modes A/B/C, rubric, gates) | `ux-md` skill: Modes A/B/C; Mode C gained a 100-point score, gates, drift, controlled generation and output in the same format | already existed; updated now |
+| 100-point rubric + 5 gates (`evals/rubrics/design-md.yaml`) | `evals/rubrics/ux-md.yaml`: 9 criteria computed by code (adding up to 100), 5 gates (`lint`, `essential-coverage`, `policy-fidelity`, `connected-to-agent`, `no-conflict`) and `judge-criteria` for the judge | created now |
+| `tools/lint-design-md.mjs` linter | `tools/lint-ux-md.mjs` (already validated the format); now also `--score` (score per criterion, bands and gates) and validation of `deviations`, semver `version` and the per-module glossary. DESIGN.md has no score computed by code: the UX.md one goes further | already existed; `--score` created now |
+| Drift check (code × front matter: `lint-raw-values`, `hazards[]` from `design-system-extractor`) | `tools/ux-lint/ux-md-drift.mjs` (U1–U6: screen without an archetype, screen archetype that disappeared, policy most screens do not follow, state without a capture, stale `updated`, expired deviation); prerequisite with a warning in `audit.mjs` | created now |
+| `owner`/`updated`/`version: alpha` (format) | `version` becomes the document's semver (minor: policy, archetype, deviation; patch: text; major: navigation/register), `format: alpha` for the format, `updated` required in practice (freshness in the score and in drift). `version: alpha` is accepted with a warning | created now |
+| `templates/DESIGN.md` | `templates/UX.md`: version/format, comment on when to bump, `deviations` block, "Declared deviations" table, per-module glossary, "same change, same commit" instruction | already existed; updated now |
+| `examples/DESIGN.md` | `examples/UX.md`: `version: 1.4.0`, `format: alpha`, inline glossary, `deviations` D1–D3 and patterns cited as evidence | already existed; updated now |
+| `knowledge/design-system/design-md.md` | `knowledge/foundations/ux-md.md`: new sections "Version and freshness", "Declared deviations", "Score and gates", "UX.md × product drift", "Glossary per module"; `design-md.md` now points to its pair | already existed; updated now |
+| Findings registry (DESIGN.md has none) | A deviation declared in `UX.md` silences the finding it covers: status `accepted-deviation` in `findings.mjs` (not counted as open nor in the lock, shown on the page with the reason, reopened if the deviation is removed or expires); `knowledge/foundations/ux-findings.md` updated | created now |
 
 ## Skills
 
-| Skill | Como trata o DESIGN.md | Equivalente do UX.md | Situação |
+| Skill | How it handles DESIGN.md | UX.md equivalent | Status |
 |---|---|---|---|
-| `iniciar` | cria/avalia o DESIGN.md e liga ao contexto dos agentes | passo 4 "UX.md" (Modo A/B/C com `--score` e drift); bloco de contexto do `CLAUDE.md`/`AGENTS.md` diz "antes de criar ou alterar UI, leia `DESIGN.md` (como parece) e `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta)"; gates de CI com `lint-ux-md` e `ux-md-drift`; relatório com nota do UX.md | criado agora |
-| `construir-ui` | para sem DESIGN.md | para sem UX.md (manda para `iniciar`/`ux-md` Modo A); lê o arquétipo e os desvios da tela antes de construir; gate final com `ux-lint` (screen, states), `lint-ux-md` e drift; "mudou comportamento, atualize o UX.md no mesmo commit"; relatório com arquétipo e versão | criado agora |
-| `design-md` | é a skill do DESIGN.md | validação passo 3 liga os dois num bloco só | criado agora |
-| `ux-md` | — | a skill do UX.md | já existia; atualizado agora |
-| `revisar-ux` | (não citava) | lê desvios da tela (divergência coberta não é achado), falta de UX.md é o primeiro achado, drift desatualiza a regra; registro com `accepted-deviation` | já existia; atualizado agora |
-| `auditar-ds` | DESIGN.md na documentação, nível 4 de maturidade, plano e métrica | UX.md e drift na documentação; nível 4 exige DESIGN.md **e** UX.md ≥ 90 sem drift; plano e CI com `lint-ux-md`/`ux-md-drift`; métrica "nota do UX.md e % de telas com arquétipo". O par de comportamento por módulo é `auditar-ux` | criado agora |
-| `auditar-ux` | — | pré-requisito "UX.md em dia" (drift), desvio em vez de vários `ignore`, glossário por módulo repassado | já existia; atualizado agora |
-| `padroes` | DESIGN.md vence padrão, com divergência apontada | o UX.md escolhe entre opções do padrão e vale para o arquétipo inteiro; decisão recorrente vai para o UX.md (versão menor) em vez de tela a tela | criado agora |
-| `stitch` | sincroniza o DESIGN.md com o Stitch e critica cores | prompt descreve o arquétipo e as políticas do UX.md (o Stitch não importa UX.md); `ux-lint/screen.mjs` no HTML gerado; ao trazer, UX.md atualizado se a tela é nova. A sincronização do design system continua só com o DESIGN.md: **não se aplica** ao UX.md porque o Stitch não tem onde guardá-lo | criado agora (parte) |
-| `escolher-ds` | constrói o DESIGN.md a partir da referência | usa `product.register`/`density` do UX.md quando existe (outro registro = versão maior do UX.md); telas mostradas cobrem os arquétipos principais | criado agora |
-| `evals` | rubrica `design-md.yaml`, comparar versões do DESIGN.md | rubrica `ux-md.yaml`, `lint-ux-md --score` e `ux-lint` como avaliadores de código, UX.md entre as versões comparadas | criado agora |
-| `arranjar-tela` | lê DESIGN.md para a aparência | já lia o UX.md (arquétipo, desvios, "Fere o UX.md?") | já existia |
-| `ux-writing` | glossário no DESIGN.md ou docs | glossário de `content.glossary` do UX.md, por módulo, com `--module` em `text.mjs`/`consistency.mjs` | já existia; atualizado agora |
-| `figma-ciclo` | gate "regra nova de uso → DESIGN.md na mesma rodada" | gate "mudança de comportamento → UX.md na mesma rodada" | criado agora |
-| `figma-trazer` | classe "padrão novo → DESIGN.md"; regra nova de uso é documentação | classe "comportamento" → UX.md + `ux-lint`; mesma regra de documentação | criado agora |
-| `figma-primeiro` | fundação vira tokens + DESIGN.md antes da 1ª tela | telas viram UX.md (Modo B) antes da 1ª tela — sem ele, `construir-ui` para | criado agora |
-| `figma-levar` | DESIGN.md é pré-requisito obrigatório | UX.md é pré-requisito **não bloqueante**: dá os estados por tela (states + arquétipo) e o agrupamento por arquétipo | criado agora |
-| `figma-fundacoes` | DESIGN.md + tokens → variáveis do Figma | não se aplica: variáveis são aparência; nada do UX.md vira variável |
-| `figma-espelhar` | fonte das fundações do espelho | não se aplica: espelha a aparência do código; estados e arquétipo chegam pelo `figma-levar` |
-| `figma-iniciar` | fonte de verdade da ida (DESIGN.md + tokens) | não se aplica: registro do ciclo; comportamento entra pelos gates de `figma-ciclo`/`figma-trazer` |
-| `figma-convencoes` | descrição de componente vem do DESIGN.md | não se aplica: regra de uso de componente é visual; regra de tela está no UX.md e não vai para o componente |
-| `tokens` | atualiza o front matter e Colors do DESIGN.md | não se aplica: tokens não têm comportamento |
+| `init` | creates/evaluates DESIGN.md and wires it into the agents' context | step 4 "UX.md" (Mode A/B/C with `--score` and drift); the `CLAUDE.md`/`AGENTS.md` context block says "before creating or changing UI, read `DESIGN.md` (how it looks) and `UX.md` (what kind of screen, where each thing goes, how it behaves)"; CI gates with `lint-ux-md` and `ux-md-drift`; report with the UX.md score | created now |
+| `build-ui` | stops without DESIGN.md | stops without UX.md (sends to `init`/`ux-md` Mode A); reads the screen's archetype and deviations before building; final gate with `ux-lint` (screen, states), `lint-ux-md` and drift; "behavior changed, update UX.md in the same commit"; report with archetype and version | created now |
+| `design-md` | is the DESIGN.md skill | validation step 3 joins both in one block | created now |
+| `ux-md` | — | the UX.md skill | already existed; updated now |
+| `review-ux` | (did not mention it) | reads the screen's deviations (a covered divergence is not a finding), a missing UX.md is the first finding, drift makes the rule stale; registry with `accepted-deviation` | already existed; updated now |
+| `audit-ds` | DESIGN.md in documentation, maturity level 4, plan and metric | UX.md and drift in documentation; level 4 requires DESIGN.md **and** UX.md ≥ 90 with no drift; plan and CI with `lint-ux-md`/`ux-md-drift`; metric "UX.md score and % of screens with an archetype". The per-module behavior counterpart is `audit-ux` | created now |
+| `audit-ux` | — | prerequisite "UX.md up to date" (drift), deviation instead of several `ignore`, per-module glossary passed through | already existed; updated now |
+| `patterns` | DESIGN.md beats a pattern, with the divergence pointed out | UX.md picks among the pattern's options and applies to the whole archetype; a recurring decision goes into UX.md (minor version) instead of screen by screen | created now |
+| `stitch` | syncs DESIGN.md with Stitch and critiques colors | the prompt describes the archetype and the UX.md policies (Stitch does not import UX.md); `ux-lint/screen.mjs` on the generated HTML; when bringing it in, UX.md updated if the screen is new. Design system sync stays DESIGN.md only: **not applicable** to UX.md because Stitch has nowhere to store it | created now (part) |
+| `choose-ds` | builds DESIGN.md from the reference | uses `product.register`/`density` from UX.md when it exists (another register = major UX.md version); screens shown cover the main archetypes | created now |
+| `evals` | `design-md.yaml` rubric, compare DESIGN.md versions | `ux-md.yaml` rubric, `lint-ux-md --score` and `ux-lint` as code evaluators, UX.md among the compared versions | created now |
+| `arrange-screen` | reads DESIGN.md for the look | already read UX.md (archetype, deviations, "Does it break UX.md?") | already existed |
+| `ux-writing` | glossary in DESIGN.md or docs | glossary from UX.md's `content.glossary`, per module, with `--module` in `text.mjs`/`consistency.mjs` | already existed; updated now |
+| `figma-cycle` | gate "new usage rule → DESIGN.md in the same round" | gate "behavior change → UX.md in the same round" | created now |
+| `figma-pull` | class "new pattern → DESIGN.md"; a new usage rule is documentation | class "behavior" → UX.md + `ux-lint`; same documentation rule | created now |
+| `figma-first` | the foundation becomes tokens + DESIGN.md before the 1st screen | screens become UX.md (Mode B) before the 1st screen — without it, `build-ui` stops | created now |
+| `figma-push` | DESIGN.md is a mandatory prerequisite | UX.md is a **non-blocking** prerequisite: it gives the states per screen (states + archetype) and the grouping by archetype | created now |
+| `figma-foundations` | DESIGN.md + tokens → Figma variables | not applicable: variables are appearance; nothing in UX.md becomes a variable |
+| `figma-mirror` | source of the mirror's foundations | not applicable: it mirrors the code's appearance; states and archetype arrive through `figma-push` |
+| `figma-init` | source of truth for the push (DESIGN.md + tokens) | not applicable: cycle registry; behavior comes in through the `figma-cycle`/`figma-pull` gates |
+| `figma-conventions` | component description comes from DESIGN.md | not applicable: a component usage rule is visual; a screen rule lives in UX.md and does not go to the component |
+| `tokens` | updates DESIGN.md's front matter and Colors | not applicable: tokens have no behavior |
 
-## Agentes, ferramentas, testes
+## Agents, tools, tests
 
-| Onde | Equivalente do UX.md | Situação |
+| Where | UX.md equivalent | Status |
 |---|---|---|
-| `agents/juiz-de-evals.md` | aceita UX.md como artefato e `judge-criteria` | criado agora |
-| `agents/revisor-ux.md` | compara comportamento com o arquétipo declarado; desvio não é achado; roda `screen.mjs` | criado agora |
-| `agents/mapeador-projeto.md`, `mapeador-ui.md` | detectam `UX.md` junto do `DESIGN.md` | criado agora |
-| `agents/mapeador-jornada.md` | lê persona, tarefas e jornadas do UX.md | criado agora |
-| `agents/extrator-design-system.md` | não se aplica: extrai o design system visual (`design-system.json`); o UX.md sai dos mapas de UI e fluxo pela skill `ux-md` Modo A |
-| `tools/ux-lint/audit.mjs` | drift como pré-requisito (aviso "UX.md desatualizado: …", item `ux-fresh`) e seção "UX.md × produto" no relatório; `--module` repassado a texto e consistência; desvios aceitos contados à parte | criado agora |
-| `tools/ux-lint/findings.mjs` | `accepted-deviation`, `--ux`, `deviations` no registro, página com o motivo | criado agora |
-| `tools/ux-lint/consistency.mjs`, `text.mjs` | `--module` escolhe o glossário (`lib/glossary.mjs`); no texto, termos canônicos com maiúscula no meio são nomes próprios no X10 | criado agora |
-| `tools/lib/yaml-lite.mjs` | listas em bloco (`- id: D1`), para o bloco `deviations` | criado agora |
-| `tools/references.mjs` | não se aplica: biblioteca pública de DESIGN.md de terceiros; não há equivalente de UX.md |
-| `tools/stitch/design-system.mjs` | não se aplica: o Stitch só importa DESIGN.md |
-| `tools/stitch/analyze-html.mjs` | equivalente de comportamento é `ux-lint/screen.mjs` sobre o HTML gerado (skill `stitch`) | criado agora (pelo procedimento, sem ferramenta nova) |
-| testes do DESIGN.md (`tools.test.mjs`, `stitch.test.mjs`, `legacy-cli.test.mjs`) | `lint-ux-md.test.mjs` (existia) e `ux-md-parity.test.mjs` (nota, drift, desvio aceito, glossário por módulo, auditoria) | criado agora |
-| `hooks/` | não se aplica: o único hook guarda a vez do Figma; o DESIGN.md também não tem hook |
+| `agents/eval-judge.md` | accepts UX.md as an artifact and `judge-criteria` | created now |
+| `agents/ux-reviewer.md` | compares behavior with the declared archetype; a deviation is not a finding; runs `screen.mjs` | created now |
+| `agents/project-mapper.md`, `ui-mapper.md` | detect `UX.md` alongside `DESIGN.md` | created now |
+| `agents/journey-mapper.md` | reads persona, tasks and journeys from UX.md | created now |
+| `agents/design-system-extractor.md` | not applicable: it extracts the visual design system (`design-system.json`); UX.md comes from the UI and flow maps through the `ux-md` skill, Mode A |
+| `tools/ux-lint/audit.mjs` | drift as a prerequisite (warning "UX.md out of date: …", item `ux-fresh`) and a "UX.md × product" section in the report; `--module` passed to text and consistency; accepted deviations counted apart | created now |
+| `tools/ux-lint/findings.mjs` | `accepted-deviation`, `--ux`, `deviations` in the registry, page with the reason | created now |
+| `tools/ux-lint/consistency.mjs`, `text.mjs` | `--module` picks the glossary (`lib/glossary.mjs`); in text, canonical terms with a capital letter in the middle are proper names in X10 | created now |
+| `tools/lib/yaml-lite.mjs` | block lists (`- id: D1`), for the `deviations` block | created now |
+| `tools/references.mjs` | not applicable: public library of third-party DESIGN.md files; there is no UX.md equivalent |
+| `tools/stitch/design-system.mjs` | not applicable: Stitch only imports DESIGN.md |
+| `tools/stitch/analyze-html.mjs` | the behavior equivalent is `ux-lint/screen.mjs` on the generated HTML (`stitch` skill) | created now (through the procedure, no new tool) |
+| DESIGN.md tests (`tools.test.mjs`, `stitch.test.mjs`, `legacy-cli.test.mjs`) | `lint-ux-md.test.mjs` (existed) and `ux-md-parity.test.mjs` (score, drift, accepted deviation, per-module glossary, audit) | created now |
+| `hooks/` | not applicable: the only hook guards the Figma turn; DESIGN.md has no hook either |
 
-## Documentos
+## Documents
 
-| Onde | Equivalente do UX.md | Situação |
+| Where | UX.md equivalent | Status |
 |---|---|---|
-| `README.md` | UX.md como peça central (fonte de verdade, ferramentas, templates, examples, evals, diagrama) | criado agora |
-| `AGENTS.md` | roteamento (`iniciar` sem UX.md, `ux-md` com nota/drift/desvios, `construir-ui` para sem os dois) e ferramentas (`--score`, `ux-md-drift`, `--module`, `--ux`) | criado agora |
-| `docs/integracoes.md` | `@UX.md`, bloco da `iniciar` passo 6, Cursor e Copilot | criado agora |
-| `docs/principios.md` | "Uma fonte de verdade": o UX.md define comportamento | criado agora |
-| `docs/fluxo-figma.md` | fundação no código inclui o UX.md | criado agora |
-| `docs/renames-2026-10.md` | `version: alpha` → semver + `format: alpha` | criado agora |
-| `knowledge/design-system/design-system-para-ia.md`, `README.md` | camada "Comportamento" (UX.md) entre visual e operação | criado agora |
-| `knowledge/design-system/governanca-e-maturidade.md` | UX.md no nível 4 | criado agora |
-| `knowledge/ia/divida-de-experiencia.md`, `knowledge/ia/README.md` | UX.md entre os documentos de contexto que toda geração lê | criado agora |
-| `knowledge/design-system/componentes.md`, `cor.md`, `escolher-design-system.md` | não se aplica: tratam de componente, cor e estilo visual |
-| `knowledge/ia/evals.md`, `evidencia-e-fontes.md` | não se aplica: regras gerais de rubrica e evidência, que já valem para o UX.md |
-| `CLAUDE.md` (do DSX) | não se aplica: cita o DESIGN.md só como exceção de formato externo nos nomes; o UX.md segue a regra geral (kebab-case), já descrita |
-| `data/gap-analysis/web-design-rules.json` | não se aplica: análise de lacunas de terceiros sobre decisão visual (ícone) |
+| `README.md` | UX.md as a core piece (source of truth, tools, templates, examples, evals, diagram) | created now |
+| `AGENTS.md` | routing (`init` without UX.md, `ux-md` with score/drift/deviations, `build-ui` stops without both) and tools (`--score`, `ux-md-drift`, `--module`, `--ux`) | created now |
+| `docs/integrations.md` | `@UX.md`, the `init` step 6 block, Cursor and Copilot | created now |
+| `docs/principles.md` | "One source of truth": UX.md defines behavior | created now |
+| `docs/figma-flow.md` | the foundation in code includes UX.md | created now |
+| `docs/renames-2026-10.md` | `version: alpha` → semver + `format: alpha` | created now |
+| `knowledge/design-system/design-system-for-ai.md`, `README.md` | "Behavior" layer (UX.md) between visual and operation | created now |
+| `knowledge/design-system/governance-and-maturity.md` | UX.md at level 4 | created now |
+| `knowledge/ia/experience-debt.md`, `knowledge/ia/README.md` | UX.md among the context documents every generation reads | created now |
+| `knowledge/design-system/components.md`, `color.md`, `choosing-a-design-system.md` | not applicable: they cover components, color and visual style |
+| `knowledge/ia/evals.md`, `evidence-and-sources.md` | not applicable: general rubric and evidence rules, which already apply to UX.md |
+| `CLAUDE.md` (DSX's own) | not applicable: it mentions DESIGN.md only as an external-format exception in naming; UX.md follows the general rule (kebab-case), already described |
+| `data/gap-analysis/web-design-rules.json` | not applicable: third-party gap analysis about a visual decision (icon) |
 
-## O que fica de fora de propósito
+## Deliberately left out
 
-- O drift (U1–U6) não entra no registro de achados: acusa o **documento** velho, não a tela errada. A correção é atualizar o UX.md.
-- Os critérios abertos (o arquétipo casa com a tarefa? as políticas são reais? o desvio é justificado?) não somam pontos na nota de código; são `judge-criteria` e gates de julgamento, como os critérios `judge`/`human` do DESIGN.md.
-- `version` do UX.md deixou de ser a versão do formato (diferente do DESIGN.md, que segue o formato do Google): a decisão do dono pede versão do documento, e o formato foi para `format`.
+- Drift (U1–U6) does not go into the findings registry: it flags a stale **document**, not a wrong screen. The fix is to update UX.md.
+- Open criteria (does the archetype match the task? are the policies real? is the deviation justified?) do not add points to the code score; they are `judge-criteria` and judgment gates, like DESIGN.md's `judge`/`human` criteria.
+- UX.md's `version` is no longer the format version (unlike DESIGN.md, which follows Google's format): the owner's decision asks for a document version, and the format moved to `format`.

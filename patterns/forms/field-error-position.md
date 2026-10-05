@@ -1,6 +1,6 @@
 ---
 id: field-error-position
-title: A mensagem de erro vai antes ou depois do campo?
+title: Does the error message go before or after the field?
 category: forms
 components: [form-field, error-message, error-summary]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["3.3.1", "3.3.3", "1.3.1", "1.4.1", "4.1.3"]
 related: [error-placement, form-errors, validation-timing, preserve-data-after-error]
 ---
 
-# A mensagem de erro vai antes ou depois do campo?
+# Does the error message go before or after the field?
 
-> **Regra:** Coloque a mensagem na mesma unidade visual do rótulo e do campo, em posição consistente e ligada programaticamente ao controle; após o envio, repita-a em um resumo no topo.
+> **Rule:** Put the message in the same visual unit as the label and the field, in a consistent position and programmatically tied to the control; after submitting, repeat it in a summary at the top.
 
-## Contexto
+## Context
 
-Quando o envio falha, a pessoa precisa perceber, sem caçar, três coisas: que existe erro, qual campo é o afetado e como corrigi-lo. A mensagem deve ficar junto do campo e seguir a ordem de leitura, e não num alerta distante.
+When a submit fails, the person needs to notice three things without hunting: that there is an error, which field is affected and how to fix it. The message must sit with the field and follow the reading order, not in a distant alert.
 
-Não existe resposta universal para "antes ou depois". Em muitos padrões a mensagem fica depois do rótulo e da dica e antes do controle; o essencial é ser percebida na sequência, manter posição consistente e estar associada ao campo. Para grupos de rádio ou checkbox, ela fica junto da pergunta.
+There is no universal answer to "before or after". In many patterns the message comes after the label and hint and before the control; what matters is that it is noticed in sequence, keeps a consistent position and is associated with the field. For radio or checkbox groups, it sits with the question.
 
-A posição anda junto com o momento: validar cedo demais pune a pessoa; validar só no fim a surpreende.
+Position goes hand in hand with timing: validating too early punishes the person; validating only at the end surprises them.
 
-## Decisão
+## Decision
 
-- **SE** o erro é de um campo simples **ENTÃO** exiba a mensagem junto ao campo, na mesma posição em todo o formulário.
-- **SE** o campo é grupo de rádio ou checkbox **ENTÃO** coloque a mensagem junto da pergunta e do grupo.
-- **SE** o envio falhou **ENTÃO** exiba um resumo no topo da área principal e repita cada mensagem ao lado do respectivo campo, com texto idêntico.
-- **SE** o resumo existe **ENTÃO** cada item aponta para o controle e o foco vai ao resumo ou ao primeiro erro.
-- **SE** o campo está vazio e acabou de receber foco **ENTÃO** não valide.
-- **SE** a validação durante o preenchimento é justificada pela regra **ENTÃO** valide sem interromper a digitação; **SENÃO** valide ao avançar ou enviar.
-- **SE** o valor foi corrigido **ENTÃO** remova a mensagem e preserve os dados.
-- **SE** o problema é de elegibilidade ou serviço **ENTÃO** use comunicação própria, não erro de campo.
+- **IF** the error belongs to a simple field **THEN** show the message next to the field, in the same position throughout the form.
+- **IF** the field is a radio or checkbox group **THEN** put the message with the question and the group.
+- **IF** the submit failed **THEN** show a summary at the top of the main area and repeat each message beside its field, with identical text.
+- **IF** there is a summary **THEN** each item points to the control and focus goes to the summary or to the first error.
+- **IF** the field is empty and has just received focus **THEN** do not validate.
+- **IF** validation while typing is justified by the rule **THEN** validate without interrupting typing; **ELSE** validate on moving on or submitting.
+- **IF** the value was corrected **THEN** remove the message and preserve the data.
+- **IF** the problem is about eligibility or the service **THEN** use dedicated communication, not a field error.
 
-## Quando usar
+## When to use
 
-- Após tentar enviar ou avançar.
-- Em formulários longos ou com vários erros.
-- Quando feedback durante o preenchimento evita erro previsível.
+- After trying to submit or move on.
+- In long forms or with several errors.
+- When feedback while filling in prevents a predictable error.
 
-## Quando evitar
+## When to avoid
 
-- Validar ao focar um campo vazio → **use em vez disso:** validar ao avançar.
-- Validar a cada tecla → **use em vez disso:** validar ao concluir o campo, com regra clara.
-- Alerta distante sem vínculo com o campo → **use em vez disso:** mensagem inline mais resumo.
-- Mensagem só "inválido" → **use em vez disso:** problema mais correção.
+- Validating when an empty field gets focus → **use instead:** validate on moving on.
+- Validating on every keystroke → **use instead:** validate when the field is done, with a clear rule.
+- A distant alert with no link to the field → **use instead:** an inline message plus a summary.
+- A message that only says "invalid" → **use instead:** the problem plus the fix.
 
-## Faça
+## Do
 
-- Mantenha rótulo, dica e mensagem juntos.
-- Explique o problema e como corrigir.
-- Use o mesmo texto no resumo e no campo.
-- Preserve o que já foi digitado.
+- Keep label, hint and message together.
+- Explain the problem and how to fix it.
+- Use the same text in the summary and in the field.
+- Preserve what was already typed.
 
-## Evite
+## Avoid
 
-- Esconder a mensagem em tooltip.
-- Duplicar textos conflitantes.
-- Indicar o erro só por cor, ícone ou posição.
-- Perder o foco após o envio.
+- Hiding the message in a tooltip.
+- Duplicating conflicting texts.
+- Signaling the error only by color, icon or position.
+- Losing focus after submitting.
 
-## Acessibilidade
+## Accessibility
 
-- Texto identifica o campo e descreve o erro (3.3.1) e sugere correção quando conhecida (3.3.3).
-- Associe mensagem e controle com `aria-describedby` e marque `aria-invalid="true"`.
-- Grupos usam `fieldset` e `legend` (1.3.1).
-- Não dependa de cor (1.4.1); anuncie mensagens dinâmicas sem roubar foco (4.1.3).
-- Coloque o resumo antes do formulário, com título claro.
+- The text identifies the field and describes the error (3.3.1) and suggests a fix when known (3.3.3).
+- Associate message and control with `aria-describedby` and set `aria-invalid="true"`.
+- Groups use `fieldset` and `legend` (1.3.1).
+- Do not rely on color (1.4.1); announce dynamic messages without stealing focus (4.1.3).
+- Place the summary before the form, with a clear heading.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Título do resumo | "Há 2 problemas para corrigir" |
-| Item do resumo | "Informe o CPF com 11 dígitos" |
-| Mensagem no campo | "Informe o CPF com 11 dígitos." |
-| Grupo | "Escolha uma forma de pagamento." |
+| Summary title | "There are 2 problems to fix" |
+| Summary item | "Enter the tax ID with 11 digits" |
+| Message on the field | "Enter the tax ID with 11 digits." |
+| Group | "Choose a payment method." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem identifica o campo.
-- [ ] Explica o problema e orienta a correção.
-- [ ] Está próxima do campo, na mesma posição em todos os campos.
-- [ ] Há resumo após o envio, com links para os campos.
-- [ ] O texto do resumo é igual ao do campo.
-- [ ] Nada é validado ao focar campo vazio.
-- [ ] A validação não interrompe a digitação.
-- [ ] A mensagem some quando o valor é corrigido.
-- [ ] Os dados preenchidos são preservados.
-- [ ] O foco vai ao resumo ou ao primeiro erro.
+- [ ] The message identifies the field.
+- [ ] It explains the problem and guides the fix.
+- [ ] It is close to the field, in the same position for every field.
+- [ ] There is a summary after submitting, with links to the fields.
+- [ ] The summary text matches the field text.
+- [ ] Nothing is validated when an empty field gets focus.
+- [ ] Validation does not interrupt typing.
+- [ ] The message disappears when the value is corrected.
+- [ ] The entered data is preserved.
+- [ ] Focus goes to the summary or to the first error.
 
-## Fundamentação
+## Rationale
 
-- W3C WAI (User Notification) e WCAG 2.2 (3.3.1): resumo mais mensagem inline, sem posição única imposta.
-- Baymard Institute: validação inline evita descoberta tardia, mas validação prematura prejudica.
-- Nielsen Norman Group (mensagens de erro hostis; diretrizes): proximidade, linguagem humana, momento certo.
-- NHS Digital Service Manual: mensagem junto à pergunta; sem validar no foco ou na digitação.
-- USWDS (Form) e Padrão Digital GOV.BR (Input): mensagem ligada ao campo.
-- CMS Design System e Adobe Spectrum: resumo mais mensagem local; valores preservados.
+- W3C WAI (User Notification) and WCAG 2.2 (3.3.1): summary plus inline message, with no single position imposed.
+- Baymard Institute: inline validation avoids late discovery, but premature validation hurts.
+- Nielsen Norman Group (hostile error messages; guidelines): proximity, human language, the right moment.
+- NHS Digital Service Manual: message with the question; no validation on focus or while typing.
+- USWDS (Form) and GOV.BR Digital Standard (Input): message tied to the field.
+- CMS Design System and Adobe Spectrum: summary plus local message; values preserved.

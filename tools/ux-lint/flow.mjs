@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// ux-lint, nível fluxo: aplica as regras F1–F5 do contrato do UX.md (knowledge/fundamentos/ux-md.md)
-// sobre o mapa de fluxo de um módulo (.dsx/maps/flows-<module>.json). Sem dependências.
+// ux-lint, flow level: applies rules F1–F5 of the UX.md contract (knowledge/foundations/ux-md.md)
+// to a module's flow map (.dsx/maps/flows-<module>.json). No dependencies.
 //
-// Formato de entrada: { screens: [{id, name, type, route, parent, persona}],
+// Input format: { screens: [{id, name, type, route, parent, persona}],
 //   transitions: [{id, from, to, trigger: {type, label}, evidence}], journeys: [{id, name, steps, persona_switches}] }
-// `type` da tela: page | dialog | tab | panel | drawer (dialog e modal contam como diálogo).
-// Passos de jornada podem ser ids de transição ou de tela. O formato antigo (telas, transicoes, jornadas,
-// de/para, gatilho, evidencia, passos…) é lido com aviso (lib/legacy.mjs).
+// Screen `type`: page | dialog | tab | panel | drawer (dialog and modal count as a dialog).
+// Journey steps may be transition ids or screen ids. The old format (telas, transicoes, jornadas,
+// de/para, gatilho, evidencia, passos…) is read with a warning (lib/legacy.mjs).
 //
-// Uso: node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]
+// Usage: node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { parseCli } from '../lib/legacy-cli.mjs';
@@ -19,8 +19,8 @@ export const SEVERITY = { F1: 3, F2: 1, F3: 2, F4: 2, F5: 3 };
 const DIALOG_TYPES = new Set(['dialog', 'modal']);
 
 /**
- * Devolve { findings: [{ rule, severity, screen, message, evidence: [] }], summary, warnings? }.
- * `warnings` lista os nomes antigos lidos no mapa.
+ * Returns { findings: [{ rule, severity, screen, message, evidence: [] }], summary, warnings? }.
+ * `warnings` lists the old names read in the map.
  */
 export function analyzeFlow(input, cfg = configFrom({})) {
   const { map, warnings } = normalizeFlowMap(input);
@@ -38,25 +38,25 @@ export function analyzeFlow(input, cfg = configFrom({})) {
   const findings = [];
   const add = (rule, screen, message, evidence = [], severity = SEVERITY[rule]) =>
     findings.push({ rule, severity, screen, message, evidence: evidence.filter(Boolean) });
-  const evidenceOf = (trs) => trs.map((t) => `${t.id} (${t.evidence || 'sem evidência'})`);
+  const evidenceOf = (trs) => trs.map((t) => `${t.id} (${t.evidence || 'no evidence'})`);
   const name = (id) => byId.get(id)?.name || id;
 
-  // Referências quebradas: transição para/de tela que não existe (não é regra do contrato; vai como aviso F0).
+  // Broken references: a transition to/from a screen that does not exist (not a contract rule; reported as warning F0).
   for (const tr of transitions) {
     for (const side of ['from', 'to']) {
-      if (!byId.has(tr[side])) add('F0', tr[side], `transição ${tr.id} aponta para tela inexistente "${tr[side]}"`, evidenceOf([tr]), 1);
+      if (!byId.has(tr[side])) add('F0', tr[side], `transition ${tr.id} points to a missing screen "${tr[side]}"`, evidenceOf([tr]), 1);
     }
   }
 
-  // F1 — tela (não diálogo) sem nenhuma saída. Transição para a própria tela (ação que fica nela) não é saída.
+  // F1: screen (not a dialog) with no way out. A transition to the same screen (an action that stays there) is not a way out.
   const deadEnds = screens.filter((t) => !isDialog(t.id) && !outgoing.get(t.id).some((tr) => tr.to !== t.id));
   const deadEndLimit = Number(cfg.flows['dead-ends'] ?? 0);
   for (const t of deadEnds) {
-    add('F1', t.id, `"${t.name}" (${t.type}) não tem nenhuma transição de saída; chega-se por ${incoming.get(t.id).length} transição(ões)`,
+    add('F1', t.id, `"${t.name}" (${t.type}) has no outgoing transition; it is reached by ${incoming.get(t.id).length} transition(s)`,
       evidenceOf(incoming.get(t.id)), deadEnds.length > deadEndLimit ? SEVERITY.F1 : 1);
   }
 
-  // F2 — tela fora de todas as jornadas (aviso).
+  // F2: screen outside every journey (warning).
   if (journeys.length) {
     const inJourneys = new Set();
     const transitionById = new Map(transitions.map((t) => [t.id, t]));
@@ -65,28 +65,28 @@ export function analyzeFlow(input, cfg = configFrom({})) {
       if (tr) { inJourneys.add(tr.from); inJourneys.add(tr.to); } else if (byId.has(p)) inJourneys.add(p);
     }
     for (const t of screens) {
-      if (!inJourneys.has(t.id)) add('F2', t.id, `"${t.name}" não aparece em nenhuma jornada`, t.component ? [t.component] : []);
+      if (!inJourneys.has(t.id)) add('F2', t.id, `"${t.name}" does not appear in any journey`, t.component ? [t.component] : []);
     }
   }
 
-  // F3 — jornada longa.
+  // F3: long journey.
   const maxSteps = Number(cfg.flows['max-journey-steps']);
   for (const j of journeys) {
     const n = (j.steps || []).length;
     if (n > maxSteps) {
       const switches = (j.persona_switches || []).length;
-      add('F3', j.id, `jornada "${j.name}" tem ${n} passos (máx. ${maxSteps})${switches ? `, com ${switches} troca(s) de persona` : ''}`, []);
+      add('F3', j.id, `journey "${j.name}" has ${n} steps (max. ${maxSteps})${switches ? `, with ${switches} persona switch(es)` : ''}`, []);
     }
   }
 
-  // F4 — diálogos empilhados: profundidade da cadeia diálogo → diálogo acima do limite. O mapa não diz se o
-  // primeiro diálogo fecha antes do segundo abrir; a regra acusa e a evidência permite conferir no código.
+  // F4: stacked dialogs: depth of the dialog → dialog chain above the limit. The map does not say whether the
+  // first dialog closes before the second opens; the rule flags it and the evidence lets you check in the code.
   const maxDialogs = Number(cfg.flows['max-stacked-dialogs']);
-  // Abertura diálogo → diálogo: não conta ação dentro do mesmo diálogo nem volta para a tela-mãe (B → A
-  // quando A é o `pai` de B).
+  // Dialog → dialog opening: an action inside the same dialog does not count, nor a return to the parent screen
+  // (B → A when A is B's `parent`).
   const stacks = (tr) => isDialog(tr.from) && isDialog(tr.to) && tr.from !== tr.to && byId.get(tr.from)?.parent !== tr.to;
   const openings = transitions.filter(stacks);
-  // Profundidade = maior cadeia de aberturas que termina no diálogo (o primeiro diálogo conta 1).
+  // Depth = longest chain of openings ending at the dialog (the first dialog counts 1).
   const depth = (id, visiting = new Set([id])) => {
     let deepest = 0;
     for (const tr of openings) {
@@ -98,21 +98,21 @@ export function analyzeFlow(input, cfg = configFrom({})) {
     return 1 + deepest;
   };
   for (const tr of transitions) {
-    if (!stacks(tr)) continue; // ação dentro do mesmo diálogo, volta ou diálogo aberto a partir de página
+    if (!stacks(tr)) continue; // action inside the same dialog, a return, or a dialog opened from a page
     const p = depth(tr.to);
     if (p > maxDialogs) {
-      add('F4', tr.to, `diálogo "${name(tr.to)}" abre a partir do diálogo "${name(tr.from)}" (${p} diálogos empilhados; máx. ${maxDialogs})${tr.trigger?.label ? ` — gatilho "${tr.trigger.label}"` : ''}`, evidenceOf([tr]));
+      add('F4', tr.to, `dialog "${name(tr.to)}" opens from dialog "${name(tr.from)}" (${p} stacked dialogs; max. ${maxDialogs})${tr.trigger?.label ? `; trigger "${tr.trigger.label}"` : ''}`, evidenceOf([tr]));
     }
   }
 
-  // F5 — tela não raiz (com pai) sem transição de volta para a mãe ou para uma tela de onde se chega a ela.
+  // F5: non-root screen (with a parent) with no transition back to the parent or to a screen it is reached from.
   if (cfg.navigation.back === 'mandatory') {
     for (const t of screens.filter((t) => t.parent)) {
-      // Origem = de onde se chega; filhas que voltam para esta tela (diálogo que fecha) não são origem.
+      // Origin = where it is reached from; children that return to this screen (a dialog that closes) are not origins.
       const origins = new Set(incoming.get(t.id).map((tr) => tr.from).filter((from) => from !== t.id && byId.get(from)?.parent !== t.id));
       const hasBack = outgoing.get(t.id).some((tr) => tr.to === t.parent || origins.has(tr.to));
       if (!hasBack) {
-        add('F5', t.id, `"${t.name}" (filha de "${name(t.parent)}") não tem transição de volta para a mãe nem para ${origins.size ? [...origins].map((o) => `"${name(o)}"`).join(', ') : 'nenhuma origem'}`,
+        add('F5', t.id, `"${t.name}" (child of "${name(t.parent)}") has no transition back to the parent nor to ${origins.size ? [...origins].map((o) => `"${name(o)}"`).join(', ') : 'any origin'}`,
           evidenceOf([...incoming.get(t.id), ...outgoing.get(t.id)]));
       }
     }
@@ -130,13 +130,13 @@ export function analyzeFlow(input, cfg = configFrom({})) {
 function main() {
   const args = parseCli('ux-lint/flow.mjs');
   if (!args._.length) {
-    console.error('Uso: node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]');
+    console.error('Usage: node tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json [--ux UX.md] [--json] [--fail-at 3]');
     process.exit(2);
   }
   const cfg = loadConfig(typeof args.ux === 'string' ? args.ux : null);
   const threshold = Number(args['fail-at'] ?? 3);
   const output = args._.map((f) => ({ file: f, ...analyzeFlow(JSON.parse(readFileSync(f, 'utf8')), cfg) }));
-  for (const s of output) for (const w of s.warnings ?? []) console.error(`AVISO ${s.file}: ${w}`);
+  for (const s of output) for (const w of s.warnings ?? []) console.error(`WARNING ${s.file}: ${w}`);
   if (args.json) console.log(JSON.stringify(output.length === 1 ? output[0] : output, null, 2));
   else {
     for (const s of output) {
@@ -147,7 +147,7 @@ function main() {
         if (a.evidence.length > 4) console.log(`      … +${a.evidence.length - 4}`);
       }
       const r = s.summary;
-      console.log(`\nResumo: ${r.screens} telas, ${r.transitions} transições, ${r.journeys} jornadas; ${r.findings} achados (${Object.entries(r.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum'})`);
+      console.log(`\nSummary: ${r.screens} screens, ${r.transitions} transitions, ${r.journeys} journeys; ${r.findings} findings (${Object.entries(r.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'none'})`);
     }
   }
   process.exit(output.some((s) => s.findings.some((a) => a.severity >= threshold)) ? 1 : 0);

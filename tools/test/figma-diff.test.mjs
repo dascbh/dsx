@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), '..', 'figma', 'diff-baseline.cjs');
 
-/** Retrato sintético no formato de tools/figma/snapshot.js em MODE 'full'. */
+/** Synthetic snapshot in the tools/figma/snapshot.js format, MODE 'full'. */
 function snapshot({ pad, title, cardName = () => 'SectionCard · X', legacy = false }) {
   const frame = (id, page, name, txt) => {
     const nodes = {
@@ -38,7 +38,7 @@ function runDiff(before, after) {
   return execFileSync(process.execPath, [SCRIPT, a, b], { encoding: 'utf8' });
 }
 
-/** Recorta uma seção `## …` do relatório até a próxima. */
+/** Cuts a `## …` section of the report up to the next one. */
 const section = (report, heading) => {
   const i = report.indexOf(heading);
   if (i < 0) return null;
@@ -50,32 +50,32 @@ const section = (report, heading) => {
 test('Figma diff: same change in 2 frames is a primitive; single change is a composition', () => {
   const report = runDiff(snapshot({ pad: 16, title: 'Demandas' }), snapshot({ pad: 12, title: 'Demanda em risco' }));
 
-  const prim = section(report, '## Agrupadas (≥ 2 frames) — classe `primitivo`');
-  assert.ok(prim, 'seção primitivo ausente:\n' + report);
-  assert.match(prim, /`SectionCard` · auto-layout · padTop 16 → 12, padBaixo 16 → 12 · \*\*2 frames\*\*/);
+  const prim = section(report, '## Grouped (≥ 2 frames): class `primitive`');
+  assert.ok(prim, 'primitive section missing:\n' + report);
+  assert.match(prim, /`SectionCard` · auto-layout · padTop 16 → 12, padBottom 16 → 12 · \*\*2 frames\*\*/);
 
-  const comp = section(report, '## Por frame — classe `composição`');
-  assert.ok(comp, 'seção composição ausente:\n' + report);
-  assert.match(comp, /### 02 · Demandas › Detalhe\n- `Título` · texto: Demandas → Demanda em risco/);
-  assert.doesNotMatch(comp, /SectionCard/, 'mudança agrupada não pode reaparecer como composição');
-  assert.doesNotMatch(comp, /Lista/, 'frame só com mudança agrupada não entra em composição');
+  const comp = section(report, '## Per frame: class `composition`');
+  assert.ok(comp, 'composition section missing:\n' + report);
+  assert.match(comp, /### 02 · Demandas › Detalhe\n- `Título` · text: Demandas → Demanda em risco/);
+  assert.doesNotMatch(comp, /SectionCard/, 'a grouped change must not reappear as a composition');
+  assert.doesNotMatch(comp, /Lista/, 'a frame with only grouped changes is not a composition');
 
-  assert.match(report, /## Tokens e estilos\n\nSem mudança\./);
+  assert.match(report, /## Tokens and styles\n\nNo change\./);
 });
 
 test('Figma diff: same change under names without a common family flags a naming problem', () => {
   const cardName = (id) => (id === '1' ? 'CardA' : 'CardB');
   const report = runDiff(snapshot({ pad: 16, title: 'x', cardName }), snapshot({ pad: 12, title: 'x', cardName }));
-  assert.equal(section(report, '## Agrupadas (≥ 2 frames) — classe `primitivo`'), null);
-  const naming = section(report, '## Possível problema de nomenclatura');
-  assert.ok(naming, 'seção de nomenclatura ausente:\n' + report);
-  assert.match(naming, /\*\*2 frames no total\*\*, espalhada por: /);
+  assert.equal(section(report, '## Grouped (≥ 2 frames): class `primitive`'), null);
+  const naming = section(report, '## Possible naming problem');
+  assert.ok(naming, 'naming section missing:\n' + report);
+  assert.match(naming, /\*\*2 frames in total\*\*, spread over: /);
   assert.match(naming, /`CardA`/);
   assert.match(naming, /`CardB`/);
 });
 
 test('Figma diff: accepts legacy baseline with pt-BR keys', () => {
   const report = runDiff(snapshot({ pad: 16, title: 'Demandas', legacy: true }), snapshot({ pad: 12, title: 'Demandas' }));
-  assert.match(report, /`SectionCard` · auto-layout · padTop 16 → 12, padBaixo 16 → 12 · \*\*2 frames\*\*/);
-  assert.doesNotMatch(report, /Mudaram, mas o baseline não tem detalhe/);
+  assert.match(report, /`SectionCard` · auto-layout · padTop 16 → 12, padBottom 16 → 12 · \*\*2 frames\*\*/);
+  assert.doesNotMatch(report, /Changed, but the baseline has no detail/);
 });

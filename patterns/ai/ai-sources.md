@@ -1,6 +1,6 @@
 ---
 id: ai-sources
-title: Como mostrar fontes e critérios nas respostas de IA?
+title: How do you show sources and criteria in AI responses?
 category: ai
 components: [citation, sources-panel, ai-response, link]
 type: contextual-decision
@@ -11,93 +11,93 @@ wcag: ["2.1.1", "2.4.4", "2.4.7", "1.4.1", "4.1.2"]
 related: [label-ai-content, ai-uncertainty, review-ai-output, confirm-ai-action]
 ---
 
-# Como mostrar fontes e critérios nas respostas de IA?
+# How do you show sources and criteria in AI responses?
 
-> **Regra:** Ligue cada afirmação relevante à fonte que a sustenta, deixe a fonte abrível e, em saídas de alto impacto, mostre também os critérios, dados e limites usados.
+> **Rule:** Link each relevant claim to the source that supports it, make the source openable and, for high-impact outputs, also show the criteria, data and limits used.
 
-## Contexto
+## Context
 
-Uma resposta de IA pode sintetizar documentos, sugerir uma ação ou embasar uma decisão. Se parte de fontes, dados ou regras, a pessoa precisa enxergar o que a sustenta e avaliar se ela se aplica ao seu contexto.
+An AI response may synthesize documents, suggest an action or support a decision. If it draws on sources, data or rules, the person needs to see what backs it and judge whether it applies to their context.
 
-Citação não garante correção: a fonte pode estar incompleta, mal interpretada ou não sustentar o trecho. O objetivo é permitir verificação proporcional ao risco, não passar confiança automática.
+A citation does not guarantee correctness: the source may be incomplete, misread or not support the passage. The goal is verification proportional to risk, not automatic trust.
 
-Um texto bem redigido soa confiável mesmo quando é impróprio. Fontes e critérios à vista permitem confrontar a interpretação com a origem e decidir se vale buscar outra evidência.
+Well-written text sounds reliable even when it is wrong. Visible sources and criteria let people compare the interpretation with the origin and decide whether to look for other evidence.
 
-## Decisão
+## Decision
 
-- **SE** a resposta usa busca, documentos, bases internas ou arquivos enviados **ENTÃO** mostre as fontes junto do trecho que cada uma sustenta.
-- **SE** o risco é baixo (sugestão local e reversível) **ENTÃO** links ou trechos bastam; não exija lista extensa.
-- **SE** a saída é uma recomendação, classificação ou decisão de grande impacto (saúde, finanças, segurança, direitos, seleção de pessoas) **ENTÃO** explique também os dados considerados, as regras aplicadas, as limitações e a incerteza.
-- **SE** não há base verificável **ENTÃO** diga isso explicitamente; nunca invente citação.
-- **SE** a resposta mistura conteúdo pesquisado, dados da pessoa e conhecimento geral do modelo **ENTÃO** identifique cada origem.
-- **SE** a fonte não sustenta o trecho **ENTÃO** não a exiba.
-- **SE** a fonte tem acesso restrito ou contém dados privados **ENTÃO** respeite permissões e avise.
-- **SENÃO** ofereça no mínimo um painel de fontes visível e fácil de achar.
+- **IF** the response uses search, documents, internal knowledge bases or uploaded files **THEN** show the sources next to the passage each one supports.
+- **IF** the risk is low (a local, reversible suggestion) **THEN** links or excerpts are enough; do not require a long list.
+- **IF** the output is a high-impact recommendation, classification or decision (health, finance, safety, rights, people selection) **THEN** also explain the data considered, the rules applied, the limitations and the uncertainty.
+- **IF** there is no verifiable basis **THEN** say so explicitly; never invent a citation.
+- **IF** the response mixes searched content, the person's data and the model's general knowledge **THEN** identify each origin.
+- **IF** the source does not support the passage **THEN** do not show it.
+- **IF** the source has restricted access or contains private data **THEN** respect permissions and say so.
+- **ELSE** provide at least a visible, easy-to-find sources panel.
 
-## Quando usar
+## When to use
 
-- Pesquisa na web, documentos e bases internas.
-- Resumos, análises e recomendações que serão conferidos.
-- Fluxos de alto impacto.
-- Respostas com várias origens.
-- Sistemas que classificam ou recomendam por regras e filtros.
+- Web search, documents and internal knowledge bases.
+- Summaries, analyses and recommendations that will be checked.
+- High-impact flows.
+- Responses with several origins.
+- Systems that classify or recommend through rules and filters.
 
-## Quando evitar
+## When to avoid
 
-- Lista extensa de fontes para sugestão trivial → **use em vez disso:** nenhuma ou uma única referência.
-- Detalhe técnico que não ajuda a avaliar → **use em vez disso:** critérios em linguagem simples.
-- Explicação no lugar de revisão humana ou confirmação → **use em vez disso:** explicação mais revisão.
-- Exposição de dados pessoais para "explicar" → **use em vez disso:** resumo sem dados sensíveis.
+- A long list of sources for a trivial suggestion → **use instead:** none or a single reference.
+- Technical detail that does not help assessment → **use instead:** criteria in plain language.
+- An explanation in place of human review or confirmation → **use instead:** explanation plus review.
+- Exposing personal data to "explain" → **use instead:** a summary without sensitive data.
 
-## Faça
+## Do
 
-- Vincule a fonte ao trecho exato.
-- Mostre tipo, data e contexto da fonte quando relevantes.
-- Separe fato citado, inferência da IA e sugestão prática.
-- Informe limites e ausência de evidência com clareza.
-- Ofereça caminho para questionar ou corrigir.
+- Tie the source to the exact passage.
+- Show the source's type, date and context when relevant.
+- Separate cited fact, AI inference and practical suggestion.
+- State limits and missing evidence clearly.
+- Offer a way to question or correct.
 
-## Evite
+## Avoid
 
-- Citações decorativas ou sem relação direta.
-- Fontes escondidas em menu difícil.
-- Explicações genéricas apresentadas como justificativa específica.
-- Indicador de confiança sem explicar o que mede.
-- Fonte que a pessoa não consegue abrir.
+- Decorative or unrelated citations.
+- Sources hidden in a hard-to-find menu.
+- Generic explanations presented as a specific justification.
+- A confidence indicator that does not explain what it measures.
+- A source the person cannot open.
 
-## Acessibilidade
+## Accessibility
 
-- Cada citação é operável por teclado (2.1.1) e tem nome acessível que identifica a fonte (4.1.2).
-- Não associe fonte e trecho só por número, cor ou posição (1.4.1).
-- Avise se a fonte abre em outra página, pede login ou tem acesso restrito (2.4.4).
-- Painel de fontes com foco visível (2.4.7) e ordem de leitura previsível.
-- Linguagem clara para incerteza e ausência de fontes.
+- Each citation is keyboard-operable (2.1.1) and has an accessible name that identifies the source (4.1.2).
+- Do not link source and passage by number, color or position alone (1.4.1).
+- Say if the source opens in another page, requires sign-in or has restricted access (2.4.4).
+- Sources panel with visible focus (2.4.7) and a predictable reading order.
+- Clear language for uncertainty and missing sources.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulo de fontes | "Fontes usadas nesta resposta" |
-| Citação | "Fonte 2: Relatório trimestral, mar/2026" |
-| Sem base | "Não encontrei fonte que sustente esta informação." |
-| Origem mista | "Baseado nos arquivos que você enviou e em conhecimento geral" |
-| Critérios | "Critérios aplicados: prazo, valor e histórico de pagamento" |
+| Sources label | "Sources used in this response" |
+| Citation | "Source 2: Quarterly report, Mar 2026" |
+| No basis | "I couldn't find a source that supports this information." |
+| Mixed origin | "Based on the files you uploaded and on general knowledge" |
+| Criteria | "Criteria applied: due date, amount and payment history" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Cada afirmação importante tem fonte identificável.
-- [ ] As fontes podem ser abertas e conferidas.
-- [ ] Fato citado, inferência e sugestão estão diferenciados.
-- [ ] Decisões de alto impacto exibem critérios ou dados considerados.
-- [ ] Limites e incerteza aparecem sem falsa precisão.
-- [ ] Não há citação irrelevante ou inventada.
-- [ ] As fontes respeitam permissões e privacidade.
-- [ ] Citações e painel funcionam por teclado e leitor de tela.
+- [ ] Each important claim has an identifiable source.
+- [ ] The sources can be opened and checked.
+- [ ] Cited fact, inference and suggestion are distinguished.
+- [ ] High-impact decisions show the criteria or data considered.
+- [ ] Limits and uncertainty appear without false precision.
+- [ ] There is no irrelevant or invented citation.
+- [ ] Sources respect permissions and privacy.
+- [ ] Citations and panel work with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- Microsoft HAX Toolkit, diretriz 11: explicações apropriadas sobre saídas e ações da IA.
-- Amershi et al. (CHI 2019), Guidelines for Human-AI Interaction: justificativa compreensível do comportamento.
-- Google PAIR (Crafting helpful explanations): explicações que ajudam a avaliar a IA.
-- Documentação pública de produtos de IA com citações e painéis de fontes (assistentes de busca e de produtividade): verificação da origem.
-- WCAG 2.2: operabilidade por teclado, propósito do link e nome-papel-valor.
+- Microsoft HAX Toolkit, guideline 11: appropriate explanations of AI outputs and actions.
+- Amershi et al. (CHI 2019), Guidelines for Human-AI Interaction: understandable justification of behavior.
+- Google PAIR (Crafting helpful explanations): explanations that help people assess the AI.
+- Public documentation of AI products with citations and sources panels (search and productivity assistants): verifying the origin.
+- WCAG 2.2: keyboard operability, link purpose and name-role-value.

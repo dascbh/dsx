@@ -1,6 +1,6 @@
 ---
 id: breadcrumbs
-title: Quando usar breadcrumbs?
+title: When should you use breadcrumbs?
 category: navigation
 components: [breadcrumbs, secondary-navigation]
 type: recommendation
@@ -11,100 +11,100 @@ wcag: ["2.4.8", "2.4.4", "1.4.10", "2.4.7", "1.3.1"]
 related: [tabs, main-navigation, pagination-vs-scroll, active-filters]
 ---
 
-# Quando usar breadcrumbs?
+# When should you use breadcrumbs?
 
-> **Regra:** Use breadcrumbs só quando existir hierarquia real de páginas, e trate o retorno aos resultados como uma ação separada da trilha.
+> **Rule:** Use breadcrumbs only when there is a real page hierarchy, and treat returning to the results as an action separate from the trail.
 
-## Contexto
+## Context
 
-Breadcrumbs são navegação secundária que mostra a posição da página na hierarquia e permite subir para níveis mais amplos. Não substituem o menu principal e não representam o caminho que a pessoa percorreu.
+Breadcrumbs are secondary navigation that shows the page's position in the hierarchy and lets the person move up to broader levels. They do not replace the main menu and do not represent the path the person took.
 
-Existem duas necessidades separadas: a trilha hierárquica, fundada na arquitetura do conteúdo, e o retorno fundado no histórico, como "Voltar aos resultados". Em produtos com busca, filtros e entrada por link externo, misturar as duas desorienta a pessoa.
+There are two separate needs: the hierarchical trail, grounded in the content architecture, and the history-based return, such as "Back to results". In products with search, filters and entry from external links, mixing the two disorients the person.
 
-O valor aparece em páginas internas acessadas diretamente, sem passar pela home. Em estruturas rasas, páginas isoladas ou fluxos lineares, o componente vira ruído e sugere uma hierarquia que não existe.
+The value shows up on internal pages reached directly, without going through the home page. In shallow structures, isolated pages or linear flows, the component becomes noise and suggests a hierarchy that does not exist.
 
-## Decisão
+## Decision
 
-- **SE** o produto tem hierarquia profunda e a pessoa pode chegar direto a páginas internas **ENTÃO** use breadcrumbs.
-- **SE** é catálogo, base de conhecimento ou portal extenso **ENTÃO** use breadcrumbs.
-- **SE** a estrutura é rasa e a posição já é evidente **ENTÃO** não use.
-- **SE** é home, landing page isolada ou página sem pai relevante **ENTÃO** não use.
-- **SE** é um fluxo linear (formulário, checkout) **ENTÃO** use indicador de progresso, não breadcrumbs.
-- **SE** a pessoa precisa recuperar busca, filtros e ordenação **ENTÃO** ofereça "Voltar aos resultados" além da trilha.
-- **SE** o nível não corresponde a uma página existente **ENTÃO** não o inclua.
-- **SE** a tela é pequena **ENTÃO** compacte por truncamento, agrupamento ou menu de ancestrais, sem deixar nenhum nível inacessível.
-- **SENÃO** não adicione o componente por hábito.
+- **IF** the product has a deep hierarchy and the person can land directly on internal pages **THEN** use breadcrumbs.
+- **IF** it is a catalog, knowledge base or large portal **THEN** use breadcrumbs.
+- **IF** the structure is shallow and the position is already evident **THEN** do not use them.
+- **IF** it is the home page, an isolated landing page or a page with no relevant parent **THEN** do not use them.
+- **IF** it is a linear flow (form, checkout) **THEN** use a progress indicator, not breadcrumbs.
+- **IF** the person needs to recover search, filters and sorting **THEN** offer "Back to results" in addition to the trail.
+- **IF** a level does not correspond to an existing page **THEN** do not include it.
+- **IF** the screen is small **THEN** compact by truncating, grouping or using an ancestors menu, without leaving any level unreachable.
+- **ELSE** do not add the component out of habit.
 
-## Quando usar
+## When to use
 
-- Hierarquia de conteúdo profunda.
-- Páginas internas acessadas por busca ou link externo.
-- Catálogos, bases de conhecimento e portais extensos.
-- Subir para a categoria pai é tarefa frequente.
+- A deep content hierarchy.
+- Internal pages reached through search or external links.
+- Catalogs, knowledge bases and large portals.
+- Moving up to the parent category is a frequent task.
 
-## Quando evitar
+## When to avoid
 
-- Home e páginas sem pai relevante → **use em vez disso:** nenhuma trilha.
-- Sites rasos → **use em vez disso:** menu principal.
-- Fluxos lineares → **use em vez disso:** indicador de progresso.
-- Substituto do menu principal → **use em vez disso:** navegação principal.
-- Trilha baseada no caminho casual da sessão → **use em vez disso:** hierarquia real mais ação de voltar.
+- Home page and pages with no relevant parent → **use instead:** no trail.
+- Shallow sites → **use instead:** the main menu.
+- Linear flows → **use instead:** a progress indicator.
+- A substitute for the main menu → **use instead:** main navigation.
+- A trail based on the session's casual path → **use instead:** the real hierarchy plus a back action.
 
-## Faça
+## Do
 
-- Modele a trilha a partir da arquitetura, não do histórico.
-- Faça cada nível anterior apontar para uma página existente.
-- Termine com o nome da página atual.
-- Use os mesmos nomes da navegação, dos títulos e das categorias.
-- Posicione de forma consistente, depois do cabeçalho e antes do título.
-- Teste entradas diretas por busca e link externo.
+- Model the trail on the architecture, not on the history.
+- Make each previous level point to an existing page.
+- End with the name of the current page.
+- Use the same names as the navigation, headings and categories.
+- Place it consistently, after the header and before the title.
+- Test direct entry through search and external links.
 
-## Evite
+## Avoid
 
-- Exibir em toda página.
-- Inventar níveis para SEO.
-- Usar rótulos vagos.
-- Confundir com etapas de um processo.
-- Apagar filtros ao voltar.
-- Esconder a trilha no mobile sem alternativa.
+- Showing it on every page.
+- Inventing levels for SEO.
+- Using vague labels.
+- Confusing it with the steps of a process.
+- Clearing filters when going back.
+- Hiding the trail on mobile with no alternative.
 
-## Acessibilidade
+## Accessibility
 
-- Marque como região de navegação rotulada (nav com nome acessível) e use lista ordenada (1.3.1).
-- Níveis anteriores são links com nomes compreensíveis (2.4.4); o item atual pode ser texto ou link com aria-current="page".
-- Esconda separadores decorativos da leitura assistiva.
-- Links e controles de truncamento operáveis por teclado, com foco visível e contraste (2.4.7).
-- Em telas estreitas, quebre, trunque ou abra lista de ancestrais, sem impedir o acesso aos níveis; teste zoom de 200% e 400% (1.4.10).
-- A trilha não pode ser o único modo de chegar a uma área importante.
-- Quando houver mais de um nav na página, rotule cada um.
+- Mark it as a labeled navigation region (nav with an accessible name) and use an ordered list (1.3.1).
+- Previous levels are links with understandable names (2.4.4); the current item can be text or a link with aria-current="page".
+- Hide decorative separators from assistive reading.
+- Links and truncation controls operable by keyboard, with visible focus and contrast (2.4.7).
+- On narrow screens, wrap, truncate or open an ancestors list without blocking access to the levels; test 200% and 400% zoom (1.4.10).
+- The trail cannot be the only way to reach an important area.
+- When the page has more than one nav, label each one.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Rótulo da região | "Você está em" |
-| Trilha | "Início > Móveis > Mesas > Mesa de jantar" |
-| Retorno com contexto | "Voltar aos resultados" |
-| Truncamento | "Mostrar níveis anteriores" |
+| Region label | "You are here" |
+| Trail | "Home > Furniture > Tables > Dining table" |
+| Return with context | "Back to results" |
+| Truncation | "Show previous levels" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Existe hierarquia real com pelo menos dois níveis.
-- [ ] Cada nível anterior é um link para página existente.
-- [ ] A página atual está identificada no fim da trilha.
-- [ ] Os rótulos são iguais aos da navegação e dos títulos.
-- [ ] A trilha está dentro de nav com nome acessível e usa lista ordenada.
-- [ ] Separadores decorativos não são lidos.
-- [ ] Quando há busca ou filtros, existe "Voltar aos resultados" que os preserva.
-- [ ] No mobile, os ancestrais continuam acessíveis.
-- [ ] Funciona com teclado, zoom de 400% e leitor de tela.
+- [ ] There is a real hierarchy with at least two levels.
+- [ ] Each previous level is a link to an existing page.
+- [ ] The current page is identified at the end of the trail.
+- [ ] The labels match the navigation and headings.
+- [ ] The trail is inside a nav with an accessible name and uses an ordered list.
+- [ ] Decorative separators are not read out.
+- [ ] When there is search or filters, a "Back to results" link preserves them.
+- [ ] On mobile, the ancestors remain reachable.
+- [ ] It works with keyboard, 400% zoom and screen reader.
 
-## Fundamentação
+## Rationale
 
-- U.S. Web Design System, breadcrumb: navegação secundária; evitar em sites simples, landing pages e processos passo a passo; marcação com nav, lista ordenada e aria-current.
-- Padrão Digital GOV.BR, breadcrumb: navegação estrutural, página atual, truncamento e telas pequenas.
-- W3C WAI, técnica G65 e padrão de breadcrumb da WAI-ARIA APG: trilha hierárquica, região rotulada e aria-current.
-- Baymard Institute: dois tipos de breadcrumbs (hierarquia e histórico) e comportamento em páginas de produto móveis; evidência específica de e-commerce.
-- W3C Design System: implementação acessível e rótulo quando há mais de um nav.
-- Nielsen Norman Group, relatório de intranets: exemplos de trilha para localização.
-- WCAG 2.2, critério 2.4.8 (localização).
+- U.S. Web Design System, breadcrumb: secondary navigation; avoid on simple sites, landing pages and step-by-step processes; markup with nav, ordered list and aria-current.
+- GOV.BR Digital Standard, breadcrumb: structural navigation, current page, truncation and small screens.
+- W3C WAI, technique G65 and the WAI-ARIA APG breadcrumb pattern: hierarchical trail, labeled region and aria-current.
+- Baymard Institute: two types of breadcrumbs (hierarchy and history) and behavior on mobile product pages; e-commerce-specific evidence.
+- W3C Design System: accessible implementation and labeling when there is more than one nav.
+- Nielsen Norman Group, intranet report: trail examples for orientation.
+- WCAG 2.2, criterion 2.4.8 (Location).

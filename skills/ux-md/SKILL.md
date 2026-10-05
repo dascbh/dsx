@@ -1,106 +1,106 @@
 ---
 name: ux-md
-description: "Cria, atualiza ou avalia o UX.md do projeto (como a interface se organiza e se comporta; rubrica de 100 pontos, gates e drift): extrai do código classificando cada tela num arquétipo, define para projeto novo ou audita com linter, nota, drift, ux-lint e revisão. Use quando faltar UX.md, telas do mesmo tipo divergirem, o drift acusar UX.md desatualizado ou pedirem para avaliá-lo."
+description: "Creates, updates or evaluates the project's UX.md (how the interface is organized and behaves; 100-point rubric, gates and drift): extracts it from code by classifying each screen into an archetype, defines it for a new project, or audits it with the linter, score, drift, ux-lint and review. Use when UX.md is missing, screens of the same type diverge, drift reports UX.md as stale, or someone asks to evaluate it."
 ---
 
-# UX.md: criar, atualizar, avaliar
+# UX.md: create, update, evaluate
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `templates/`, `tools/`, `examples/`, `archetypes/` são relativos a ela; caminhos sem prefixo (`UX.md`, `.dsx/`, `src/`) são do projeto do usuário.
+> **DSX root:** two levels above this skill's base directory. Paths under `knowledge/`, `templates/`, `tools/`, `examples/`, `archetypes/` are relative to it; paths without a prefix (`UX.md`, `.dsx/`, `src/`) belong to the user's project.
 
-Contrato (schema, 13 seções, versão e frescor, desvios, nota e gates, drift U1–U6, regras T/F/S/C/L): `knowledge/fundamentos/ux-md.md`. Rubrica: `evals/rubrics/ux-md.yaml`. Modelo: `templates/UX.md`. Exemplo aprovado: `examples/UX.md`. Catálogo de tipos de tela: `archetypes/` (um cartão por id).
+Contract (schema, 13 sections, version and freshness, deviations, score and gates, drift U1–U6, rules T/F/S/C/L): `knowledge/foundations/ux-md.md`. Rubric: `evals/rubrics/ux-md.yaml`. Template: `templates/UX.md`. Approved example: `examples/UX.md`. Screen-type catalog: `archetypes/` (one card per id).
 
-**Princípio:** o `DESIGN.md` diz como a tela **parece**; o `UX.md` diz **que tipo de tela é, onde fica cada coisa e como ela se comporta**. O valor está no que ele impede o agente de adivinhar: posição da primária, quando confirmar, o que mostrar no vazio, como se volta.
+**Principle:** `DESIGN.md` says how the screen **looks**; `UX.md` says **what type of screen it is, where everything goes and how it behaves**. Its value lies in what it keeps the agent from guessing: where the primary action sits, when to confirm, what to show when empty, how to go back.
 
 ## UX.md and the UX blueprint
 
 `UX.md` is the **product** contract: conventions every screen follows. The **objective** contract is the UX blueprint (`templates/ux-blueprint.md`), written into the front demand's Forward design family (`specs/<demand-id>/design/intended-model.md`, `flow.md`, `ia.md`). Keep them apart: UX.md never lists one objective's scenarios, and a blueprint cites UX.md policies by key instead of restating them. When a blueprint needs something UX.md forbids, record a deviation in UX.md (`deviations` + D… table) or revise UX.md in the same cycle; never let the two disagree silently. `tools/ux-lint/blueprint.mjs check` verifies the blueprint against the captures and the flow map; `ux-md-drift.mjs` keeps verifying UX.md against the product.
 
-## Escolha o modo
+## Choose the mode
 
-- Não existe `UX.md` e há produto/código → **Modo A: extrair**
-- Não existe `UX.md` e o projeto é novo → **Modo B: definir**
-- Existe `UX.md` → **Modo C: avaliar** (e depois corrigir as lacunas)
+- No `UX.md` and there is a product/code → **Mode A: extract**
+- No `UX.md` and the project is new → **Mode B: define**
+- `UX.md` exists → **Mode C: evaluate** (then fix the gaps)
 
-## Modo A — Extrair do código
+## Mode A — Extract from code
 
-1. **Mapas primeiro.** Se `.dsx/maps/` não existir ou estiver velho, rode a skill `mapear`. Leia `ui-map` (telas, diálogos, componentes), `flows` (grafo de navegação), `tasks` (passos e confirmações), `journey` (persona e momentos) e `domain` (vocabulário das entidades). Item em `uncertain` não é fato: confirme com `confirmar-mapas` ou marque "(inferido)".
-2. **Mapa de fluxo com evidência.** Para cada módulo, garanta um `.dsx/maps/flows-<module>.json` com `screens`, `transitions` (`trigger` + `evidence` `arquivo:linha`) e `journeys` (formato em `knowledge/fundamentos/ux-md.md`). Sem evidência no código, a transição não entra.
-3. **Capturas pelo código.** Se o projeto tem uma skill de captura pelo código (`capture-from-code` do DSX, ou a do projeto), capture as telas principais e seus estados em HTML. São a entrada do ux-lint de tela e a referência de "como está hoje". Nunca reconstrua uma tela existente por texto.
-4. **Classifique cada tela num arquétipo.** Para cada rota/diálogo do mapa, leia os cartões de `archetypes/` e escolha o de `quando-usar` que casa com a **tarefa** da tela (não com a aparência). SE nenhum casa → ENTÃO registre o desvio na seção 5 com o motivo. SE a tela faz duas tarefas de tipos diferentes → ENTÃO registre como desvio e proponha a separação.
-5. **Derive as políticas do que o código já faz.** Conte, não suponha: onde está a primária nas telas do mesmo tipo, quantas primárias por região, ordem dos botões em diálogo, se ação irreversível pede confirmação, como o sucesso aparece (toast, inline), quais estados cada tela trata, como os formulários validam. A maioria vira a política no front matter; anote a evidência (arquivo ou tela) na prosa.
-6. **Inconsistências viram "Não faça".** Toda divergência entre telas do mesmo arquétipo (ex.: primária no rodapé numa lista e no topo na outra; diálogo sobre diálogo; "Confirmar" em ação destrutiva) entra no bloco "Não faça" com a tela onde aparece. Problemas recorrentes resolvidos bem viram "Faça".
-7. **Desvios estruturados.** Cada tela que difere do cartão de propósito entra na tabela "Desvios declarados" da seção 5 **e** no bloco `deviations` do front matter, com `screens` (ids do mapa), `rules` (as regras do ux-lint que o desvio explica: L9 para região ausente, T3 para `h1` de outra tela, F1 para beco intencional…), `reason` e `decided-by`. Dívida que deve ser corrigida não é desvio: vai em "Não faça".
-8. **Seletores de verificação.** Preencha `verification.selectors` com as classes reais do kit (ex.: botão cheio do MUI, variante destrutiva do shadcn) olhando as capturas.
-9. **Glossário.** Um glossário por vocabulário: se o produto tem módulos com termos próprios, use `content.glossary: { default: …, <módulo>: … }`.
-10. **Pergunte ao usuário** só o que o código não responde: persona, o que é crítico errar, o que a experiência nunca faz, termos proibidos.
-11. `version: 1.0.0`, `format: alpha`, `updated` de hoje. Valide (Modo C, passos 1 a 3).
+1. **Maps first.** If `.dsx/maps/` does not exist or is stale, run the `map-ux` skill. Read `ui-map` (screens, dialogs, components), `flows` (navigation graph), `tasks` (steps and confirmations), `journey` (persona and moments) and `domain` (entity vocabulary). An item under `uncertain` is not a fact: confirm it with `confirm-maps` or mark it "(inferred)".
+2. **Flow map with evidence.** For each module, make sure there is a `.dsx/maps/flows-<module>.json` with `screens`, `transitions` (`trigger` + `evidence` `file:line`) and `journeys` (format in `knowledge/foundations/ux-md.md`). A transition with no evidence in the code does not go in.
+3. **Captures from code.** If the project has a capture-from-code skill (DSX's `capture-from-code`, or the project's own), capture the main screens and their states as HTML. They are the input of the screen ux-lint and the reference for "how it is today". Never rebuild an existing screen from a text description.
+4. **Classify each screen into an archetype.** For each route/dialog in the map, read the cards in `archetypes/` and pick the one whose `quando-usar` matches the screen's **task** (not its looks). IF none matches → THEN record the deviation in section 5 with the reason. IF the screen does two tasks of different types → THEN record it as a deviation and propose splitting it.
+5. **Derive the policies from what the code already does.** Count, do not assume: where the primary action sits on screens of the same type, how many primary actions per region, button order in dialogs, whether irreversible actions ask for confirmation, how success shows up (toast, inline), which states each screen handles, how forms validate. The majority becomes the policy in the front matter; note the evidence (file or screen) in the prose.
+6. **Inconsistencies become "Don't".** Every divergence between screens of the same archetype (e.g. primary action in the footer on one list and at the top on another; dialog over dialog; "Confirmar" on a destructive action) goes into the "Don't" block with the screen where it appears. Recurring problems that were solved well become "Do".
+7. **Structured deviations.** Each screen that differs from its card on purpose goes into the "Declared deviations" table in section 5 **and** into the `deviations` block of the front matter, with `screens` (map ids), `rules` (the ux-lint rules the deviation explains: L9 for a missing region, T3 for another screen's `h1`, F1 for an intentional dead end…), `reason` and `decided-by`. Debt that should be fixed is not a deviation: it goes under "Don't".
+8. **Verification selectors.** Fill in `verification.selectors` with the kit's real classes (e.g. MUI's contained button, shadcn's destructive variant) by looking at the captures.
+9. **Glossary.** One glossary per vocabulary: if the product has modules with their own terms, use `content.glossary: { default: …, <module>: … }`.
+10. **Ask the user** only what the code cannot answer: persona, what is critical to get wrong, what the experience never does, forbidden terms.
+11. `version: 1.0.0`, `format: alpha`, `updated` set to today. Validate (Mode C, steps 1 to 3).
 
-## Modo B — Definir para projeto novo
+## Mode B — Define for a new project
 
-1. Entreviste em uma rodada: persona e tarefa principal, frequência e contexto (desktop 8 h/dia? celular em trânsito?), o que custa caro errar, o que o produto nunca faz.
-2. Escolha `product.register` com `knowledge/design-system/escolher-design-system.md`. O registro restringe os arquétipos: SE `operational` → ENTÃO lista operacional, master-detail, editor com painel e painel de acompanhamento são a base; SE `consumer` ou `brand` → ENTÃO prefira poucas telas por tarefa, assistente em etapas e página pública de decisão; SE `editorial` → ENTÃO documento com visor e biblioteca. Confirme no campo `register` de cada cartão.
-3. Liste as telas a partir das tarefas (uma tarefa principal por tela) e atribua o arquétipo de cada uma no front matter.
-4. Fixe as políticas em aberto (posição da primária, confirmação, feedback, validação) consultando os padrões correspondentes em `patterns/` (skill `padroes`). Escolha uma opção e escreva por quê.
-5. Preencha `templates/UX.md` inteiro. Nenhuma seção pode ficar só com comentário. "Faça e não faça" vem de riscos concretos da tarefa enquanto não houver problema real; revise depois do primeiro teste.
+1. Interview in a single round: persona and main task, frequency and context (desktop 8 h/day? phone on the move?), what is expensive to get wrong, what the product never does.
+2. Choose `product.register` with `knowledge/design-system/choosing-a-design-system.md`. The register constrains the archetypes: IF `operational` → THEN operational list, master-detail, editor with panel and monitoring dashboard are the base; IF `consumer` or `brand` → THEN prefer few screens per task, step-by-step wizard and public decision page; IF `editorial` → THEN document with viewer and library. Confirm against the `register` field of each card.
+3. List the screens from the tasks (one main task per screen) and assign each one's archetype in the front matter.
+4. Settle the open policies (primary action position, confirmation, feedback, validation) by consulting the matching patterns in `patterns/` (skill `patterns`). Pick one option and write down why.
+5. Fill in `templates/UX.md` completely. No section may be left with only a comment. "Do and don't" comes from concrete risks of the task until there is a real problem; revise it after the first test.
 
-## Regras de escrita (valem para A e B)
+## Writing rules (apply to A and B)
 
-- Critério observável em vez de adjetivo: ~~"navegação intuitiva"~~ → "toda tela não raiz tem migalha e botão de voltar; profundidade máxima 3".
-- Nomes de áreas e botões exatamente como aparecem na tela.
-- Seção 5 é uma tabela: tela | arquétipo | variação | desvio. Toda tela do front matter aparece nela.
-- Não repita os padrões: cite o id (`patterns/actions/action-placement.md`) e diga qual opção o produto fixou.
-- Não invente telas que não existem nem políticas que o código contradiz sem registrar a contradição.
-- **Versão:** a cada mudança suba `version` (arquétipo, política ou desvio → menor; só texto → patch; modelo de navegação ou `register` → maior) e `updated`, no mesmo commit da mudança de UI que a motivou.
+- Observable criterion instead of adjective: ~~"intuitive navigation"~~ → "every non-root screen has a breadcrumb and a back button; maximum depth 3".
+- Area and button names exactly as they appear on screen.
+- Section 5 is a table: screen | archetype | variation | deviation. Every screen in the front matter appears in it.
+- Do not restate the patterns: cite the id (`patterns/actions/action-placement.md`) and say which option the product settled on.
+- Do not invent screens that do not exist, nor policies the code contradicts, without recording the contradiction.
+- **Version:** on every change bump `version` (archetype, policy or deviation → minor; text only → patch; navigation model or `register` → major) and `updated`, in the same commit as the UI change that motivated it.
 
-## Modo C — Avaliar
+## Mode C — Evaluate
 
-**Passo 1 — Formato (automático):**
+**Step 1 — Format (automatic):**
 ```bash
-node <DSX>/tools/lint-ux-md.mjs UX.md          # --json para máquina
+node <DSX>/tools/lint-ux-md.mjs UX.md          # --json for machines
 ```
-Qualquer ERRO reprova. Avisos de "sem cartão" indicam arquétipo sem referência no catálogo ainda.
+Any ERROR fails. "No card" warnings point to an archetype that has no reference in the catalog yet.
 
-**Passo 2 — Nota, gates e drift (automático):**
+**Step 2 — Score, gates and drift (automatic):**
 ```bash
-node <DSX>/tools/lint-ux-md.mjs UX.md --score --map .dsx/maps/flows-<module>.json --screens <pasta-de-capturas>
+node <DSX>/tools/lint-ux-md.mjs UX.md --score --map .dsx/maps/flows-<module>.json --screens <captures-folder>
 node <DSX>/tools/ux-lint/ux-md-drift.mjs UX.md --module <module> --root .
 ```
-Nota de 100 pontos por critério (cobertura de telas, políticas com evidência, estados, fluxos, glossário, faça/não faça, seletores, frescor, desvios) e gates: `lint`, `essential-coverage`, `policy-fidelity`, `connected-to-agent` (código) e `no-conflict` (juiz). Qualquer gate ✘ reprova, independentemente da nota. Faixas como no `DESIGN.md`: 90–100 robusto · 75–89 utilizável com lacunas · 60–74 revisar · < 60 alto risco. Drift U1–U6 é correção do documento (arquétipo faltando, tela que sumiu, política que a maioria das telas não segue, estado sem captura, `updated` velho, desvio vencido).
+100-point score by criterion (screen coverage, policies with evidence, states, flows, glossary, do/don't, selectors, freshness, deviations) and gates: `lint`, `essential-coverage`, `policy-fidelity`, `connected-to-agent` (code) and `no-conflict` (judge). Any ✘ gate fails, regardless of the score. Bands as in `DESIGN.md`: 90–100 robust · 75–89 usable with gaps · 60–74 revise · < 60 high risk. Drift U1–U6 is a correction to the document (missing archetype, screen that disappeared, policy most screens do not follow, state without a capture, stale `updated`, expired deviation).
 
-**Passo 3 — Tela e fluxo (automático, gate objetivo):**
+**Step 3 — Screen and flow (automatic, objective gate):**
 ```bash
-node <DSX>/tools/ux-lint/screen.mjs <pasta-de-capturas> --ux UX.md
+node <DSX>/tools/ux-lint/screen.mjs <captures-folder> --ux UX.md
 node <DSX>/tools/ux-lint/flow.mjs .dsx/maps/flows-<module>.json --ux UX.md
 ```
-Achados de severidade ≥ 3 são correção antes de entregar ou dívida registrada com dono. Registre em `.dsx/findings` e decida pelo registro: rode com `--json`, `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen screen.json --flow flow.json --root <repo>`, e trate as decisões pelo registro (`findings.mjs page`/`decide`, contrato em `knowledge/fundamentos/achados-de-ux.md`). Dívida registrada = item `open` ou `ignored` com motivo; `findings.mjs check` no CI impede que piore.
+Findings of severity ≥ 3 must be fixed before delivery or become registered debt with an owner. Record them in `.dsx/findings` and decide through the register: run with `--json`, `node <DSX>/tools/ux-lint/findings.mjs register --module <m> --screen screen.json --flow flow.json --root <repo>`, and handle decisions through the register (`findings.mjs page`/`decide`, contract in `knowledge/foundations/ux-findings.md`). Registered debt = an `open` or `ignored` item with a reason; `findings.mjs check` in CI keeps it from getting worse.
 
-**Passo 4 — Julgamento (skill `revisar-ux` e `juiz-de-evals` com `evals/rubrics/ux-md.yaml`, `judge-criteria`):** o que a máquina não mede.
-- O arquétipo atribuído casa com a tarefa de cada tela? (Leia o `quando-usar` e o `evitar-quando` do cartão.)
-- As políticas do front matter são o que o produto faz de fato, ou são aspiração? Contradição sem registro é reprovação.
-- "Faça e não faça" vêm de problemas reais (tela, achado, chamado) ou são genéricos?
-- Percurso cognitivo das jornadas principais sobre as capturas, usando a seção 11 como roteiro.
-- Cada desvio de `deviations` é decisão de produto com motivo, ou dívida disfarçada?
+**Step 4 — Judgment (skill `review-ux` and `eval-judge` with `evals/rubrics/ux-md.yaml`, `judge-criteria`):** what the machine does not measure.
+- Does the assigned archetype match each screen's task? (Read the card's `quando-usar` and `evitar-quando`.)
+- Are the front matter policies what the product actually does, or are they aspirations? An unrecorded contradiction fails.
+- Do "Do and don't" come from real problems (screen, finding, ticket) or are they generic?
+- Cognitive walkthrough of the main journeys over the captures, using section 11 as the script.
+- Is each deviation in `deviations` a product decision with a reason, or disguised debt?
 
-**Passo 5 — Geração controlada** (teste de aceitação, como no `DESIGN.md`): peça uma tela nova de um arquétipo já usado só com o `UX.md`, o `DESIGN.md` e o código. Cada posição de ação, confirmação, estado ou rótulo que o agente teve de inventar é lacuna do `UX.md`.
+**Step 5 — Controlled generation** (acceptance test, as in `DESIGN.md`): ask for a new screen of an archetype already in use with only `UX.md`, `DESIGN.md` and the code. Every action position, confirmation, state or label the agent had to invent is a gap in `UX.md`.
 
-**Saída do Modo C:**
+**Mode C output:**
 ```
-Gates: lint ✔/✘ · cobertura ✔/✘ · fidelidade ✔/✘ · conexão ✔/✘ · conflitos ✔/✘
-Nota: NN/100 (faixa) · version X.Y.Z · updated AAAA-MM-DD
-Por critério: <critério> NN/peso — evidência
-Drift: U… (o que mudar no UX.md)
-Achados de tela/fluxo: id, regra, severidade, correção (ou desvio a declarar)
-Lacunas reveladas na geração controlada: …
-Diff proposto no UX.md (com a nova version): …
+Gates: lint ✔/✘ · coverage ✔/✘ · fidelity ✔/✘ · connection ✔/✘ · conflicts ✔/✘
+Score: NN/100 (band) · version X.Y.Z · updated YYYY-MM-DD
+By criterion: <criterion> NN/weight — evidence
+Drift: U… (what to change in UX.md)
+Screen/flow findings: id, rule, severity, fix (or deviation to declare)
+Gaps revealed by controlled generation: …
+Proposed diff to UX.md (with the new version): …
 ```
 
 ## Checklist
 
-- [ ] Toda tela e diálogo do mapa está no front matter `archetypes` ou declarado como desvio na seção 5.
-- [ ] Políticas com evidência (Modo A) ou com o padrão que as justifica (Modo B).
-- [ ] Inconsistências encontradas viraram "Não faça" com a tela de origem.
-- [ ] `lint-ux-md.mjs` sem erro; `ux-lint` de tela e fluxo rodados e registrados em `.dsx/findings/<modulo>/`; severidade ≥ 3 tratada.
-- [ ] Desvios na tabela da seção 5 e no bloco `deviations` (mesmos ids); `rules` preenchido quando o desvio explica um achado.
-- [ ] `version` (semver) e `updated` atualizados no mesmo commit da mudança de UI.
-- [ ] `lint-ux-md.mjs --score` com gates de código ✔ e `ux-md-drift.mjs` sem achado (ou cada achado virou correção no arquivo).
-- [ ] Bloco de contexto no `CLAUDE.md`/`AGENTS.md` do projeto (skill `iniciar`, passo 6): "antes de criar ou alterar UI, leia `DESIGN.md` (como parece) e `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta)".
+- [ ] Every screen and dialog in the map is in the front matter `archetypes` or declared as a deviation in section 5.
+- [ ] Policies backed by evidence (Mode A) or by the pattern that justifies them (Mode B).
+- [ ] Inconsistencies found became "Don't" entries with the source screen.
+- [ ] `lint-ux-md.mjs` with no error; screen and flow `ux-lint` run and recorded in `.dsx/findings/<module>/`; severity ≥ 3 handled.
+- [ ] Deviations in the section 5 table and in the `deviations` block (same ids); `rules` filled in when the deviation explains a finding.
+- [ ] `version` (semver) and `updated` bumped in the same commit as the UI change.
+- [ ] `lint-ux-md.mjs --score` with code gates ✔ and `ux-md-drift.mjs` with no finding (or each finding turned into a fix in the file).
+- [ ] Context block in the project's `CLAUDE.md`/`AGENTS.md` (skill `init`, step 6): "before creating or changing UI, read `DESIGN.md` (how it looks) and `UX.md` (what type of screen, where everything goes, how it behaves)".

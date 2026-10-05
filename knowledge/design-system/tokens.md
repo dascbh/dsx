@@ -1,63 +1,63 @@
 # Design tokens
 
-## Quando consultar
+## When to consult
 
-- Ao criar, renomear, remover ou consumir qualquer token.
-- Ao adicionar um tema (escuro, alto contraste, marca) ou um modo (densidade).
-- Ao rodar o pipeline de tokens deste repositório ou interpretar um erro dele.
-- Quando um componente "não troca de tema" ou aparece valor cru no código.
+- When creating, renaming, removing or consuming any token.
+- When adding a theme (dark, high contrast, brand) or a mode (density).
+- When running this repository's token pipeline or interpreting one of its errors.
+- When a component "does not switch themes" or a raw value shows up in the code.
 
-## Conceito em uma frase
+## The concept in one sentence
 
-Token é um **nome estável para uma decisão de design**. O valor pode mudar; o nome e o papel não. O código de UI conhece apenas nomes; os valores moram em arquivos de token e chegam por referência.
+A token is a **stable name for a design decision**. The value may change; the name and the role do not. UI code knows only names; values live in token files and arrive by reference.
 
-## Regras
+## Rules
 
-1. **Nunca escreva valor cru em código de UI.** Hex, `rgb()`, `oklch()`, px fora de token, `z-index` mágico e valores arbitrários de framework utilitário são proibidos fora de `tokens/`.
-2. **Componentes consomem a camada semântica** (ou a de componente). Primitivos só alimentam semânticos.
-3. **Nomeie pela função, não pela aparência.** `color.text.muted`, nunca `color.cinza-claro`.
-4. **Toda cor semântica usada como texto ou contorno essencial precisa de um par declarado** em `tokens/contrast-pairs.json`.
-5. **Tema troca valores, nunca nomes.** O tema escuro tem as mesmas chaves que o claro.
-6. **Não edite `tokens/build/`.** É saída gerada; a fonte é sempre `tokens/*.tokens.json`.
-7. **Crie token quando o valor for compartilhado ou carregar decisão.** Valor usado uma única vez, sem intenção reaproveitável, não justifica token novo; reavalie se ele deveria ser um token existente.
+1. **Never write raw values in UI code.** Hex, `rgb()`, `oklch()`, px outside a token, magic `z-index` and utility-framework arbitrary values are forbidden outside `tokens/`.
+2. **Components consume the semantic layer** (or the component layer). Primitives only feed semantic tokens.
+3. **Name by function, not appearance.** `color.text.muted`, never `color.cinza-claro` (light gray).
+4. **Every semantic color used as text or an essential outline needs a declared pair** in `tokens/contrast-pairs.json`.
+5. **A theme changes values, never names.** The dark theme has the same keys as the light one.
+6. **Do not edit `tokens/build/`.** It is generated output; the source is always `tokens/*.tokens.json`.
+7. **Create a token when the value is shared or carries a decision.** A value used only once, with no reusable intent, does not justify a new token; reconsider whether it should be an existing token.
 
-## As três camadas
+## The three layers
 
-| Camada | Pergunta que responde | No repositório | Quem consome |
+| Layer | Question it answers | In the repository | Who consumes it |
 |---|---|---|---|
-| 1. Primitivo | "Quais valores existem?" | `tokens/primitives.tokens.json` | Somente a camada 2 |
-| 2. Semântico | "Para que serve este valor?" | `tokens/semantic.light.tokens.json` e `semantic.dark.tokens.json` | Componentes e telas |
-| 3. Componente (opcional) | "Qual decisão é exclusiva deste componente?" | Ainda não existe no repo | O próprio componente |
+| 1. Primitive | "Which values exist?" | `tokens/primitives.tokens.json` | Only layer 2 |
+| 2. Semantic | "What is this value for?" | `tokens/semantic.light.tokens.json` and `semantic.dark.tokens.json` | Components and screens |
+| 3. Component (optional) | "Which decision is exclusive to this component?" | Does not exist in the repo yet | The component itself |
 
-### Camada 1: primitivos
+### Layer 1: primitives
 
-Inventário bruto, sem intenção de uso. No repo:
+Raw inventory, with no usage intent. In the repo:
 
-- Cor: `color.white`, `color.black`, e rampas de 11 passos (`50, 100, 200, …, 900, 950`) para `color.brand`, `color.neutral`, `color.success`, `color.danger`, `color.warning`, `color.info`.
-- Espaço: `space.<multiplicador>` sobre unidade de 4px: `space.0` (0), `space.0_5` (2px), `space.1` (4px), `space.1_5` (6px), `space.2` (8px), `space.3` (12px), `space.4` (16px), `space.5` (20px), `space.6` (24px), `space.8` (32px), `space.10` (40px), `space.12` (48px), `space.16` (64px), `space.20` (80px), `space.24` (96px), `space.32` (128px).
-- Raio: `radius.none` (0), `sm` (4px), `md` (8px), `lg` (12px), `xl` (16px), `full` (9999px).
-- Tipografia: `font.family.sans`, `font.family.mono`, `font.weight.regular|medium|semibold|bold` (400–700), `font.size.12|14|16|20|25|31|39|49|61`, `font.lineHeight.tight|snug|normal` (1.1 / 1.25 / 1.5).
-- Movimento: `duration.instant|fast|base|slow` (0 / 120 / 200 / 320 ms), `easing.standard|enter|exit` (cubic-bezier).
-- Elevação: `shadow.sm|md|lg`.
+- Color: `color.white`, `color.black`, and 11-step ramps (`50, 100, 200, …, 900, 950`) for `color.brand`, `color.neutral`, `color.success`, `color.danger`, `color.warning`, `color.info`.
+- Space: `space.<multiplier>` on a 4px unit: `space.0` (0), `space.0_5` (2px), `space.1` (4px), `space.1_5` (6px), `space.2` (8px), `space.3` (12px), `space.4` (16px), `space.5` (20px), `space.6` (24px), `space.8` (32px), `space.10` (40px), `space.12` (48px), `space.16` (64px), `space.20` (80px), `space.24` (96px), `space.32` (128px).
+- Radius: `radius.none` (0), `sm` (4px), `md` (8px), `lg` (12px), `xl` (16px), `full` (9999px).
+- Typography: `font.family.sans`, `font.family.mono`, `font.weight.regular|medium|semibold|bold` (400–700), `font.size.12|14|16|20|25|31|39|49|61`, `font.lineHeight.tight|snug|normal` (1.1 / 1.25 / 1.5).
+- Motion: `duration.instant|fast|base|slow` (0 / 120 / 200 / 320 ms), `easing.standard|enter|exit` (cubic-bezier).
+- Elevation: `shadow.sm|md|lg`.
 
-### Camada 2: semânticos
+### Layer 2: semantic
 
-Dão papel ao valor. No repo:
+They give the value a role. In the repo:
 
 - `color.bg.*` (`canvas`, `surface`, `sunken`, `overlay`, `inverse`)
 - `color.text.*` (`primary`, `secondary`, `muted`, `inverse`, `link`, `on-action`)
 - `color.border.*` (`default`, `strong`, `focus`)
 - `color.action.*` (`primary`, `primary-hover`, `primary-active`, `secondary`, `secondary-hover`, `danger`, `danger-hover`, `disabled`, `disabled-text`)
 - `color.feedback.*` (`success|danger|warning|info` × `-bg|-text|-icon`)
-- `color.ai.*` (`accent`, `surface`) para marcar conteúdo gerado por IA
+- `color.ai.*` (`accent`, `surface`) to mark AI-generated content
 - `space.inset-xs|sm|md|lg`, `space.stack-sm|md|lg`, `space.inline-sm|md`, `space.section`
 - `size.touch-target` (44px), `size.control-sm|md|lg` (32/40/48px), `size.focus-ring` (2px), `size.measure` (68ch)
 - `radius.control`, `radius.card`, `radius.pill`
 - `motion.feedback`, `motion.transition`, `motion.overlay`
 
-### Camada 3: componente
+### Layer 3: component
 
-Use **só** quando um componente precisa de uma decisão que não é papel geral do sistema (ex.: sub-marca que muda só o raio do botão). Excesso de tokens de componente vira um segundo sistema paralelo. Se for criar, aponte sempre para um semântico:
+Use it **only** when a component needs a decision that is not a general system role (e.g. a sub-brand that changes only the button radius). Too many component tokens become a second, parallel system. If you create one, always point to a semantic token:
 
 ```json
 {
@@ -72,35 +72,35 @@ Use **só** quando um componente precisa de uma decisão que não é papel geral
 }
 ```
 
-(Exemplo ilustrativo: `button.*` não existe hoje no repositório.)
+(Illustrative example: `button.*` does not exist in the repository today.)
 
-## Gramática de nomes
+## Naming grammar
 
-Forma geral: `categoria.papel.variante-estado`.
+General form: `category.role.variant-state`.
 
-| Segmento | Valores usados no repo | Observação |
+| Segment | Values used in the repo | Note |
 |---|---|---|
-| categoria | `color`, `space`, `size`, `radius`, `font`, `duration`, `easing`, `shadow`, `motion` | Primeira palavra sempre é o tipo de decisão |
-| papel | `bg`, `text`, `border`, `action`, `feedback`, `ai`; `inset`, `stack`, `inline`, `section` | Descreve função |
-| variante | `primary`, `secondary`, `muted`, `danger`, `success`, `sm`, `md`, `lg` | Importância, tipo ou tamanho |
-| estado | `hover`, `active`, `disabled`, `focus` | Sufixo com hífen: `primary-hover` |
+| category | `color`, `space`, `size`, `radius`, `font`, `duration`, `easing`, `shadow`, `motion` | The first word is always the decision type |
+| role | `bg`, `text`, `border`, `action`, `feedback`, `ai`; `inset`, `stack`, `inline`, `section` | Describes function |
+| variant | `primary`, `secondary`, `muted`, `danger`, `success`, `sm`, `md`, `lg` | Importance, type or size |
+| state | `hover`, `active`, `disabled`, `focus` | Hyphenated suffix: `primary-hover` |
 
-Regras de nome:
+Naming rules:
 
-- Delimitador de grupo é o **ponto** no JSON; no CSS vira hífen: `color.text.primary` → `--color-text-primary`; `space.inset-md` → `--space-inset-md`.
-- Primitivos numéricos usam o **passo da rampa** (`brand.600`) ou o **multiplicador da grade** (`space.4` = 4 × 4px). Decimais usam sublinhado: `space.0_5`.
-- O nome tem que ser dedutível: quem conhece `color.feedback.danger-text` deve adivinhar `color.feedback.warning-text`.
-- Mesmo vocabulário em design, código e documentação. Variável na ferramenta de design `color/text/primary` corresponde a `color.text.primary`.
-- Proibido: nomes de aparência (`azul-escuro`), nomes relativos sem definição (`maior`), nomes de origem (`frame-231`), versões (`card-final-v2`).
+- The group delimiter is the **dot** in JSON; in CSS it becomes a hyphen: `color.text.primary` → `--color-text-primary`; `space.inset-md` → `--space-inset-md`.
+- Numeric primitives use the **ramp step** (`brand.600`) or the **grid multiplier** (`space.4` = 4 × 4px). Decimals use an underscore: `space.0_5`.
+- The name must be deducible: whoever knows `color.feedback.danger-text` should guess `color.feedback.warning-text`.
+- Same vocabulary in design, code and documentation. The design tool variable `color/text/primary` corresponds to `color.text.primary`.
+- Forbidden: appearance names (`azul-escuro`, dark blue), undefined relative names (`maior`, bigger), origin names (`frame-231`), versions (`card-final-v2`).
 
-## Formato W3C DTCG
+## W3C DTCG format
 
-O repo segue o formato do Design Tokens Community Group:
+The repo follows the Design Tokens Community Group format:
 
-- Todo token tem `$value`; `$type` é obrigatório no repo (pode ser herdado do grupo pai; o build já trata essa herança).
-- `$description` é opcional, mas **use em todo token semântico cujo uso não seja óbvio**. Ela vira documentação para pessoas e agentes.
-- Grupos são objetos aninhados; chaves iniciadas por `$` são metadados, não tokens.
-- Tipos usados: `color`, `dimension`, `fontFamily`, `fontWeight`, `number`, `duration`, `cubicBezier`, `shadow`.
+- Every token has `$value`; `$type` is mandatory in the repo (it may be inherited from the parent group; the build already handles that inheritance).
+- `$description` is optional, but **use it on every semantic token whose use is not obvious**. It becomes documentation for people and agents.
+- Groups are nested objects; keys starting with `$` are metadata, not tokens.
+- Types used: `color`, `dimension`, `fontFamily`, `fontWeight`, `number`, `duration`, `cubicBezier`, `shadow`.
 
 ```json
 {
@@ -109,73 +109,75 @@ O repo segue o formato do Design Tokens Community Group:
       "muted": {
         "$type": "color",
         "$value": "{color.neutral.600}",
-        "$description": "Mínimo permitido para texto: >= 4.5:1 sobre canvas"
+        "$description": "Minimum allowed for text: >= 4.5:1 on canvas"
       }
     }
   }
 }
 ```
 
+(The `$description` is quoted verbatim from the repo's token file.)
+
 ### Aliases
 
-- Referência é `{caminho.do.token}`; o build resolve recursivamente e **falha** em referência inexistente ou circular.
-- Um alias pode estar inteiro (`"{space.4}"`) ou embutido numa string; prefira o alias inteiro.
-- Alias semântico → primitivo é o caso normal (`radius.control` → `radius.md`; `motion.feedback` → `duration.fast`). Alias semântico → semântico é permitido quando um papel deriva de outro, e é o que um token de componente faz (`button.primary.bg` → `color.action.primary`).
-- Valor literal na camada semântica só quando não há primitivo equivalente e criar um seria ruído (no repo: `color.bg.overlay` com alfa e `size.*`). Documente o porquê na `$description`.
+- A reference is `{path.to.token}`; the build resolves it recursively and **fails** on a nonexistent or circular reference.
+- An alias can be whole (`"{space.4}"`) or embedded in a string; prefer the whole alias.
+- Semantic → primitive alias is the normal case (`radius.control` → `radius.md`; `motion.feedback` → `duration.fast`). Semantic → semantic alias is allowed when one role derives from another, and it is what a component token does (`button.primary.bg` → `color.action.primary`).
+- A literal value in the semantic layer only when there is no equivalent primitive and creating one would be noise (in the repo: `color.bg.overlay` with alpha and `size.*`). Document why in the `$description`.
 
-## Temas e modos
+## Themes and modes
 
-- Tema claro = `semantic.light.tokens.json` (base completa).
-- Tema escuro = `semantic.dark.tokens.json`, que **redefine apenas o que muda** (no repo, só `color.*`). Chaves ausentes herdam do claro; por isso `space.*` e `size.*` não se repetem.
-- O build **rejeita** chave no escuro que não exista no claro. Isso garante paridade de nomes.
-- Componentes nunca perguntam "qual tema estou?". Eles leem `var(--color-bg-surface)` e o tema decide.
+- Light theme = `semantic.light.tokens.json` (full base).
+- Dark theme = `semantic.dark.tokens.json`, which **redefines only what changes** (in the repo, only `color.*`). Missing keys inherit from light; that is why `space.*` and `size.*` are not repeated.
+- The build **rejects** a key in dark that does not exist in light. This guarantees name parity.
+- Components never ask "which theme am I in?". They read `var(--color-bg-surface)` and the theme decides.
 
-SE → ENTÃO:
+IF → THEN:
 
-- **SE** precisa de alto contraste ou de outra marca **ENTÃO** crie outro arquivo semântico com as mesmas chaves e um seletor próprio no build; não crie tokens novos para isso.
-- **SE** precisa de densidade compacta **ENTÃO** é um modo que remapeia `space.inset-*`/`size.control-*`; veja `espacamento-e-layout.md`.
-- **SE** um valor é idêntico nos dois temas **ENTÃO** não o repita no escuro (herda).
-- **SE** uma cor tem o mesmo primitivo nos dois temas **ENTÃO** suspeite: quase sempre o escuro precisa de outro passo da rampa. Veja `cor.md`.
+- **IF** you need high contrast or another brand **THEN** create another semantic file with the same keys and its own selector in the build; do not create new tokens for it.
+- **IF** you need compact density **THEN** it is a mode that remaps `space.inset-*`/`size.control-*`; see `spacing-and-layout.md`.
+- **IF** a value is identical in both themes **THEN** do not repeat it in dark (it inherits).
+- **IF** a color uses the same primitive in both themes **THEN** be suspicious: dark almost always needs a different ramp step. See `color.md`.
 
-### Saída CSS gerada
+### Generated CSS output
 
-`tokens/build/tokens.css` contém:
+`tokens/build/tokens.css` contains:
 
-1. `:root { … }` com todos os primitivos + semânticos do tema claro.
-2. `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { … } }` com os semânticos escuros: o sistema do usuário decide, a menos que a página force claro.
-3. `:root[data-theme="dark"] { … }` para forçar escuro independentemente da preferência.
+1. `:root { … }` with all primitives + light theme semantic tokens.
+2. `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { … } }` with the dark semantic tokens: the user's system decides, unless the page forces light.
+3. `:root[data-theme="dark"] { … }` to force dark regardless of preference.
 
-## Pipeline do repositório
+## Repository pipeline
 
-| Comando | Faz |
+| Command | Does |
 |---|---|
-| `node tools/build-tokens.mjs` | Achata os três arquivos, resolve aliases, valida paridade de temas, checa cada par de `contrast-pairs.json` nos dois temas, grava `tokens/build/tokens.css`, `tokens.light.json`, `tokens.dark.json`. Sai com código 1 se algum par falhar |
-| `node tools/build-tokens.mjs --check` | Mesmas validações, sem gravar arquivos. Use em CI |
-| `node tools/palette.mjs "#5754ed" --name brand --format dtcg` | Gera rampa 50–950 em OKLCH pronta para colar em `primitives.tokens.json` (formatos: `json`, `css`, `dtcg`) |
-| `node tools/type-scale.mjs --base 16 --ratio major-third` | Gera escala tipográfica; `--fluid` gera `clamp()` |
-| `node tools/spacing-scale.mjs --base 4 --format dtcg` | Gera a escala de espaço |
-| `node tools/contrast.mjs "#627187" "#ffffff"` | Contraste de um par, com níveis AA/AAA |
-| `node tools/contrast.mjs --pairs tokens/contrast-pairs.json --tokens tokens/build/tokens.light.json` | Valida pares contra um tema resolvido |
-| `node tools/lint-raw-values.mjs src/` | Lista valores crus e mostra drift por 1000 linhas; `--json` para máquina |
+| `node tools/build-tokens.mjs` | Flattens the three files, resolves aliases, validates theme parity, checks each pair in `contrast-pairs.json` in both themes, writes `tokens/build/tokens.css`, `tokens.light.json`, `tokens.dark.json`. Exits with code 1 if any pair fails |
+| `node tools/build-tokens.mjs --check` | Same validations, without writing files. Use in CI |
+| `node tools/palette.mjs "#5754ed" --name brand --format dtcg` | Generates a 50–950 OKLCH ramp ready to paste into `primitives.tokens.json` (formats: `json`, `css`, `dtcg`) |
+| `node tools/type-scale.mjs --base 16 --ratio major-third` | Generates a type scale; `--fluid` generates `clamp()` |
+| `node tools/spacing-scale.mjs --base 4 --format dtcg` | Generates the spacing scale |
+| `node tools/contrast.mjs "#627187" "#ffffff"` | Contrast of one pair, with AA/AAA levels |
+| `node tools/contrast.mjs --pairs tokens/contrast-pairs.json --tokens tokens/build/tokens.light.json` | Validates pairs against a resolved theme |
+| `node tools/lint-raw-values.mjs src/` | Lists raw values and shows drift per 1000 lines; `--json` for machines |
 
-Formato de um par em `contrast-pairs.json`:
+Format of a pair in `contrast-pairs.json` (as in the repo file):
 
 ```json
-{ "fg": "color.text.muted", "bg": "color.bg.surface", "min": 4.5, "use": "texto de apoio em card" }
+{ "fg": "color.text.muted", "bg": "color.bg.surface", "min": 4.5, "use": "supporting text on card" }
 ```
 
-Cores com alfa (hex de 8 dígitos, como `color.bg.overlay`) são ignoradas na checagem, pois o contraste depende do que está atrás; valide-as manualmente sobre o conteúdo real.
+Colors with alpha (8-digit hex, such as `color.bg.overlay`) are skipped in the check, since contrast depends on what is behind them; validate them manually over the real content.
 
-### Fluxo para adicionar um token
+### Flow for adding a token
 
-1. Decida a camada. Papel novo → semântico. Valor novo sem papel → primitivo.
-2. Edite `tokens/primitives.tokens.json` e/ou `semantic.light.tokens.json`.
-3. Se for cor, adicione o valor escuro em `semantic.dark.tokens.json` e o par em `contrast-pairs.json`.
-4. Rode `node tools/build-tokens.mjs`. Corrija toda `FALHA`.
-5. Consuma no código como `var(--<caminho-com-hífens>)`.
-6. Rode `node tools/lint-raw-values.mjs` no código alterado.
+1. Decide the layer. New role → semantic. New value with no role → primitive.
+2. Edit `tokens/primitives.tokens.json` and/or `semantic.light.tokens.json`.
+3. If it is a color, add the dark value in `semantic.dark.tokens.json` and the pair in `contrast-pairs.json`.
+4. Run `node tools/build-tokens.mjs`. Fix every `FAIL` (the tool's failure label).
+5. Consume it in code as `var(--<hyphenated-path>)`.
+6. Run `node tools/lint-raw-values.mjs` on the changed code.
 
-## Consumo em código
+## Consumption in code
 
 ```css
 .card {
@@ -189,25 +191,25 @@ Cores com alfa (hex de 8 dígitos, como `color.bg.overlay`) são ignoradas na ch
 .card a { color: var(--color-text-link); }
 ```
 
-`1px` de borda é aceito pelo linter (só valores de 2px para cima são sinalizados). Se um valor cru for realmente inevitável, marque a linha com o comentário `dsx-ignore` e justifique; o escape é auditável por busca.
+A `1px` border is accepted by the linter (only values of 2px and up are flagged). If a raw value is truly unavoidable, mark the line with the `dsx-ignore` comment and justify it; the escape is auditable by search.
 
-## Anti-padrões
+## Anti-patterns
 
-- Componente lendo `--color-brand-600` direto: quebra o tema escuro e o rebranding.
-- Token semântico com nome de cor (`color.bg.blue`).
-- Repetir no tema escuro o mesmo primitivo do claro "porque funciona".
-- Tokens sem `$description` em papéis ambíguos.
-- Arquivo único misturando camadas.
-- Editar `tokens/build/*` à mão.
-- Criar token de componente para cada propriedade de cada componente.
-- Tratar o build como opcional: pares de contraste não validados viram dívida silenciosa.
+- A component reading `--color-brand-600` directly: breaks the dark theme and rebranding.
+- A semantic token with a color name (`color.bg.blue`).
+- Repeating in the dark theme the same primitive as light "because it works".
+- Tokens without `$description` in ambiguous roles.
+- A single file mixing layers.
+- Editing `tokens/build/*` by hand.
+- Creating a component token for every property of every component.
+- Treating the build as optional: unvalidated contrast pairs become silent debt.
 
 ## Checklist
 
-- [ ] Token novo está na camada certa e tem nome funcional dedutível.
-- [ ] `$type` e `$value` presentes; `$description` quando o uso não é óbvio.
-- [ ] Alias aponta para token existente; nenhum ciclo.
-- [ ] Cor nova tem valor no tema escuro e par em `contrast-pairs.json`.
-- [ ] `node tools/build-tokens.mjs` passou sem `FALHA`.
-- [ ] Nenhum arquivo em `tokens/build/` foi editado manualmente.
-- [ ] Código de UI consome apenas `var(--…)` semântico; `lint-raw-values` sem ocorrências novas.
+- [ ] The new token is in the right layer and has a deducible functional name.
+- [ ] `$type` and `$value` present; `$description` when the use is not obvious.
+- [ ] Alias points to an existing token; no cycles.
+- [ ] A new color has a dark theme value and a pair in `contrast-pairs.json`.
+- [ ] `node tools/build-tokens.mjs` passed with no `FAIL`.
+- [ ] No file in `tokens/build/` was edited manually.
+- [ ] UI code consumes only semantic `var(--…)`; `lint-raw-values` with no new occurrences.

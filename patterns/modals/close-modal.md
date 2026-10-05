@@ -1,6 +1,6 @@
 ---
 id: close-modal
-title: Como fechar um modal corretamente?
+title: How should a modal be closed correctly?
 category: modals
 components: [modal, button]
 type: accessibility
@@ -11,87 +11,87 @@ wcag: ["2.1.2", "2.4.3", "2.4.7", "4.1.2"]
 related: [when-to-use-modal, when-to-avoid-modal, confirm-action, keyboard-focus]
 ---
 
-# Como fechar um modal corretamente?
+# How should a modal be closed correctly?
 
-> **Regra:** Todo modal tem uma saída visível e nomeada, descarta dados somente com confirmação e devolve o foco ao elemento que o abriu.
+> **Rule:** Every modal has a visible, named exit, discards data only after confirmation and returns focus to the element that opened it.
 
-## Contexto
+## Context
 
-Fechar um modal vai além de tirar uma camada da tela. A pessoa precisa saber que ação encerra o diálogo, o destino do que foi digitado e onde o foco vai parar.
+Closing a modal is more than removing a layer from the screen. The person needs to know which action ends the dialog, what happens to what they typed and where focus will land.
 
-Sem saída clara, o usuário fica preso, perde dados ou não sabe se a tarefa terminou. Para quem usa teclado ou leitor de tela, perder o ponto de retorno desorienta por completo.
+Without a clear exit, people get stuck, lose data or cannot tell whether the task finished. For keyboard and screen reader users, losing the return point is completely disorienting.
 
-Fechar, cancelar, salvar e descartar são ações diferentes e devem ter rótulos diferentes.
+Close, cancel, save and discard are different actions and must have different labels.
 
-## Decisão
+## Decision
 
-- **SE** o modal é aberto por um controle **ENTÃO** ao fechar devolva o foco a esse controle.
-- **SE** a tarefa pode ser abandonada **ENTÃO** ofereça "Cancelar" ao lado de uma ação primária com verbo específico.
-- **SE** o modal tem botão de fechar apenas com ícone **ENTÃO** dê a ele nome acessível "Fechar".
-- **SE** há dados não salvos **ENTÃO** preserve-os ou peça confirmação explícita antes de descartar.
-- **SE** Escape pode encerrar sem perda **ENTÃO** habilite Escape; **SE** apagaria trabalho **ENTÃO** acione confirmação.
-- **SE** o modal é transacional **ENTÃO** priorize "Cancelar" e a ação primária em vez de depender só do X.
-- **SENÃO** mantenha o X visível no canto do diálogo.
+- **IF** the modal is opened by a control **THEN** return focus to that control on close.
+- **IF** the task can be abandoned **THEN** offer "Cancel" next to a primary action with a specific verb.
+- **IF** the modal has an icon-only close button **THEN** give it the accessible name "Close".
+- **IF** there is unsaved data **THEN** keep it or ask for explicit confirmation before discarding.
+- **IF** Escape can close without loss **THEN** enable Escape; **IF** it would erase work **THEN** trigger a confirmation.
+- **IF** the modal is transactional **THEN** favor "Cancel" and the primary action rather than relying on the X alone.
+- **ELSE** keep the X visible in the corner of the dialog.
 
-## Quando usar
+## When to use
 
-- Modais com saída visível e compreensível.
-- Casos em que fechar, cancelar e salvar têm efeitos distintos.
-- Diálogos em que o foco pode retornar ao acionador.
+- Modals with a visible, understandable exit.
+- Cases where closing, cancelling and saving have different effects.
+- Dialogs where focus can return to the trigger.
 
-## Quando evitar
+## When to avoid
 
-- X sem nome acessível como única saída → **use em vez disso:** botão com `aria-label="Fechar"` mais ação textual.
-- "Sim", "Não" ou "OK" ambíguos → **use em vez disso:** verbos específicos.
-- Fluxo longo com rolagem dentro do modal → **use em vez disso:** página própria.
+- An X with no accessible name as the only exit → **use instead:** a button with `aria-label="Close"` plus a text action.
+- Ambiguous "Yes", "No" or "OK" → **use instead:** specific verbs.
+- A long, scrolling flow inside the modal → **use instead:** its own page.
 
-## Faça
+## Do
 
-- Nomeie o botão de fechar.
-- Diferencie fechar, cancelar e salvar nos rótulos.
-- Confirme antes de descartar dados.
-- Remova o bloqueio do fundo ao fechar.
-- Retorne o foco ao acionador.
+- Name the close button.
+- Distinguish close, cancel and save in the labels.
+- Confirm before discarding data.
+- Remove the background lock on close.
+- Return focus to the trigger.
 
-## Evite
+## Avoid
 
-- Descartar dados silenciosamente.
-- Deixar o foco escapar para trás do modal.
-- Usar "Sim"/"Não" isolados.
-- Perder o contexto da tela de origem.
+- Silently discarding data.
+- Letting focus escape behind the modal.
+- Using "Yes"/"No" on their own.
+- Losing the context of the originating screen.
 
-## Acessibilidade
+## Accessibility
 
-- Use `role="dialog"`, título via `aria-labelledby` e `aria-modal="true"` apenas se o fundo estiver realmente inativo.
-- Ao abrir, mova o foco para um controle adequado; Tab e Shift+Tab ficam contidos no modal (WCAG 2.1.2, 2.4.3).
-- Foco visível em todos os controles (WCAG 2.4.7).
-- Ícone sem texto precisa de nome acessível (WCAG 4.1.2).
-- Teste com teclado, zoom e leitor de tela.
+- Use `role="dialog"`, a title via `aria-labelledby` and `aria-modal="true"` only if the background is truly inert.
+- On open, move focus to a suitable control; Tab and Shift+Tab stay inside the modal (WCAG 2.1.2, 2.4.3).
+- Visible focus on every control (WCAG 2.4.7).
+- An icon without text needs an accessible name (WCAG 4.1.2).
+- Test with keyboard, zoom and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Botão de ícone | "Fechar" |
-| Abandonar tarefa | "Cancelar" |
-| Salvar | "Salvar alterações" |
-| Confirmar descarte | "Descartar alterações" / "Continuar editando" |
+| Icon button | "Close" |
+| Abandon task | "Cancel" |
+| Save | "Save changes" |
+| Confirm discard | "Discard changes" / "Keep editing" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Existe botão de fechar visível?
-- [ ] O botão tem nome acessível?
-- [ ] Fechar, cancelar e salvar têm rótulos distintos?
-- [ ] Escape fecha quando não há perda de dados?
-- [ ] O foco fica contido no modal enquanto aberto?
-- [ ] O foco retorna ao acionador ao fechar?
-- [ ] Dados não salvos são preservados ou confirmados?
-- [ ] O fundo volta a ficar interativo?
+- [ ] Is there a visible close button?
+- [ ] Does the button have an accessible name?
+- [ ] Do close, cancel and save have distinct labels?
+- [ ] Does Escape close when no data would be lost?
+- [ ] Does focus stay inside the modal while it is open?
+- [ ] Does focus return to the trigger on close?
+- [ ] Is unsaved data preserved or confirmed?
+- [ ] Does the background become interactive again?
 
-## Fundamentação
+## Rationale
 
-- W3C WAI-ARIA APG (Dialog Modal): foco inicial, contenção, Escape, retorno ao acionador, nome acessível.
-- IBM Carbon (Modal, acessibilidade e uso): ciclo de Tab, Escape, X, diferença entre modais passivas e transacionais.
-- Padrão Digital GOV.BR (Modal): ações distintas e delimitadas.
-- U.S. Web Design System (Modal): comportamentos de interação.
-- AMAWeb (checklist de acessibilidade): verificação de teclado, foco e identificação.
+- W3C WAI-ARIA APG (Dialog Modal): initial focus, containment, Escape, return to trigger, accessible name.
+- IBM Carbon (Modal, accessibility and usage): Tab cycle, Escape, X, difference between passive and transactional modals.
+- GOV.BR Digital Standard (Modal): distinct, well-bounded actions.
+- U.S. Web Design System (Modal): interaction behaviors.
+- AMAWeb (accessibility checklist): keyboard, focus and identification checks.

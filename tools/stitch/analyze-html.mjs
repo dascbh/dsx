@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-// Analisa o HTML de uma tela gerada pelo Stitch contra o DSX — antes de qualquer crítica de UX.
+// Analyzes the HTML of a Stitch-generated screen against DSX, before any UX critique.
 //
-//   node tools/stitch/analyze-html.mjs <tela.html> [--design-md DESIGN.md] [--json]
+//   node tools/stitch/analyze-html.mjs <screen.html> [--design-md DESIGN.md] [--json]
 //
-// O Stitch devolve HTML com Tailwind via CDN e um `tailwind.config` embutido no <head>. Este script:
-//  1. lê a config (cores e raios) e mede, na MARCAÇÃO, quantos usos de cor são papéis do DSX e quantos
-//     são papéis Material 3 que só existem no Stitch (cada um traz o token DSX para onde mapear);
-//  2. acusa valores arbitrários do Tailwind (`bg-[#…]`, `p-[13px]`) e estilos inline;
-//  3. mede contraste dos pares texto/fundo declarados no MESMO elemento (gate: ≥ 4.5:1);
-//  4. faz uma triagem de acessibilidade estática (não substitui a skill `acessibilidade` nem axe):
-//     imagem sem alt, botão/link sem nome acessível, campo sem rótulo, elemento clicável sem teclado,
-//     h1 único, lang, links "#", ordenação sem aria-sort.
-// Sai com 1 se algum gate falhar (contraste, nome acessível, campo sem rótulo, clicável sem teclado).
-// Saída --json: { ok, failures, has_config, radius, colors: { total_uses, dsx_uses, dsx_percent, roles: [{ role, uses,
+// Stitch returns HTML with Tailwind from a CDN and a `tailwind.config` embedded in <head>. This script:
+//  1. reads the config (colors and radii) and measures, in the MARKUP, how many color uses are DSX roles and how
+//     many are Material 3 roles that exist only in Stitch (each one carries the DSX token to map to);
+//  2. flags Tailwind arbitrary values (`bg-[#…]`, `p-[13px]`) and inline styles;
+//  3. measures the contrast of text/background pairs declared on the SAME element (gate: ≥ 4.5:1);
+//  4. runs a static accessibility triage (does not replace the `accessibility` skill or axe):
+//     image without alt, button/link without an accessible name, field without a label, clickable element
+//     without keyboard access, single h1, lang, "#" links, sorting without aria-sort.
+// Exits 1 when a gate fails (contrast, accessible name, unlabeled field, clickable without keyboard).
+// --json output: { ok, failures, has_config, radius, colors: { total_uses, dsx_uses, dsx_percent, roles: [{ role, uses,
 //   value, source (dsx|stitch|unknown), map_to }] }, contrast, arbitrary, inline: { total, examples }, a11y: [{ gate, rule,
 //   occurrences, example }] }.
 import { readFileSync } from 'node:fs';
@@ -74,34 +74,34 @@ export function analyzeHtml(html, { dsxRoles = null } = {}) {
   const arbitrary = [...body.matchAll(/\b[a-z-]+-\[(?:#|\d)[^\]]*\]/g)].map((m) => m[0]);
   const inline = [...body.matchAll(/\sstyle="([^"]*)"/g)].map((m) => m[1]);
 
-  // Triagem de acessibilidade estática.
+  // Static accessibility triage.
   const a11y = [];
   const add = (gate, rule, n, example) => n && a11y.push({ gate, rule, occurrences: n, example });
   const imgs = tagsMatching(body, /<img\b[^>]*>/gi);
-  add(true, 'imagem sem alt (1.1.1)', imgs.filter((t) => attribute(t, 'alt') == null).length, imgs.find((t) => attribute(t, 'alt') == null));
+  add(true, 'image without alt (1.1.1)', imgs.filter((t) => attribute(t, 'alt') == null).length, imgs.find((t) => attribute(t, 'alt') == null));
   const buttons = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi)];
   const unnamedButtons = buttons.filter((b) => !attribute(`<b ${b[1]}>`, 'aria-label') && !attribute(`<b ${b[1]}>`, 'title') && !visibleText(b[2]));
-  add(true, 'botão sem nome acessível (4.1.2)', unnamedButtons.length, unnamedButtons[0]?.[0].slice(0, 120));
+  add(true, 'button without an accessible name (4.1.2)', unnamedButtons.length, unnamedButtons[0]?.[0].slice(0, 120));
   const links = [...body.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
   const unnamedLinks = links.filter((l) => !attribute(`<a ${l[1]}>`, 'aria-label') && !visibleText(l[2]));
-  add(true, 'link sem nome acessível (2.4.4)', unnamedLinks.length, unnamedLinks[0]?.[0].slice(0, 120));
-  add(false, 'link com href="#" (destino a ligar no código)', links.filter((l) => /href="#"/.test(l[1])).length);
+  add(true, 'link without an accessible name (2.4.4)', unnamedLinks.length, unnamedLinks[0]?.[0].slice(0, 120));
+  add(false, 'link with href="#" (destination to wire in code)', links.filter((l) => /href="#"/.test(l[1])).length);
   const fields = tagsMatching(body, /<(input|select|textarea)\b[^>]*>/gi).filter((t) => !/type="(hidden|submit|button)"/i.test(t));
   const labelled = new Set([...body.matchAll(/<label\b[^>]*for="([^"]+)"/gi)].map((m) => m[1]));
   const unlabelled = fields.filter((t) => !attribute(t, 'aria-label') && !attribute(t, 'aria-labelledby') && !labelled.has(attribute(t, 'id') ?? '\u0000') && !/<label\b[^>]*>(?:(?!<\/label>)[\s\S])*$/i.test(body.slice(0, body.indexOf(t))));
-  add(true, 'campo sem rótulo associado (1.3.1/3.3.2)', unlabelled.length, unlabelled[0]);
+  add(true, 'field without an associated label (1.3.1/3.3.2)', unlabelled.length, unlabelled[0]);
   const clickables = tagsMatching(body, /<(tr|div|li|span|td)\b[^>]*(?:onclick=|cursor-pointer)[^>]*>/gi);
   const noKeyboard = clickables.filter((t) => !attribute(t, 'tabindex') && !attribute(t, 'role'));
-  add(true, 'elemento clicável sem acesso por teclado (2.1.1)', noKeyboard.length, noKeyboard[0]);
+  add(true, 'clickable element without keyboard access (2.1.1)', noKeyboard.length, noKeyboard[0]);
   const h1 = (body.match(/<h1\b/gi) ?? []).length;
-  if (h1 !== 1) a11y.push({ gate: false, rule: `h1 deve ser único (encontrados: ${h1})`, occurrences: 1 });
-  if (!/<html[^>]*\blang="/i.test(html)) a11y.push({ gate: true, rule: 'html sem lang (3.1.1)', occurrences: 1 });
+  if (h1 !== 1) a11y.push({ gate: false, rule: `h1 must be unique (found: ${h1})`, occurrences: 1 });
+  if (!/<html[^>]*\blang="/i.test(html)) a11y.push({ gate: true, rule: 'html without lang (3.1.1)', occurrences: 1 });
   const sortable = (body.match(/<th\b[^>]*>(?:(?!<\/th>)[\s\S])*(?:sort|arrow_(?:up|down)ward|unfold)/gi) ?? []).length;
   const ariaSort = (body.match(/aria-sort=/g) ?? []).length;
-  if (sortable > ariaSort) a11y.push({ gate: false, rule: `cabeçalhos ordenáveis sem aria-sort (${sortable - ariaSort})`, occurrences: sortable - ariaSort });
+  if (sortable > ariaSort) a11y.push({ gate: false, rule: `sortable headers without aria-sort (${sortable - ariaSort})`, occurrences: sortable - ariaSort });
 
   const failures = [
-    ...contrastPairs.filter((c) => !c.ok).map((c) => `contraste ${c.ratio}:1 em ${c.fg} sobre ${c.bg}`),
+    ...contrastPairs.filter((c) => !c.ok).map((c) => `contrast ${c.ratio}:1 for ${c.fg} on ${c.bg}`),
     ...a11y.filter((x) => x.gate).map((x) => `${x.rule}: ${x.occurrences}`),
   ];
   return {
@@ -112,25 +112,25 @@ export function analyzeHtml(html, { dsxRoles = null } = {}) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const a = parseCli('stitch/analyze-html.mjs'); // apelidos com aviso para nomes antigos
+  const a = parseCli('stitch/analyze-html.mjs'); // aliases with a warning for old names
   const file = a._[0];
-  if (!file) { console.error('Uso: node tools/stitch/analyze-html.mjs <tela.html> [--design-md DESIGN.md] [--json]'); process.exit(2); }
+  if (!file) { console.error('Usage: node tools/stitch/analyze-html.mjs <screen.html> [--design-md DESIGN.md] [--json]'); process.exit(2); }
   const dsxRoles = a['design-md'] ? Object.keys(readDesignMd(readFileSync(a['design-md'], 'utf8')).fm.colors ?? {}) : null;
   const r = analyzeHtml(readFileSync(file, 'utf8'), { dsxRoles });
   if (a.json) console.log(JSON.stringify(r, null, 2));
   else {
     const c = r.colors;
-    console.log(`Cores na marcação: ${c.total_uses} usos${c.dsx_percent != null ? ` — ${c.dsx_percent}% em papéis do DSX` : ' (passe --design-md para separar DSX × Stitch)'}`);
-    for (const p of c.roles.filter((x) => x.source === 'stitch')) console.log(`  só Stitch: ${p.role} (${p.uses}×, ${p.value}) → ${p.map_to ?? 'SEM MAPEAMENTO: decidir token'}`);
-    if (r.radius) console.log(`Raios na config: ${r.radius.replace(/\s+/g, ' ')}`);
-    console.log(`Valores arbitrários: ${r.arbitrary.length}${r.arbitrary.length ? ' — ' + r.arbitrary.slice(0, 5).join(' ') : ''} · style inline: ${r.inline.total}`);
+    console.log(`Colors in the markup: ${c.total_uses} uses${c.dsx_percent != null ? `, ${c.dsx_percent}% in DSX roles` : ' (pass --design-md to separate DSX from Stitch)'}`);
+    for (const p of c.roles.filter((x) => x.source === 'stitch')) console.log(`  Stitch only: ${p.role} (${p.uses}×, ${p.value}) → ${p.map_to ?? 'NO MAPPING: decide the token'}`);
+    if (r.radius) console.log(`Radii in the config: ${r.radius.replace(/\s+/g, ' ')}`);
+    console.log(`Arbitrary values: ${r.arbitrary.length}${r.arbitrary.length ? ': ' + r.arbitrary.slice(0, 5).join(' ') : ''} · inline style: ${r.inline.total}`);
     const bad = r.contrast.filter((x) => !x.ok);
-    console.log(`Contraste (pares no mesmo elemento): ${r.contrast.length - bad.length}/${r.contrast.length} OK`);
-    for (const x of bad) console.log(`  FALHA ${x.ratio}:1 ${x.fg} sobre ${x.bg}`);
-    console.log('Acessibilidade (triagem estática):');
-    if (!r.a11y.length) console.log('  nada encontrado');
-    for (const x of r.a11y) console.log(`  ${x.gate ? 'GATE ' : 'aviso'} ${x.rule}: ${x.occurrences}${x.example ? `\n         ex.: ${String(x.example).slice(0, 140)}` : ''}`);
-    console.log(r.ok ? 'Resultado: APROVADO nos gates objetivos (siga para a crítica de UX)' : `Resultado: REPROVADO\n  - ${r.failures.join('\n  - ')}`);
+    console.log(`Contrast (pairs on the same element): ${r.contrast.length - bad.length}/${r.contrast.length} OK`);
+    for (const x of bad) console.log(`  FAIL ${x.ratio}:1 ${x.fg} on ${x.bg}`);
+    console.log('Accessibility (static triage):');
+    if (!r.a11y.length) console.log('  nothing found');
+    for (const x of r.a11y) console.log(`  ${x.gate ? 'GATE ' : 'warn '} ${x.rule}: ${x.occurrences}${x.example ? `\n         e.g. ${String(x.example).slice(0, 140)}` : ''}`);
+    console.log(r.ok ? 'Result: PASSED the objective gates (go on to the UX critique)' : `Result: FAILED\n  - ${r.failures.join('\n  - ')}`);
   }
   process.exit(r.ok ? 0 : 1);
 }

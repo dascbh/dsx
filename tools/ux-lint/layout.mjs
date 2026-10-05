@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-// ux-lint, layout e hierarquia: aplica as regras L1–L9 (knowledge/fundamentos/ux-md.md e hierarquia-visual.md)
-// sobre a geometria medida das capturas (tools/ux-lint/measure.mjs → <nome>.geometry.json). Sem dependências e
-// sem navegador: só lê os arquivos de geometria, o UX.md e os cartões de arquétipo.
+// ux-lint, layout and hierarchy: applies rules L1–L9 (knowledge/foundations/ux-md.md and visual-hierarchy.md)
+// to the measured geometry of the captures (tools/ux-lint/measure.mjs → <name>.geometry.json). No dependencies and
+// no browser: it only reads the geometry files, the UX.md and the archetype cards.
 //
-// Uso: node tools/ux-lint/layout.mjs <pasta-geometria|arquivos.geometry.json...> [--ux UX.md] [--archetypes <pasta>] [--json] [--fail-at 3]
-// A tela é ligada ao arquétipo pelo id no nome da captura (`<nn>-<screen-id>[.<state>]`), comparado com os ids e
-// rotas listados em `archetypes` do UX.md (a rota é comparada com o <title> da captura). Do cartão
-// `archetypes/<id>.md` vêm as regiões esperadas (L9) e `primary-action.position` (L1); sem arquétipo, vale
-// `actions.primary-position` do UX.md. L9 só roda na captura do estado principal (sem sufixo de estado).
+// Usage: node tools/ux-lint/layout.mjs <geometry-folder|files.geometry.json...> [--ux UX.md] [--archetypes <folder>] [--json] [--fail-at 3]
+// A screen is linked to its archetype by the id in the capture name (`<nn>-<screen-id>[.<state>]`), compared with the
+// ids and routes listed under `archetypes` in the UX.md (the route is compared with the capture's <title>). The card
+// `archetypes/<id>.md` gives the expected regions (L9) and `primary-action.position` (L1); without an archetype,
+// `actions.primary-position` from the UX.md applies. L9 runs only on the main-state capture (no state suffix).
 // JSON (--json): { summary, screens: [{ file, screen, archetype, dialog_open, findings: [{ rule, severity, region,
-// message, anchor, evidence, elements, measure }] }] } — família `layout` no registro (findings.mjs --layout).
+// message, anchor, evidence, elements, measure }] }] } (family `layout` in the registry, findings.mjs --layout).
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -20,7 +20,7 @@ import { loadArchetypes } from '../lint-archetypes.mjs';
 
 const DEFAULT_ARCHETYPES = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'archetypes');
 
-/** Cartões de arquétipo → { id: { id, regions, primary_action } }. */
+/** Archetype cards → { id: { id, regions, primary_action } }. */
 export function archetypeCatalog(dir = DEFAULT_ARCHETYPES) {
   const out = {};
   for (const c of loadArchetypes(dir)) {
@@ -33,8 +33,8 @@ export function archetypeCatalog(dir = DEFAULT_ARCHETYPES) {
 const normRoute = (s) => String(s ?? '').trim().replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
 
 /**
- * Arquétipo da tela pelo mapa `archetypes` do UX.md ({ archetype: [ids ou rotas] }). Compara o id da tela
- * (nome da captura sem número e estado) e o título da captura (rota). Devolve o id do arquétipo ou null.
+ * Archetype of a screen from the UX.md `archetypes` map ({ archetype: [ids or routes] }). Compares the screen id
+ * (capture name without number and state) and the capture title (route). Returns the archetype id or null.
  */
 export function resolveArchetype(screenName, title, archetypesMap = {}) {
   const sid = screenIdOf(screenName);
@@ -49,10 +49,10 @@ export function resolveArchetype(screenName, title, archetypesMap = {}) {
   return null;
 }
 
-/** Estado da captura pelo sufixo (`02-acervo.empty` → `empty`); principal = null. */
+/** Capture state from its suffix (`02-acervo.empty` → `empty`); main = null. */
 export const stateOf = (screenName) => String(screenName).replace(/\.geometry\.json$|\.html?$/, '').split('.').slice(1).join('.') || null;
 
-/** Limites das regras: padrões do DSX + chave `layout` do front matter do UX.md. */
+/** Rule thresholds: DSX defaults + the `layout` key of the UX.md front matter. */
 export function limitsFrom(cfg) {
   const over = cfg?.layout && typeof cfg.layout === 'object' ? cfg.layout : {};
   const out = { ...LAYOUT_DEFAULTS };
@@ -60,7 +60,7 @@ export function limitsFrom(cfg) {
   return out;
 }
 
-/** Analisa uma geometria com o contexto do projeto. */
+/** Analyzes one geometry with the project context. */
 export function analyzeGeometry(geom, cfg = configFrom({}), catalog = {}) {
   const archId = resolveArchetype(geom.screen ?? geom.file ?? '', geom.title, cfg.archetypes);
   const card = archId ? catalog[archId] ?? { id: archId, regions: [], primary_action: null } : null;
@@ -99,14 +99,14 @@ export function summarize(results) {
 function main() {
   const args = parseCli('ux-lint/layout.mjs');
   if (!args._.length) {
-    console.error('Uso: node tools/ux-lint/layout.mjs <pasta-geometria|arquivos.geometry.json...> [--ux UX.md] [--archetypes <pasta>] [--json] [--fail-at 3]');
+    console.error('Usage: node tools/ux-lint/layout.mjs <geometry-folder|files.geometry.json...> [--ux UX.md] [--archetypes <folder>] [--json] [--fail-at 3]');
     process.exit(2);
   }
   const cfg = loadConfig(typeof args.ux === 'string' ? args.ux : null);
   const catalog = archetypeCatalog(typeof args.archetypes === 'string' ? args.archetypes : DEFAULT_ARCHETYPES);
   const files = listGeometry(args._);
   if (!files.length) {
-    console.error('Nenhum arquivo .geometry.json. Gere a geometria antes: node tools/ux-lint/measure.mjs <capturas> --out <pasta>');
+    console.error('No .geometry.json file. Generate the geometry first: node tools/ux-lint/measure.mjs <captures> --out <folder>');
     process.exit(2);
   }
   const results = files.map((f) => analyzeGeometry(JSON.parse(readFileSync(f, 'utf8')), cfg, catalog));
@@ -116,15 +116,15 @@ function main() {
   else {
     for (const r of results) {
       const name = basename(r.file);
-      const tag = `${r.archetype ? ` [${r.archetype}]` : ' [sem arquétipo]'}${r.dialog_open ? ' (diálogo aberto)' : ''}`;
+      const tag = `${r.archetype ? ` [${r.archetype}]` : ' [no archetype]'}${r.dialog_open ? ' (dialog open)' : ''}`;
       if (!r.findings.length) { console.log(`✓ ${name}${tag}`); continue; }
       console.log(`✗ ${name}${tag}`);
       for (const a of [...r.findings].sort((x, y) => y.severity - x.severity || x.rule.localeCompare(y.rule))) {
         console.log(`   ${a.rule} sev ${a.severity} | ${a.region} | ${a.message}${a.evidence ? `\n      ${a.evidence.split(', ')[0]}` : ''}`);
       }
     }
-    const rules = Object.entries(summary.by_rule).sort(([x], [y]) => x.localeCompare(y, 'pt', { numeric: true })).map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum';
-    console.log(`\nResumo: ${summary.screens} telas (${summary.screens_without_archetype} sem arquétipo), ${summary.screens_with_findings} com achado, ${summary.findings} achados (${rules}); severidade ${Object.entries(summary.by_severity).map(([k, v]) => `${k}:${v}`).join(' ')}`);
+    const rules = Object.entries(summary.by_rule).sort(([x], [y]) => x.localeCompare(y, 'en', { numeric: true })).map(([k, v]) => `${k}=${v}`).join(' ') || 'none';
+    console.log(`\nSummary: ${summary.screens} screens (${summary.screens_without_archetype} without an archetype), ${summary.screens_with_findings} with findings, ${summary.findings} findings (${rules}); severity ${Object.entries(summary.by_severity).map(([k, v]) => `${k}:${v}`).join(' ')}`);
   }
   process.exit(results.some((r) => r.findings.some((a) => a.severity >= threshold)) ? 1 : 0);
 }

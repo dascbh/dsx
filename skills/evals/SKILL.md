@@ -1,62 +1,62 @@
 ---
 name: evals
-description: "Cria avaliações repetíveis para UI gerada por agentes e features de IA: casos, gates, limiares, avaliador por critério (código, LLM-juiz, humano) e regressões. Use para medir aderência ao design system ou comparar versões."
+description: "Creates repeatable evaluations for agent-generated UI and AI features: cases, gates, thresholds, a per-criterion evaluator (code, LLM judge, human) and regressions. Use to measure adherence to the design system or to compare versions."
 ---
 
-# Evals de UI e de IA
+# UI and AI evals
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `evals/`, `tools/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. The `knowledge/`, `evals/` and `tools/` paths are relative to it.
 
-Referências: `knowledge/ia/evals.md`; rubricas prontas em `evals/rubrics/`; casos de exemplo em `evals/cases/`.
+References: `knowledge/ia/evals.md`; ready-made rubrics in `evals/rubrics/`; example cases in `evals/cases/`.
 
-## 1. Comece pela tarefa
+## 1. Start with the task
 
-Escreva: *quem* usa, *para fazer o quê*, *o que é um resultado bom* — em linguagem de produto. Só depois derive critérios. Métrica escolhida antes da tarefa mede o que é fácil, não o que importa.
+Write down: *who* uses it, *to do what*, *what a good result is* — in product language. Only then derive criteria. A metric chosen before the task measures what is easy, not what matters.
 
-## 2. Critérios em quatro tipos (nunca faça média entre tipos)
+## 2. Criteria in four types (never average across types)
 
-| Tipo | Papel | Exemplo (UI gerada por agente) |
+| Type | Role | Example (agent-generated UI) |
 |---|---|---|
-| **Gate** | binário; reprova a versão | zero valores crus; nenhum par de contraste < mínimo; foco visível |
-| **Limiar** | mínimo aceitável | nota ≥ 3/4 em "hierarquia visual" |
-| **Meta** | otimização contínua | menos componentes novos por tela |
-| **Guardrail** | não pode piorar | tempo de geração, tamanho do bundle |
+| **Gate** | binary; fails the version | zero raw values; no contrast pair < minimum; visible focus |
+| **Threshold** | acceptable minimum | score ≥ 3/4 on "visual hierarchy" |
+| **Target** | continuous optimization | fewer new components per screen |
+| **Guardrail** | must not get worse | generation time, bundle size |
 
-## 3. Avaliador certo para cada critério
+## 3. The right evaluator for each criterion
 
-- **Código** (preferir sempre que possível): `tools/lint-raw-values.mjs`, `tools/contrast.mjs`, `tools/lint-design-md.mjs`, `tools/lint-ux-md.mjs --score` (nota de 100 do UX.md), `tools/ux-lint/*` (comportamento da tela gerada contra o `UX.md`: T, S, L), axe/Playwright, validação de schema, estado final do sistema.
-- **LLM-juiz:** critérios abertos (clareza do texto, adequação do padrão de interação). Rubrica com âncoras descritivas por nota e exemplos de aprovado/reprovado; um critério por chamada; peça evidência antes da nota. **Calibre** contra ≥ 20 julgamentos humanos e reporte concordância.
-- **Humano:** julgamento de domínio, segurança, casos ambíguos, calibração do juiz.
+- **Code** (prefer whenever possible): `tools/lint-raw-values.mjs`, `tools/contrast.mjs`, `tools/lint-design-md.mjs`, `tools/lint-ux-md.mjs --score` (UX.md score out of 100), `tools/ux-lint/*` (behavior of the generated screen against the `UX.md`: T, S, L), axe/Playwright, schema validation, final system state.
+- **LLM judge:** open criteria (text clarity, fit of the interaction pattern). A rubric with descriptive anchors per score and pass/fail examples; one criterion per call; ask for evidence before the score. **Calibrate** against ≥ 20 human judgments and report agreement.
+- **Human:** domain judgment, safety, ambiguous cases, judge calibration.
 
-## 4. Casos
+## 4. Cases
 
-Arquivo JSONL em `evals/cases/` (veja `evals/cases/generated-ui.jsonl`), uma linha por caso com as chaves `id`, `type` (`typical | edge | adversarial | regression`), `request`, `expected` (opcional) e `verify` (ids de gates/critérios da rubrica; `interaction-patterns:<id-do-padrão>` aponta um padrão). Rubricas usam `gates`, `criteria`, `evaluator` (`code | judge | human`), `how`, `threshold` e `anchors`. Misture:
-- **típicos** (o pedido comum),
-- **borda** (lista vazia, texto 3× maior, 320px, tema escuro, erro de rede),
-- **adversariais** (pedido para usar cor fora da paleta, para "remover o outline", para criar modal para tudo),
-- **regressões** (toda falha real vira caso, com o id do incidente).
+A JSONL file in `evals/cases/` (see `evals/cases/generated-ui.jsonl`), one line per case with the keys `id`, `type` (`typical | edge | adversarial | regression`), `request`, `expected` (optional) and `verify` (ids of rubric gates/criteria; `interaction-patterns:<pattern-id>` points to a pattern). Rubrics use `gates`, `criteria`, `evaluator` (`code | judge | human`), `how`, `threshold` and `anchors`. Mix:
+- **typical** (the common request),
+- **edge** (empty list, 3× longer text, 320px, dark theme, network error),
+- **adversarial** (a request to use a color outside the palette, to "remove the outline", to create a modal for everything),
+- **regressions** (every real failure becomes a case, with the incident id).
 
-## 5. Rode e reporte
+## 5. Run and report
 
-- **N ≥ 3 tentativas por caso** — sistemas generativos variam; reporte taxa de aprovação e variância, não um único resultado.
-- Compare versões (prompt, skill, DESIGN.md, UX.md, modelo) no **mesmo** conjunto.
-- Para RAG: avalie separado recuperação, suficiência do contexto, fidelidade da resposta e acerto da citação.
-- Para agentes: avalie trajetória (ferramenta certa, ações proibidas não executadas, confirmação pedida nos riscos altos) **e** estado final.
+- **N ≥ 3 attempts per case** — generative systems vary; report pass rate and variance, not a single result.
+- Compare versions (prompt, skill, DESIGN.md, UX.md, model) on the **same** set.
+- For RAG: evaluate retrieval, context sufficiency, answer faithfulness and citation accuracy separately.
+- For agents: evaluate the trajectory (right tool, forbidden actions not executed, confirmation requested for high risks) **and** the final state.
 
-## Rubricas prontas
+## Ready-made rubrics
 
-- `evals/rubrics/generated-ui.yaml` — tela gerada por agente dentro do design system.
-- `evals/rubrics/design-md.yaml` — qualidade do DESIGN.md (espelha a skill `design-md`).
-- `evals/rubrics/ux-md.yaml` — qualidade do UX.md (espelha a skill `ux-md`): nota de 100 por código (`lint-ux-md.mjs --score`), gates e `judge-criteria` para o juiz (arquétipo casa com a tarefa, políticas reais, desvios justificados).
-- `evals/rubrics/ai-feature.yaml` — UX de feature com IA/agente.
+- `evals/rubrics/generated-ui.yaml` — agent-generated screen within the design system.
+- `evals/rubrics/design-md.yaml` — DESIGN.md quality (mirrors the `design-md` skill).
+- `evals/rubrics/ux-md.yaml` — UX.md quality (mirrors the `ux-md` skill): score out of 100 by code (`lint-ux-md.mjs --score`), gates and `judge-criteria` for the judge (archetype matches the task, real policies, justified deviations).
+- `evals/rubrics/ai-feature.yaml` — UX of an AI/agent feature.
 
-## Saída
+## Output
 
 ```
-Versão avaliada: …   Conjunto: N casos × K tentativas
-Gates: <gate> X/N ✔ …   (qualquer ✘ = reprovado)
-Limiares: <critério> média ± dp (mín. exigido)
-Metas / guardrails: …
-Falhas novas → casos de regressão adicionados: …
-Concordância juiz × humano: κ ou % (se houver juiz)
+Version evaluated: …   Set: N cases × K attempts
+Gates: <gate> X/N ✔ …   (any ✘ = failed)
+Thresholds: <criterion> mean ± sd (required minimum)
+Targets / guardrails: …
+New failures → regression cases added: …
+Judge × human agreement: κ or % (if there is a judge)
 ```

@@ -1,8 +1,8 @@
 ---
 version: alpha
 name: DSX Base
-description: Tema padrão do framework DSX. Interface de produto (SaaS/B2B), densidade média, foco em leitura e tarefa.
-owner: time-de-design-system
+description: Default theme of the DSX framework. Product interface (SaaS/B2B), medium density, focused on reading and tasks.
+owner: design-system-team
 updated: 2026-10-01
 colors:
   canvas: "#ffffff"
@@ -126,119 +126,119 @@ components:
 
 # DSX Base
 
-Fonte de tokens: `tokens/*.tokens.json` (compilados em `tokens/build/tokens.css`). Este arquivo é a tradução legível dessas decisões. Se houver divergência, **os tokens vencem** e este arquivo deve ser corrigido.
+Token source: `tokens/*.tokens.json` (compiled into `tokens/build/tokens.css`). This file is the readable translation of those decisions. If they diverge, **the tokens win** and this file must be fixed.
 
 ## Overview
 
-Interface de trabalho, não de vitrine. A pessoa usuária chega para concluir uma tarefa e sair. Por isso:
+A work interface, not a showcase. The user arrives to finish a task and leave. Therefore:
 
-- **Calma visual:** superfícies neutras, no máximo **uma** cor de destaque competindo por atenção em cada viewport (a cor primária).
-- **Hierarquia pela tipografia e pelo espaço**, não por cor nem por caixas. Bordas e sombras são o último recurso.
-- **Densidade média:** controles de 40px, espaçamento em grade de 4px, texto corrido limitado a 68 caracteres por linha.
-- **Previsibilidade acima de surpresa:** a mesma ação tem sempre a mesma aparência e a mesma posição.
+- **Visual calm:** neutral surfaces, at most **one** accent color competing for attention in each viewport (the primary color).
+- **Hierarchy through typography and space**, not through color or boxes. Borders and shadows are the last resort.
+- **Medium density:** 40px controls, spacing on a 4px grid, running text limited to 68 characters per line.
+- **Predictability over surprise:** the same action always has the same appearance and the same position.
 
-Personalidade em critérios observáveis: sóbria (sem gradientes, sem ilustrações decorativas em telas de tarefa), direta (rótulos com verbo), confiável (todo estado do sistema tem representação visível).
+Personality as observable criteria: sober (no gradients, no decorative illustrations on task screens), direct (labels with a verb), trustworthy (every system state has a visible representation).
 
 ## Colors
 
-| Papel | Token | Onde aparece | Onde NUNCA aparece |
+| Role | Token | Where it appears | Where it NEVER appears |
 |---|---|---|---|
-| Primária | `primary` | Ação principal da tela (1 por região), estado selecionado, anel de foco | Texto corrido, fundos grandes, ícones decorativos |
-| Secundária | `secondary` | Ações alternativas ao lado da primária | Como única ação de um formulário |
-| Perigo | `danger` | Ações destrutivas confirmadas e mensagens de erro | Para "chamar atenção" em algo que não é erro ou destruição |
-| Canvas / Surface | `canvas`, `surface` | Fundo da página / cards e painéis | — |
-| Texto | `text-primary`, `text-secondary`, `text-muted` | Conteúdo, apoio, metadados | `text-muted` em texto essencial para concluir a tarefa |
-| Feedback | `*-bg` + `on-*-bg` | Alertas e mensagens inline de sucesso, erro, atenção e informação | Decoração |
-| IA | `ai-surface`, `ai-accent` | Exclusivamente para marcar conteúdo gerado por IA | Qualquer outro conteúdo |
+| Primary | `primary` | The screen's main action (1 per region), selected state, focus ring | Running text, large backgrounds, decorative icons |
+| Secondary | `secondary` | Alternative actions next to the primary | As the only action of a form |
+| Danger | `danger` | Confirmed destructive actions and error messages | To "grab attention" on something that is not an error or destruction |
+| Canvas / Surface | `canvas`, `surface` | Page background / cards and panels | — |
+| Text | `text-primary`, `text-secondary`, `text-muted` | Content, support, metadata | `text-muted` on text essential to finish the task |
+| Feedback | `*-bg` + `on-*-bg` | Inline alerts and messages for success, error, warning and information | Decoration |
+| AI | `ai-surface`, `ai-accent` | Exclusively to mark AI-generated content | Any other content |
 
-Regras:
+Rules:
 
-- Todo par texto/fundo listado acima tem contraste **≥ 4.5:1**; bordas de campo, foco e ícones informativos têm **≥ 3:1**. Os pares são verificados por `node tools/build-tokens.mjs`.
-- **Cor nunca é o único sinal.** Erro = cor + ícone + texto; selecionado = cor + peso/forma/marcador.
-- No tema escuro a primária vira um tom claro com texto escuro (`on-primary` escuro). Não inverta cores à mão: use os tokens semânticos, que já têm valor por tema.
+- Every text/background pair listed above has contrast **≥ 4.5:1**; field borders, focus and informative icons have **≥ 3:1**. The pairs are checked by `node tools/build-tokens.mjs`.
+- **Color is never the only signal.** Error = color + icon + text; selected = color + weight/shape/marker.
+- In the dark theme the primary becomes a light tone with dark text (dark `on-primary`). Do not invert colors by hand: use the semantic tokens, which already have a value per theme.
 
 ## Typography
 
-- Família única (Inter, com fallback de sistema) para toda a interface; monoespaçada só para código e identificadores.
-- Escala modular de razão **1.25** com base 16px.
-- **`h1` é o título único da página.** `h2` agrupa seções; `h3` agrupa blocos dentro de uma seção. Não pule níveis.
-- `display` só em telas de boas-vindas ou estados vazios de primeiro uso — nunca em telas de tarefa.
-- `body` (16px/1.5) para todo texto de leitura. Nunca menor que 14px para conteúdo; 12px só para legendas não essenciais.
-- Peso 600 para títulos e 500 para rótulos. Não use 700 fora de `display`.
-- Largura máxima de texto corrido: **68ch**.
+- A single family (Inter, with a system fallback) for the whole interface; monospace only for code and identifiers.
+- Modular scale with ratio **1.25** and a 16px base.
+- **`h1` is the page's only title.** `h2` groups sections; `h3` groups blocks within a section. Do not skip levels.
+- `display` only on welcome screens or first-use empty states, never on task screens.
+- `body` (16px/1.5) for all reading text. Never smaller than 14px for content; 12px only for non-essential captions.
+- Weight 600 for headings and 500 for labels. Do not use 700 outside `display`.
+- Maximum width of running text: **68ch**.
 
 ## Layout
 
-- Grade de espaçamento de **4px**. Use apenas os passos de `spacing` — nada de 5px, 10px, 15px.
-- Ritmo vertical: 8px entre rótulo e campo, 16px entre campos, 32px entre grupos, 64px entre seções.
-- Containers: largura máxima de 1200px para páginas de conteúdo; tabelas e dashboards podem usar largura total.
-- Breakpoints: 640 / 768 / 1024 / 1280px. Abaixo de 640px, layout de uma coluna e ações primárias ocupando a largura total.
-- Formulários em coluna única. Campos relacionados curtos (CEP + número) podem dividir a linha.
-- Ação primária à direita no rodapé de diálogos e formulários desktop; no mobile, empilhada com a primária no topo.
+- A **4px** spacing grid. Use only the `spacing` steps: no 5px, 10px, 15px.
+- Vertical rhythm: 8px between label and field, 16px between fields, 32px between groups, 64px between sections.
+- Containers: maximum width of 1200px for content pages; tables and dashboards may use the full width.
+- Breakpoints: 640 / 768 / 1024 / 1280px. Below 640px, a one-column layout and primary actions taking the full width.
+- Single-column forms. Short related fields (postal code + number) may share a row.
+- Primary action on the right in the footer of dialogs and desktop forms; on mobile, stacked with the primary on top.
 
 ## Elevation & Depth
 
-Profundidade é comunicada por **contraste de superfície** primeiro, borda em segundo, sombra em terceiro.
+Depth is conveyed by **surface contrast** first, border second, shadow third.
 
-| Nível | Uso | Tratamento |
+| Level | Use | Treatment |
 |---|---|---|
-| 0 | Página | `canvas`, sem borda |
-| 1 | Cards, painéis | `surface` + borda `border` |
-| 2 | Dropdowns, popovers, tooltips | `canvas` + sombra `md` |
-| 3 | Modais e diálogos | `canvas` + sombra `lg` + scrim `overlay` |
+| 0 | Page | `canvas`, no border |
+| 1 | Cards, panels | `surface` + `border` border |
+| 2 | Dropdowns, popovers, tooltips | `canvas` + `md` shadow |
+| 3 | Modals and dialogs | `canvas` + `lg` shadow + `overlay` scrim |
 
-Nunca empilhe mais de dois níveis visíveis ao mesmo tempo (ex.: modal sobre modal é proibido).
+Never stack more than two visible levels at the same time (e.g. a modal over a modal is forbidden).
 
 ## Shapes
 
-- Raio `md` (8px) para controles (botões, campos, chips); `lg` (12px) para containers (cards, modais); `full` para avatares e badges.
-- Não misture raios diferentes em elementos do mesmo nível.
-- Ícones em traço de 1.5–2px, tamanho 16px em linha com texto e 20px isolados.
+- Radius `md` (8px) for controls (buttons, fields, chips); `lg` (12px) for containers (cards, modals); `full` for avatars and badges.
+- Do not mix different radii on elements of the same level.
+- Icons with a 1.5–2px stroke, 16px inline with text and 20px on their own.
 
 ## Components
 
-Todo componente interativo implementa **todos** os estados: padrão, hover, foco visível, ativo, desabilitado, carregando e — quando recebe dados — erro, vazio e sucesso.
+Every interactive component implements **all** states: default, hover, visible focus, active, disabled, loading and, when it receives data, error, empty and success.
 
-- **Botão:** altura 40px (alvo de toque ≥ 44px no mobile via área clicável). Rótulo = verbo + objeto ("Salvar alterações"). Em envio: desabilita, mostra spinner no próprio botão e mantém a largura. Uma única primária por região.
-- **Campo de texto:** rótulo visível acima (nunca só placeholder); texto de ajuda abaixo; erro abaixo do campo, com ícone e texto, ligado por `aria-describedby`. Validar ao sair do campo ou ao enviar — nunca a cada tecla.
-- **Card:** um assunto por card; título `h3`; no máximo uma ação primária.
-- **Tabela:** preferir a cards quando a pessoa compara atributos; cabeçalho fixo, ordenação indicada por ícone + `aria-sort`.
-- **Modal:** só para decisões que bloqueiam o fluxo. Fecha com Esc, botão visível e clique no scrim (exceto se houver dados não salvos). Foco preso dentro e devolvido ao gatilho.
-- **Toast:** só para confirmação de ações não críticas; 6s por padrão (4–10s conforme o tamanho do texto), pausável no hover/foco, anunciado por `role="status"`. Se tiver ação (ex.: "Desfazer"), fica até ser usado ou dispensado. Erros nunca vão para toast.
-- **Resposta de IA:** sempre em `ai-response`, com rótulo "Gerado por IA", fontes quando houver e ações de editar/refazer/descartar.
+- **Button:** 40px tall (touch target ≥ 44px on mobile through the clickable area). Label = verb + object ("Salvar alterações" in a pt-BR product). While submitting: disables, shows a spinner inside the button and keeps its width. A single primary per region.
+- **Text field:** visible label above (never only a placeholder); help text below; the error below the field, with icon and text, tied by `aria-describedby`. Validate on leaving the field or on submit, never on every keystroke.
+- **Card:** one subject per card; an `h3` title; at most one primary action.
+- **Table:** prefer it over cards when the person compares attributes; sticky header, sorting shown by an icon + `aria-sort`.
+- **Modal:** only for decisions that block the flow. Closes with Esc, a visible button and a click on the scrim (unless there is unsaved data). Focus trapped inside and returned to the trigger.
+- **Toast:** only to confirm non-critical actions; 6s by default (4–10s depending on the text length), pausable on hover/focus, announced by `role="status"`. If it has an action (e.g. "Desfazer" in a pt-BR product), it stays until used or dismissed. Errors never go to a toast.
+- **AI response:** always in `ai-response`, with the label "Gerado por IA" (in a pt-BR product), sources when there are any, and edit/regenerate/discard actions.
 
 ## Do's and Don'ts
 
-**Faça**
+**Do**
 
-- Use apenas tokens semânticos (`var(--color-text-primary)`), nunca primitivos nem valores crus.
-- Projete os estados vazio, carregando e erro antes do estado ideal.
-- Escreva rótulos de botão com verbo e objeto.
-- Mantenha a ação primária no mesmo lugar em todas as telas do mesmo tipo.
-- Peça confirmação específica (ação + objeto + consequência) só para ações destrutivas ou irreversíveis; para o resto, ofereça desfazer.
+- Use only semantic tokens (`var(--color-text-primary)`), never primitives or raw values.
+- Design the empty, loading and error states before the ideal state.
+- Write button labels with a verb and an object.
+- Keep the primary action in the same place on every screen of the same type.
+- Ask for a specific confirmation (action + object + consequence) only for destructive or irreversible actions; for the rest, offer undo.
 
-**Não faça**
+**Don't**
 
-- Não crie variante nova de componente sem registrar o motivo neste arquivo.
-- Não use cor para decorar; cor carrega significado.
-- Não use placeholder como rótulo.
-- Não desabilite o botão de envio para "impedir erro" — deixe enviar e explique o que falta.
-- Não use modal para conteúdo longo, formulários extensos ou mensagens de sucesso.
-- Não abra links em nova aba sem avisar.
+- Do not create a new component variant without recording the reason in this file.
+- Do not use color to decorate; color carries meaning.
+- Do not use a placeholder as a label.
+- Do not disable the submit button to "prevent errors": let it submit and explain what is missing.
+- Do not use a modal for long content, extensive forms or success messages.
+- Do not open links in a new tab without warning.
 
 ## Accessibility
 
-- Meta: **WCAG 2.2 nível AA** em todas as telas.
-- Foco visível com anel de 2px em `focus`, contraste ≥ 3:1, nunca removido (`outline: none` sem substituto é proibido).
-- Alvo de toque mínimo 24×24px (piso) e 44×44px (padrão do sistema).
-- Respeite `prefers-reduced-motion`: transições acima de 200ms viram fade simples ou nada.
-- Zoom de 200% e largura de 320px sem perda de conteúdo nem rolagem horizontal.
-- Toda imagem informativa tem `alt`; ícones sem texto têm nome acessível.
+- Target: **WCAG 2.2 level AA** on every screen.
+- Visible focus with a 2px ring in `focus`, contrast ≥ 3:1, never removed (`outline: none` without a replacement is forbidden).
+- Minimum touch target 24×24px (floor) and 44×44px (system default).
+- Respect `prefers-reduced-motion`: transitions longer than 200ms become a simple fade or nothing.
+- 200% zoom and a 320px width with no loss of content and no horizontal scrolling.
+- Every informative image has `alt`; icons without text have an accessible name.
 
 ## Agent Instructions
 
-1. Leia este arquivo e `tokens/build/tokens.css` antes de qualquer mudança de interface.
-2. Reutilize componentes existentes. Se nenhum servir, explique por que antes de criar um novo.
-3. Consulte `patterns/` para decisões de interação (modal ou não, toast ou inline, etc.).
-4. Entregue a lista de tokens e componentes usados e os estados implementados.
-5. Rode `node tools/lint-raw-values.mjs <pasta-alterada>` e corrija toda ocorrência antes de concluir.
+1. Read this file and `tokens/build/tokens.css` before any interface change.
+2. Reuse existing components. If none fits, explain why before creating a new one.
+3. Consult `patterns/` for interaction decisions (modal or not, toast or inline, etc.).
+4. Deliver the list of tokens and components used and the states implemented.
+5. Run `node tools/lint-raw-values.mjs <changed-folder>` and fix every occurrence before finishing.

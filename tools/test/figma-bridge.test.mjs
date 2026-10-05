@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { plan, generateScript } from '../figma/tokens-to-figma.mjs';
 import { compare, apply, toDtcg } from '../figma/figma-to-tokens.mjs';
 
-/** Figma falso, só com a API de variáveis usada pelo script gerado. */
+/** Fake Figma, with only the variables API the generated script uses. */
 function fakeFigma() {
   const cols = [], vars = [];
   let n = 0;
@@ -32,7 +32,7 @@ function fakeFigma() {
 }
 const run = (script, figma) => new Function('figma', `return (async () => {${script}})()`)(figma);
 
-/** Snapshot equivalente ao que tools/figma/snapshot.js devolveria para as variáveis do falso. */
+/** Snapshot equivalent to what tools/figma/snapshot.js would return for the fake's variables. */
 function snapshotOf({ cols, vars }) {
   const varName = Object.fromEntries(vars.map((v) => [v.id, v.name]));
   const modes = {};
@@ -99,7 +99,7 @@ test('Figma change becomes a DTCG diff and the contrast gate rejects a bad value
     useTokensDir(dir);
     const failures = checkContrast(build().resolved).filter((x) => !x.ok);
     useTokensDir(join(process.cwd(), 'tokens'));
-    assert.ok(failures.some((x) => x.bg === 'color.action.primary'), 'brand.400 com texto branco deve reprovar');
+    assert.ok(failures.some((x) => x.bg === 'color.action.primary'), 'brand.400 with white text must fail');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

@@ -1,8 +1,8 @@
-// Kit de doadores das prévias: percorre as capturas do módulo e guarda, com o CSS que cada um usa, os pedaços reais
-// que as operações montam na tela (synthesize-state, synthesize-region, insert, wrap, variant, style com theme:,
-// annotate de dica): blocos de estado de *.error/*.empty/*.loading.html, alertas por cor, botões por variante,
-// painel, título, legenda, chip, texto de apoio, campo de busca, classes de tooltip, cor de erro e a escala de
-// títulos (h1–h6) como o produto a usa. Nunca maquete: tudo vem de alguma captura. Sem dependências.
+// Donor kit of the previews: walks the module's captures and keeps, with the CSS each one uses, the real pieces the
+// operations build on the screen (synthesize-state, synthesize-region, insert, wrap, variant, style with theme:,
+// hint annotate): state blocks from *.error/*.empty/*.loading.html, alerts by color, buttons by variant, panel,
+// heading, caption, chip, helper text, search field, tooltip classes, error color and the heading scale (h1–h6) as
+// the product uses it. Never a mockup: everything comes from some capture. No dependencies.
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -12,19 +12,19 @@ export const KIT_VERSION = 6;
 const KIT_FILE = 'kit.json';
 const STATE_BLOCKS = ['error', 'empty', 'loading'];
 
-/** Linhas de texto visíveis de uma captura (sem estilos e scripts), para achar o que um estado acrescenta. */
+/** Visible text lines of a capture (no styles or scripts), to find what a state adds. */
 export function textLines(html) {
   const body = String(html).slice(Math.max(0, String(html).indexOf('<body')));
   return body.replace(/<(style|script)[\s\S]*?<\/\1>/gi, '').replace(/<[^>]+>/g, '\n').split('\n')
     .map((l) => l.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim())
     .filter(Boolean);
 }
-/** Textos que a captura de estado tem e a tela base não tem (o bloco do estado). */
+/** Texts the state capture has and the base screen does not (the state block). */
 export function addedLines(baseHtml, stateHtml) {
   const base = new Set(textLines(baseHtml));
   return [...new Set(textLines(stateHtml).filter((l) => !base.has(l)))];
 }
-/** Escala de títulos: moda do tamanho de cada nível nas capturas, sem nível menor maior que o de cima. */
+/** Heading scale: mode of each level's size in the captures, no lower level larger than the one above. */
 export function typographyScale(samples) {
   const out = {};
   let prev = Infinity;
@@ -42,7 +42,7 @@ export function typographyScale(samples) {
 }
 
 /* c8 ignore start */
-/** Roda dentro de uma captura: expõe `window.__dsxkitc` com os coletores. */
+/** Runs inside a capture: exposes `window.__dsxkitc` with the collectors. */
 export function kitCollector() {
   const visible = (el) => {
     const r = el.getBoundingClientRect();
@@ -81,7 +81,7 @@ export function kitCollector() {
     return { html: c.outerHTML, css };
   };
   const first = (sel, ok = () => true) => [...document.querySelectorAll(sel)].find((e) => visible(e) && ok(e));
-  // texto de apoio e legenda de cor neutra (cinza): saturação baixa, nada de apoio de sucesso ou de erro
+  // neutral (gray) helper text and caption: low saturation, no success or error helper
   const sat = (x) => { const [r, g, b] = (getComputedStyle(x).color.match(/\d+/g) || [0, 0, 0]).map(Number); return Math.max(r, g, b) - Math.min(r, g, b); };
   const neutral = (sel) => [...document.querySelectorAll(sel)].find((e) => visible(e) && !e.classList.contains('Mui-error') && [e, ...e.querySelectorAll('*')].every((x) => sat(x) < 40));
   window.__dsxkitc = {
@@ -101,7 +101,7 @@ export function kitCollector() {
       while (lca && !els.every((e) => lca.contains(e))) lca = lca.parentElement;
       if (!lca || lca === document.body || lca.matches('main') || lca.querySelector('[role=tablist], nav, h1')) return null;
       const r = lca.getBoundingClientRect();
-      // contexto do bloco: alinhamento e espaçamento do contêiner que o envolvia (célula da tabela, cartão…)
+      // block context: alignment and spacing of the container around it (table cell, card…)
       const host = lca.parentElement;
       const hs = host ? getComputedStyle(host) : null;
       const ctx = hs ? Object.fromEntries([['text-align', hs.textAlign], ['padding', hs.padding], ['display', /flex|grid/.test(hs.display) ? hs.display : 'block'], ['justify-content', hs.justifyContent], ['align-items', hs.alignItems], ['flex-direction', hs.flexDirection]].filter(([, v]) => v && v !== 'normal' && v !== '0px')) : null;
@@ -135,7 +135,7 @@ export function kitCollector() {
       for (const v of need) { const el = first(`.MuiButton-root.MuiButton-${v}.MuiButton-sizeMedium`, live) || first(`.MuiButton-root.MuiButton-${v}`, live); if (el) out[v] = { className: el.className, css: rulesFor(el) }; }
       return out;
     },
-    /** Classe de tooltip do kit (elemento na tela ou regra no CSS) e a cor de erro do tema (regra `.Mui-error`). */
+    /** Kit tooltip class (element on screen or CSS rule) and the theme error color (`.Mui-error` rule). */
     sheet() {
       let tooltip = null, error = null;
       const tip = first('.MuiTooltip-tooltip');
@@ -159,15 +159,15 @@ export function kitCollector() {
 const hex = (rgbStr) => { const m = String(rgbStr).match(/\d+/g); return m && m.length >= 3 ? `#${m.slice(0, 3).map((n) => Number(n).toString(16).padStart(2, '0')).join('')}` : rgbStr; };
 
 /**
- * Monta (ou lê do cache `kit.json` em `outDir`) o kit do módulo. `files`: capturas .html; `extras`: chaves
- * "<captura>|<seletor>" pedidas por `insert` com `from`. Devolve o kit.
+ * Builds (or reads from the `kit.json` cache in `outDir`) the module kit. `files`: .html captures; `extras`: keys
+ * "<capture>|<selector>" requested by `insert` with `from`. Returns the kit.
  */
 export async function buildKit(page, { screensDir, files, outDir, extras = [], log = () => {} }) {
   const hashes = files.map((f) => [f, createHash('sha1').update(readFileSync(join(screensDir, f))).digest('hex')]);
   const key = createHash('sha1').update(JSON.stringify([KIT_VERSION, hashes, [...extras].sort()])).digest('hex');
   const cacheFile = outDir ? join(outDir, KIT_FILE) : null;
   if (cacheFile && existsSync(cacheFile)) {
-    try { const k = JSON.parse(readFileSync(cacheFile, 'utf8')); if (k.key === key) return k.kit; } catch { /* refaz */ }
+    try { const k = JSON.parse(readFileSync(cacheFile, 'utf8')); if (k.key === key) return k.kit; } catch { /* rebuild */ }
   }
   const kit = { typography: {}, blocks: { error: [], empty: [], loading: [] }, alerts: {}, buttons: {}, roles: {}, extras: {}, error_color: null };
   const samples = {};
@@ -207,11 +207,11 @@ export async function buildKit(page, { screensDir, files, outDir, extras = [], l
         if (d) kit.extras[x] = d;
       }
     } catch (e) {
-      log(`kit: ${f} ignorada (${String(e.message).split('\n')[0]})`);
+      log(`kit: ${f} skipped (${String(e.message).split('\n')[0]})`);
     }
   }
   kit.typography = typographyScale(samples);
-  // bloco menor primeiro: o que só tem o estado, sem levar a tela junto
+  // smaller block first: the one with only the state, without taking the screen along
   for (const k of STATE_BLOCKS) kit.blocks[k].sort((a, b) => a.area - b.area || a.html.length - b.html.length);
   if (cacheFile) writeFileSync(cacheFile, JSON.stringify({ key, kit }));
   return kit;

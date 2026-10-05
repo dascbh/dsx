@@ -1,6 +1,6 @@
 ---
 id: retry
-title: Quando e como oferecer "Tentar novamente" após um erro?
+title: When and how should you offer "Try again" after an error?
 category: feedback
 components: [alert, button, snackbar]
 type: recommendation
@@ -11,92 +11,92 @@ wcag: ["4.1.3", "1.4.1", "2.1.1"]
 related: [temporary-failure, double-submit, preserve-data-after-error, helpful-error-message]
 ---
 
-# Quando e como oferecer "Tentar novamente" após um erro?
+# When and how should you offer "Try again" after an error?
 
-> **Regra:** Ofereça "Tentar novamente" só quando a causa for provavelmente temporária e a repetição for segura; preserve o estado, evite duplicidade e dê uma saída após poucas falhas.
+> **Rule:** Offer "Try again" only when the cause is probably temporary and repeating is safe; preserve the state, avoid duplicates and give a way out after a few failures.
 
-## Contexto
+## Context
 
-A ação de repetir é útil quando a falha pode ser passageira e repetir tem chance real de concluir a tarefa. Não deve ser resposta automática para qualquer erro.
+A retry action is useful when the failure may be transient and repeating has a real chance of completing the task. It should not be the automatic answer to every error.
 
-Boa recuperação reúne explicação curta, estado preservado, uma ação clara e teto de tentativas. Se a operação pode já ter terminado, deixe consultar o resultado primeiro ou adote um mecanismo contra duplicidade.
+Good recovery combines a short explanation, a preserved state, one clear action and a cap on attempts. If the operation may already have completed, let people check the result first or use a mechanism against duplicates.
 
-Repetir às cegas pode cobrar duas vezes, duplicar registros ou apagar dados.
+Retrying blindly can charge twice, duplicate records or wipe data.
 
-## Decisão
+## Decision
 
-- **SE** a causa é transitória (conexão caiu, tempo esgotado, indisponibilidade momentânea) **ENTÃO** ofereça "Tentar novamente".
-- **SE** o dado é inválido **ENTÃO** leve o usuário ao campo para corrigir; não ofereça repetir.
-- **SE** falta permissão **ENTÃO** explique e indique como obter acesso; não ofereça repetir.
-- **SE** o sistema sabe que a tentativa falhará sempre **ENTÃO** não ofereça repetir.
-- **SE** a ação cria, paga, envia ou exclui **ENTÃO** confirme o resultado antes de repetir, ou aplique idempotência no serviço.
-- **SE** o usuário aciona repetir **ENTÃO** mostre processamento, bloqueie cliques duplicados e comunique o desfecho.
-- **SE** houver uma ou poucas falhas seguidas **ENTÃO** ofereça saída: verificar conexão, ver status, voltar, salvar localmente ou pedir ajuda.
-- **SE** o erro é contextual e não bloqueante **ENTÃO** use a ação junto à mensagem (inline ou snackbar), uma única ação.
-- **SENÃO** preserve dados, filtros, posição e progresso.
+- **IF** the cause is transient (connection dropped, timeout, momentary unavailability) **THEN** offer "Try again".
+- **IF** the data is invalid **THEN** take the user to the field to fix it; do not offer a retry.
+- **IF** permission is missing **THEN** explain and say how to get access; do not offer a retry.
+- **IF** the system knows the attempt will always fail **THEN** do not offer a retry.
+- **IF** the action creates, pays, sends or deletes **THEN** confirm the result before retrying, or apply idempotency in the service.
+- **IF** the user triggers a retry **THEN** show processing, block duplicate clicks and communicate the outcome.
+- **IF** there are one or a few consecutive failures **THEN** offer a way out: check the connection, see the status, go back, save locally or ask for help.
+- **IF** the error is contextual and non-blocking **THEN** put the action next to the message (inline or snackbar), a single action.
+- **ELSE** preserve data, filters, position and progress.
 
-## Quando usar
+## When to use
 
-- Falha de rede, timeout ou indisponibilidade breve.
-- Operação não concluída, com estado preservado.
-- Feedback visível durante a nova tentativa.
+- A network failure, timeout or brief unavailability.
+- An operation that did not complete, with its state preserved.
+- Visible feedback during the new attempt.
 
-## Quando evitar
+## When to avoid
 
-- Dados inválidos → **use em vez disso:** correção guiada no campo.
-- Permissão ausente → **use em vez disso:** orientação de acesso.
-- Ação que pode duplicar efeitos → **use em vez disso:** verificar estado antes.
-- Falha permanente → **use em vez disso:** saída alternativa.
+- Invalid data → **use instead:** guided correction in the field.
+- Missing permission → **use instead:** guidance on getting access.
+- An action that may duplicate effects → **use instead:** check the state first.
+- A permanent failure → **use instead:** an alternative way out.
 
-## Faça
+## Do
 
-- Diga o que falhou e o que a nova tentativa vai fazer.
-- Use uma única ação clara.
-- Informe espera recomendada antes de repetir.
-- Ofereça saída após falhas repetidas.
+- Say what failed and what the new attempt will do.
+- Use a single clear action.
+- State the recommended wait before retrying.
+- Offer a way out after repeated failures.
 
-## Evite
+## Avoid
 
-- Mensagem "Erro" sozinha.
-- Loop infinito de tentativas idênticas.
-- Limpar dados ao falhar.
-- Várias ações repetidas competindo.
-- Mascarar uma ação que já foi concluída.
+- An "Error" message on its own.
+- An infinite loop of identical attempts.
+- Clearing data on failure.
+- Several competing retry actions.
+- Masking an action that has already completed.
 
-## Acessibilidade
+## Accessibility
 
-- Botão com nome acessível claro; sem retirar o foco de forma inesperada.
-- Anuncie "Tentando novamente" e o desfecho em região de status, sem mover o foco (WCAG 4.1.3).
-- Desabilitar temporariamente evita duplicidade, mas o usuário deve entender o que acontece.
-- Não dependa só de vermelho, ícone ou animação (WCAG 1.4.1); operação por teclado (WCAG 2.1.1).
+- A button with a clear accessible name; do not move focus away unexpectedly.
+- Announce "Trying again" and the outcome in a status region, without moving focus (WCAG 4.1.3).
+- Temporarily disabling prevents duplicates, but the user must understand what is happening.
+- Do not rely only on red, an icon or animation (WCAG 1.4.1); keyboard operation (WCAG 2.1.1).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Falha de carregamento | "Não foi possível carregar os resultados. Tentar novamente" |
-| Em andamento | "Tentando novamente…" |
-| Falha repetida | "Ainda não deu certo. Verifique sua conexão ou volte mais tarde." |
-| Saída | "Voltar" |
+| Load failure | "We couldn't load the results. Try again" |
+| In progress | "Trying again…" |
+| Repeated failure | "Still not working. Check your connection or come back later." |
+| Way out | "Go back" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A causa pode ser temporária?
-- [ ] A repetição é segura?
-- [ ] A mensagem diz o que falhou?
-- [ ] O botão descreve a ação?
-- [ ] Dados e progresso foram preservados?
-- [ ] O estado de nova tentativa é anunciado?
-- [ ] Cliques duplicados são bloqueados?
-- [ ] Há limite de tentativas e uma alternativa?
-- [ ] Funciona por teclado?
+- [ ] Could the cause be temporary?
+- [ ] Is repeating safe?
+- [ ] Does the message say what failed?
+- [ ] Does the button describe the action?
+- [ ] Were data and progress preserved?
+- [ ] Is the retry state announced?
+- [ ] Are duplicate clicks blocked?
+- [ ] Is there a limit on attempts and an alternative?
+- [ ] Does it work by keyboard?
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, 4.1.3 e técnica ARIA22: estados dinâmicos anunciados sem mover foco.
-- Baymard Institute (mensagens de erro adaptativas, fluxo de checkout): mensagens específicas, preservação de dados, recuperação guiada.
-- Adobe Spectrum (escrita de erros, alert banner): explicar, orientar, ação direta e inline.
-- Material Design (Errors): snackbar com retry; não oferecer quando falhará sempre.
-- IBM Carbon (ações comuns, notificações): ação curta e contextual.
-- Padrão Digital GOV.BR (Message): feedback curto, global vs. contextual.
-- IETF RFC 9110 e Stripe (idempotência): repetir com segurança operações idempotentes.
+- WCAG 2.2, 4.1.3 and technique ARIA22: dynamic states announced without moving focus.
+- Baymard Institute (adaptive error messages, checkout flow): specific messages, data preservation, guided recovery.
+- Adobe Spectrum (writing errors, alert banner): explain, guide, a direct and inline action.
+- Material Design (Errors): a snackbar with retry; do not offer it when it will always fail.
+- IBM Carbon (common actions, notifications): a short, contextual action.
+- Brazilian Government Digital Standard GOV.BR (Message): short feedback, global vs. contextual.
+- IETF RFC 9110 and Stripe (idempotency): safely repeating idempotent operations.

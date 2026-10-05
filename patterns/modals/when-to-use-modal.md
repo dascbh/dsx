@@ -1,6 +1,6 @@
 ---
 id: when-to-use-modal
-title: Quando usar modal?
+title: When should you use a modal?
 category: modals
 components: [modal, dialog, button]
 type: recommendation
@@ -11,104 +11,104 @@ wcag: ["2.1.1", "2.1.2", "2.4.3", "2.4.7", "1.4.10", "4.1.2"]
 related: [when-to-avoid-modal, close-modal, keyboard-focus, confirm-action]
 ---
 
-# Quando usar modal?
+# When should you use a modal?
 
-> **Regra:** Use modal só para decisão ou tarefa curta que exige atenção imediata; se uma página, mensagem inline ou painel lateral resolver, não use modal.
+> **Rule:** Use a modal only for a short decision or task that needs immediate attention; if a page, inline message or side panel would do, do not use a modal.
 
-## Contexto
+## Context
 
-Uma modal sobrepõe a página atual e impede a interação com o fundo. A interrupção ajuda em decisões importantes, mas faz a pessoa perder o contexto e dificulta a navegação, principalmente em telas pequenas, com teclado e com tecnologias assistivas.
+A modal overlays the current page and prevents interaction with the background. The interruption helps with important decisions, but it costs the person their context and makes navigation harder, especially on small screens, with a keyboard and with assistive technology.
 
-O uso excessivo aumenta a carga cognitiva. Antes de abrir uma modal, verifique se outro padrão resolve com menos interrupção.
+Overuse increases cognitive load. Before opening a modal, check whether another pattern solves the problem with less interruption.
 
-Quando usada, a modal precisa controlar o foco, impedir interação acidental com o fundo e fechar de forma previsível.
+When used, the modal must manage focus, prevent accidental interaction with the background and close predictably.
 
-## Decisão
+## Decision
 
-- **SE** a pessoa deve confirmar uma ação importante ou difícil de desfazer **ENTÃO** use modal curta.
-- **SE** a mensagem é crítica e exige reconhecimento **ENTÃO** use modal.
-- **SE** a tarefa é curta (poucos campos) e não deve tirar a pessoa da tela **ENTÃO** use modal.
-- **SE** a escolha bloqueia o próximo passo **ENTÃO** use modal.
-- **SE** o formulário é longo ou complexo **ENTÃO** use página própria.
-- **SE** há várias etapas **ENTÃO** use fluxo em página com indicador de progresso.
-- **SE** é mensagem comum de erro ou sucesso **ENTÃO** use mensagem inline ou toast.
-- **SE** é o conteúdo principal da página **ENTÃO** não use modal.
-- **SE** a abertura seria automática e frequente **ENTÃO** não use modal.
-- **SENÃO** prefira painel lateral ou conteúdo contextual.
+- **IF** the person must confirm an important or hard-to-undo action **THEN** use a short modal.
+- **IF** the message is critical and requires acknowledgement **THEN** use a modal.
+- **IF** the task is short (a few fields) and should not take the person off the screen **THEN** use a modal.
+- **IF** the choice blocks the next step **THEN** use a modal.
+- **IF** the form is long or complex **THEN** use a dedicated page.
+- **IF** there are several steps **THEN** use a page flow with a progress indicator.
+- **IF** it is a routine error or success message **THEN** use an inline message or toast.
+- **IF** it is the main content of the page **THEN** do not use a modal.
+- **IF** it would open automatically and often **THEN** do not use a modal.
+- **ELSE** prefer a side panel or contextual content.
 
-## Quando usar
+## When to use
 
-- Confirmação de ação importante.
-- Decisão difícil de desfazer.
-- Mensagem crítica que exige reconhecimento.
-- Tarefa curta sem perda de contexto.
-- Informação complementar e pontual.
-- Escolha que bloqueia o próximo passo.
+- Confirming an important action.
+- A hard-to-undo decision.
+- A critical message that requires acknowledgement.
+- A short task with no loss of context.
+- Occasional supplementary information.
+- A choice that blocks the next step.
 
-## Quando evitar
+## When to avoid
 
-- Formulários longos ou complexos → **use em vez disso:** página dedicada.
-- Fluxos com várias etapas → **use em vez disso:** fluxo em páginas.
-- Mensagens comuns de erro ou sucesso → **use em vez disso:** mensagem inline ou toast.
-- Conteúdo principal → **use em vez disso:** corpo da página.
-- Link externo sem necessidade de confirmação → **use em vez disso:** link direto.
-- Interrupções automáticas e frequentes → **use em vez disso:** aviso não bloqueante.
+- Long or complex forms → **use instead:** dedicated page.
+- Multi-step flows → **use instead:** page flow.
+- Routine error or success messages → **use instead:** inline message or toast.
+- Main content → **use instead:** page body.
+- External link that needs no confirmation → **use instead:** direct link.
+- Automatic, frequent interruptions → **use instead:** non-blocking notice.
 
-## Faça
+## Do
 
-- Use modais com moderação.
-- Abra apenas depois de uma ação clara da pessoa.
-- Escreva um título específico que explique o propósito.
-- Use botões com ações explícitas ("Excluir", "Manter").
-- Mantenha o conteúdo curto.
-- Ofereça um botão de fechar visível e uma saída clara.
+- Use modals sparingly.
+- Open them only after a clear action by the person.
+- Write a specific title that explains the purpose.
+- Use buttons with explicit actions ("Delete", "Keep").
+- Keep the content short.
+- Provide a visible close button and a clear exit.
 
-## Evite
+## Avoid
 
-- Abrir sem contexto ou sem ação prévia.
-- Usar "Sim" e "Não" isolados.
-- Colocar páginas inteiras dentro de modais.
-- Esconder o botão de fechar.
-- Usar modal para toda mensagem.
-- Bloquear a pessoa sem explicar.
-- Criar várias áreas de rolagem aninhadas.
+- Opening without context or without a prior action.
+- Using "Yes" and "No" on their own.
+- Putting whole pages inside modals.
+- Hiding the close button.
+- Using a modal for every message.
+- Blocking the person without explanation.
+- Creating several nested scroll areas.
 
-## Acessibilidade
+## Accessibility
 
-- Use role="dialog" e nomeie com título visível via aria-labelledby (4.1.2).
-- Use aria-modal="true" somente quando o fundo estiver de fato inativo para todos.
-- Ao abrir, mova o foco para dentro; Tab permanece dentro da modal e não prende a pessoa (2.1.1, 2.1.2).
-- Escape fecha quando apropriado; ao fechar, o foco volta ao elemento que abriu (2.4.3).
-- Botão de fechar visível e indicador de foco preservado (2.4.7).
-- Permita rolagem vertical para conteúdo maior e teste zoom de 400% sem perda de conteúdo (1.4.10).
-- Teste teclado e leitor de tela.
+- Use role="dialog" and name it with a visible title via aria-labelledby (4.1.2).
+- Use aria-modal="true" only when the background is truly inert for everyone.
+- On open, move focus inside; Tab stays inside the modal without trapping the person (2.1.1, 2.1.2).
+- Escape closes when appropriate; on close, focus returns to the element that opened it (2.4.3).
+- Visible close button and a preserved focus indicator (2.4.7).
+- Allow vertical scrolling for larger content and test 400% zoom without loss of content (1.4.10).
+- Test keyboard and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Título | "Descartar rascunho?" |
-| Ação principal | "Descartar" |
-| Ação secundária | "Continuar editando" |
-| Fechar | "Fechar" |
-| Escolha delimitada | "Escolha a forma de envio" |
+| Title | "Discard draft?" |
+| Primary action | "Discard" |
+| Secondary action | "Keep editing" |
+| Close | "Close" |
+| Bounded choice | "Choose a delivery method" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Nenhum padrão menos disruptivo resolve o caso.
-- [ ] A modal abre após uma ação da pessoa.
-- [ ] O título explica o propósito.
-- [ ] Os botões descrevem suas ações, sem "Sim" e "Não".
-- [ ] O conteúdo é curto e não exige fluxo de várias etapas.
-- [ ] Existe botão de fechar visível.
-- [ ] O foco entra na modal e permanece nela.
-- [ ] Escape fecha, quando apropriado.
-- [ ] O foco retorna ao elemento acionador.
-- [ ] Testada com teclado e leitor de tela.
+- [ ] No less disruptive pattern solves the case.
+- [ ] The modal opens after an action by the person.
+- [ ] The title explains the purpose.
+- [ ] The buttons describe their actions, with no "Yes" and "No".
+- [ ] The content is short and does not need a multi-step flow.
+- [ ] There is a visible close button.
+- [ ] Focus enters the modal and stays in it.
+- [ ] Escape closes it, when appropriate.
+- [ ] Focus returns to the triggering element.
+- [ ] Tested with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- W3C WAI-ARIA Authoring Practices, padrão de diálogo modal: foco inicial, Tab, Escape, retorno do foco e aria-modal.
-- U.S. Web Design System, modal: uso com moderação, alternativas menos disruptivas, evitar fluxos complexos e mensagens comuns.
-- Padrão Digital de Governo, modal: interrupções propositais, decisões críticas e tarefas curtas; conteúdo conciso e ações claras.
-- AMAWeb, checklist ABNT NBR 17225 e manual de acessibilidade digital: foco visível, ordem previsível e operação por teclado.
+- W3C WAI-ARIA Authoring Practices, modal dialog pattern: initial focus, Tab, Escape, focus return and aria-modal.
+- U.S. Web Design System, modal: use sparingly, less disruptive alternatives, avoid complex flows and common messages.
+- Brazilian Government Digital Standard, modal: deliberate interruptions, critical decisions and short tasks; concise content and clear actions.
+- AMAWeb, ABNT NBR 17225 checklist and digital accessibility manual: visible focus, predictable order and keyboard operation.

@@ -1,6 +1,6 @@
 ---
 id: technical-error-code
-title: Erros técnicos devem mostrar códigos ao usuário?
+title: Should technical errors show codes to the user?
 category: feedback
 components: [alert, error-message, copy-button]
 type: contextual-decision
@@ -11,94 +11,94 @@ wcag: ["3.3.1", "3.3.3", "4.1.3", "1.4.1"]
 related: [helpful-error-message, ai-error-recovery, retry, temporary-failure]
 ---
 
-# Erros técnicos devem mostrar códigos ao usuário?
+# Should technical errors show codes to the user?
 
-> **Regra:** Explique o impacto e o próximo passo primeiro; mostre um código apenas como referência secundária, rotulada e copiável, quando ele ajudar o suporte a localizar a ocorrência.
+> **Rule:** Explain the impact and the next step first; show a code only as a secondary, labeled and copyable reference, when it helps support locate the occurrence.
 
-## Contexto
+## Context
 
-Um código de erro é um identificador para diagnóstico, suporte e rastreamento. Sozinho, não diz o que a pessoa pode fazer. A pergunta certa não é se códigos são bons, mas se este código ajuda este público a se recuperar ou pedir ajuda.
+An error code is an identifier for diagnosis, support and tracking. On its own, it does not say what the person can do. The right question is not whether codes are good, but whether this code helps this audience recover or ask for help.
 
-Para o público geral, a mensagem principal traduz o impacto e indica a ação segura. Códigos no início da mensagem desviam a atenção para algo que a maioria não sabe interpretar.
+For a general audience, the main message translates the impact and points to the safe action. Codes at the start of the message pull attention toward something most people cannot interpret.
 
-Detalhes técnicos também podem revelar a implementação ou facilitar enumeração de contas. A solução une clareza para quem usa, segurança na exposição e rastreabilidade para a equipe.
+Technical details can also reveal the implementation or make account enumeration easier. The solution combines clarity for the user, safe exposure and traceability for the team.
 
-## Decisão
+## Decision
 
-- **SE** o erro é simples e o usuário consegue corrigir (validação de campo, por exemplo) **ENTÃO** não mostre código; explique a correção.
-- **SE** a falha persiste, afeta muitas pessoas ou exige investigação **ENTÃO** mostre código como referência secundária.
-- **SE** não há canal de suporte ou o código não leva a nenhuma ação **ENTÃO** omita-o.
-- **SE** mostra o código **ENTÃO** coloque-o depois da mensagem, com rótulo ("Código de referência: 8F4K2") e botão de copiar.
-- **SE** gera o identificador **ENTÃO** use valor curto, estável e sem dado sensível, correlacionado a logs internos.
-- **SE** a operação pode ter sido concluída **ENTÃO** informe como consultar o status antes de sugerir repetir.
-- **SE** o fluxo é de autenticação ou recuperação de conta **ENTÃO** use mensagem genérica que não revele existência de conta ou regra interna.
-- **SE** o público é técnico **ENTÃO** pode oferecer detalhes expansíveis ("Mostrar detalhes"), nunca stack trace bruto.
-- **SENÃO** mantenha o detalhe técnico apenas nos logs.
+- **IF** the error is simple and the user can fix it (field validation, for example) **THEN** show no code; explain the fix.
+- **IF** the failure persists, affects many people or requires investigation **THEN** show a code as a secondary reference.
+- **IF** there is no support channel or the code leads to no action **THEN** omit it.
+- **IF** you show the code **THEN** place it after the message, with a label ("Reference code: 8F4K2") and a copy button.
+- **IF** you generate the identifier **THEN** use a short, stable value with no sensitive data, correlated with internal logs.
+- **IF** the operation may have completed **THEN** say how to check its status before suggesting a retry.
+- **IF** the flow is authentication or account recovery **THEN** use a generic message that does not reveal whether an account exists or any internal rule.
+- **IF** the audience is technical **THEN** you may offer expandable details ("Show details"), never a raw stack trace.
+- **ELSE** keep technical detail in the logs only.
 
-## Quando usar
+## When to use
 
-- Suporte precisa localizar a ocorrência.
-- Falha persistente ou em massa.
-- Canal de atendimento disponível.
-- Código curto e sem dados sensíveis.
+- Support needs to locate the occurrence.
+- A persistent or widespread failure.
+- A support channel is available.
+- A short code with no sensitive data.
 
-## Quando evitar
+## When to avoid
 
-- Erros que a pessoa corrige sozinha → **use em vez disso:** mensagem com instrução.
-- Validações de campo → **use em vez disso:** mensagem junto ao campo.
-- Exposição de stack trace ou sistema interno → **use em vez disso:** logs.
-- Autenticação com risco de enumeração → **use em vez disso:** mensagem genérica.
-- Mensagem que some antes de copiar → **use em vez disso:** mensagem persistente.
+- Errors the person can fix alone → **use instead:** a message with instructions.
+- Field validations → **use instead:** a message next to the field.
+- Exposing a stack trace or internal system → **use instead:** logs.
+- Authentication with an enumeration risk → **use instead:** a generic message.
+- A message that disappears before it can be copied → **use instead:** a persistent message.
 
-## Faça
+## Do
 
-- Explique o que não aconteceu e se a operação foi concluída.
-- Indique a ação segura.
-- Rotule o código como referência.
-- Preserve o estado da operação.
-- Teste a referência com o time de suporte.
+- Explain what did not happen and whether the operation completed.
+- Point to the safe action.
+- Label the code as a reference.
+- Preserve the operation's state.
+- Test the reference with the support team.
 
-## Evite
+## Avoid
 
-- Começar a mensagem pelo número.
-- Exibir stack trace ou dados internos.
-- Culpar a pessoa.
-- Pedir interpretação técnica.
-- Revelar contas válidas.
+- Starting the message with the number.
+- Showing a stack trace or internal data.
+- Blaming the person.
+- Asking for technical interpretation.
+- Revealing valid accounts.
 
-## Acessibilidade
+## Accessibility
 
-- Código como texto selecionável, com rótulo explícito e contraste adequado (WCAG 1.4.1: não se apoiar só em cor ou ícone).
-- Botão "Copiar código" com nome acessível, foco visível e confirmação textual.
-- Falha informativa em região de status sem mover o foco (WCAG 4.1.3); decisão urgente em alerta ou diálogo bem estruturado.
-- Erro ligado a campo: identifique o item e associe a mensagem (WCAG 3.3.1, 3.3.3).
+- The code as selectable text, with an explicit label and adequate contrast (WCAG 1.4.1: do not rely only on color or an icon).
+- A "Copy code" button with an accessible name, visible focus and a text confirmation.
+- An informative failure in a status region without moving focus (WCAG 4.1.3); an urgent decision in a well-structured alert or dialog.
+- A field-related error: identify the item and associate the message (WCAG 3.3.1, 3.3.3).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Mensagem principal | "Não foi possível salvar o arquivo. Tente novamente em instantes." |
-| Referência | "Código de referência: 8F4K2" |
-| Copiar | "Copiar código" / "Código copiado" |
-| Suporte | "Se o problema continuar, informe este código ao suporte." |
+| Main message | "We couldn't save the file. Try again in a moment." |
+| Reference | "Reference code: 8F4K2" |
+| Copy | "Copy code" / "Code copied" |
+| Support | "If the problem continues, give this code to support." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem explica o que aconteceu?
-- [ ] A ação segura está clara?
-- [ ] O código tem função real?
-- [ ] O código vem depois da mensagem principal e tem rótulo?
-- [ ] O código é copiável por teclado?
-- [ ] O identificador não contém dados sensíveis?
-- [ ] Stack trace e detalhes internos ficam fora da interface?
-- [ ] O suporte consegue localizar a ocorrência pelo código?
-- [ ] Fluxos de autenticação usam mensagem genérica?
+- [ ] Does the message explain what happened?
+- [ ] Is the safe action clear?
+- [ ] Does the code have a real purpose?
+- [ ] Does the code come after the main message and have a label?
+- [ ] Can the code be copied by keyboard?
+- [ ] Is the identifier free of sensitive data?
+- [ ] Are stack traces and internal details kept out of the interface?
+- [ ] Can support locate the occurrence by the code?
+- [ ] Do authentication flows use a generic message?
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, 3.3.1 e 3.3.3: erro descrito em texto e sugestão de correção.
-- OWASP (Error Handling Cheat Sheet e Improper Error Handling): sem detalhes de implementação na interface.
-- IETF RFC 9457 (Problem Details): separar contrato de API de apresentação ao usuário.
-- Adobe Spectrum (escrita de erros): código só quando útil, ao final.
-- IBM Carbon (Notification): título curto, corpo conciso, ação de resolução.
-- Atlassian Design System (mensagens de erro): explicar, oferecer alternativa, revelar detalhes gradualmente.
+- WCAG 2.2, 3.3.1 and 3.3.3: the error described in text and a correction suggested.
+- OWASP (Error Handling Cheat Sheet and Improper Error Handling): no implementation details in the interface.
+- IETF RFC 9457 (Problem Details): separate the API contract from what the user sees.
+- Adobe Spectrum (writing errors): a code only when useful, at the end.
+- IBM Carbon (Notification): a short title, a concise body, a resolving action.
+- Atlassian Design System (error messages): explain, offer an alternative, reveal details progressively.

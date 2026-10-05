@@ -1,10 +1,10 @@
 ---
 id: monitoring-dashboard
-title: Painel de acompanhamento
-summary: Tela de visão geral que responde como as coisas estão e o que pede atenção agora, com indicadores, tendências e uma lista curta de pendências.
+title: Monitoring dashboard
+summary: Overview screen that answers how things are and what needs attention now, with indicators, trends and a short list of pending items.
 register: [operational]
-when-to-use: SE a pessoa precisa saber a situação de um conjunto e decidir onde agir primeiro ENTÃO use painel de acompanhamento
-avoid-when: a pessoa vai agir item a item sobre a lista inteira (use lista operacional), os números não levam a nenhuma decisão ou só há um indicador
+when-to-use: IF the person needs to know the situation of a set and decide where to act first THEN use a monitoring dashboard
+avoid-when: the person will act item by item on the whole list (use operational list), the numbers lead to no decision, or there is only one indicator
 regions: [page-header, period-bar, kpi-strip, charts-area, pending-list]
 primary-action: { region: page-header, position: top-right, max: 1 }
 states: [loading, empty, no-data-in-period, partial, stale, error, no-access]
@@ -13,93 +13,93 @@ variations: [kpis-above-list, pending-first, dashboard-per-role]
 rules: [T1, T3, T6, F1, F2]
 ---
 
-# Painel de acompanhamento
+# Monitoring dashboard
 
-A tela de entrada de um módulo ou de uma carteira: quantos pedidos vencem neste mês, quantos aguardam resposta de terceiros, como evoluiu o volume, o que está atrasado. Cada número precisa responder "e daí?" — levar a uma lista filtrada onde a pessoa age. Painel que só exibe é decoração.
+The entry screen of a module or a portfolio: how many orders are due this month, how many are waiting for a third party's answer, how volume evolved, what is late. Every number must answer "so what?" by leading to a filtered list where the person acts. A dashboard that only displays is decoration.
 
-## Quando usar
+## When to use
 
-- **SE** a pergunta da pessoa é "o que precisa de mim agora" **ENTÃO** a `pending-list` vem antes dos gráficos (variação `pending-first`).
-- **SE** a pergunta é "como estamos indo" **ENTÃO** indicadores com comparação (contra o período anterior ou meta) e tendência.
-- **SE** um indicador não leva a nenhuma ação **ENTÃO** remova-o ou mova para um relatório; o painel tem de 3 a 6 indicadores.
-- **SE** cada número tem uma lista por trás **ENTÃO** o número é link para a `operational-list` já filtrada.
-- **SE** perfis diferentes olham coisas diferentes **ENTÃO** use `dashboard-per-role`, não um painel com tudo.
-- **SENÃO** (a pessoa vai trabalhar a lista inteira) **ENTÃO** comece pela `operational-list` com contadores nos filtros.
+- **IF** the person's question is "what needs me now" **THEN** the `pending-list` comes before the charts (`pending-first` variation).
+- **IF** the question is "how are we doing" **THEN** indicators with a comparison (against the previous period or a target) and a trend.
+- **IF** an indicator leads to no action **THEN** remove it or move it to a report; the dashboard has 3 to 6 indicators.
+- **IF** each number has a list behind it **THEN** the number is a link to the `operational-list`, already filtered.
+- **IF** different roles look at different things **THEN** use `dashboard-per-role`, not one dashboard with everything.
+- **ELSE** (the person will work through the whole list) **THEN** start from the `operational-list` with counters on the filters.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header  Visão geral (h1)    Atualizado 09:12 [Ação]        │
+│ page-header  Overview (h1)        Updated 09:12 [Action]       │
 ├──────────────────────────────────────────────────────────────┤
-│ period-bar  [Este mês ▾]  comparar com: mês anterior          │
+│ period-bar  [This month ▾]  compare with: previous month      │
 ├──────────────┬──────────────┬──────────────┬─────────────────┤
 │ kpi-strip                                                     │
-│ Vencem no mês│ Aguardando   │ Atrasados    │ Concluídos      │
-│ 18  ↑4       │ 7            │ 3 ▲ atenção  │ 42  ↓2          │
+│ Due this mon.│ Waiting      │ Late         │ Done            │
+│ 18  ↑4       │ 7            │ 3 ▲ attention│ 42  ↓2          │
 ├──────────────┴──────────────┴──────────────┴─────────────────┤
-│ charts-area      Volume por semana  ▁▃▅▇▅▃                    │
+│ charts-area      Volume per week  ▁▃▅▇▅▃                      │
 ├──────────────────────────────────────────────────────────────┤
-│ pending-list   5 itens mais urgentes · Ver todos →             │
+│ pending-list   5 most urgent items · See all →                 │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **page-header** — `h1`, horário da última atualização dos dados e, se existir, uma primária (ex.: "Novo pedido"); exportar como secundária.
-- **period-bar** — período com atalhos (hoje, 7 dias, mês, personalizado) e comparação; o período escolhido aparece por extenso e vale para todos os blocos.
-- **kpi-strip** — de 3 a 6 cartões: rótulo, valor, variação com sinal e texto ("↑ 4 em relação ao mês anterior"), destaque de atenção com ícone além da cor; cada cartão é link para a lista filtrada.
-- **charts-area** — 1 ou 2 gráficos que explicam a tendência; título que afirma a leitura, eixo com unidade, tabela alternativa acessível.
-- **pending-list** — até 5–10 itens mais urgentes com motivo da urgência e ação direta, mais "Ver todos" para a lista completa.
+- **page-header**: the `h1`, the time of the last data update and, if there is one, a primary (e.g. "New order"); export as secondary.
+- **period-bar**: the period with shortcuts (today, 7 days, month, custom) and a comparison; the chosen period appears spelled out and applies to every block.
+- **kpi-strip**: 3 to 6 cards: label, value, change with sign and text ("↑ 4 compared with the previous month"), an attention highlight with an icon besides color; each card is a link to the filtered list.
+- **charts-area**: 1 or 2 charts that explain the trend; a title that states the reading, an axis with a unit, an accessible alternative table.
+- **pending-list**: up to 5–10 most urgent items with the reason for the urgency and a direct action, plus "See all" for the full list.
 
-## Ações
+## Actions
 
-- **Primária:** no máximo uma, no `page-header`; muitos painéis não têm primária — tudo bem.
-- **Navegação:** cada indicador e cada pendência leva a uma tela de trabalho; o painel não é beco sem saída.
-- **Ações nas pendências:** uma ação curta por item (abrir, cobrar), nunca formulário embutido.
-- **Atualizar:** botão para recarregar quando os dados não são em tempo real, com horário visível.
+- **Primary:** at most one, in the `page-header`; many dashboards have no primary, and that is fine.
+- **Navigation:** every indicator and every pending item leads to a work screen; the dashboard is not a dead end.
+- **Actions on pending items:** one short action per item (open, follow up), never an embedded form.
+- **Refresh:** a button to reload when the data is not real time, with the time visible.
 
-## Estados
+## States
 
-- **loading** — esqueleto por bloco; cada bloco carrega de forma independente.
-- **empty** — conta ou módulo novo, sem dados: explique o que aparecerá e leve à primeira ação produtiva (importar, criar).
-- **no-data-in-period** — há dados, não no período escolhido: diga isso e sugira um período maior; nunca mostre zero como se fosse resultado.
-- **partial** — um bloco falhou e os outros não: o bloco mostra erro próprio com "Tentar novamente"; os demais ficam.
-- **stale** — os dados têm atraso conhecido (processamento noturno, sincronização): avise o horário de referência em destaque.
-- **error** — falha geral: alerta na página com "Tentar novamente"; período escolhido preservado.
-- **no-access** — o perfil não vê este painel ou parte dele: blocos restritos não aparecem; painel inteiro restrito explica a quem pedir acesso.
+- **loading**: a skeleton per block; each block loads independently.
+- **empty**: a new account or module with no data: explain what will show up and lead to the first productive action (import, create).
+- **no-data-in-period**: there is data, just not in the chosen period: say so and suggest a longer period; never show zero as if it were a result.
+- **partial**: one block failed and the others did not: the block shows its own error with "Try again"; the rest stay.
+- **stale**: the data has a known delay (overnight processing, sync): show the reference time prominently.
+- **error**: general failure: an alert on the page with "Try again"; the chosen period preserved.
+- **no-access**: the role cannot see this dashboard or part of it: restricted blocks do not appear; a fully restricted dashboard explains whom to ask for access.
 
-## Variações
+## Variations
 
 ### kpis-above-list
-Faixa de indicadores no topo, gráficos no meio, pendências embaixo.
-**Favorece:** gestão, leitura de tendência, reunião de acompanhamento.
-**Piora:** quem precisa agir rola até encontrar o que fazer.
+An indicator strip at the top, charts in the middle, pending items below.
+**Favors:** management, reading trends, follow-up meetings.
+**Worsens:** whoever needs to act scrolls until they find what to do.
 
 ### pending-first
-Lista de pendências no topo, indicadores compactos ao lado ou abaixo.
-**Favorece:** quem opera; abre o painel para trabalhar.
-**Piora:** a visão de tendência fica secundária; gestores perdem contexto.
+The pending list at the top, compact indicators beside or below it.
+**Favors:** operators; they open the dashboard to work.
+**Worsens:** the trend view becomes secondary; managers lose context.
 
 ### dashboard-per-role
-Composição diferente por papel (operador, gestor, curador), definida pelo produto, não montada pela pessoa.
-**Favorece:** cada perfil vê o que decide; menos ruído.
-**Piora:** mais telas a manter e testar; quem troca de papel precisa reaprender; exige saber os papéis com precisão.
+A different composition per role (operator, manager, curator), defined by the product, not assembled by the person.
+**Favors:** each role sees what it decides on; less noise.
+**Worsens:** more screens to maintain and test; whoever changes roles must relearn; requires knowing the roles precisely.
 
-## Anti-padrões
+## Anti-patterns
 
-- Doze cartões de número sem nenhum link.
-- Variação comunicada só por verde e vermelho.
-- Zero exibido quando o dado não carregou.
-- Gráfico decorativo sem pergunta que ele responda.
-- Período diferente em cada bloco sem dizer.
-- Painel personalizável por arrastar como substituto de saber o que a pessoa precisa.
+- Twelve number cards with no link at all.
+- Change conveyed only by green and red.
+- Zero displayed when the data did not load.
+- A decorative chart that answers no question.
+- A different period in each block without saying so.
+- A drag-to-customize dashboard as a substitute for knowing what the person needs.
 
 ## Checklist
 
-- [ ] De 3 a 6 indicadores, cada um com link para a lista filtrada.
-- [ ] Variação com sinal, texto e ícone, não só cor.
-- [ ] Período por extenso e comum a todos os blocos; horário de atualização visível.
-- [ ] Falha de um bloco não derruba os outros.
-- [ ] `no-data-in-period` distinto de `empty`.
-- [ ] Gráficos com título que afirma a leitura e alternativa em tabela.
+- [ ] 3 to 6 indicators, each with a link to the filtered list.
+- [ ] Change with sign, text and icon, not color alone.
+- [ ] The period spelled out and shared by every block; update time visible.
+- [ ] One block's failure does not bring down the others.
+- [ ] `no-data-in-period` distinct from `empty`.
+- [ ] Charts with a title that states the reading and a table alternative.

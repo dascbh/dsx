@@ -1,26 +1,26 @@
-# Mapa de suposições: <solução>
+# Assumption map: <solution>
 
-<!-- Referência: knowledge/pesquisa/discovery-e-estrategia.md §5 -->
-<!-- Escrita individual antes da discussão. Cargo não é evidência: cite a fonte. -->
+<!-- Reference: knowledge/research/discovery-and-strategy.md §5 -->
+<!-- Write individually before the discussion. Job title is not evidence: cite the source. -->
 
-**Solução avaliada:** <o quê, para quem, qual oportunidade, qual resultado>
-**Data:** <AAAA-MM-DD> · **Participantes:** <...>
+**Solution evaluated:** <what, for whom, which opportunity, which outcome>
+**Date:** <YYYY-MM-DD> · **Participants:** <...>
 
-## Suposições
-<!-- Forma observável: quem, faz o quê, em que condição, em quanto tempo. -->
-| ID | Suposição observável | Categoria D/U/T/N/E | Importância (1–5) | Força da evidência (1–5) | Fonte e limite da evidência |
+## Assumptions
+<!-- Observable form: who does what, under which condition, in how much time. -->
+| ID | Observable assumption | Category D/U/T/B/E | Importance (1–5) | Evidence strength (1–5) | Source and limit of the evidence |
 |---|---|---|---|---|---|
-| S1 | <...> | <...> | <...> | <...> | <...> |
-| S2 | <...> | <...> | <...> | <...> | <...> |
-<!-- D desejabilidade · U usabilidade · T viabilidade técnica · N viabilidade de negócio · E ética -->
+| A1 | <...> | <...> | <...> | <...> | <...> |
+| A2 | <...> | <...> | <...> | <...> | <...> |
+<!-- D desirability · U usability · T technical feasibility · B business viability · E ethics -->
 
-## Matriz
-| | Evidência fraca | Evidência forte |
+## Matrix
+| | Weak evidence | Strong evidence |
 |---|---|---|
-| **Importante** | <S…> → **testar primeiro** | <S…> → seguir |
-| **Pouco importante** | <S…> → monitorar | <S…> → pano de fundo |
+| **Important** | <A…> → **test first** | <A…> → proceed |
+| **Less important** | <A…> → monitor | <A…> → background |
 
-## Plano de teste (1–3 suposições críticas)
-| ID | Pergunta | Menor teste | Critério de sucesso (fixado ANTES) | Se passar | Se falhar | Responsável | Prazo |
+## Test plan (1–3 critical assumptions)
+| ID | Question | Smallest test | Success criterion (set BEFORE) | If it passes | If it fails | Owner | Deadline |
 |---|---|---|---|---|---|---|---|
-| <S…> | <...> | <protótipo / pergunta única / mineração de dados / spike> | <...> | <...> | <...> | <...> | <...> |
+| <A…> | <...> | <prototype / single question / data mining / spike> | <...> | <...> | <...> | <...> | <...> |

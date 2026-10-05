@@ -23,7 +23,7 @@ test('classify: financial dashboard is operational', () => {
 });
 
 test('evaluate: a component contrast failure lowers the score', () => {
-  // parte de um curado aprovado e força o texto do 1º componente a ficar igual ao fundo
+  // starts from an approved curated item and forces the 1st component's text to match its background
   const good = readFileSync(join(DIR, 'designmd-app', 'polaris.md'), 'utf8');
   const bg = good.match(/backgroundColor:\s*("?\{colors\.[\w-]+\}"?)/)[1];
   const bad = good.replace(/(textColor:\s*)("?\{colors\.[\w-]+\}"?)/, `$1${bg}`);
@@ -40,9 +40,9 @@ test('curated: each copy exists, carries CC BY 4.0 credit and matches curated.js
   assert.equal(files.length, curated.length);
   for (const c of curated) {
     const md = readFileSync(join(DIR, c.file), 'utf8');
-    assert.match(md, /CC BY 4\.0/, `${c.slug} sem crédito`);
-    assert.match(md, /designmd\.app\/library\//, `${c.slug} sem origem`);
-    assert.ok(md.startsWith('---'), `${c.slug} sem front matter`);
+    assert.match(md, /CC BY 4\.0/, `${c.slug} without credit`);
+    assert.match(md, /designmd\.app\/library\//, `${c.slug} without source`);
+    assert.ok(md.startsWith('---'), `${c.slug} without front matter`);
     assert.ok(REGISTERS.includes(c.register), `${c.slug}: register "${c.register}"`);
   }
 });
@@ -61,6 +61,6 @@ test('cli: legacy subcommand, flags and values are mapped with a warning', () =>
   const warnings = [];
   const a = parseCli('references.mjs', ['buscar', '--registro', 'operacional', '--uso', 'dashboard', '--tema', 'escuro', '--curados'], (m) => warnings.push(m));
   assert.deepEqual(a, { _: ['search'], register: 'operational', use: 'dashboard', theme: 'dark', curated: true });
-  assert.ok(warnings.every((w) => /nome antigo, use/.test(w)));
+  assert.ok(warnings.every((w) => /old name, use/.test(w)));
   assert.equal(warnings.length, 7);
 });

@@ -1,21 +1,21 @@
 #!/usr/bin/env node
-// Drift UX.md × produto: confronta o UX.md com o mapa de fluxo, as capturas (e a geometria, quando houver) e
-// acusa o que o arquivo deixou de descrever. É o par, para o UX.md, da conferência front matter × código do
-// DESIGN.md. Sem dependências. Contrato: knowledge/fundamentos/ux-md.md ("Drift UX.md × produto").
+// UX.md × product drift: compares the UX.md with the flow map, the captures (and the geometry, when present) and
+// flags what the file no longer describes. It is the UX.md counterpart of the DESIGN.md front matter × code check.
+// No dependencies. Contract: knowledge/foundations/ux-md.md ("UX.md × product drift").
 //
-//   U1 tela do mapa ou das capturas sem arquétipo no UX.md e fora de todo desvio declarado (sev 2)
-//   U2 entrada de `archetypes` que não nomeia nenhuma tela do mapa (tela que não existe mais) (sev 2)
-//   U3 política do front matter que a maioria das telas de um arquétipo já não segue (sev 2): reaproveita os
-//      detectores — T1 (primárias por região), T2 (ordem do diálogo), T5 (rótulo da destrutiva) e, com geometria,
-//      L1 (posição da primária). Precisa de ≥ 2 telas do arquétipo; telas cobertas por desvio da regra não contam.
-//   U4 estado declarado em `states` que nenhuma captura tem (`<nn>-<tela>.<estado>.html`) (sev 2)
-//   U5 `updated` mais velho que a última mudança das telas (git do mapa e das capturas; sem git, data do arquivo) (sev 1)
-//   U6 desvio vencido (`until` no passado) ou que cita tela inexistente no mapa (sev 1)
+//   U1 screen of the map or the captures with no archetype in the UX.md and outside every declared deviation (sev 2)
+//   U2 `archetypes` entry that names no screen of the map (a screen that no longer exists) (sev 2)
+//   U3 front matter policy that most screens of an archetype no longer follow (sev 2): reuses the detectors:
+//      T1 (primaries per region), T2 (dialog order), T5 (destructive label) and, with geometry, L1 (primary
+//      position). Needs ≥ 2 screens of the archetype; screens covered by a deviation of the rule do not count.
+//   U4 state declared in `states` that no capture has (`<nn>-<screen>.<state>.html`) (sev 2)
+//   U5 `updated` older than the screens' last change (git of the map and the captures; without git, file date) (sev 1)
+//   U6 expired deviation (`until` in the past) or one citing a screen missing from the map (sev 1)
 //
-// Uso: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <capturas>] [--geometry <pasta>]
-//        [--module <m> --root <projeto> [--config <file>]] [--json] [--fail-at 2]
-//      Com --module e --root, os padrões são os da auditoria (lib/project-paths.mjs): <root>/.dsx/maps/flows-<m>.json,
-//      <root>/.dsx/captures/<m> e <root>/.dsx/captures/<m>/geometry (legado .stitch/<m>/… lido com aviso).
+// Usage: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <captures>] [--geometry <folder>]
+//        [--module <m> --root <project> [--config <file>]] [--json] [--fail-at 2]
+//      With --module and --root, the defaults are the audit's (lib/project-paths.mjs): <root>/.dsx/maps/flows-<m>.json,
+//      <root>/.dsx/captures/<m> and <root>/.dsx/captures/<m>/geometry (legacy .stitch/<m>/… read with a warning).
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, basename, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -31,27 +31,27 @@ import { resolveProjectPaths } from './lib/project-paths.mjs';
 export const SEVERITY = { U1: 2, U2: 2, U3: 2, U4: 2, U5: 1, U6: 1 };
 const PRINCIPAL = new Set(['success', 'open']);
 const TRANSIENT = new Set(['running', 'submitting', 'saving']);
-/** Regra do detector → política do front matter que ela verifica. */
+/** Detector rule → the front matter policy it checks. */
 const POLICY_RULES = {
-  T1: { policy: 'actions.primary-per-region', what: 'mais primárias por região que o limite' },
-  T2: { policy: 'actions.dialog-order', what: 'a outra ordem de botões no diálogo' },
-  T5: { policy: 'actions.destructive-specific-label', what: 'rótulo genérico na ação destrutiva' },
-  L1: { policy: 'actions.primary-position', what: 'a primária fora da posição declarada' },
+  T1: { policy: 'actions.primary-per-region', what: 'more primaries per region than the limit' },
+  T2: { policy: 'actions.dialog-order', what: 'the other button order in the dialog' },
+  T5: { policy: 'actions.destructive-specific-label', what: 'a generic label on the destructive action' },
+  L1: { policy: 'actions.primary-position', what: 'the primary outside the declared position' },
 };
 
 const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
 const day = (now) => (now instanceof Date ? now : new Date(now)).toISOString().slice(0, 10);
 
-/** Lê o front matter do UX.md (texto) já com os nomes novos. */
+/** Reads the UX.md front matter (text), already with the new names. */
 function frontMatterOf(md) {
   const { frontMatter } = splitFrontMatter(String(md).replace(/\r\n/g, '\n'));
-  if (!frontMatter) throw new Error('UX.md sem front matter (--- ... ---)');
+  if (!frontMatter) throw new Error('UX.md without front matter (--- ... ---)');
   return configFrom(parseYaml(frontMatter));
 }
 
 /**
- * Analisa o drift. `ux` é o texto do UX.md; `map`, `screens` e `geometry` são caminhos (opcionais).
- * Devolve { findings: [{ rule, severity, screen, policy?, message, evidence }], summary, inventory }.
+ * Analyzes the drift. `ux` is the UX.md text; `map`, `screens` and `geometry` are paths (optional).
+ * Returns { findings: [{ rule, severity, screen, policy?, message, evidence }], summary, inventory }.
  */
 export function analyzeDrift(ux, { map = null, screens = null, geometry = null, root = null, now = new Date(), lastChange, archetypesDir } = {}) {
   const cfg = frontMatterOf(ux);
@@ -62,29 +62,29 @@ export function analyzeDrift(ux, { map = null, screens = null, geometry = null, 
   const archetypes = cfg.archetypes ?? {};
   const inDeviation = (id) => deviations.some((d) => !expired(d, now) && coversScreen(d, id));
 
-  // U1 — tela sem arquétipo nem desvio.
+  // U1: screen without an archetype or deviation.
   let covered = 0;
   const uncovered = [];
   for (const s of inv.screens.values()) {
     if (archetypeOf(s, archetypes) || inDeviation(s.id)) { covered++; continue; }
     uncovered.push(s);
-    const where = s.in_map ? `mapa${s.captures.length ? ' e capturas' : ''}` : 'capturas';
-    add('U1', s.id, `tela "${s.id}"${s.name ? ` (${s.name})` : ''} está no ${where} e não tem arquétipo no UX.md nem desvio declarado`, s.captures[0] ?? (inv.map ? basename(inv.map) : null));
+    const where = s.in_map ? `map${s.captures.length ? ' and captures' : ''}` : 'captures';
+    add('U1', s.id, `screen "${s.id}"${s.name ? ` (${s.name})` : ''} is in the ${where} and has no archetype in the UX.md nor a declared deviation`, s.captures[0] ?? (inv.map ? basename(inv.map) : null));
   }
 
-  // U2 — entrada de archetypes que não nomeia tela do mapa.
+  // U2: archetypes entry that names no screen of the map.
   const stale = [];
   if (inv.has_map) {
     const mapScreens = [...inv.screens.values()].filter((s) => s.in_map);
     for (const [arch, entries] of Object.entries(archetypes)) for (const e of [].concat(entries ?? [])) {
       if (mapScreens.some((s) => entryMatches(e, s))) continue;
       stale.push(`${arch}: ${e}`);
-      add('U2', String(e), `archetypes.${arch} cita "${e}", que não é tela do mapa (removida ou renomeada?)`, basename(inv.map));
+      add('U2', String(e), `archetypes.${arch} cites "${e}", which is not a screen of the map (removed or renamed?)`, basename(inv.map));
     }
   }
 
-  // U3 — política que a maioria das telas do arquétipo não segue.
-  const groups = new Map(); // arquétipo → regra → { eligible: [], violating: [] }
+  // U3: policy that most screens of the archetype do not follow.
+  const groups = new Map(); // archetype → rule → { eligible: [], violating: [] }
   const tally = (arch, rule, id, violates) => {
     if (!arch) return;
     if (deviations.some((d) => !expired(d, now) && d.rules.includes(rule) && coversScreen(d, id))) return;
@@ -126,33 +126,33 @@ export function analyzeDrift(ux, { map = null, screens = null, geometry = null, 
     if (r.eligible.length < 2 || r.violating.length * 2 <= r.eligible.length) continue;
     const p = POLICY_RULES[rule];
     const value = p.policy.split('.').reduce((o, k) => o?.[k], cfg);
-    add('U3', null, `${p.policy}: ${value} — ${r.violating.length} de ${r.eligible.length} telas de ${arch} já mostram ${p.what} (${rule}): ${r.violating.slice(0, 6).join(', ')}${r.violating.length > 6 ? ', …' : ''}. Mude a política ou corrija as telas`, `${rule} × ${arch}`, { policy: p.policy, archetype: arch });
+    add('U3', null, `${p.policy}: ${value}; ${r.violating.length} of ${r.eligible.length} ${arch} screens already show ${p.what} (${rule}): ${r.violating.slice(0, 6).join(', ')}${r.violating.length > 6 ? ', …' : ''}. Change the policy or fix the screens`, `${rule} × ${arch}`, { policy: p.policy, archetype: arch });
   }
 
-  // U4 — estado declarado sem nenhuma captura.
+  // U4: declared state with no capture.
   const missingStates = [];
   if (inv.has_captures) {
     const captured = new Set([...inv.screens.values()].flatMap((s) => [...s.states]));
     for (const st of [].concat(cfg.states ?? []).map(String)) {
       if (PRINCIPAL.has(st) || TRANSIENT.has(st) || captured.has(st)) continue;
       missingStates.push(st);
-      add('U4', null, `states declara "${st}", mas nenhuma captura tem esse estado (<nn>-<tela>.${st}.html): capture o estado ou tire-o da lista`, inv.screens_dir ? basename(inv.screens_dir) : null);
+      add('U4', null, `states declares "${st}", but no capture has that state (<nn>-<screen>.${st}.html): capture the state or take it off the list`, inv.screens_dir ? basename(inv.screens_dir) : null);
     }
   }
 
-  // U5 — updated mais velho que as telas.
+  // U5: updated older than the screens.
   const change = lastChange !== undefined ? lastChange : lastScreensChange({ map: inv.map, screens: inv.screens_dir, root });
   const updated = cfg.updated ? String(cfg.updated) : null;
   if (change && (!updated || updated < change.date)) {
-    add('U5', null, `updated ${updated ?? '(ausente)'} é anterior à última mudança das telas (${change.date}, ${change.source === 'git' ? 'último commit do mapa/capturas' : 'data do arquivo mais novo; sem git'}): revise o UX.md e suba version/updated`, change.paths.map((p) => basename(p)).join(', '));
+    add('U5', null, `updated ${updated ?? '(missing)'} is earlier than the screens' last change (${change.date}, ${change.source === 'git' ? 'last commit of the map/captures' : 'date of the newest file; no git'}): review the UX.md and bump version/updated`, change.paths.map((p) => basename(p)).join(', '));
   }
 
-  // U6 — desvio vencido ou com tela inexistente.
+  // U6: expired deviation or one citing a missing screen.
   for (const d of deviations) {
-    if (expired(d, now)) add('U6', null, `desvio ${d.id} venceu em ${d.until}: renove (novo until com motivo) ou corrija as telas — os achados cobertos voltaram a abrir`, `deviations.${d.id}`);
+    if (expired(d, now)) add('U6', null, `deviation ${d.id} expired on ${d.until}: renew it (new until with a reason) or fix the screens; the findings it covered are open again`, `deviations.${d.id}`);
     if (inv.has_map) {
       const ghost = d.screens.filter((x) => x !== '*' && !inv.screens.has(screenKey(x)));
-      if (ghost.length) add('U6', null, `desvio ${d.id} cita tela(s) fora do mapa: ${ghost.join(', ')}`, `deviations.${d.id}`);
+      if (ghost.length) add('U6', null, `deviation ${d.id} cites screen(s) missing from the map: ${ghost.join(', ')}`, `deviations.${d.id}`);
     }
   }
 
@@ -169,23 +169,23 @@ export function analyzeDrift(ux, { map = null, screens = null, geometry = null, 
   };
 }
 
-/** Uma linha por regra, para o aviso de pré-requisito da auditoria ("UX.md desatualizado: …"). */
+/** One line per rule, for the audit's prerequisite warning ("UX.md out of date: …"). */
 export function driftHeadline(result) {
   const s = result.summary;
   const parts = [];
-  if (s.uncovered.length) parts.push(`${s.uncovered.length} tela(s) sem arquétipo (${s.uncovered.slice(0, 4).join(', ')}${s.uncovered.length > 4 ? ', …' : ''})`);
-  if (s.stale_entries.length) parts.push(`${s.stale_entries.length} arquétipo(s) atribuído(s) a tela que não existe`);
+  if (s.uncovered.length) parts.push(`${s.uncovered.length} screen(s) without an archetype (${s.uncovered.slice(0, 4).join(', ')}${s.uncovered.length > 4 ? ', …' : ''})`);
+  if (s.stale_entries.length) parts.push(`${s.stale_entries.length} archetype(s) assigned to a screen that does not exist`);
   const u3 = result.findings.filter((f) => f.rule === 'U3');
-  if (u3.length) parts.push(`${u3.length} política(s) que a maioria das telas não segue (${[...new Set(u3.map((f) => f.policy))].join(', ')})`);
-  if (s.missing_states.length) parts.push(`estado(s) declarado(s) sem captura: ${s.missing_states.join(', ')}`);
+  if (u3.length) parts.push(`${u3.length} polic(ies) most screens do not follow (${[...new Set(u3.map((f) => f.policy))].join(', ')})`);
+  if (s.missing_states.length) parts.push(`declared state(s) with no capture: ${s.missing_states.join(', ')}`);
   const u5 = result.findings.find((f) => f.rule === 'U5');
-  if (u5) parts.push(`updated ${s.updated ?? '(ausente)'} anterior às telas (${s.last_change.date})`);
+  if (u5) parts.push(`updated ${s.updated ?? '(missing)'} earlier than the screens (${s.last_change.date})`);
   const u6 = result.findings.filter((f) => f.rule === 'U6');
-  if (u6.length) parts.push(`${u6.length} desvio(s) vencido(s) ou com tela fora do mapa`);
+  if (u6.length) parts.push(`${u6.length} deviation(s) expired or citing a screen missing from the map`);
   return parts.join('; ');
 }
 
-const USAGE = 'Uso: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <capturas>] [--geometry <pasta>] [--module <m> --root <projeto> [--config <file>]] [--json] [--fail-at 2]';
+const USAGE = 'Usage: node tools/ux-lint/ux-md-drift.mjs <UX.md> [--map flows.json] [--screens <captures>] [--geometry <folder>] [--module <m> --root <project> [--config <file>]] [--json] [--fail-at 2]';
 
 function main() {
   const a = parseCli('ux-lint/ux-md-drift.mjs');
@@ -194,7 +194,7 @@ function main() {
   const root = typeof a.root === 'string' ? resolve(a.root) : null;
   const mod = typeof a.module === 'string' ? a.module : null;
   const pp = root && mod ? resolveProjectPaths({ root, module: mod, config: typeof a.config === 'string' ? a.config : null, flags: { ux: resolve(file) } }) : null;
-  for (const w of pp?.warnings ?? []) console.error(`AVISO ${w}`);
+  for (const w of pp?.warnings ?? []) console.error(`WARNING ${w}`);
   const pick = (flag, def) => (typeof a[flag] === 'string' ? resolve(a[flag]) : pp ? def : null);
   const map = pick('map', pp?.map);
   const screens = pick('screens', pp?.captures);
@@ -205,11 +205,11 @@ function main() {
   if (a.json) console.log(JSON.stringify({ file, ...r }, null, 2));
   else {
     const s = r.summary;
-    console.log(`Drift UX.md × produto: ${file}`);
-    console.log(`  insumos: mapa ${s.has_map ? '✓' : '—'} · capturas ${s.has_captures ? '✓' : '—'} · geometria ${s.has_geometry ? '✓' : '—'} · ${s.deviations} desvio(s) declarado(s)`);
+    console.log(`UX.md × product drift: ${file}`);
+    console.log(`  inputs: map ${s.has_map ? '✓' : '—'} · captures ${s.has_captures ? '✓' : '—'} · geometry ${s.has_geometry ? '✓' : '—'} · ${s.deviations} declared deviation(s)`);
     for (const f of r.findings) console.log(`  ${f.rule} sev ${f.severity}${f.screen ? ` | ${f.screen}` : ''} | ${f.message}${f.evidence ? `\n      ${f.evidence}` : ''}`);
-    console.log(`\n  ${s.screens} telas no inventário, ${s.covered} com arquétipo ou desvio; ${s.findings} achado(s) de drift (${Object.entries(s.by_rule).map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum'})`);
-    console.log(r.findings.length ? `  UX.md desatualizado: ${driftHeadline(r)}` : '  UX.md em dia com o mapa e as capturas.');
+    console.log(`\n  ${s.screens} screens in the inventory, ${s.covered} with an archetype or deviation; ${s.findings} drift finding(s) (${Object.entries(s.by_rule).map(([k, v]) => `${k}=${v}`).join(' ') || 'none'})`);
+    console.log(r.findings.length ? `  UX.md out of date: ${driftHeadline(r)}` : '  UX.md up to date with the map and the captures.');
   }
   process.exit(r.findings.some((f) => f.severity >= failAt) ? 1 : 0);
 }

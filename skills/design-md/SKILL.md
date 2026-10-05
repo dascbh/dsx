@@ -1,98 +1,98 @@
 ---
 name: design-md
-description: "Cria, atualiza ou avalia o DESIGN.md do projeto (rubrica de 100 pontos e gates): extrai do código, define para projeto novo ou audita o existente. Use quando faltar DESIGN.md, agentes gerarem UI inconsistente ou pedirem para avaliá-lo."
+description: "Creates, updates or evaluates the project's DESIGN.md (100-point rubric and gates): extracts it from code, defines it for a new project or audits the existing one. Use when DESIGN.md is missing, agents generate inconsistent UI or someone asks to evaluate it."
 ---
 
-# DESIGN.md: criar, atualizar, avaliar
+# DESIGN.md: create, update, evaluate
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `templates/`, `tools/`, `examples/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. Paths under `knowledge/`, `templates/`, `tools/`, `examples/` are relative to it.
 
-Referência completa: `knowledge/design-system/design-md.md`. Template: `templates/DESIGN.md`. Exemplo preenchido e aprovado: `examples/DESIGN.md`.
+Full reference: `knowledge/design-system/design-md.md`. Template: `templates/DESIGN.md`. Filled-in, approved example: `examples/DESIGN.md`.
 
-**Princípio:** o valor do arquivo está no que ele **impede o agente de adivinhar**. Valor sem intenção é metade do trabalho: o YAML diz *o quê*, a prosa diz *quando, por que e onde não usar*.
+**Principle:** the file's value lies in what it **keeps the agent from guessing**. A value without intent is half the job: the YAML says *what*, the prose says *when, why and where not to use it*.
 
-## Escolha o modo
+## Choose the mode
 
-- Não existe DESIGN.md e há produto/código → **Modo A: extrair**
-- Não existe DESIGN.md e o projeto é novo → **Modo B: definir**
-- Existe DESIGN.md → **Modo C: avaliar** (e depois corrigir as lacunas)
+- No DESIGN.md and there is a product/code → **Mode A: extract**
+- No DESIGN.md and the project is new → **Mode B: define**
+- DESIGN.md exists → **Mode C: evaluate** (then fix the gaps)
 
-## Modo A — Extrair de produto existente
+## Mode A — Extract from an existing product
 
-1. **Inventário real**: se `.dsx/maps/design-system.json` existir (skill `mapear`), parta dele — já traz tokens por adaptador (MUI, Tailwind v3/v4, CSS vars, DTCG), valores em uso, `hazards[]` de drift e um rascunho de front matter. Senão, delegue ao subagente `extrator-design-system`. Levante: fonte de tokens (CSS vars, tema Tailwind/MUI, `*.tokens.json`), cores efetivamente usadas (conte ocorrências), escalas de fonte/espaço/raio, componentes compartilhados e seus estados.
-2. **Nomeie por papel, não por aparência**: `primary`, `text-secondary`, `danger` — nunca `blue-500` no front matter. Valores usados uma única vez são candidatos a drift, não a token.
-3. **Escreva a prosa com evidência**: para cada regra, de onde ela veio (arquivo, tela). Marque com `(inferido)` tudo o que você deduziu sem ver explicitamente.
-4. **Faça/Não faça a partir de erros reais**: inconsistências encontradas no inventário viram "Não faça".
-5. **Pergunte ao usuário** só o que o código não responde: personalidade, densidade-alvo, o que nunca pode acontecer.
-6. Valide (passo "Validação" abaixo).
+1. **Real inventory**: if `.dsx/maps/design-system.json` exists (skill `map-ux`), start from it — it already carries tokens per adapter (MUI, Tailwind v3/v4, CSS vars, DTCG), values in use, drift `hazards[]` and a draft front matter. Otherwise, delegate to the `design-system-extractor` subagent. Survey: token source (CSS vars, Tailwind/MUI theme, `*.tokens.json`), colors actually used (count occurrences), font/space/radius scales, shared components and their states.
+2. **Name by role, not by looks**: `primary`, `text-secondary`, `danger` — never `blue-500` in the front matter. Values used only once are drift candidates, not tokens.
+3. **Write the prose with evidence**: for each rule, where it came from (file, screen). Mark with `(inferred)` everything you deduced without seeing it explicitly.
+4. **Do/Don't from real mistakes**: inconsistencies found in the inventory become "Don't".
+5. **Ask the user** only what the code cannot answer: personality, target density, what must never happen.
+6. Validate ("Validation" step below).
 
-## Modo B — Definir para projeto novo
+## Mode B — Define for a new project
 
-1. Entreviste em uma rodada: tipo de produto e uso (tarefa x vitrine), público e contexto de uso (mobile em trânsito? desktop 8h/dia?), densidade, 1 cor de marca, tom de voz.
-2. Gere a base com as ferramentas (detalhes na skill `tokens`):
+1. Interview in a single round: product type and use (task x showcase), audience and context of use (mobile on the move? desktop 8h/day?), density, 1 brand color, tone of voice.
+2. Generate the base with the tools (details in the `tokens` skill):
    ```bash
-   node tools/palette.mjs "<cor-da-marca>" --format dtcg
-   node tools/type-scale.mjs --base 16 --ratio major-third   # 1.2 para denso; 1.333 para editorial
+   node tools/palette.mjs "<brand-color>" --format dtcg
+   node tools/type-scale.mjs --base 16 --ratio major-third   # 1.2 for dense; 1.333 for editorial
    node tools/spacing-scale.mjs --base 4
    ```
-3. Atribua papéis semânticos e verifique **cada par texto/fundo** com `tools/contrast.mjs` **antes** de escrever o arquivo.
-4. Preencha `templates/DESIGN.md` inteiro. Nenhuma seção pode ficar só com comentário.
+3. Assign semantic roles and check **every text/background pair** with `tools/contrast.mjs` **before** writing the file.
+4. Fill in `templates/DESIGN.md` completely. No section may be left with only a comment.
 
-## Regras de escrita (valem para A e B)
+## Writing rules (apply to A and B)
 
-- Troque adjetivos por critérios observáveis: ~~"moderno e clean"~~ → "no máximo uma cor de destaque por viewport; hierarquia por tipografia e espaço; sem sombra em cards".
-- Cores: tabela **Papel | Token | Onde aparece | Onde NUNCA aparece**.
-- Tipografia: regras de **hierarquia** ("h1 é o título único da página"), não só tamanhos.
-- Componentes: variantes + **todos os estados** (padrão, hover, foco, ativo, desabilitado, carregando, erro, vazio, sucesso) + contraindicações.
-- Acessibilidade: números (contraste, alvo de toque, zoom), nunca "deve ser acessível".
-- Inclua a seção **Agent Instructions**: *quando* consultar, *o que* preservar, *como* validar.
-- Não invente componentes que não existem em produção. Não contradiga os tokens.
+- Replace adjectives with observable criteria: ~~"modern and clean"~~ → "at most one accent color per viewport; hierarchy through typography and space; no shadow on cards".
+- Colors: table **Role | Token | Where it appears | Where it NEVER appears**.
+- Typography: **hierarchy** rules ("h1 is the page's single title"), not just sizes.
+- Components: variants + **all states** (default, hover, focus, active, disabled, loading, error, empty, success) + contraindications.
+- Accessibility: numbers (contrast, touch target, zoom), never "should be accessible".
+- Include the **Agent Instructions** section: *when* to consult it, *what* to preserve, *how* to validate.
+- Do not invent components that do not exist in production. Do not contradict the tokens.
 
-## Modo C — Avaliar (rubrica de 100 pontos)
+## Mode C — Evaluate (100-point rubric)
 
-**Passo 1 — Gates objetivos (automáticos):**
+**Step 1 — Objective gates (automatic):**
 ```bash
 node tools/lint-design-md.mjs DESIGN.md
 ```
-Qualquer ERRO reprova, independentemente da nota.
+Any ERROR fails, regardless of the score.
 
-**Passo 2 — Gates de julgamento** (reprovação automática se qualquer um falhar):
-1. Contradiz o produto/tokens reais sem justificativa registrada.
-2. Pares essenciais de cor abaixo do mínimo WCAG.
-3. O arquivo não chega ao contexto do agente (não está referenciado em CLAUDE.md/AGENTS.md/regras da ferramenta).
-4. Instruções conflitantes para o mesmo contexto (ex.: DESIGN.md diz uma coisa, `.cursor/rules` diz outra).
+**Step 2 — Judgment gates** (automatic failure if any of them fails):
+1. Contradicts the real product/tokens without a recorded justification.
+2. Essential color pairs below the WCAG minimum.
+3. The file does not reach the agent's context (it is not referenced in CLAUDE.md/AGENTS.md/tool rules).
+4. Conflicting instructions for the same context (e.g. DESIGN.md says one thing, `.cursor/rules` says another).
 
-**Passo 3 — Nota**, com evidência por critério:
+**Step 3 — Score**, with evidence per criterion:
 
-| Critério | Peso | Pergunta |
+| Criterion | Weight | Question |
 |---|---:|---|
-| Fidelidade à fonte | 15 | Tokens e componentes correspondem ao produto (amostre 5 telas/arquivos)? |
-| Validade técnica | 10 | Passa no linter, referências resolvem? |
-| Tokens semânticos | 10 | Nomes por função, escalas coerentes, sem duplicação? |
-| Intenção e prosa | 15 | A prosa explica decisões que o valor sozinho não explica? |
-| Componentes e estados | 15 | Componentes centrais têm variantes e todos os estados? |
-| Acessibilidade | 15 | Regras verificáveis com números? |
-| Responsividade | 8 | Mobile, conteúdo longo, vazio/erro/carregando? |
-| Guardrails | 5 | "Não faça" específicos, ligados a erros reais? |
-| Operação com agente | 4 | Comprovadamente carregado no contexto do agente? |
-| Manutenção | 3 | Dono, data, rotina de revisão? |
+| Fidelity to source | 15 | Do tokens and components match the product (sample 5 screens/files)? |
+| Technical validity | 10 | Passes the linter, references resolve? |
+| Semantic tokens | 10 | Names by function, coherent scales, no duplication? |
+| Intent and prose | 15 | Does the prose explain decisions the value alone does not? |
+| Components and states | 15 | Do core components have variants and all states? |
+| Accessibility | 15 | Verifiable rules with numbers? |
+| Responsiveness | 8 | Mobile, long content, empty/error/loading? |
+| Guardrails | 5 | Specific "Don'ts", tied to real mistakes? |
+| Agent operation | 4 | Demonstrably loaded into the agent's context? |
+| Maintenance | 3 | Owner, date, review routine? |
 
-Faixas: **90–100** robusto · **75–89** utilizável com lacunas · **60–74** revisar antes de virar autoridade · **< 60** alto risco (o agente vai inventar decisões centrais).
+Bands: **90–100** robust · **75–89** usable with gaps · **60–74** revise before it becomes an authority · **< 60** high risk (the agent will invent core decisions).
 
-**Passo 4 — Geração controlada** (teste de aceitação): peça uma tela nova usando só o DESIGN.md e o código do projeto. Liste o que o agente teve de inventar (cor, espaçamento, estado, componente). Cada invenção é uma lacuna do arquivo.
+**Step 4 — Controlled generation** (acceptance test): ask for a new screen using only DESIGN.md and the project's code. List what the agent had to invent (color, spacing, state, component). Each invention is a gap in the file.
 
-**Saída do Modo C:**
+**Mode C output:**
 ```
-Gates: lint ✔/✘ · fidelidade ✔/✘ · contraste ✔/✘ · conexão ✔/✘ · conflitos ✔/✘
-Nota: NN/100 (faixa)
-Por critério: <critério> NN/peso — evidência
-Lacunas reveladas na geração controlada: …
-Correções priorizadas (máx. 7): …
+Gates: lint ✔/✘ · fidelity ✔/✘ · contrast ✔/✘ · connection ✔/✘ · conflicts ✔/✘
+Score: NN/100 (band)
+By criterion: <criterion> NN/weight — evidence
+Gaps revealed by controlled generation: …
+Prioritized fixes (max. 7): …
 ```
 
-## Validação (todos os modos)
+## Validation (all modes)
 
-1. `node tools/lint-design-md.mjs DESIGN.md` sem erros.
-2. Se o projeto usa tokens DTCG: `node tools/build-tokens.mjs` sem falhas de contraste, e os valores do front matter batem com `tokens/build/*.json`.
-3. Conecte ao agente — a skill `iniciar` faz isso, num bloco único com o par do `DESIGN.md`, o `UX.md` (skill `ux-md`); mínimo: uma linha em `CLAUDE.md`/`AGENTS.md` dizendo "Antes de criar ou alterar UI, leia `DESIGN.md` (como parece) e `UX.md` (que tipo de tela, onde fica cada coisa, como se comporta)".
-4. Registre `owner` e `updated` no front matter.
+1. `node tools/lint-design-md.mjs DESIGN.md` with no errors.
+2. If the project uses DTCG tokens: `node tools/build-tokens.mjs` with no contrast failures, and the front matter values match `tokens/build/*.json`.
+3. Connect it to the agent — the `init` skill does this, in a single block together with `DESIGN.md`'s pair, `UX.md` (skill `ux-md`); minimum: one line in `CLAUDE.md`/`AGENTS.md` saying "Before creating or changing UI, read `DESIGN.md` (how it looks) and `UX.md` (what type of screen, where everything goes, how it behaves)".
+4. Record `owner` and `updated` in the front matter.

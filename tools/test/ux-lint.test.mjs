@@ -38,7 +38,7 @@ test('html: contract selectors', () => {
   const input = querySelector(root, '#n');
   assert.equal(closest(input, 'main, nav').tag, 'main');
   assert.equal(closest(input, 'nav'), null);
-  assert.throws(() => querySelectorAll(root, 'a:hover'), /não suportado/);
+  assert.throws(() => querySelectorAll(root, 'a:hover'), /Unsupported selector/);
 });
 
 test('yaml-lite: 3 levels, inline lists with quotes, "#" and "," protected', () => {
@@ -74,8 +74,8 @@ test('T1: two primaries in main; open dialog ignores the page behind', () => {
 test('T2: dialog footer with the action before cancel', () => {
   const r = analyzeScreen(page(dialogHtml('Excluir proposta?', '<p>x</p>', primaryBtn('Excluir proposta') + secondaryBtn('Cancelar'))));
   assert.deepEqual(rules(r), ['T2']);
-  assert.match(r.findings[0].region, /diálogo "Excluir proposta\?"/);
-  // Botão de conteúdo antes do Fechar do rodapé não é rodapé: não compara.
+  assert.match(r.findings[0].region, /dialog "Excluir proposta\?"/);
+  // A content button before the footer's Fechar is not in the footer: not compared.
   assert.deepEqual(rules(analyzeScreen(page(dialogHtml('Categorias', primaryBtn('Adicionar'), secondaryBtn('Fechar'))))), []);
   // Ordem inversa declarada no UX.md.
   const cfg = configFrom({ actions: { 'dialog-order': 'action-cancel' } });
@@ -141,7 +141,7 @@ test('flow: F1–F5 on a synthetic map', () => {
   const cfg = configFrom({ flows: { 'max-journey-steps': 5 } });
   const { findings } = analyzeFlow(map, cfg);
   const byRule = (r) => findings.filter((a) => a.rule === r);
-  assert.deepEqual(byRule('F1').map((a) => a.screen), ['fim']); // laço para si mesma não é saída
+  assert.deepEqual(byRule('F1').map((a) => a.screen), ['fim']); // a loop to itself is not a way out
   assert.match(byRule('F1')[0].evidence[0], /src\/App\.tsx:20/);
   assert.deepEqual(byRule('F2').map((a) => a.screen), ['solta']);
   assert.deepEqual(byRule('F3').map((a) => a.screen), ['j1']);
@@ -171,8 +171,8 @@ test('config: legacy Portuguese front matter gives the same config, with warning
   const a = configFrom(current), b = configFrom(legacy);
   assert.deepEqual(b, a);
   assert.equal(a.legacyWarnings.length, 0);
-  assert.ok(b.legacyWarnings.some((w) => /nome antigo "acoes", renomeie para "actions"/.test(w)));
-  assert.ok(b.legacyWarnings.some((w) => /valor antigo "rodape-direita" em actions.primary-position, renomeie para "bottom-right"/.test(w)));
+  assert.ok(b.legacyWarnings.some((w) => /old name "acoes", rename to "actions"/.test(w)));
+  assert.ok(b.legacyWarnings.some((w) => /old value "rodape-direita" in actions.primary-position, rename to "bottom-right"/.test(w)));
 });
 
 test('flow: legacy Portuguese map gives the same findings, with warnings', () => {
@@ -189,8 +189,8 @@ test('flow: legacy Portuguese map gives the same findings, with warnings', () =>
   const a = analyzeFlow(current), b = analyzeFlow(legacy);
   assert.deepEqual(b.findings, a.findings);
   assert.equal(a.warnings, undefined);
-  assert.ok(b.warnings.some((w) => /"telas", renomeie para "screens"/.test(w)));
-  assert.ok(b.warnings.some((w) => /tipo de tela antigo "dialogo", renomeie para "dialog"/.test(w)));
+  assert.ok(b.warnings.some((w) => /"telas", rename to "screens"/.test(w)));
+  assert.ok(b.warnings.some((w) => /old screen type "dialogo", rename to "dialog"/.test(w)));
 });
 
 test('JSON convention: outputs use snake_case keys; camelCase and Portuguese outputs are normalized on read', () => {

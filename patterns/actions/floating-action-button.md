@@ -1,6 +1,6 @@
 ---
 id: floating-action-button
-title: Quando usar botão flutuante?
+title: When should you use a floating action button?
 category: actions
 components: [floating-action-button, fab, button]
 type: contextual-decision
@@ -11,101 +11,101 @@ wcag: ["4.1.2", "2.5.8", "2.1.1", "2.4.7", "2.3.3"]
 related: [icon-only-button, icon-and-text-button, button-hierarchy, touch-target]
 ---
 
-# Quando usar botão flutuante?
+# When should you use a floating action button?
 
-> **Regra:** Use botão flutuante somente para uma única ação primária, frequente e construtiva, sem cobrir conteúdo nem competir com a navegação.
+> **Rule:** Use a floating action button only for a single primary, frequent and constructive action, without covering content or competing with navigation.
 
-## Contexto
+## Context
 
-O botão flutuante põe uma ação em evidência sobre o conteúdo e a deixa ao alcance enquanto a página rola. O custo é que, fixo na tela, ele pode tampar informações, campos, controles, navegação ou avisos temporários.
+A floating action button puts an action in evidence over the content and keeps it within reach while the page scrolls. The cost is that, fixed on screen, it can cover information, fields, controls, navigation or temporary notices.
 
-Pesam na escolha a prioridade da ação, a frequência de uso, o dispositivo, a densidade da tela e a clareza do ícone. Sem critério, o botão oculta conteúdo, compete na hierarquia e faz uma ação secundária parecer a principal.
+The choice depends on the action's priority, frequency of use, device, screen density and how clear the icon is. Used without criteria, the button hides content, competes in the hierarchy and makes a secondary action look like the main one.
 
-Ações construtivas e recorrentes, como criar, adicionar, compartilhar ou iniciar, são o caso de uso. No desktop, não é uma forma de economizar espaço.
+Constructive, recurring actions such as create, add, share or start are the use case. On desktop, it is not a way to save space.
 
-## Decisão
+## Decision
 
-- **SE** existe uma ação principal, construtiva e recorrente na tela **ENTÃO** pode usar um botão flutuante.
-- **SE** há várias ações com a mesma prioridade **ENTÃO** use barra de ações ou toolbar.
-- **SE** a ação só faz sentido ao lado de um campo, card ou seção **ENTÃO** prefira botão inline.
-- **SE** a ação é destrutiva, rara ou de difícil entendimento **ENTÃO** evite o botão flutuante.
-- **SE** o ícone é ambíguo **ENTÃO** adicione rótulo visível (versão estendida).
-- **SE** a tela é um formulário ou é muito densa **ENTÃO** prefira ação inline ou barra persistente.
-- **SE** o botão cobrir conteúdo, navegação inferior, teclado virtual, banners ou toasts **ENTÃO** reposicione ou troque o padrão.
-- **SENÃO** use um botão comum na hierarquia da página.
+- **IF** there is one main, constructive and recurring action on the screen **THEN** a floating action button may be used.
+- **IF** there are several actions with the same priority **THEN** use an action bar or toolbar.
+- **IF** the action only makes sense next to a field, card or section **THEN** prefer an inline button.
+- **IF** the action is destructive, rare or hard to understand **THEN** avoid the floating action button.
+- **IF** the icon is ambiguous **THEN** add a visible label (extended version).
+- **IF** the screen is a form or very dense **THEN** prefer an inline action or a persistent bar.
+- **IF** the button would cover content, bottom navigation, the on-screen keyboard, banners or toasts **THEN** reposition it or change the pattern.
+- **ELSE** use a regular button within the page hierarchy.
 
-Limite: um único botão flutuante por tela ou contexto.
+Limit: a single floating action button per screen or context.
 
-## Quando usar
+## When to use
 
-- Ação principal e recorrente da tela.
-- Ação continua relevante durante a rolagem.
-- Ícone ou rótulo comunica claramente a finalidade.
-- Há espaço para não cobrir conteúdo ou controles.
-- A posição se adapta ao dispositivo e à área segura.
+- The screen's main, recurring action.
+- The action stays relevant while scrolling.
+- The icon or label clearly communicates the purpose.
+- There is room to avoid covering content or controls.
+- The position adapts to the device and the safe area.
 
-## Quando evitar
+## When to avoid
 
-- Várias ações de mesma prioridade → **use em vez disso:** toolbar ou barra de ações.
-- Ação ligada a uma seção específica → **use em vez disso:** botão inline.
-- Ação destrutiva ou rara → **use em vez disso:** menu ou botão comum com confirmação.
-- Significado dependente de ícone ambíguo → **use em vez disso:** botão com texto.
-- Funciona só com mouse ou hover → **use em vez disso:** controle operável por toque e teclado.
+- Several actions with the same priority → **use instead:** toolbar or action bar.
+- An action tied to a specific section → **use instead:** inline button.
+- A destructive or rare action → **use instead:** a menu or a regular button with confirmation.
+- Meaning that depends on an ambiguous icon → **use instead:** a button with text.
+- Works only with mouse or hover → **use instead:** a control operable by touch and keyboard.
 
-## Faça
+## Do
 
-- Priorize uma ação.
-- Use rótulo visível quando o significado não for imediato.
-- Reserve espaço ao redor do botão.
-- Respeite áreas seguras, navegação inferior e teclado virtual.
-- Mantenha foco visível.
-- Teste com conteúdo real, zoom e leitor de tela.
-- Adapte a posição à plataforma e à direção de leitura; o canto inferior direito é comum, mas não universal.
+- Prioritize one action.
+- Use a visible label when the meaning is not immediate.
+- Reserve space around the button.
+- Respect safe areas, bottom navigation and the on-screen keyboard.
+- Keep focus visible.
+- Test with real content, zoom and screen reader.
+- Adapt the position to the platform and reading direction; the bottom-right corner is common but not universal.
 
-## Evite
+## Avoid
 
-- Usar por moda.
-- Empilhar vários botões flutuantes.
-- Cobrir cards, campos ou mensagens.
-- Esconder o nome da ação.
-- Depender só de cor ou sombra para destacá-lo.
-- Usar para ações destrutivas.
+- Using it because it is fashionable.
+- Stacking several floating buttons.
+- Covering cards, fields or messages.
+- Hiding the action's name.
+- Relying on color or shadow alone to make it stand out.
+- Using it for destructive actions.
 
-## Acessibilidade
+## Accessibility
 
-- Use um elemento button nativo com nome acessível que descreva a ação ("Criar nota", não "Mais") (4.1.2).
-- Garanta Tab, Enter e Espaço, foco visível e ordem previsível (2.1.1, 2.4.7).
-- Área de interação mínima de 24 x 24 CSS pixels, ou exceção de espaçamento (2.5.8).
-- Não use apenas cor, sombra, movimento ou posição para transmitir a ação.
-- Respeite prefers-reduced-motion em animações (2.3.3) e verifique que o botão não cobre conteúdo ampliado.
-- Teste teclado, toque, leitor de tela, voz, zoom e tamanhos de tela.
+- Use a native button element with an accessible name that describes the action ("Create note", not "More") (4.1.2).
+- Ensure Tab, Enter and Space, visible focus and a predictable order (2.1.1, 2.4.7).
+- A minimum interaction area of 24 x 24 CSS pixels, or the spacing exception (2.5.8).
+- Do not use color, shadow, motion or position alone to convey the action.
+- Respect prefers-reduced-motion in animations (2.3.3) and check that the button does not cover zoomed content.
+- Test keyboard, touch, screen reader, voice, zoom and screen sizes.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Nome acessível só com ícone | "Criar nota" |
-| Versão estendida | "Nova mensagem" |
-| Compartilhar | "Compartilhar lista" |
-| Evitar | "Mais", "Botão", "+" sem nome |
+| Accessible name, icon only | "Create note" |
+| Extended version | "New message" |
+| Share | "Share list" |
+| Avoid | "More", "Button", "+" with no name |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A tela tem no máximo um botão flutuante.
-- [ ] A ação é construtiva e recorrente.
-- [ ] O botão tem nome acessível específico.
-- [ ] O botão não cobre conteúdo, campos, navegação ou mensagens em nenhum tamanho de tela.
-- [ ] A posição respeita áreas seguras e teclado virtual.
-- [ ] A área de toque é de pelo menos 24 x 24 CSS pixels.
-- [ ] Tab, Enter e Espaço funcionam e o foco é visível.
-- [ ] Animações respeitam prefers-reduced-motion.
-- [ ] A ação não seria melhor em toolbar ou botão inline.
+- [ ] The screen has at most one floating action button.
+- [ ] The action is constructive and recurring.
+- [ ] The button has a specific accessible name.
+- [ ] The button does not cover content, fields, navigation or messages at any screen size.
+- [ ] The position respects safe areas and the on-screen keyboard.
+- [ ] The touch area is at least 24 x 24 CSS pixels.
+- [ ] Tab, Enter and Space work and focus is visible.
+- [ ] Animations respect prefers-reduced-motion.
+- [ ] The action would not be better in a toolbar or an inline button.
 
-## Fundamentação
+## Rationale
 
-- Material Design 3, FAB: destaque para a ação primária ou mais comum; evitar ações menores, destrutivas ou pouco claras; limitar a quantidade por tela.
-- Android Developers, botão de ação flutuante: variações padrão, pequena, grande e estendida e casos de uso de criação.
-- Material UI, botão de ação flutuante: um por tela para a ação primária.
-- Baymard Institute, pesquisa de e-commerce móvel e filtros móveis: ações fixas devem ser avaliadas quanto a tamanho, posição e sobreposição de conteúdo.
-- WCAG 2.2, critérios 4.1.2 (nome, função, valor) e 2.5.8 (tamanho mínimo do alvo).
-- IBM Carbon, acessibilidade de botão: teclado e nomes para botões só com ícone.
+- Material Design 3, FAB: emphasis for the primary or most common action; avoid minor, destructive or unclear actions; limit the number per screen.
+- Android Developers, floating action button: standard, small, large and extended variants and creation use cases.
+- Material UI, floating action button: one per screen for the primary action.
+- Baymard Institute, mobile e-commerce and mobile filters research: fixed actions must be assessed for size, position and content overlap.
+- WCAG 2.2, criteria 4.1.2 (name, role, value) and 2.5.8 (target size minimum).
+- IBM Carbon, button accessibility: keyboard and names for icon-only buttons.

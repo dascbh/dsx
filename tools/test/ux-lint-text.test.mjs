@@ -41,7 +41,7 @@ test('inventory: types, variants and open dialog', () => {
   assert.deepEqual(byType('accessible-name'), ['Navegação principal']);
   assert.deepEqual(byType('empty-value'), ['—']);
 
-  // Com diálogo aberto, só o diálogo.
+  // With a dialog open, only the dialog.
   const withDialog = takeInventory(page(`<h1>Pedidos</h1>${btn('Enviar pedido')}<div role="dialog"><h2 class="MuiDialogTitle-root">Excluir proposta?</h2>${btn('Excluir proposta')}</div>`));
   assert.deepEqual(withDialog.map((i) => i.text).sort(), ['Excluir proposta', 'Excluir proposta?']);
 });
@@ -76,12 +76,12 @@ test('X2: compound title and button "Label — Name"', () => {
   assert.ok(has('<h2>Revisar antes de gravar · itens.xlsx</h2>', 'X2'));
   assert.ok(has('<h2>Etapa 2: escolher modelo</h2>', 'X2'));
   const b = findingsOf(btn('Remover da lista — Ana Souza', 'text')).find((x) => x.rule === 'X2');
-  assert.match(b.message, /nome acessível/);
-  assert.match(b.suggestion, /texto "Remover da lista"/);
+  assert.match(b.message, /accessible name/);
+  assert.match(b.suggestion, /text "Remover da lista"/);
   const iconBtn = '<button class="MuiIconButton-root" aria-label="Remover da lista — Ana Souza"><svg></svg></button>';
-  assert.deepEqual(rules(iconBtn), ['X1'], 'botão só com ícone: o nome no aria-label está certo; só o travessão é achado');
+  assert.deepEqual(rules(iconBtn), ['X1'], 'icon-only button: the name in the aria-label is right; only the dash is a finding');
   assert.ok(!has('<h2>Pedidos de 2024 – 2026</h2>', 'X2'));
-  assert.ok(!has('<p class="MuiTypography-caption">Prazo · 3 dias</p>', 'X2'), 'texto de apoio não entra no X2');
+  assert.ok(!has('<p class="MuiTypography-caption">Prazo · 3 dias</p>', 'X2'), 'helper text is not checked by X2');
 });
 
 test('X3: helper text that only repeats the title, or opens repeating it', () => {
@@ -89,7 +89,7 @@ test('X3: helper text that only repeats the title, or opens repeating it', () =>
   const a = findingsOf('<h2>Endereço de entrega</h2><p>Endereço de entrega deste fornecedor. Só o aprovador altera.</p>').find((x) => x.rule === 'X3');
   assert.equal(a.suggestion, 'Só o aprovador altera.');
   assert.ok(!has('<h2>Campos comuns</h2><p>Preenchidos uma vez e valem para todos os pedidos do lote.</p>', 'X3'));
-  assert.ok(!has('<h2>Preenchimento</h2><p>2 campos por preencher</p>', 'X3'), 'contagem é informação');
+  assert.ok(!has('<h2>Preenchimento</h2><p>2 campos por preencher</p>', 'X3'), 'a count is information');
 });
 
 test('X4: empty opening', () => {
@@ -115,18 +115,18 @@ test('X6: long button, without object or without verb', () => {
   assert.ok(has(btn('Confirmar'), 'X6'));
   assert.ok(has(btn('Novo item'), 'X6'));
   assert.ok(!has(btn('Salvar proposta'), 'X6'));
-  assert.ok(!has(btn('Metalúrgica Serra Azul Ltda.', 'text'), 'X6'), 'nome de empresa é valor, não ação');
-  assert.ok(!has(btn('Novo item'), 'X6', configFrom({ content: { buttons: 'free' } })), 'sem a política verbo-objeto, só a lista');
+  assert.ok(!has(btn('Metalúrgica Serra Azul Ltda.', 'text'), 'X6'), 'a company name is a value, not an action');
+  assert.ok(!has(btn('Novo item'), 'X6', configFrom({ content: { buttons: 'free' } })), 'without the verb-object policy, only the list applies');
   assert.ok(has(btn('OK'), 'X6', configFrom({ content: { buttons: 'free' } })));
 });
 
 test('X7: tooltip/aria-label repeating the text; long hint on a control', () => {
   assert.ok(has(btn('Salvar proposta', 'contained', ' aria-label="Salvar proposta"'), 'X7'));
   assert.ok(has(btn('Salvar proposta', 'contained', ' title="Salvar proposta"'), 'X7'));
-  assert.ok(!has('<span class="MuiTypography-noWrap" title="pedido-fornecimento.pdf">pedido-fornecimento.pdf</span>', 'X7'), 'texto truncado: a dica é o texto inteiro');
+  assert.ok(!has('<span class="MuiTypography-noWrap" title="pedido-fornecimento.pdf">pedido-fornecimento.pdf</span>', 'X7'), 'truncated text: the hint is the full text');
   const longText = 'Refaz a leitura dos dados das páginas que ainda faltam e mantém o que você já confirmou antes';
   assert.ok(has(btn('Reprocessar', 'text', ` title="${longText}"`), 'X7'));
-  assert.ok(!has(`<span title="${longText}">i</span>`, 'X7'), 'fora de controle não conta');
+  assert.ok(!has(`<span title="${longText}">i</span>`, 'X7'), 'outside a control it does not count');
 });
 
 test('X8: placeholder repeating the label', () => {
@@ -187,12 +187,12 @@ test('source: comments ignored, exact literal, template and interpolated data', 
   const r2 = sourceOf(index, 'Aprovado fora da plataforma — sem registro', '—');
   assert.deepEqual([r2.location, r2.occurrences[0].file, r2.occurrences[0].line], ['code', 'src/vocab.py', 1]);
   const r3 = sourceOf(index, 'Abrir 1ª Nota Fiscal — Frete no editor', '—');
-  assert.equal(r3.location, 'data', 'o travessão veio do nome interpolado');
+  assert.equal(r3.location, 'data', 'the dash came from the interpolated name');
   assert.equal(r3.occurrences[0].line, 5);
   const r4 = sourceOf(index, 'Pedidos e Fornecedores', 'Fornecedores');
   assert.deepEqual([r4.location, r4.occurrences[0].line], ['code', 6]);
   const r5 = sourceOf(index, '1ª Nota Fiscal — Frete', '—');
-  assert.equal(r5.location, 'data', 'só em fixture de teste');
+  assert.equal(r5.location, 'data', 'only in a test fixture');
   assert.equal(sourceOf(index, 'Texto que não existe em lugar nenhum', null), null);
 });
 
@@ -206,7 +206,7 @@ test('group: same text on several screens = one finding; template with data beco
   assert.equal(x1[0].variants.length, 2);
   assert.deepEqual(x1[0].screens, ['t1.html', 't2.html']);
   const x10 = groups.find((g) => g.rule === 'X10');
-  assert.ok(x10.probable_data, '"Ana Souza" veio do dado');
+  assert.ok(x10.probable_data, '"Ana Souza" came from data');
   assert.equal(x10.severity, 0);
   const plain = group(res);
   assert.ok(plain.every((g) => !g.probable_data && !g.source));
@@ -216,7 +216,7 @@ test('CLI: args with several folders, --ignore, --json with inventory and source
   assert.deepEqual(parseTextArgs(['--screens', 'a', 'b', '--code', 'c', 'd', '--ux', 'U.md', '--json']), { screens: ['a', 'b'], code: ['c', 'd'], ignore: [], ux: 'U.md', module: null, json: true });
   const warned = [];
   assert.deepEqual(parseTextArgs(['--telas', 'a', '--codigo', 'c'], (m) => warned.push(m)), { screens: ['a'], code: ['c'], ignore: [], ux: null, module: null, json: false });
-  assert.ok(warned.some((w) => /--telas é nome antigo, use --screens/.test(w)) && warned.length === 2);
+  assert.ok(warned.some((w) => /--telas.*--screens/.test(w)) && warned.length === 2);
   const dir = mkdtempSync(join(tmpdir(), 'texto-'));
   try {
     mkdirSync(join(dir, 'screens'));
@@ -239,4 +239,38 @@ test('CLI: args with several folders, --ignore, --json with inventory and source
 test('inventory: title wrapping a button (disclosure) counts once, as title, without the status chip', () => {
   const inv = takeInventory(page('<h3 class="MuiTypography-root"><button class="MuiButtonBase-root"><svg></svg><span class="MuiBox-root">Condição de pagamento</span><span class="MuiChip-root"><span class="MuiChip-label">Preenchidos</span></span></button></h3>'));
   assert.deepEqual(inv.map((i) => [i.type, i.text]), [['title', 'Condição de pagamento']]);
+});
+
+test('language pack: content.language en judges English product text', () => {
+  const en = configFrom({ content: { language: 'en' } });
+  // X4: English empty openings; the pt-BR pack does not see them.
+  assert.ok(has('<p class="MuiTypography-caption">Here you can see your orders.</p>', 'X4', en));
+  assert.ok(has('<p class="MuiTypography-caption">On this page you review proposals.</p>', 'X4', en));
+  assert.ok(!has('<p class="MuiTypography-caption">Here you can see your orders.</p>', 'X4'));
+  // X6: bare confirmation and verb-object with the English verb list.
+  assert.ok(has(btn('OK'), 'X6', en));
+  assert.ok(has(btn('Submit'), 'X6', en));
+  assert.ok(has(btn('New item'), 'X6', en), '"New" is not a verb');
+  assert.ok(!has(btn('Save proposal'), 'X6', en));
+  assert.ok(!has(btn('Acme Supplies Inc.', 'text'), 'X6', en), 'a company name is a value, not an action');
+  // X10: Title Case, minor words ignored.
+  assert.ok(has('<h1>Orders and Suppliers</h1>', 'X10', en));
+  assert.ok(has(btn('Create New Order'), 'X10', en));
+  assert.ok(!has('<h1>Orders and suppliers</h1>', 'X10', en));
+  // X9 optional marker, X1b suggestion and X11 OCR explanation in English.
+  assert.ok(!has('<label>Phone (optional)</label>', 'X9', en));
+  assert.ok(has('<label>Unit price (this order only)</label>', 'X9', en));
+  const x1b = findingsOf('<table><tr><td>—</td></tr></table>', en).find((x) => x.rule === 'X1b');
+  assert.match(x1b.suggestion, /Not provided/);
+  assert.ok(!has('<p class="MuiTypography-caption">OCR (text recognition) of the pages</p>', 'X11', en));
+  // X1: dashes are flagged in English too.
+  assert.ok(has('<p class="MuiTypography-caption">Approved outside — no record</p>', 'X1', en));
+});
+
+test('language pack: pt-BR stays the default and accepts tag variants', () => {
+  assert.ok(has('<p class="MuiTypography-caption">Aqui você pode ver os pedidos.</p>', 'X4'));
+  for (const language of ['pt-BR', 'pt', 'pt_br']) {
+    assert.ok(has('<p class="MuiTypography-caption">Aqui você pode ver os pedidos.</p>', 'X4', configFrom({ content: { language } })), language);
+  }
+  assert.ok(has(btn('Novo item'), 'X6', configFrom({ content: { language: 'en-US' } })), 'en-US resolves to en: "Novo" is not an English verb');
 });

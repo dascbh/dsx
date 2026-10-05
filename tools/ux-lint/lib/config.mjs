@@ -1,6 +1,7 @@
-// Configuração do ux-lint: lê o front matter de um UX.md e completa com os padrões do contrato
-// (knowledge/fundamentos/ux-md.md, "Schema do front matter"). Omitido = vale o padrão do DSX.
-// Front matter com nomes antigos em português é aceito (lib/legacy.mjs): convertido, com aviso.
+// ux-lint configuration: reads the front matter of a UX.md and fills it in with the contract defaults
+// (knowledge/foundations/ux-md.md, "Front matter schema"). Omitted = the DSX default applies.
+// A front matter with old Portuguese names is accepted (lib/legacy.mjs): converted, with a warning.
+// `content.language` is left as declared (omitted = pt-BR, resolved by lib/lang/index.mjs).
 import { readFileSync } from 'node:fs';
 import { parseYaml, splitFrontMatter } from '../../lib/yaml-lite.mjs';
 import { normalizeUxFrontMatter } from './legacy.mjs';
@@ -41,8 +42,8 @@ function merge(base, over) {
 }
 
 /**
- * Front matter (objeto) → configuração completa. Nomes antigos viram os novos; os avisos ficam em
- * `legacyWarnings` (propriedade não enumerável, para não entrar em comparações nem no JSON).
+ * Front matter (object) → full configuration. Old names become the new ones; the warnings go in
+ * `legacyWarnings` (non-enumerable property, so it stays out of comparisons and JSON).
  */
 export function configFrom(frontMatter = {}) {
   const { frontMatter: fm, warnings } = normalizeUxFrontMatter(frontMatter || {});
@@ -51,7 +52,7 @@ export function configFrom(frontMatter = {}) {
   const kit = kitProfile(cfg.verification.kit);
   if (!s.primary) s.primary = kit.primary;
   if (!s.destructive) s.destructive = kit.destructive;
-  // Seletores aceitam string única ou lista; normaliza para string (lista com vírgula).
+  // Selectors accept a single string or a list; normalized to a string (comma-separated list).
   for (const k of Object.keys(s)) if (Array.isArray(s[k]) && k !== 'regions') s[k] = s[k].join(', ');
   if (typeof s.regions === 'string') s.regions = s.regions.split(',').map((x) => x.trim()).filter(Boolean);
   if (!Array.isArray(cfg.content.forbidden)) cfg.content.forbidden = [cfg.content.forbidden].filter(Boolean);
@@ -61,12 +62,12 @@ export function configFrom(frontMatter = {}) {
   return cfg;
 }
 
-/** Lê um UX.md (ou nada) e devolve a configuração. Avisos de nome antigo vão para stderr. */
+/** Reads a UX.md (or nothing) and returns the configuration. Old-name warnings go to stderr. */
 export function loadConfig(uxPath) {
   if (!uxPath) return configFrom({});
   const { frontMatter } = splitFrontMatter(readFileSync(uxPath, 'utf8'));
-  if (!frontMatter) throw new Error(`${uxPath}: sem front matter (--- ... ---)`);
+  if (!frontMatter) throw new Error(`${uxPath}: no front matter (--- ... ---)`);
   const cfg = configFrom(parseYaml(frontMatter));
-  for (const w of cfg.legacyWarnings) console.error(`AVISO ${uxPath}: ${w}`);
+  for (const w of cfg.legacyWarnings) console.error(`WARNING ${uxPath}: ${w}`);
   return cfg;
 }

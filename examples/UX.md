@@ -49,6 +49,7 @@ content:
   glossary: inline                # table in "Content & Microcopy"; per module: { default: <file>, <module>: <file> }
   buttons: verb-object
   forbidden: [tenant, payload, job, status_code, null, ERP_ID]
+  language: en                    # language of the product text the text detectors judge (pt-BR | en; omitted = pt-BR)
 flows:
   max-journey-steps: 10
   max-stacked-dialogs: 1
@@ -87,7 +88,7 @@ deviations:
 
 # Purchasing — UX
 
-Fictional product, used as the reference example of the format. The decisions below came from the code (maps in `.dsx/maps/`), from 6 interviews with buyers and from the first-half support log; whatever was deduced without direct evidence is marked "(inferred)". On conflict, the more restrictive behavior wins (confirmation, visible way back) until the next review. The product's interface text is in English; a product in another language writes its labels in that language and keeps this structure.
+Fictional product, used as the reference example of the format. The decisions below came from the code (maps in `.dsx/maps/`), from 6 interviews with buyers and from the first-half support log; whatever was deduced without direct evidence is marked "(inferred)". On conflict, the more restrictive behavior wins (confirmation, visible way back) until the next review. The product's interface text is in English (`content.language: en`); a product in another language writes its labels in that language, declares it in `content.language` and keeps this structure.
 
 ## Overview
 

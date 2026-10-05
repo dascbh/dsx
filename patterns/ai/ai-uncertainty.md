@@ -1,6 +1,6 @@
 ---
 id: ai-uncertainty
-title: Como comunicar limites e incerteza de respostas de IA?
+title: How do you communicate the limits and uncertainty of AI responses?
 category: ai
 components: [notice, label, confidence-indicator]
 type: contextual-decision
@@ -11,92 +11,92 @@ wcag: ["1.4.1", "4.1.3", "2.2.1", "3.1.5"]
 related: [label-ai-content, ai-sources, review-ai-output, confirm-ai-action, ai-error-recovery]
 ---
 
-# Como comunicar limites e incerteza de respostas de IA?
+# How do you communicate the limits and uncertainty of AI responses?
 
-> **Regra:** Comunique a incerteza perto do resultado, com linguagem proporcional ao desempenho real e ligada a uma ação concreta (conferir, comparar, ver fontes, pedir revisão); mostre número de confiança só se for válido e compreensível.
+> **Rule:** Communicate uncertainty close to the result, in language proportional to actual performance and tied to a concrete action (check, compare, view sources, request review); show a confidence number only if it is valid and understandable.
 
-## Contexto
+## Context
 
-Modelos de IA não são igualmente confiáveis em todas as tarefas; o resultado varia com dados, contexto e formulação. Uma resposta fluente parece mais certa do que é, e a pessoa pode tratá-la como fato.
+AI models are not equally reliable across tasks; results vary with data, context and phrasing. A fluent response seems more certain than it is, and the person may treat it as fact.
 
-Limites explícitos evitam confiança excessiva e também rejeição indiscriminada de uma ferramenta útil nas tarefas certas. A comunicação deve ser calibrada ao risco, sem exigir percentual em toda resposta.
+Explicit limits prevent overreliance and also blanket rejection of a tool that is useful for the right tasks. Communication should be calibrated to risk, without requiring a percentage on every response.
 
-Um estudo de CHI mostrou que complexidade da tarefa e incerteza alteram a dependência da IA; por isso teste a comunicação no contexto real, sobretudo quando o impacto é alto.
+A CHI study showed that task complexity and uncertainty change reliance on AI; test the communication in the real context, especially when the impact is high.
 
-## Decisão
+## Decision
 
-- **SE** o desempenho varia ou a tarefa é ambígua, nova ou com dados incompletos **ENTÃO** mostre o limite junto à resposta.
-- **SE** a saída pode afetar saúde, dinheiro, direitos, segurança ou algo difícil de reverter **ENTÃO** reforce o aviso e encaminhe para revisão humana, fontes ou confirmação.
-- **SE** a evidência não sustenta certeza **ENTÃO** use "pode", "talvez" ou "provavelmente" e evite "isso está correto".
-- **SE** existe mais de uma interpretação plausível **ENTÃO** mostre alternativas ou cenários.
-- **SE** usa indicador de confiança **ENTÃO** explique o significado, o cálculo e o limiar que muda a conduta; **SENÃO** prefira categorias simples.
-- **SE** a diferença numérica não muda a decisão **ENTÃO** não mostre falsa precisão (ex.: 87,3%).
-- **SE** a qualidade é menor para idioma, dado ou tarefa específica **ENTÃO** avise.
-- **SE** o impacto é baixo **ENTÃO** use aviso discreto; não aplique o mesmo alerta em todas as respostas.
-- **SENÃO** mantenha um aviso curto e fixo, mas nunca como substituto de fontes ou revisão.
+- **IF** performance varies or the task is ambiguous, new or based on incomplete data **THEN** show the limit next to the response.
+- **IF** the output can affect health, money, rights, safety or something hard to reverse **THEN** strengthen the notice and route to human review, sources or confirmation.
+- **IF** the evidence does not support certainty **THEN** use "may", "perhaps" or "probably" and avoid "this is correct".
+- **IF** there is more than one plausible interpretation **THEN** show alternatives or scenarios.
+- **IF** you use a confidence indicator **THEN** explain its meaning, how it is calculated and the threshold that changes what to do; **ELSE** prefer simple categories.
+- **IF** the numeric difference does not change the decision **THEN** do not show false precision (e.g. 87.3%).
+- **IF** quality is lower for a specific language, data set or task **THEN** say so.
+- **IF** the impact is low **THEN** use a discreet notice; do not apply the same warning to every response.
+- **ELSE** keep a short, fixed notice, but never as a substitute for sources or review.
 
-## Quando usar
+## When to use
 
-- Respostas, recomendações e classificações de desempenho variável.
-- Predições com cenários plausíveis.
-- Conteúdo que será enviado, publicado ou usado para agir.
+- Responses, recommendations and classifications with variable performance.
+- Predictions with plausible scenarios.
+- Content that will be sent, published or acted on.
 
-## Quando evitar
+## When to avoid
 
-- Percentual sem explicação ou calibração → **use em vez disso:** categoria com texto.
-- Disclaimer genérico no lugar de fontes ou revisão → **use em vez disso:** ação concreta de verificação.
-- Alerta idêntico para baixo e alto impacto → **use em vez disso:** graduar pelo risco.
-- Aviso distante do resultado → **use em vez disso:** junto da saída.
+- A percentage without explanation or calibration → **use instead:** a category with text.
+- A generic disclaimer in place of sources or review → **use instead:** a concrete verification action.
+- The same warning for low and high impact → **use instead:** grade it by risk.
+- A notice far from the result → **use instead:** next to the output.
 
-## Faça
+## Do
 
-- Diga qual parte precisa de verificação.
-- Ofereça fontes, correção ou revisão humana.
-- Mantenha o aviso visível até ser compreendido.
-- Teste a compreensão com quem decide.
+- Say which part needs checking.
+- Offer sources, correction or human review.
+- Keep the notice visible until it is understood.
+- Test comprehension with the people who decide.
 
-## Evite
+## Avoid
 
-- Afirmar que a IA "sabe" sem base.
-- Usar só cor, ícone ou posição para sinalizar incerteza.
-- Números sem unidade, referência ou limiar.
-- Transferir toda a responsabilidade ao usuário com um disclaimer.
-- Remover a possibilidade de seguir com segurança.
+- Claiming the AI "knows" without basis.
+- Using color, icon or position alone to signal uncertainty.
+- Numbers without unit, reference or threshold.
+- Shifting all responsibility to the user with a disclaimer.
+- Removing the possibility of proceeding safely.
 
-## Acessibilidade
+## Accessibility
 
-- Limitação em texto, não só cor, ícone, som ou animação (WCAG 1.4.1).
-- Linguagem simples; nomes acessíveis para indicadores e ações de verificação (WCAG 3.1.5 como referência de leitura).
-- Foco visível e teclado em alertas, fontes e caminhos de recurso.
-- Não faça o aviso sumir antes de ser lido (WCAG 2.2.1).
-- Anuncie atualizações do resultado sem mover o foco (WCAG 4.1.3).
-- Explique unidades e limiares para leitores de tela.
+- The limitation in text, not color, icon, sound or animation alone (WCAG 1.4.1).
+- Plain language; accessible names for indicators and verification actions (WCAG 3.1.5 as a reading reference).
+- Visible focus and keyboard support on alerts, sources and recourse paths.
+- Do not let the notice disappear before it is read (WCAG 2.2.1).
+- Announce result updates without moving focus (WCAG 4.1.3).
+- Explain units and thresholds for screen readers.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Aviso geral | "Esta resposta pode conter erros. Confira antes de usar." |
-| Alto impacto | "Não use como orientação médica. Consulte um profissional." |
-| Alternativas | "Há duas interpretações possíveis. Qual você quis dizer?" |
-| Ação | "Ver fontes" / "Pedir revisão" |
+| General notice | "This response may contain errors. Check it before using it." |
+| High impact | "Do not use this as medical advice. Consult a professional." |
+| Alternatives | "There are two possible interpretations. Which one did you mean?" |
+| Action | "View sources" / "Request review" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A interface esclarece o que a IA faz e em que ponto pode errar?
-- [ ] A linguagem corresponde ao desempenho real?
-- [ ] O aviso fica perto do resultado relevante?
-- [ ] O aviso leva a uma ação (conferir, comparar, revisar)?
-- [ ] Indicadores numéricos têm significado e limiar explicados?
-- [ ] O tratamento varia com impacto e reversibilidade?
-- [ ] Nada depende só de cor ou ícone?
-- [ ] Os controles funcionam por teclado e leitor de tela?
+- [ ] Does the interface make clear what the AI does and where it can be wrong?
+- [ ] Does the language match actual performance?
+- [ ] Is the notice close to the relevant result?
+- [ ] Does the notice lead to an action (check, compare, review)?
+- [ ] Do numeric indicators have their meaning and threshold explained?
+- [ ] Does the treatment vary with impact and reversibility?
+- [ ] Does nothing depend on color or icon alone?
+- [ ] Do the controls work with keyboard and screen reader?
 
-## Fundamentação
+## Rationale
 
-- Microsoft HAX Toolkit (diretrizes 2 e padrão 2A): comunicar desempenho e erros possíveis; ajustar precisão da linguagem.
-- Google People + AI Guidebook: modelos mentais, calibração da confiança, comunicação de confiança.
-- Amershi et al. (2019, CHI): 18 diretrizes de interação humano-IA.
-- Salimzadeh, He e Gadiraju (2024, CHI): efeito da incerteza e do tipo de tarefa na dependência.
-- Buçinca et al. (2021, CHI): reduzir dependência automática estimulando análise.
-- Documentação pública de fornecedores de IA: respostas podem estar incorretas e exigem avaliação crítica.
+- Microsoft HAX Toolkit (guideline 2 and pattern 2A): communicate performance and possible errors; tune the precision of the language.
+- Google People + AI Guidebook: mental models, trust calibration, communicating confidence.
+- Amershi et al. (2019, CHI): 18 guidelines for human-AI interaction.
+- Salimzadeh, He and Gadiraju (2024, CHI): the effect of uncertainty and task type on reliance.
+- Buçinca et al. (2021, CHI): reducing automatic reliance by prompting analysis.
+- Public documentation from AI vendors: responses may be incorrect and require critical evaluation.

@@ -1,44 +1,26 @@
-# Fundamentos de UX/UI
+# fundamentos (moved)
 
-> **Quando consultar**
-> - Antes de projetar, construir ou revisar qualquer tela, fluxo ou texto de interface.
-> - Para escolher qual arquivo carregar: leia a tabela abaixo e carregue só o que a tarefa pede.
-> - Os fundamentos dão o **porquê** e as regras gerais; os pattern cards em `../../patterns/` dão a solução concreta para cada situação recorrente.
+This folder was renamed to [foundations/](../foundations/README.md) when the DSX knowledge base moved to English (see "Round 4 — English" in docs/renames-2026-10.md). Old paths are kept here only so references from existing projects can be resolved.
 
-## Arquivos
+| Old path | New path |
+|---|---|
+| knowledge/fundamentos/README.md | [knowledge/foundations/README.md](../foundations/README.md) |
+| knowledge/fundamentos/achados-de-ux.md | [knowledge/foundations/ux-findings.md](../foundations/ux-findings.md) |
+| knowledge/fundamentos/arquitetura-da-informacao.md | [knowledge/foundations/information-architecture.md](../foundations/information-architecture.md) |
+| knowledge/fundamentos/avaliacao-de-usabilidade.md | [knowledge/foundations/usability-evaluation.md](../foundations/usability-evaluation.md) |
+| knowledge/fundamentos/dark-patterns.md | [knowledge/foundations/dark-patterns.md](../foundations/dark-patterns.md) |
+| knowledge/fundamentos/dimensoes-de-ux.md | [knowledge/foundations/ux-dimensions.md](../foundations/ux-dimensions.md) |
+| knowledge/fundamentos/elementos-comparados.md | [knowledge/foundations/compared-elements.md](../foundations/compared-elements.md) |
+| knowledge/fundamentos/fontes-de-ux.md | [knowledge/foundations/ux-sources.md](../foundations/ux-sources.md) |
+| knowledge/fundamentos/formularios.md | [knowledge/foundations/forms.md](../foundations/forms.md) |
+| knowledge/fundamentos/heuristicas-nielsen.md | [knowledge/foundations/nielsen-heuristics.md](../foundations/nielsen-heuristics.md) |
+| knowledge/fundamentos/hierarquia-visual.md | [knowledge/foundations/visual-hierarchy.md](../foundations/visual-hierarchy.md) |
+| knowledge/fundamentos/interacao-e-feedback.md | [knowledge/foundations/interaction-and-feedback.md](../foundations/interaction-and-feedback.md) |
+| knowledge/fundamentos/marcas-de-texto-gerado.md | [knowledge/foundations/generated-text-marks.md](../foundations/generated-text-marks.md) |
+| knowledge/fundamentos/psicologia-e-leis.md | [knowledge/foundations/psychology-and-laws.md](../foundations/psychology-and-laws.md) |
+| knowledge/fundamentos/tendencias.md | [knowledge/foundations/trends.md](../foundations/trends.md) |
+| knowledge/fundamentos/ux-md.md | [knowledge/foundations/ux-md.md](../foundations/ux-md.md) |
+| knowledge/fundamentos/ux-writing.md | [knowledge/foundations/ux-writing.md](../foundations/ux-writing.md) |
+| knowledge/fundamentos/variacoes-de-ux.md | [knowledge/foundations/ux-variations.md](../foundations/ux-variations.md) |
 
-| Arquivo | Conteúdo | Carregue quando |
-|---|---|---|
-| [heuristicas-nielsen.md](heuristicas-nielsen.md) | As 10 heurísticas com sinais de violação, perguntas de auditoria e correções; escala de severidade 0–4 | For revisar qualquer interface ou classificar a gravidade de um achado |
-| [avaliacao-de-usabilidade.md](avaliacao-de-usabilidade.md) | Processo de avaliação heurística, cognitive walkthrough (4 perguntas), inspeção vs. teste, modelo de relatório | For conduzir uma revisão formal, simular um iniciante ou escrever relatório de achados |
-| [psicologia-e-leis.md](psicologia-e-leis.md) | Carga cognitiva, Fitts, Hick, Gestalt, affordance e signifiers, modelos mentais, vieses (enquadramento, confirmação, kill your darlings) | Decidir quantidade de opções, tamanho e posição de alvos, agrupamentos, ou justificar por que algo confunde |
-| [hierarquia-visual.md](hierarquia-visual.md) | Alavancas de hierarquia, regras numéricas (tipo, espaço, contraste), padrões de varredura, densidade, teste do borrão | Montar layout, definir escala tipográfica/espaçamento, ou quando "tudo parece igual" |
-| [interacao-e-feedback.md](interacao-e-feedback.md) | Especificação de interação, limiares 0,1/1/10 s, feedback, microinterações e durações, estados vazios, onboarding | Especificar comportamento de controles, carregamentos, animações, vazios ou primeiro uso |
-| [ux-writing.md](ux-writing.md) | Princípios, fórmulas (botão, erro, vazio, confirmação, sucesso), tom de voz em 4 dimensões, estilo pt-BR, glossário | Escrever ou revisar qualquer texto visível |
-| [marcas-de-texto-gerado.md](marcas-de-texto-gerado.md) | Marcas que fazem o texto parecer gerado por IA ou burocrático (travessão, título composto, descrição que repete o título, abertura vazia, caixa de título, termo técnico…), com antes/depois e as regras X1–X11 de `tools/ux-lint/text.mjs` | Revisar texto escrito por agente, ler o relatório do `text.mjs` ou explicar por que uma tela "parece feita por IA" |
-| [achados-de-ux.md](achados-de-ux.md) | Contrato do registro de achados de UX (`.dsx/findings/<module>/`): id estável, `findings.json`/`options.json`/`decisions.json`, status calculado (open, decided, ignored, fixed, regression) e trava contra piora | Depois de rodar `text.mjs`/`screen.mjs`/`flow.mjs`; para saber o que está aberto, decidido, corrigido ou voltou; ao ligar `findings.mjs check` no CI |
-| [variacoes-de-ux.md](variacoes-de-ux.md) | Variações de tela e fluxo: eixos (estrutura, divisão do fluxo, modelo de interação, densidade e texto, momento da validação, confirmação × desfazer, primeiro × segundo plano), como gerar alternativas genuínas, hipótese e trade-off, armadilhas | Repensar uma tela ou um fluxo (skill `repensar-ux`); avaliar se alternativas são diferentes de verdade |
-| [dimensoes-de-ux.md](dimensoes-de-ux.md) | As 14 dimensões da auditoria de UX (texto, ações, layout, hierarquia, AI, navegação, fluxos, formulários, estados, consistência, acessibilidade, heurísticas, leis cognitivas, dark patterns): pergunta, regras, como é verificada, lacunas; lacunas vindas de outras fontes | Ao rodar `tools/ux-lint/audit.mjs` ou a skill `auditar-ux`; para saber o que a máquina mede e o que é julgamento |
-| [formularios.md](formularios.md) | Estrutura, ordem, rótulos, tipos de campo, teclados móveis e autocomplete, validação, erros, etapas, envio | Criar ou revisar qualquer formulário |
-| [arquitetura-da-informacao.md](arquitetura-da-informacao.md) | Sistemas de AI, onde algo deve morar, navegação, rotulagem, findability e busca, user flow, fidelidade de wireframe/protótipo | Decidir estrutura, navegação e nomes; desenhar fluxo; escolher fidelidade |
-| [dark-patterns.md](dark-patterns.md) | Catálogo (nome, reconhecimento, dano, alternativa) e linhas vermelhas que o agente deve recusar | Qualquer fluxo de compra, assinatura, cancelamento, consentimento ou pedido para "aumentar conversão" |
-| [ux-md.md](ux-md.md) | Contrato do `UX.md`: schema do front matter, 13 seções, arquétipos de tela e regras de verificação T1–T7/F1–F5 | Criar, extrair ou avaliar o `UX.md`; antes de construir ou rearranjar tela num projeto que o tem |
-| [fontes-de-ux.md](fontes-de-ux.md) | Fontes externas de UX (CamaraUX, GOV.UK, Carbon, Material, NN/g, leis de UX…), o que cada uma oferece e como usar sem copiar | Buscar ideias ou lacunas para padrões e arquétipos; antes de citar ou trazer conteúdo de fora |
-| [tendencias.md](tendencias.md) | Sinais e hipóteses para 2027 (IA agêntica, interfaces generativas, confiança) | Discussões de direção; produtos com IA. Nunca como fonte de regra |
-
-## Ordem sugerida por tipo de tarefa
-
-- **Revisar uma tela:** heuristicas-nielsen → hierarquia-visual → ux-writing → (formularios, se houver) → dark-patterns.
-- **Projetar uma feature nova:** arquitetura-da-informacao (fluxo e lugar) → psicologia-e-leis → hierarquia-visual → interacao-e-feedback → ux-writing.
-- **Auditoria formal com relatório:** avaliacao-de-usabilidade + heuristicas-nielsen.
-- **Projetar/rearranjar tela:** ux-md (arquétipo e políticas do `UX.md` do projeto) → hierarquia-visual → interacao-e-feedback → formularios (se houver) → ux-writing; skill `arranjar-tela`.
-- **Repensar tela ou fluxo (variações):** variacoes-de-ux → psicologia-e-leis → arquitetura-da-informacao → interacao-e-feedback → ux-writing; skill `repensar-ux`.
-- **Texto apenas:** ux-writing → marcas-de-texto-gerado (com o relatório de `tools/ux-lint/text.mjs`).
-- **Monetização, consentimento, retenção:** dark-patterns primeiro.
-
-## Convenções destes arquivos
-
-- Cada arquivo abre com "Quando consultar" e fecha com "Checklist de auditoria".
-- Regras são imperativas; decisões aparecem como **SE → ENTÃO**; números são limiares práticos, não leis.
-- Severidade sempre na escala 0–4 de [heuristicas-nielsen.md](heuristicas-nielsen.md).
-- Acessibilidade aparece integrada, mas conformidade WCAG exige auditoria específica.
+Update references in your project to the new paths.

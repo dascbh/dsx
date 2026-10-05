@@ -1,6 +1,6 @@
 ---
 id: review-ai-output
-title: Como deixar pessoas revisarem e editarem resultados gerados por IA?
+title: How do you let people review and edit AI-generated results?
 category: ai
 components: [text-field, editor, ai-suggestion, button]
 type: contextual-decision
@@ -11,97 +11,97 @@ wcag: ["2.1.1", "2.4.7", "4.1.3", "1.4.1", "2.4.3"]
 related: [confirm-ai-action, label-ai-content, ai-uncertainty, ai-error-recovery]
 ---
 
-# Como deixar pessoas revisarem e editarem resultados gerados por IA?
+# How do you let people review and edit AI-generated results?
 
-> **Regra:** Apresente todo resultado de IA como proposta que a pessoa pode aceitar, editar, refinar, regenerar ou descartar antes que ele afete uma decisão, comunicação ou fluxo.
+> **Rule:** Present every AI result as a proposal the person can accept, edit, refine, regenerate or discard before it affects a decision, communication or flow.
 
-## Contexto
+## Context
 
-A IA pode escrever e-mails, sintetizar documentos, preencher campos, classificar registros ou sugerir respostas. Antes que esse resultado guie uma decisão, seja enviado, publicado ou tome o lugar de um conteúdo existente, a pessoa precisa avaliá-lo e, se for o caso, alterá-lo.
+AI can write emails, summarize documents, fill in fields, classify records or suggest replies. Before that result guides a decision, is sent, is published or replaces existing content, the person needs to assess it and, if needed, change it.
 
-Os resultados podem vir incompletos, entender mal o contexto ou repetir uma decisão imprópria. Poder corrigir mantém a pessoa como responsável e impede que uma sugestão probabilística pareça definitiva.
+Results may be incomplete, misread the context or repeat an inappropriate decision. Being able to correct keeps the person accountable and stops a probabilistic suggestion from looking final.
 
-Esta regra cobre o resultado entregue para uso. Ela não dispensa a confirmação antes de uma ação externa: revisar um rascunho é diferente de autorizar envio, publicação ou mudança de dados. O grau de controle deve acompanhar o risco, a reversibilidade e a confiança exigida.
+This rule covers the result delivered for use. It does not replace confirmation before an external action: reviewing a draft is different from authorizing a send, publication or data change. The degree of control should follow risk, reversibility and the confidence required.
 
-## Decisão
+## Decision
 
-- **SE** a IA produz rascunho, resumo, extração, classificação ou preenchimento que será aproveitado **ENTÃO** apresente como proposta, com aceitar, editar, refinar, regenerar e descartar conforme o contexto.
-- **SE** o resultado é longo ou estruturado **ENTÃO** permita correção local, sem regenerar tudo.
-- **SE** a sugestão substitui conteúdo existente **ENTÃO** mostre o escopo da mudança e preserve a versão anterior ou um "Desfazer".
-- **SE** a pessoa precisa comparar com o original **ENTÃO** exiba a diferença sem depender só de cor.
-- **SE** o uso posterior tem efeito externo, financeiro, destrutivo ou de permissões **ENTÃO** conecte a revisão a uma confirmação própria antes de executar.
-- **SE** a sugestão é local, reversível e de baixo risco, e a pessoa já a controla **ENTÃO** não exija revisão obrigatória.
-- **SENÃO** trate o resultado como proposta até aceite explícito.
+- **IF** the AI produces a draft, summary, extraction, classification or fill-in that will be used **THEN** present it as a proposal, with accept, edit, refine, regenerate and discard as the context requires.
+- **IF** the result is long or structured **THEN** allow local correction without regenerating everything.
+- **IF** the suggestion replaces existing content **THEN** show the scope of the change and keep the previous version or an "Undo".
+- **IF** the person needs to compare with the original **THEN** show the difference without relying on color alone.
+- **IF** later use has an external, financial, destructive or permission effect **THEN** connect the review to its own confirmation before executing.
+- **IF** the suggestion is local, reversible and low-risk, and the person already controls it **THEN** do not require mandatory review.
+- **ELSE** treat the result as a proposal until explicitly accepted.
 
-## Quando usar
+## When to use
 
-- Rascunhos de texto, e-mails, respostas e documentos.
-- Resumo, extração, classificação ou preenchimento de campos a validar.
-- Recomendações que orientam decisão de produto, atendimento ou operação.
-- Conteúdo que poderá ser publicado, enviado ou compartilhado.
-- Alterações propostas para conteúdo existente.
+- Drafts of text, emails, replies and documents.
+- Summaries, extractions, classifications or field fill-ins to be validated.
+- Recommendations that guide product, support or operations decisions.
+- Content that may be published, sent or shared.
+- Proposed changes to existing content.
 
-## Quando evitar
+## When to avoid
 
-- Revisão obrigatória em sugestão local, reversível e de baixo risco → **use em vez disso:** aplicar com "Desfazer".
-- Edição como substituta de confirmação em ação externa → **use em vez disso:** confirmação própria da ação.
-- Correção escondida em menu genérico → **use em vez disso:** controles visíveis junto ao resultado.
-- Obrigar a refazer o pedido inteiro → **use em vez disso:** refino e edição local.
-- Resposta final sem possibilidade de editar, recusar ou recuperar → **use em vez disso:** proposta editável.
+- Mandatory review of a local, reversible, low-risk suggestion → **use instead:** apply it with "Undo".
+- Editing as a substitute for confirming an external action → **use instead:** the action's own confirmation.
+- Correction hidden in a generic menu → **use instead:** visible controls next to the result.
+- Forcing the whole request to be redone → **use instead:** refinement and local editing.
+- A final response with no way to edit, reject or recover → **use instead:** an editable proposal.
 
-## Faça
+## Do
 
-- Trate o resultado como proposta até aceite.
-- Permita editar no próprio contexto do resultado.
-- Use verbos que descrevem o efeito de cada botão.
-- Preserve versão anterior, origem ou desfazer.
-- Mostre o escopo antes de substituir conteúdo.
-- Eleve a revisão quando o impacto for alto.
+- Treat the result as a proposal until accepted.
+- Allow editing within the result's own context.
+- Use verbs that describe each button's effect.
+- Keep the previous version, the origin or undo.
+- Show the scope before replacing content.
+- Raise the level of review when the impact is high.
 
-## Evite
+## Avoid
 
-- Substituir conteúdo automaticamente sem caminho de revisão ou recuperação.
-- Reduzir a pessoa a aceitar ou recomeçar.
-- Um único botão ambíguo para mudança ampla.
-- Destacar só "Aceitar" e esconder descartar e editar.
-- Tratar edição local como autorização para enviar ou publicar.
-- Apoiar-se apenas em ícones, cores ou animações para indicar o que pode ser corrigido.
+- Replacing content automatically with no review or recovery path.
+- Reducing the person to accepting or starting over.
+- A single ambiguous button for a broad change.
+- Highlighting only "Accept" and hiding discard and edit.
+- Treating a local edit as authorization to send or publish.
+- Relying only on icons, colors or animations to show what can be corrected.
 
-## Acessibilidade
+## Accessibility
 
-- Controles de editar, aceitar, regenerar e descartar com nomes acessíveis e foco visível (2.4.7).
-- Uso integral por teclado e ordem de foco coerente com a leitura do resultado (2.1.1, 2.4.3).
-- Não use só ícones para revisão ou descarte.
-- Quando uma sugestão substituir conteúdo, anuncie a mudança sem roubar o foco e preserve o desfazer (4.1.3).
-- Evite atualizações automáticas que desloquem o foco ou façam a pessoa perder o ponto onde lia.
-- Em comparações de versões, a diferença não pode depender só de cor (1.4.1).
+- Edit, accept, regenerate and discard controls with accessible names and visible focus (2.4.7).
+- Full keyboard use and a focus order consistent with reading the result (2.1.1, 2.4.3).
+- Do not use icons alone for review or discard.
+- When a suggestion replaces content, announce the change without stealing focus and keep undo (4.1.3).
+- Avoid automatic updates that move focus or make the person lose their reading position.
+- When comparing versions, the difference must not depend on color alone (1.4.1).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Aceitar | "Inserir no documento" |
-| Substituir | "Substituir trecho selecionado" |
-| Refinar | "Pedir ajuste" |
-| Regenerar | "Gerar outra versão" |
-| Descartar | "Descartar sugestão" |
-| Rótulo do resultado | "Rascunho sugerido pela IA. Revise antes de usar." |
+| Accept | "Insert into document" |
+| Replace | "Replace selected text" |
+| Refine | "Ask for changes" |
+| Regenerate | "Generate another version" |
+| Discard | "Discard suggestion" |
+| Result label | "Draft suggested by AI. Review before using." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O resultado aparece como proposta, não como conteúdo definitivo.
-- [ ] Há ação visível para aceitar, editar e descartar.
-- [ ] A edição ocorre no próprio contexto do resultado.
-- [ ] Em conteúdos longos, é possível corrigir só uma parte.
-- [ ] Ao substituir conteúdo, há versão anterior ou desfazer.
-- [ ] Cada botão nomeia seu efeito.
-- [ ] Ação externa posterior pede confirmação própria.
-- [ ] Os controles funcionam por teclado com foco visível.
-- [ ] Diferenças entre versões não dependem só de cor.
+- [ ] The result appears as a proposal, not as final content.
+- [ ] There is a visible action to accept, edit and discard.
+- [ ] Editing happens within the result's own context.
+- [ ] In long content, a single part can be corrected.
+- [ ] When content is replaced, there is a previous version or undo.
+- [ ] Each button names its effect.
+- [ ] A later external action asks for its own confirmation.
+- [ ] The controls work by keyboard with visible focus.
+- [ ] Differences between versions do not depend on color alone.
 
-## Fundamentação
+## Rationale
 
-- Microsoft HAX Toolkit, diretriz 9 (apoiar correção eficiente) e padrão 9B (edições ricas e detalhadas): facilitar editar, refinar ou recuperar quando a IA erra.
-- Amershi e colegas (2019), diretrizes de interação humano-IA: 18 diretrizes avaliadas com profissionais de design.
-- Google PAIR, guia People + AI: projetar IA centrada em pessoas e calibrar confiança.
-- Documentação pública de assistentes de escrita com IA em editores de texto: manter, regenerar, refinar ou descartar rascunhos; revisão de texto alternativo gerado.
+- Microsoft HAX Toolkit, guideline 9 (support efficient correction) and pattern 9B (rich and detailed edits): make it easy to edit, refine or recover when the AI is wrong.
+- Amershi and colleagues (2019), guidelines for human-AI interaction: 18 guidelines evaluated with design practitioners.
+- Google PAIR, People + AI Guidebook: designing people-centered AI and calibrating trust.
+- Public documentation of AI writing assistants in text editors: keep, regenerate, refine or discard drafts; review of generated alt text.

@@ -43,7 +43,7 @@ test('missing prerequisites are reported with how to generate them', () => {
     const by = Object.fromEntries(pre.items.map((p) => [p.id, p]));
     assert.equal(by.screens.ok, true);
     assert.equal(by.map.ok, false);
-    assert.match(by.map.fix, /mapear/);
+    assert.match(by.map.fix, /map-ux/);
     assert.equal(by.ux.ok, false);
     assert.match(by.ux.fix, /lint-ux-md/);
     assert.equal(by.code.ok, false);
@@ -61,17 +61,17 @@ test('flow detector is skipped without a map; report has every dimension', () =>
     assert.equal(flow.status, 'skipped');
     assert.equal(r.dimensions.filter((d) => d.id !== '(none)').length, loadMatrix().dimensions.length);
     const actions = r.dimensions.find((d) => d.id === 'actions');
-    assert.equal(actions.open, 1, 'T1: duas primárias no main');
+    assert.equal(actions.open, 1, 'T1: two primaries in main');
     assert.equal(actions.by_severity[3], 1);
     assert.equal(actions.added, 1);
     const nav = r.dimensions.find((d) => d.id === 'navigation');
-    assert.equal(nav.effective_coverage, 'judgment', 'sem fluxo, navegação vira julgamento');
+    assert.equal(nav.effective_coverage, 'judgment', 'without a flow, navigation becomes judgment');
     assert.equal(r.registered, false);
-    assert.ok(!existsSync(join(root, '.dsx', 'findings', 'm', 'findings.json')), 'sem --register não grava');
+    assert.ok(!existsSync(join(root, '.dsx', 'findings', 'm', 'findings.json')), 'without --register nothing is written');
     const text = formatReport(r);
-    assert.match(text, /Relatório por dimensão/);
+    assert.match(text, /Per-dimension report/);
     assert.match(text, /✗ map/);
-    assert.match(text, /como gerar/);
+    assert.match(text, /how to produce/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -84,7 +84,7 @@ test('missing detector is tolerated and lowers coverage', () => {
     const layout = r.dimensions.find((d) => d.id === 'layout');
     assert.equal(layout.effective_coverage, 'judgment');
     assert.deepEqual(layout.missing_families.map((x) => x.family), ['layout']);
-    assert.match(formatReport(r), /detector ausente/);
+    assert.match(formatReport(r), /detector missing/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -131,7 +131,13 @@ test('CLI: usage error without --module; --json and --page work', () => {
     assert.equal(r.status, 0, r.stderr);
     const out = JSON.parse(r.stdout);
     assert.ok(Array.isArray(out.dimensions) && out.dimensions.length >= 14);
-    assert.ok(out.dimensions.every((d) => 'open' in d && 'added' in d && 'fixed' in d && 'regressions' in d && 'gaps_pt' in d));
-    assert.match(readFileSync(page, 'utf8'), /Copiar decisões/);
+    assert.ok(out.dimensions.every((d) => 'open' in d && 'added' in d && 'fixed' in d && 'regressions' in d && 'gaps' in d && 'gaps_pt' in d && d.name === d.name_pt));
+    assert.match(readFileSync(page, 'utf8'), /Copy decisions/);
+    const pt = join(root, 'page-pt.html');
+    assert.equal(spawnSync(process.execPath, [CLI, '--module', 'm', '--root', root, '--json', '--page', pt, '--lang', 'pt-BR'], { encoding: 'utf8' }).status, 0);
+    assert.match(readFileSync(pt, 'utf8'), /Copiar decisões/);
+    const bad = spawnSync(process.execPath, [CLI, '--module', 'm', '--root', root, '--page', pt, '--lang', 'fr'], { encoding: 'utf8' });
+    assert.equal(bad.status, 2);
+    assert.match(bad.stderr, /unknown --lang "fr"/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

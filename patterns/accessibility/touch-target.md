@@ -1,6 +1,6 @@
 ---
 id: touch-target
-title: Qual deve ser o tamanho mínimo de um alvo de toque?
+title: What should the minimum size of a touch target be?
 category: accessibility
 components: [button, icon-button, checkbox, radio, switch, toolbar]
 type: accessibility
@@ -11,85 +11,85 @@ wcag: ["2.5.8", "2.5.5", "2.4.7", "4.1.2"]
 related: [icon-and-text-button, icon-only-button, keyboard-focus, action-placement]
 ---
 
-# Qual deve ser o tamanho mínimo de um alvo de toque?
+# What should the minimum size of a touch target be?
 
-> **Regra:** Dimensione a área interativa, não o desenho: mínimo de 24 × 24 CSS px (piso AA) e 44–48 unidades para controles de toque, com espaço entre vizinhos.
+> **Rule:** Size the interactive area, not the drawing: at least 24 × 24 CSS px (the AA floor) and 44–48 units for touch controls, with space between neighbors.
 
-## Contexto
+## Context
 
-A borda visual de um ícone ou botão não precisa ter o mesmo tamanho da região sensível ao toque. Ícone pequeno é aceitável se estiver inserido numa área maior; botão grande encostado em outro ainda provoca toques errados.
+The visual edge of an icon or button does not have to match the touch-sensitive region. A small icon is fine inside a larger area; a large button pressed up against another still causes mistaps.
 
-Os números 24, 44 e 48 vêm de fontes diferentes: 24 é o piso de conformidade AA, 44 é a referência de plataformas Apple e do nível AAA, e 48 é a referência do Android. Nenhum deles vale como regra única para todo contexto. A escolha depende do custo do erro, da frequência da ação e da densidade necessária.
+The numbers 24, 44 and 48 come from different sources: 24 is the AA conformance floor, 44 is the Apple platform and AAA reference, and 48 is the Android reference. None of them is a single rule for every context. The choice depends on the cost of an error, how often the action is used and the density required.
 
-Alvos pequenos e juntos causam toques acidentais, lentidão e exclusão de quem tem tremor, mobilidade reduzida ou usa o aparelho com uma mão só.
+Small, crowded targets cause accidental taps, slowness and exclusion of people with tremor, reduced mobility or who use the device one-handed.
 
-## Decisão
+## Decision
 
-- **SE** o controle é acionado por ponteiro ou toque **ENTÃO** garanta no mínimo 24 × 24 CSS px de área interativa.
-- **SE** o alvo é menor que 24 × 24 px **ENTÃO** garanta que um círculo de 24 px centrado nele não toque outro alvo nem o círculo de outro alvo.
-- **SE** é botão, ícone ou ação de toque comum **ENTÃO** projete 44 × 44 CSS px (web/iOS) ou 48 × 48 dp (Android).
-- **SE** a ação é crítica, irreversível, frequente ou fica na borda da tela **ENTÃO** aumente área e distância além de 44–48.
-- **SE** o ícone precisa ficar pequeno **ENTÃO** mantenha o ícone e amplie a área com padding ou pseudo-elemento.
-- **SE** o link está dentro de uma frase **ENTÃO** trate como conteúdo em linha (exceção do critério), mas não aplique a exceção a ícones de toolbar.
-- **SENÃO** use 44 × 44 como padrão do design system.
+- **IF** the control is operated by pointer or touch **THEN** guarantee at least 24 × 24 CSS px of interactive area.
+- **IF** the target is smaller than 24 × 24 px **THEN** make sure a 24 px circle centered on it does not touch another target or another target's circle.
+- **IF** it is a common button, icon or touch action **THEN** design 44 × 44 CSS px (web/iOS) or 48 × 48 dp (Android).
+- **IF** the action is critical, irreversible, frequent or sits at the screen edge **THEN** increase area and spacing beyond 44–48.
+- **IF** the icon must stay small **THEN** keep the icon and enlarge the area with padding or a pseudo-element.
+- **IF** the link sits inside a sentence **THEN** treat it as inline content (an exception in the criterion), but do not apply the exception to toolbar icons.
+- **ELSE** use 44 × 44 as the design system default.
 
-## Quando usar
+## When to use
 
-- Botões de ação em telas móveis.
-- Botões somente com ícone e controles de toolbar.
-- Fechar modal, voltar e ações de topo.
-- Checkbox, radio e switch.
-- Ações frequentes ou irreversíveis.
+- Action buttons on mobile screens.
+- Icon-only buttons and toolbar controls.
+- Close modal, back and top-bar actions.
+- Checkbox, radio and switch.
+- Frequent or irreversible actions.
 
-## Quando evitar
+## When to avoid
 
-- Medir só o ícone visível → **use em vez disso:** medir a área clicável completa.
-- Tratar 24 px como tamanho ideal → **use em vez disso:** 24 como piso e 44–48 como meta.
-- Encolher alvos para caber mais ações → **use em vez disso:** agrupar em menu de overflow.
-- Aplicar exceções sem avaliar contexto → **use em vez disso:** testar com toque real.
+- Measuring only the visible icon → **use instead:** measure the full clickable area.
+- Treating 24 px as the ideal size → **use instead:** 24 as the floor and 44–48 as the target.
+- Shrinking targets to fit more actions → **use instead:** group them in an overflow menu.
+- Applying exceptions without assessing context → **use instead:** test with real touch.
 
-## Faça
+## Do
 
-- Defina o hit area no componente base, não por tela.
-- Separe ações vizinhas com espaço mensurável.
-- Dê mais área às ações críticas.
-- Teste em aparelho real, com uma mão e com zoom.
+- Define the hit area in the base component, not per screen.
+- Separate neighboring actions with measurable space.
+- Give critical actions more area.
+- Test on a real device, one-handed and with zoom.
 
-## Evite
+## Avoid
 
-- Quatro ícones pequenos comprimidos numa barra.
-- Áreas interativas sobrepostas.
-- Esconder a área ampliada sem feedback de foco ou pressão.
-- Exigir toque preciso para ação importante.
+- Four small icons squeezed into a bar.
+- Overlapping interactive areas.
+- Hiding the enlarged area without focus or press feedback.
+- Requiring a precise tap for an important action.
 
-## Acessibilidade
+## Accessibility
 
-- WCAG 2.2, critério 2.5.8 (AA): mínimo de 24 × 24 CSS px; exceções para espaçamento, alvo equivalente, texto em linha, controle do agente de usuário e necessidade essencial.
-- Critério 2.5.5 (AAA): 44 × 44 CSS px.
-- Ampliar a área não pode remover o foco visível (2.4.7), esconder estado nem alterar o nome acessível (4.1.2).
-- Garanta operação por teclado e por tecnologia assistiva em todos os controles.
+- WCAG 2.2, criterion 2.5.8 (AA): minimum of 24 × 24 CSS px; exceptions for spacing, equivalent target, inline text, user agent control and essential need.
+- Criterion 2.5.5 (AAA): 44 × 44 CSS px.
+- Enlarging the area must not remove visible focus (2.4.7), hide state or change the accessible name (4.1.2).
+- Ensure keyboard and assistive technology operation for every control.
 
-## Microcópia
+## Microcopy
 
-Não se aplica.
+Not applicable.
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Todo alvo tem pelo menos 24 × 24 CSS px ou cumpre a exceção de espaçamento.
-- [ ] Controles de toque comuns têm 44–48 unidades de área.
-- [ ] A área interativa de ícones é maior que o desenho quando necessário.
-- [ ] Controles vizinhos têm separação medida e suficiente.
-- [ ] Ações críticas têm área e distância maiores que as demais.
-- [ ] Não existem áreas interativas sobrepostas.
-- [ ] O foco de teclado continua visível.
-- [ ] Nome e estado acessíveis foram preservados.
-- [ ] A tela foi testada em dispositivo real.
+- [ ] Every target is at least 24 × 24 CSS px or meets the spacing exception.
+- [ ] Common touch controls have 44–48 units of area.
+- [ ] The interactive area of icons is larger than the drawing when needed.
+- [ ] Neighboring controls have measured, sufficient separation.
+- [ ] Critical actions have more area and distance than the others.
+- [ ] There are no overlapping interactive areas.
+- [ ] Keyboard focus is still visible.
+- [ ] Accessible name and state were preserved.
+- [ ] The screen was tested on a real device.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 2.5.8 (Target Size Minimum): limite mínimo AA de 24 × 24 px, mais as exceções previstas.
-- WCAG 2.2, critério 2.5.5 (Target Size Enhanced): 44 × 44 px, exigido no AAA.
-- Apple Human Interface Guidelines: região de toque de 44 × 44 pt e atenção ao espaçamento.
-- Android Developers (acessibilidade): área de 48 × 48 dp, com padding compondo a área.
-- U.S. Web Design System: transforma o requisito de 24 px em teste de componente.
-- Estudo de Parhi, Karlson e Bederson sobre interação com o polegar: alvos físicos mais largos elevam desempenho e preferência; o equivalente em pixels varia conforme o dispositivo.
+- WCAG 2.2, criterion 2.5.8 (Target Size Minimum): AA floor of 24 × 24 px, plus the listed exceptions.
+- WCAG 2.2, criterion 2.5.5 (Target Size Enhanced): 44 × 44 px, required at AAA.
+- Apple Human Interface Guidelines: 44 × 44 pt touch region and attention to spacing.
+- Android Developers (accessibility): 48 × 48 dp area, with padding making up the area.
+- U.S. Web Design System: turns the 24 px requirement into a component test.
+- Parhi, Karlson and Bederson's study on thumb interaction: wider physical targets improve performance and preference; the pixel equivalent varies by device.

@@ -1,6 +1,6 @@
 ---
 id: not-color-alone
-title: Por que não usar apenas cor para comunicar erros?
+title: Why not use color alone to communicate errors?
 category: accessibility
 components: [form-field, error-message, icon, chart]
 type: accessibility
@@ -11,90 +11,90 @@ wcag: ["1.4.1", "1.4.11", "1.4.3", "3.3.1", "1.3.1"]
 related: [form-errors, required-fields, field-error-position, success-confirmation]
 ---
 
-# Por que não usar apenas cor para comunicar erros?
+# Why not use color alone to communicate errors?
 
-> **Regra:** Cor reforça o estado, mas nunca é o único sinal: acompanhe-a de texto que diga o problema, perto do elemento afetado.
+> **Rule:** Color reinforces a state but is never the only cue: pair it with text that states the problem, next to the affected element.
 
-## Contexto
+## Context
 
-Erros, avisos, obrigatoriedade e confirmações costumam ter cores próprias. Se a cor é o único sinal, quem tem daltonismo, baixa visão, tela com brilho reduzido, impressão em cinza ou usa leitor de tela pode não perceber o que aconteceu nem o que fazer.
+Errors, warnings, required fields and confirmations usually have their own colors. When color is the only cue, people with color blindness or low vision, screens with dimmed brightness, grayscale printouts and screen reader users may miss what happened and what to do.
 
-O requisito não proíbe cor. Ele impede que a cor seja o único meio de transmitir informação, indicar ação, pedir resposta ou distinguir elemento. Texto, ícone, padrão ou borda adicional precisam carregar a mesma informação.
+The requirement does not forbid color. It forbids color being the only means of conveying information, indicating an action, prompting a response or distinguishing an element. Text, an icon, a pattern or an extra border must carry the same information.
 
-Um ícone sem significado explícito ou uma legenda distante também não resolve.
+An icon without explicit meaning or a distant legend does not solve it either.
 
-## Decisão
+## Decision
 
-- **SE** um campo está inválido **ENTÃO** escreva o problema em texto, ligado ao campo, além de qualquer cor.
-- **SE** a cor sinaliza sucesso, alerta ou erro **ENTÃO** acrescente texto ou ícone com significado.
-- **SE** um campo é obrigatório **ENTÃO** marque com texto (ex.: "obrigatório"), não só com cor.
-- **SE** gráficos, tabelas ou mapas distinguem categorias por cor **ENTÃO** adicione padrão, rótulo, forma ou legenda próxima.
-- **SE** um estado de controle muda **ENTÃO** use sinal adicional (ícone, sublinhado, peso, texto).
-- **SE** usa ícone como reforço **ENTÃO** ele precisa ter nome ou contexto compreensível.
-- **SE** a informação aparece dinamicamente **ENTÃO** associe ao controle e verifique o anúncio no leitor de tela.
-- **SENÃO** valide a tela em escala de cinza.
+- **IF** a field is invalid **THEN** write the problem as text, tied to the field, in addition to any color.
+- **IF** color signals success, warning or error **THEN** add text or a meaningful icon.
+- **IF** a field is required **THEN** mark it with text (e.g. "required"), not with color alone.
+- **IF** charts, tables or maps distinguish categories by color **THEN** add a pattern, label, shape or nearby legend.
+- **IF** a control changes state **THEN** use an additional cue (icon, underline, weight, text).
+- **IF** you use an icon as reinforcement **THEN** it needs an understandable name or context.
+- **IF** the information appears dynamically **THEN** associate it with the control and check how the screen reader announces it.
+- **ELSE** check the screen in grayscale.
 
-## Quando usar
+## When to use
 
-- Erros de validação.
-- Estados de sucesso, alerta, seleção e obrigatoriedade.
-- Gráficos, tabelas e mapas com categorias por cor.
-- Links e controles que mudam de estado.
+- Validation errors.
+- Success, warning, selection and required states.
+- Charts, tables and maps with color-coded categories.
+- Links and controls that change state.
 
-## Quando evitar
+## When to avoid
 
-- Borda ou fundo vermelho como única indicação → **use em vez disso:** mensagem textual mais ícone.
-- Campo obrigatório só por cor → **use em vez disso:** texto "obrigatório" no rótulo.
-- Legenda distante que exige memorização → **use em vez disso:** rótulo direto no elemento.
-- Ícone no lugar do texto → **use em vez disso:** ícone com texto.
+- A red border or background as the only indication → **use instead:** a text message plus an icon.
+- A required field marked by color only → **use instead:** the text "required" in the label.
+- A distant legend that must be memorized → **use instead:** a label directly on the element.
+- An icon in place of text → **use instead:** an icon with text.
 
-## Faça
+## Do
 
-- Escreva o estado e identifique o campo.
-- Associe a mensagem ao controle.
-- Mantenha contraste em texto, ícones e bordas.
-- Teste em escala de cinza e com simulação de daltonismo.
+- Write out the state and identify the field.
+- Associate the message with the control.
+- Keep contrast in text, icons and borders.
+- Test in grayscale and with color-blindness simulation.
 
-## Evite
+## Avoid
 
-- Usar só vermelho para erro.
-- Marcar sucesso só com verde.
-- Trocar texto por ícone sem nome.
-- Aceitar baixo contraste entre estados.
-- Validar apenas visualmente.
+- Using only red for errors.
+- Marking success with green only.
+- Replacing text with an unnamed icon.
+- Accepting low contrast between states.
+- Checking only visually.
 
-## Acessibilidade
+## Accessibility
 
-- 1.4.1 (nível A): cor não é o único meio visual.
-- 1.4.11: contraste de ícones, bordas e indicadores de estado.
-- 1.4.3: contraste do texto da mensagem.
-- 3.3.1: erro descrito em texto; 1.3.1: relação campo-mensagem programática.
-- Teste com pessoas que não distinguem cores, zoom, alto contraste, teclado e leitor de tela.
+- 1.4.1 (level A): color is not the only visual means.
+- 1.4.11: contrast of icons, borders and state indicators.
+- 1.4.3: contrast of the message text.
+- 3.3.1: error described in text; 1.3.1: programmatic field-message relationship.
+- Test with people who cannot distinguish colors, with zoom, high contrast, keyboard and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Erro de campo | "Digite o número do cartão." |
-| Senha | "Crie uma senha com pelo menos 8 caracteres." |
-| Obrigatório | "Nome completo (obrigatório)" |
-| Sucesso | "Dados salvos." |
+| Field error | "Enter the card number." |
+| Password | "Create a password with at least 8 characters." |
+| Required | "Full name (required)" |
+| Success | "Details saved." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O erro tem indicação textual.
-- [ ] O campo afetado está identificado.
-- [ ] A tela continua compreensível em escala de cinza.
-- [ ] O ícone reforça, mas não substitui, o texto.
-- [ ] A mensagem está perto do elemento.
-- [ ] Texto, ícones e bordas têm contraste suficiente.
-- [ ] O estado dinâmico é anunciado.
-- [ ] Obrigatoriedade não depende só de cor.
+- [ ] The error has a text indication.
+- [ ] The affected field is identified.
+- [ ] The screen still makes sense in grayscale.
+- [ ] The icon reinforces the text but does not replace it.
+- [ ] The message is close to the element.
+- [ ] Text, icons and borders have enough contrast.
+- [ ] The dynamic state is announced.
+- [ ] Required status does not depend on color alone.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, 1.4.1 e documento "Understanding" do critério: cor não pode ser o único meio.
-- WCAG 2.2: 1.4.11, 1.4.3, 3.3.1 e 1.3.1.
-- Padrão Digital GOV.BR (Message): cores semânticas como apoio, com alternativa textual.
-- AMAWeb (manual e checklist): campos obrigatórios com texto além do vermelho; verificações de contraste.
-- Adobe Spectrum (escrita para erros): borda, ícone e mensagem textual.
+- WCAG 2.2, 1.4.1 and its "Understanding" document: color cannot be the only means.
+- WCAG 2.2: 1.4.11, 1.4.3, 3.3.1 and 1.3.1.
+- GOV.BR Digital Standard (Message): semantic colors as support, with a text alternative.
+- AMAWeb (manual and checklist): required fields marked with text beyond red; contrast checks.
+- Adobe Spectrum (writing for errors): border, icon and text message.

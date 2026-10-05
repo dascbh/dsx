@@ -1,6 +1,6 @@
 ---
 id: autofill
-title: Quando usar preenchimento automático?
+title: When should you use autofill?
 category: forms
 components: [text-field, autocomplete, combobox, address]
 type: recommendation
@@ -11,100 +11,100 @@ wcag: ["1.3.5", "3.3.7", "2.1.1", "1.4.1", "4.1.2"]
 related: [dropdown, address-by-postal-code, required-fields, preserve-data-after-error]
 ---
 
-# Quando usar preenchimento automático?
+# When should you use autofill?
 
-> **Regra:** Use preenchimento automático para reduzir digitação, mas mantenha todos os campos visíveis, editáveis e confirmáveis pela pessoa.
+> **Rule:** Use autofill to reduce typing, but keep every field visible, editable and confirmable by the person.
 
-## Contexto
+## Context
 
-Preencher formulários demanda memória, digitação e conferência. O preenchimento automático alivia esse trabalho, mas o termo abrange comportamentos diferentes: o navegador oferece dados guardados (autofill), o campo propõe opções enquanto se digita (autocomplete de lista) ou o sistema completa campos relacionados depois de uma seleção.
+Filling in forms takes memory, typing and checking. Autofill eases that work, but the term covers different behaviors: the browser offers saved data (autofill), the field proposes options while the person types (list autocomplete), or the system completes related fields after a selection.
 
-Nenhum deles deve ocultar o que foi preenchido nem converter uma sugestão em decisão sem volta. A pessoa precisa saber de onde veio o valor, conferi-lo, corrigi-lo e continuar à mão se a sugestão faltar ou estiver errada.
+None of them should hide what was filled in or turn a suggestion into an irreversible decision. The person needs to know where the value came from, check it, correct it and carry on by hand if the suggestion is missing or wrong.
 
-Misturar autofill com autocomplete de busca gera interface difícil de anunciar, navegar e corrigir.
+Mixing browser autofill with search autocomplete produces an interface that is hard to announce, navigate and correct.
 
-## Decisão
+## Decision
 
-- **SE** o campo coleta dado recorrente da própria pessoa (nome, e-mail, telefone, endereço, CEP, usuário, cartão) **ENTÃO** declare o atributo autocomplete com o token padronizado correspondente e mantenha o rótulo visível.
-- **SE** a pessoa precisa achar um valor em lista grande **ENTÃO** use sugestões curtas e relevantes, navegáveis por teclado, que aceitem digitação contínua.
-- **SE** não há correspondência na lista **ENTÃO** permita informar o valor manualmente.
-- **SE** é endereço **ENTÃO** use a busca como apoio, preencha os campos relacionados após a seleção e mantenha-os visíveis e editáveis, com alternativa de digitar manualmente.
-- **SE** uma seleção preenche outros campos **ENTÃO** indique o que mudou e mantenha editáveis.
-- **SE** o valor pode pertencer a outra pessoa **ENTÃO** não habilite autofill ou exija confirmação.
-- **SE** a sugestão altera decisão importante **ENTÃO** peça confirmação explícita.
-- **SENÃO** não impeça o autofill do navegador.
+- **IF** the field collects the person's own recurring data (name, email, phone, address, postal code, username, card) **THEN** declare the autocomplete attribute with the matching standard token and keep the label visible.
+- **IF** the person needs to find a value in a large list **THEN** use short, relevant suggestions, navigable by keyboard, that accept continuous typing.
+- **IF** nothing in the list matches **THEN** let the person enter the value manually.
+- **IF** it is an address **THEN** use lookup as support, fill the related fields after the selection and keep them visible and editable, with the option to type manually.
+- **IF** a selection fills other fields **THEN** show what changed and keep them editable.
+- **IF** the value may belong to someone else **THEN** do not enable autofill, or require confirmation.
+- **IF** the suggestion changes an important decision **THEN** ask for explicit confirmation.
+- **ELSE** do not block the browser's autofill.
 
-## Quando usar
+## When to use
 
-- Campo de dado conhecido e recorrente da própria pessoa.
-- Propósito do campo identificável por token padronizado.
-- Lista extensa em que sugestões relevantes ajudam.
-- Resultado revisável antes do envio.
-- Alternativa manual disponível.
+- A known, recurring piece of the person's own data.
+- The field's purpose is identifiable by a standard token.
+- A long list where relevant suggestions help.
+- The result can be reviewed before submitting.
+- A manual alternative is available.
 
-## Quando evitar
+## When to avoid
 
-- Valor que pode pertencer a outra pessoa → **use em vez disso:** campo em branco com rótulo claro.
-- Sugestão que altera decisão importante sem confirmação → **use em vez disso:** etapa de confirmação.
-- Sistema que não mostra todos os campos preenchidos → **use em vez disso:** campos convencionais visíveis.
-- Lista longa, irrelevante ou que cobre campos e rótulos → **use em vez disso:** lista curta posicionada sem sobreposição.
-- Apagar o que a pessoa digitou sem aviso → **use em vez disso:** preservar e avisar.
+- A value that may belong to someone else → **use instead:** an empty field with a clear label.
+- A suggestion that changes an important decision without confirmation → **use instead:** a confirmation step.
+- A system that does not show every filled field → **use instead:** visible conventional fields.
+- A long, irrelevant list, or one that covers fields and labels → **use instead:** a short list positioned without overlap.
+- Erasing what the person typed without warning → **use instead:** preserve it and warn.
 
-## Faça
+## Do
 
-- Identifique o propósito real do campo com o token correto.
-- Mantenha o rótulo visível.
-- Mostre sugestões curtas e relevantes.
-- Preserve a edição manual.
-- Permita revisar os valores preenchidos.
-- Teste sem dados salvos, com dados divergentes e endereço não encontrado.
+- Identify the field's real purpose with the correct token.
+- Keep the label visible.
+- Show short, relevant suggestions.
+- Preserve manual editing.
+- Let the person review the filled values.
+- Test with no saved data, with mismatched data and with an address that is not found.
 
-## Evite
+## Avoid
 
-- Preencher sem explicar.
-- Ocultar campos relacionados.
-- Forçar uma sugestão.
-- Bloquear a entrada manual.
-- Enviar o formulário automaticamente.
-- Apagar dados sem aviso.
-- Depender de um navegador específico.
+- Filling in without explaining.
+- Hiding related fields.
+- Forcing a suggestion.
+- Blocking manual entry.
+- Submitting the form automatically.
+- Erasing data without warning.
+- Depending on a specific browser.
 
-## Acessibilidade
+## Accessibility
 
-- Use autocomplete com valores válidos, coerentes com a finalidade real do campo (1.3.5); o token acompanha o dado que o rótulo pede, e não o nome interno no código.
-- Para sugestões, use aria-autocomplete conforme o comportamento real: list, inline ou both; anuncie abertura, item ativo e seleção (4.1.2).
-- Mantenha o foco no campo enquanto a lista aparece; teclado navega e seleciona; ofereça forma clara de rejeitar (2.1.1).
-- Não use só cor, posição ou alteração visual para mostrar o valor escolhido (1.4.1).
-- Não remova rótulos, instruções ou campos convencionais depois da sugestão.
-- Evite pedir de novo dados já informados na mesma sessão (3.3.7).
-- Teste leitor de tela, teclado, zoom, toque e voz.
+- Use autocomplete with valid values that match the field's real purpose (1.3.5); the token follows the data the label asks for, not the internal name in the code.
+- For suggestions, use aria-autocomplete according to the real behavior: list, inline or both; announce opening, the active item and the selection (4.1.2).
+- Keep focus in the field while the list is shown; the keyboard navigates and selects; offer a clear way to reject (2.1.1).
+- Do not rely only on color, position or a visual change to show the chosen value (1.4.1).
+- Do not remove labels, instructions or conventional fields after the suggestion.
+- Avoid asking again for data already given in the same session (3.3.7).
+- Test screen reader, keyboard, zoom, touch and voice.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Sem resultado | "Não encontramos esse endereço. Preencha os campos manualmente." |
-| Aviso de preenchimento | "Preenchemos rua, bairro e cidade. Confira os dados." |
-| Alternativa manual | "Digitar endereço manualmente" |
-| Rótulo | "CEP" |
+| No result | "We couldn't find that address. Fill in the fields manually." |
+| Autofill notice | "We filled in street, neighborhood and city. Please check them." |
+| Manual alternative | "Enter address manually" |
+| Label | "Postal code" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Campos de dados pessoais têm autocomplete com token padronizado correto.
-- [ ] O rótulo continua visível depois de preencher.
-- [ ] Os campos relacionados preenchidos continuam visíveis e editáveis.
-- [ ] Existe alternativa de digitação manual quando não há sugestão.
-- [ ] A lista de sugestões funciona com teclado e não cobre o formulário.
-- [ ] O formulário não é enviado automaticamente após a seleção.
-- [ ] Nada digitado é apagado sem aviso.
-- [ ] Testado sem dados salvos e com dados divergentes.
+- [ ] Personal data fields have autocomplete with the correct standard token.
+- [ ] The label stays visible after filling.
+- [ ] Filled related fields stay visible and editable.
+- [ ] There is a manual typing alternative when there is no suggestion.
+- [ ] The suggestion list works with the keyboard and does not cover the form.
+- [ ] The form is not submitted automatically after the selection.
+- [ ] Nothing typed is erased without warning.
+- [ ] Tested with no saved data and with mismatched data.
 
-## Fundamentação
+## Rationale
 
-- W3C WAI, técnica H98 e critério 1.3.5: tokens autocomplete padronizados e benefícios para pessoas com dificuldades motoras, de memória e linguagem.
-- W3C, regra de validação do atributo autocomplete: estrutura válida dos tokens.
-- W3C WAI-ARIA 1.2, aria-autocomplete: sugestões inline, em lista ou combinadas.
-- Baymard Institute, busca automática de endereço e autocomplete: reduz erros, mas campos convencionais visíveis e entrada manual são necessários; evidência de e-commerce.
-- Baymard Institute, detecção automática de cidade e estado: menos digitação em dispositivos móveis.
-- GOV.UK Design System, campo de texto: autocomplete para acelerar o preenchimento.
-- Adobe Spectrum, IBM Carbon e U.S. Web Design System, combo box: sugestões que mantêm o campo editável.
+- W3C WAI, technique H98 and criterion 1.3.5: standard autocomplete tokens and their benefits for people with motor, memory and language difficulties.
+- W3C, autocomplete attribute validation rule: valid token structure.
+- W3C WAI-ARIA 1.2, aria-autocomplete: inline, list or combined suggestions.
+- Baymard Institute, automatic address lookup and autocomplete: reduces errors, but visible conventional fields and manual entry are necessary; e-commerce evidence.
+- Baymard Institute, automatic city and state detection: less typing on mobile devices.
+- GOV.UK Design System, text input: autocomplete to speed up filling.
+- Adobe Spectrum, IBM Carbon and U.S. Web Design System, combo box: suggestions that keep the field editable.

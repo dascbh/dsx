@@ -1,12 +1,15 @@
-// Código que roda DENTRO da captura (Playwright, file://) para as prévias de opção: localiza o elemento do achado,
-// aplica as operações de `preview` (lib/preview-spec.mjs) e desenha contornos, anotações e selos por cima. Os
-// doadores do módulo (blocos de estado, alertas, botões, painel, chip…) chegam em `window.__dsxkit`, montados por
-// lib/preview-kit.mjs a partir das próprias capturas. Contrato: knowledge/fundamentos/achados-de-ux.md.
-// Sem dependências. A função é serializada (`runtime.toString()`), então não pode usar nada de fora dela.
+// Code that runs INSIDE the capture (Playwright, file://) for the option previews: locates the finding's element,
+// applies the `preview` operations (lib/preview-spec.mjs) and draws outlines, annotations and badges on top. The
+// module donors (state blocks, alerts, buttons, panel, chip…) arrive in `window.__dsxkit`, built by
+// lib/preview-kit.mjs from the captures themselves. Contract: knowledge/foundations/ux-findings.md.
+// No dependencies. The function is serialized (`runtime.toString()`), so it cannot use anything outside it. The text
+// it draws comes in `window.__dsxstr` (lib/page-strings.mjs runtimeStrings, page language; English fallback).
 
 /* c8 ignore start */
 export function runtime() {
   const kit = window.__dsxkit || {};
+  const STR = Object.assign({ screenReader: 'Screen reader', fold: 'fold ({px} px)', belowFold: '↓ «{t}» is below the fold, {px} px from the top', regionShell: 'Region expected by the archetype; the content depends on the decision.', search: 'Search' }, window.__dsxstr || {});
+  const fmt = (t, o) => String(t).replace(/\{(\w+)\}/g, (m, k) => (k in o ? o[k] : m));
   const clean = (s) => String(s || '').replace(/[​-‍﻿]/g, '').replace(/\s+/g, ' ').trim();
   const visible = (el) => {
     const r = el.getBoundingClientRect();
@@ -43,7 +46,7 @@ export function runtime() {
     for (const n of ns.slice(1)) n.nodeValue = '';
   }
 
-  // ---------- título principal e regiões da tela ----------
+  // ---------- main title and screen regions ----------
   function mainTitle() {
     const h1 = [...document.querySelectorAll('h1, [role=heading][aria-level="1"]')].find(visible);
     if (h1) return h1;
@@ -51,13 +54,13 @@ export function runtime() {
     const top = root.getBoundingClientRect().top;
     const cands = [...root.querySelectorAll('h2, h3, h4, h5, h6, [role=heading], p, span, div, label')]
       .filter((e) => ownText(e) && visible(e) && !e.closest('nav, button, a, [role=tablist], [role=tab], [data-dsx-mark], .MuiChip-root') && e.getBoundingClientRect().top - top < 400);
-    // título editável (campo de texto grande no topo) também conta
+    // an editable title (large text field at the top) also counts
     cands.push(...[...root.querySelectorAll('input[type=text], input:not([type]), textarea')].filter((e) => e.value && visible(e) && fontPx(e) >= 18 && e.getBoundingClientRect().top - top < 400));
     let best = null, bs = 0;
     for (const e of cands) { const s = fontPx(e) + (/^H[2-6]$/.test(e.tagName) ? 0.5 : 0); if (s > bs + 0.01) { best = e; bs = s; } }
     return best;
   }
-  /** Conteúdo da tela abaixo do cabeçalho (título e abas); em diálogo, o DialogContent. */
+  /** Screen content below the header (title and tabs); in a dialog, the DialogContent. */
   function contentArea() {
     const dlg = openDialog();
     if (dlg) {
@@ -80,7 +83,7 @@ export function runtime() {
     const content = kids.slice(i);
     return { parent: P, before: content[0] || null, content };
   }
-  /** A tabela ou lista do conteúdo (o que muda de dados); sem ela, o maior bloco do conteúdo. */
+  /** The content's table or list (what changes with data); without it, the largest content block. */
   function dataRegion(area) {
     const SEL = 'table, [role=grid], [role=table], .MuiTableContainer-root, ul, ol, .MuiList-root, [role=list]';
     let best = null, ba = 0;
@@ -94,7 +97,7 @@ export function runtime() {
     return big;
   }
 
-  // ---------- doadores (da própria captura primeiro, senão do kit do módulo) ----------
+  // ---------- donors (from the capture itself first, else from the module kit) ----------
   function inject(css) {
     if (!css) return;
     const s = document.createElement('style');
@@ -125,7 +128,7 @@ export function runtime() {
       local = inp ? inp.closest('.MuiTextField-root, .MuiFormControl-root, .MuiInputBase-root') : null;
     } else if (ROLE_SEL[role]) {
       const list = [...document.querySelectorAll(ROLE_SEL[role])].filter((e) => visible(e) && !mark0(e) && !e.classList.contains('Mui-error') && (role !== 'panel' || (R(e).w >= 240 && !e.closest('[role=dialog]'))));
-      // texto de apoio e legenda: o de cor mais neutra (não copiar um apoio de sucesso ou de erro)
+      // helper text and caption: the most neutral color (do not copy a success or error helper)
       local = NEUTRAL.has(role) ? list.filter((e) => sat(e) < 40).sort((a, b) => sat(a) - sat(b))[0] : list[0];
     }
     if (local) return SHALLOW.has(role) ? local.cloneNode(false) : local.cloneNode(true);
@@ -133,14 +136,14 @@ export function runtime() {
     return fromKit(k);
   }
 
-  // ---------- tokens de texto ----------
+  // ---------- text tokens ----------
   const parts = (t) => { const s = clean(t).split(/\s+[—–·|]\s+/); return s.length > 1 ? [s[0], s.slice(1).join(' — ')] : [s[0]]; };
   function contextLabel(el) {
     const SEL = 'label, legend, h2, h3, h4, h5, h6, [role=heading], .MuiTypography-overline, .MuiTypography-subtitle1, .MuiTypography-subtitle2, .MuiFormLabel-root, th';
     const strong = (e) => { const cs = getComputedStyle(e); const t = clean(e.innerText); return cs.textTransform === 'uppercase' || Number(cs.fontWeight) >= 600 || (/[A-ZÀ-Ý]{3}/.test(t) && t === t.toUpperCase()); };
     const ok = (e) => visible(e) && !e.contains(el) && !e.closest('button, a, [role=button], .MuiChip-root') && (e.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) && clean(e.innerText).length >= 2 && clean(e.innerText).length <= 40;
     for (let a = el.parentElement, depth = 0; a && depth < 6 && a !== document.body; a = a.parentElement, depth++) {
-      // o rótulo mais próximo antes do botão, no menor contêiner que tenha um (título, legenda ou texto destacado)
+      // the nearest label before the button, in the smallest container that has one (title, caption or highlighted text)
       const prev = [...a.querySelectorAll('*')].filter((e) => (e.matches(SEL) || (ownText(e) && strong(e))) && ok(e));
       if (prev.length) {
         let t = clean(prev.at(-1).innerText).replace(/[*:]\s*$/, '').trim();
@@ -157,20 +160,20 @@ export function runtime() {
     const out = String(text).replace(/\{(self|context|no-parens|part:(\d))\}/g, (m, k, n) => {
       if (k === 'self') return orig;
       if (k === 'no-parens') return clean(orig.replace(/\s*\([^)]*\)/g, ''));
-      if (k === 'context') { const c = contextLabel(el); if (!c) miss = 'sem rótulo por perto para servir de objeto'; return c || ''; }
+      if (k === 'context') { const c = contextLabel(el); if (!c) miss = 'no nearby label to serve as the object'; return c || ''; }
       const p = parts(orig)[Number(n)];
-      if (p === undefined) miss = `o texto "${orig}" não tem o bloco ${Number(n) + 1}`;
+      if (p === undefined) miss = `the text "${orig}" has no block ${Number(n) + 1}`;
       return p ?? '';
     });
     return miss ? { error: miss } : { text: clean(out) };
   }
 
-  // ---------- localização ----------
+  // ---------- locating ----------
   function find(loc) {
     const out = [];
     st.via = 'text';
     if (loc.kind === 'main-title') { const t = mainTitle(); return t ? [t] : []; }
-    for (const s of loc.selectors || []) { try { const el = document.querySelector(s); if (el && visible(el) && !out.includes(el)) out.push(el); } catch { /* seletor inválido */ } }
+    for (const s of loc.selectors || []) { try { const el = document.querySelector(s); if (el && visible(el) && !out.includes(el)) out.push(el); } catch { /* invalid selector */ } }
     if (out.length) return out.slice(0, loc.max || 1);
     const dlg = openDialog();
     const order = (l) => (dlg ? [...l.filter((e) => dlg.contains(e)), ...l.filter((e) => !dlg.contains(e))] : l);
@@ -187,7 +190,7 @@ export function runtime() {
       return order([...new Set(hits)]);
     };
     const pats = (loc.patterns || []).map((p) => new RegExp(p, 'i'));
-    // T1 e L3 citam vários elementos: um por padrão, na ordem do achado.
+    // T1 and L3 cite several elements: one per pattern, in the finding's order.
     if ((loc.max || 1) > 1 && pats.length > 1) {
       const res = [];
       for (const p of pats) { const h = pass((t) => p.test(t)).find((e) => !res.includes(e)); if (h) res.push(h); }
@@ -197,7 +200,7 @@ export function runtime() {
     if (!hits.length && (loc.prefixes || []).length) hits = pass((t) => loc.prefixes.some((p) => t.startsWith(p)));
     if (!hits.length && (loc.contains || []).length) hits = pass((t) => loc.contains.some((p) => t.includes(p)));
     if (!hits.length && (loc.loose || []).length) { const lp = loc.loose.map((p) => new RegExp(p, 'i')); hits = pass((t) => lp.some((p) => p.test(t))); }
-    // Nome acessível, dica (title) ou placeholder: o texto está num atributo, não em pixels.
+    // Accessible name, hint (title) or placeholder: the text is in an attribute, not in pixels.
     if (!hits.length && pats.length) {
       const shown = (e) => (visible(e) ? e : e.parentElement && visible(e.parentElement) && e.getBoundingClientRect().width > 0 ? e.parentElement : null);
       let attrText = null;
@@ -237,7 +240,7 @@ export function runtime() {
     return { x, y, w: Math.min(vw, x2 + 8) - x, h: Math.min(vh, y2 + 8) - y };
   }
 
-  // ---------- sobreposições (fora do produto: contorno, balão, selo, dobra) ----------
+  // ---------- overlays (outside the product: outline, balloon, badge, fold) ----------
   function overlay(css, text) {
     const d = document.createElement('div');
     d.setAttribute('data-dsx-mark', '');
@@ -257,10 +260,10 @@ export function runtime() {
     if (el) el.textContent = text;
     return el;
   }
-  /** Balão ligado ao elemento: "Leitor de tela: «…»", a dica (com as classes de tooltip do kit, se houver) ou nota. */
+  /** Balloon tied to the element: "Screen reader: «…»", the hint (with the kit's tooltip classes, if any) or a note. */
   function balloon(el, kind, text) {
     const r = R(el);
-    const label = kind === 'screen-reader' ? `Leitor de tela: «${text}»` : text;
+    const label = kind === 'screen-reader' ? `${STR.screenReader}: «${text}»` : text;
     const tall = r.h > innerHeight * 0.4 || (r.y + r.h + 90 >= innerHeight && r.y < 90);
     const side = tall && r.x + r.w + 400 < innerWidth;
     const below = !tall && r.y + r.h + 90 < innerHeight;
@@ -292,11 +295,11 @@ export function runtime() {
     const y = fold - scrollY;
     if (y < 0 || y > innerHeight) return;
     overlay(`left:0;top:${y - 1}px;width:100%;height:0;border-top:2px dashed #E5484D`);
-    overlay(`right:12px;top:${y - 24}px;background:#E5484D;color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;padding:5px 8px;border-radius:6px`, `dobra (${fold} px)`);
+    overlay(`right:12px;top:${y - 24}px;background:#E5484D;color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;padding:5px 8px;border-radius:6px`, fmt(STR.fold, { px: fold }));
     if (note) overlay(`left:${(document.querySelector('main') || document.body).getBoundingClientRect().left + 16}px;top:${y - 30}px;background:#1E2130;color:#fff;font:500 13px/1.3 Inter,system-ui,sans-serif;padding:6px 10px;border-radius:8px`, note);
   }
 
-  // ---------- estados e regiões montados na tela ----------
+  // ---------- states and regions built on the screen ----------
   function setBlockTexts(block, { title, text, action }) {
     const btns = [...block.querySelectorAll('button, a.MuiButton-root, [role=button]')];
     const nodes = textNodes(block).filter((n) => !btns.some((b) => b.contains(n)));
@@ -337,7 +340,7 @@ export function runtime() {
     el.querySelectorAll('.MuiAlert-action').forEach((a) => a.remove());
     el.style.removeProperty('display');
     if (recolor) {
-      // alerta de erro montado com a cor de erro do tema (lida do CSS da captura), no padrão do kit: texto escuro, fundo claro
+      // error alert built with the theme error color (read from the capture CSS), in the kit pattern: dark text, light background
       const [r, g, b] = rgb(recolor);
       el.style.setProperty('color', `rgb(${Math.round(r * 0.4)}, ${Math.round(g * 0.4)}, ${Math.round(b * 0.4)})`, 'important');
       el.style.setProperty('background-color', `rgb(${Math.round(r + (255 - r) * 0.9)}, ${Math.round(g + (255 - g) * 0.9)}, ${Math.round(b + (255 - b) * 0.9)})`, 'important');
@@ -353,7 +356,7 @@ export function runtime() {
       .filter((e) => visible(e) || (e.parentElement && visible(e.parentElement)));
     const starred = (e) => { const fc = e.closest('.MuiFormControl-root'); return fc && /\*/.test((fc.querySelector('label') || {}).textContent || ''); };
     const req = inputs.find((e) => e.required || e.getAttribute('aria-required') === 'true') || inputs.find(starred) || inputs[0];
-    if (!req) return { error: 'esta captura não tem campo de formulário para mostrar o erro (os campos ficam num diálogo ou passo que a tela abre)' };
+    if (!req) return { error: 'this capture has no form field to show the error on (the fields are in a dialog or step the screen opens)' };
     const fc = req.closest('.MuiTextField-root, .MuiFormControl-root') || req.parentElement;
     const color = kit.error_color || '#d32f2f';
     req.setAttribute('aria-invalid', 'true');
@@ -381,18 +384,18 @@ export function runtime() {
     const area = contentArea();
     if (r.mode === 'banner') {
       const el = alertEl(r.color || 'info', r.text);
-      if (!el) return { error: 'nenhum alerta nas capturas do módulo para montar o aviso' };
+      if (!el) return { error: 'no alert in the module captures to build the notice' };
       if (dlg) area.parent.appendChild(el); else area.parent.insertBefore(el, area.before);
       el.style.setProperty('margin-top', dlg ? '16px' : '0');
       el.style.setProperty('margin-bottom', '16px');
       return { el, added: [el] };
     }
     const d = pickBlock(r.block, r.button ?? !!r.action);
-    if (!d) return { error: `nenhuma captura do módulo tem bloco de estado "${r.block}" para copiar` };
+    if (!d) return { error: `no module capture has a "${r.block}" state block to copy` };
     let block = fromKit(d);
     if (r.block !== 'loading') setBlockTexts(block, { title: r.title, text: r.text, action: r.action });
     if (d.ctx) {
-      // o contexto do bloco na captura doadora (centralização, espaçamento da célula ou do contêiner que o envolvia)
+      // the block context in the donor capture (centering, spacing of the cell or container around it)
       const w = document.createElement('div');
       for (const [k, v] of Object.entries(d.ctx)) w.style.setProperty(k, v);
       w.appendChild(block);
@@ -400,7 +403,7 @@ export function runtime() {
     }
     if (r.mode === 'replace-data' && !dlg) {
       const data = dataRegion(area);
-      if (!data) return { error: 'não achei a tabela ou lista da tela para trocar pelo estado' };
+      if (!data) return { error: 'could not find the screen table or list to replace with the state' };
       data.before(block);
       data.style.setProperty('display', 'none', 'important');
     } else {
@@ -428,16 +431,16 @@ export function runtime() {
       el = roleEl('search-field');
       if (el) {
         const inp = el.querySelector('input') || el;
-        inp.placeholder = `${op.title || 'Buscar'}…`; inp.value = '';
+        inp.placeholder = `${op.title || STR.search}…`; inp.value = '';
         el.style.setProperty('margin', '0 0 16px'); el.style.setProperty('max-width', '420px');
       }
     }
-    if (!el) el = shell(op.title || op.region, 'Região prevista no arquétipo; o conteúdo depende da decisão.');
+    if (!el) el = shell(op.title || op.region, STR.regionShell);
     if (area.dialog || !area.before) area.parent.appendChild(el); else area.parent.insertBefore(el, area.before);
     return { el, added: [el] };
   }
 
-  // ---------- operações ----------
+  // ---------- operations ----------
   function targetsOf(op) {
     if (op.selector) { const e = document.querySelector(op.selector); return e ? [e] : []; }
     const t = st.targets;
@@ -461,7 +464,7 @@ export function runtime() {
     if (op.op === 'synthesize-region') return synthesizeRegion(op);
     const list = targetsOf(op);
     const el = list[0];
-    if (!el) return { error: op.targets === 'all-but-last' ? 'só um elemento localizado; não há o que rebaixar' : 'alvo da operação não encontrado' };
+    if (!el) return { error: op.targets === 'all-but-last' ? 'only one element located; nothing to demote' : 'operation target not found' };
     if (op.op === 'text') {
       const changed = [];
       for (const [i, t] of list.entries()) {
@@ -484,14 +487,14 @@ export function runtime() {
     if (op.op === 'remove') { const r = R(el); el.style.setProperty('display', 'none', 'important'); return { removed: r }; }
     if (op.op === 'variant') {
       for (const t of list) {
-        if (!t.classList.contains('MuiButton-root')) return { error: 'o elemento não é um botão do MUI; variant não se aplica' };
+        if (!t.classList.contains('MuiButton-root')) return { error: 'the element is not an MUI button; variant does not apply' };
         const size = [...t.classList].find((c) => /^MuiButton-size/.test(c));
         const donors = [...document.querySelectorAll(`.MuiButton-root.MuiButton-${op.variant}`)].filter((d) => !list.includes(d) && visible(d) && !d.disabled && !d.classList.contains('Mui-disabled'));
         const donor = donors.find((d) => size && d.classList.contains(size)) || donors[0];
         const wasDisabled = t.classList.contains('Mui-disabled');
         if (donor) t.className = donor.className;
         else if (kit.buttons && kit.buttons[op.variant]) { inject(kit.buttons[op.variant].css); t.className = kit.buttons[op.variant].className; }
-        else return { error: `nenhum botão "${op.variant}" nas capturas do módulo para copiar o estilo` };
+        else return { error: `no "${op.variant}" button in the module captures to copy the style from` };
         if (!wasDisabled) t.classList.remove('Mui-disabled');
       }
       return { el, added: list.slice(1) };
@@ -524,7 +527,7 @@ export function runtime() {
     if (op.op === 'style') {
       let n = 0;
       for (const t of list) for (const [k, v] of Object.entries(op.css)) { const val = themeValue(v, t, k); if (val !== null) { t.style.setProperty(k, val); n++; } }
-      if (!n) return { error: 'a escala de títulos do tema não foi lida nas capturas do módulo' };
+      if (!n) return { error: 'the theme heading scale was not read from the module captures' };
       return { el, added: list.slice(1) };
     }
     if (op.op === 'align') {
@@ -563,14 +566,14 @@ export function runtime() {
         }
         if (v !== node.nodeValue) node.nodeValue = v.replace(/\(\s*,\s*/g, '(').replace(/,\s*\)/g, ')').replace(/\(\s*\)/g, '').replace(/\s+([,.;:])/g, '$1').replace(/:\s*:/g, ':').replace(/ {2,}/g, ' ');
       }
-      if (!n) return { error: 'nenhum dos textos a trocar está no elemento' };
+      if (!n) return { error: 'none of the texts to replace is in the element' };
       return { el };
     }
     if (op.op === 'insert') {
       let node;
       if (op.source) node = op.from ? fromKit(kit.extras && kit.extras[`${op.from}|${op.source}`]) : (document.querySelector(op.source) || { cloneNode: () => null }).cloneNode(true);
       else node = roleEl(op.like);
-      if (!node) return { error: `nenhum elemento "${op.like || op.source}" nas capturas do módulo para copiar` };
+      if (!node) return { error: `no "${op.like || op.source}" element in the module captures to copy` };
       if (op.text !== undefined) {
         const rv = resolve(op.text, el, st.targets.indexOf(el));
         if (rv.error) return { error: rv.error };
@@ -596,7 +599,7 @@ export function runtime() {
       return { el, text: rv.text, noMark: true };
     }
     if (op.op === 'badge') return { el, noMark: true, badge: op.text };
-    return { error: `operação ${op.op} não se aplica ao DOM` };
+    return { error: `operation ${op.op} does not apply to the DOM` };
   }
   function mark(rects, color, dashed) {
     for (const r of rects) {
@@ -615,9 +618,9 @@ export function runtime() {
       if (loc.viewport) scrollTo(0, 0); else st.targets[0].scrollIntoView({ block: 'center', inline: 'nearest' });
       return { found: st.targets.length, crop: contextRect(st.targets), rects: st.targets.map(R), via: st.via };
     },
-    /** Tela inteira: sem elemento; devolve o retângulo do diálogo aberto (o recorte) ou null. */
+    /** Whole screen: no element; returns the open dialog rectangle (the crop) or null. */
     screen() { st.targets = []; st.orig = []; const d = openDialog(); const p = d && (d.querySelector('.MuiDialog-paper') || d); if (p && (R(p).y < 0 || R(p).y + R(p).h > innerHeight)) p.scrollIntoView({ block: 'start' }); return { dialog: p ? R(p) : null }; },
-    /** Antes: balão com o nome acessível ou a dica de hoje; linha da dobra; devolve os retângulos das sobreposições. */
+    /** Before: balloon with today's accessible name or hint; fold line; returns the overlay rectangles. */
     before(opts) {
       st.overlays = [];
       const el = st.targets[0];
@@ -627,7 +630,7 @@ export function runtime() {
       }
       if (opts.fold) {
         const r = el ? el.getBoundingClientRect() : null;
-        foldLine(opts.fold, r && r.bottom + scrollY > opts.fold ? `↓ «${clean(el.innerText).slice(0, 40)}» está abaixo da dobra, a ${Math.round(r.bottom + scrollY)} px do topo` : null);
+        foldLine(opts.fold, r && r.bottom + scrollY > opts.fold ? fmt(STR.belowFold, { t: clean(el.innerText).slice(0, 40), px: Math.round(r.bottom + scrollY) }) : null);
       }
       return { overlays: st.overlays };
     },
@@ -654,7 +657,7 @@ export function runtime() {
         if (r.badge) badged = r.badge;
       }
       if (opts.fold) foldLine(opts.fold, null);
-      // contorno verde só no que a operação mudou ou montou (não nos outros elementos localizados)
+      // green outline only on what the operation changed or built (not on the other located elements)
       const live = [...(touched.length || st.added.length ? touched : st.targets), ...st.added].filter((t) => t.isConnected && visible(t));
       const rects = marked ? (st.marks.length ? st.marks : [...new Set(live)].map(R)) : [];
       const crop = live.length ? contextRect(live) : null;
@@ -664,7 +667,7 @@ export function runtime() {
       const unchanged = geometric && !st.added.length && now.length === before.length && now.every((r, i) => same(r, before[i]));
       return { rects, removed, crop, texts, unchanged, overlays: st.overlays, applied, badged };
     },
-    /** Selo no canto superior direito do recorte (por dentro), para não cobrir o elemento nem o vizinho. */
+    /** Badge in the top-right corner of the crop (inside), so it covers neither the element nor its neighbor. */
     badgeAt(box, text) {
       overlay(`left:${box.x + box.width - 12}px;top:${box.y + 10}px;transform:translateX(-100%);background:#F1F3F5;color:#1E2130;border:1.5px solid #5B6578;font:600 12.5px/1 Inter,system-ui,sans-serif;padding:7px 12px;border-radius:999px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.18)`, `✓ ${text}`);
     },

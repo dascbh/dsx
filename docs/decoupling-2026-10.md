@@ -45,10 +45,10 @@ New, generic: `tools/ux-lint/lib/project-paths.mjs`, `tools/ux-lint/lib/kits.mjs
 | `examples/UX.md` | contract-management example mirroring the pilot's module | new English example "Purchasing" (orders, requisitions, suppliers, approvals) with `paths` and `verification.kit: mui`; lint and score tests adapted to English headings |
 | `templates/UX.md` | description example from the pilot's domain | neutral example; `paths` and `verification.kit` placeholders |
 | `archetypes/*.md`, `archetypes/index.json` | examples and wireframe labels from the pilot (drafts, amendments, clauses, law office, "de acordo") | purchasing examples (orders, catalog items, supplier confirmation); ASCII wireframes kept the same width |
-| `knowledge/fundamentos/marcas-de-texto-gerado.md`, `ux-md.md`, `achados-de-ux.md`, `elementos-comparados.md`, `variacoes-de-ux.md`, `interacao-e-feedback.md` | real interface texts and file paths of the pilot | equivalent purchasing texts that keep each rule's point; schema shows `paths` and `kit` |
-| `agents/extrator-design-system.md` | the pilot's brand hex and a component name in the example output | neutral values |
+| `knowledge/foundations/generated-text-marks.md`, `ux-md.md`, `ux-findings.md`, `compared-elements.md`, `ux-variations.md`, `interaction-and-feedback.md` | real interface texts and file paths of the pilot | equivalent purchasing texts that keep each rule's point; schema shows `paths` and `kit` |
+| `agents/design-system-extractor.md` | the pilot's brand hex and a component name in the example output | neutral values |
 | `data/gap-analysis/web-design-rules.json` | named the pilot's capture skill | `capture-from-code` |
-| `skills/auditar-ux`, `repensar-ux`, `arranjar-tela`, `construir-ui`, `escolher-ds`, `ux-md`, `stitch`, `ux-writing` | the pilot's capture skill and harness folder, `cd frontend`, default folders, a "pilot" section title, manifest example with the pilot's module | `capture-from-code`, `docs/project-paths.md`, "folder with Playwright", neutral manifest example |
+| `skills/audit-ux`, `rethink-ux`, `arrange-screen`, `build-ui`, `choose-ds`, `ux-md`, `stitch`, `ux-writing` | the pilot's capture skill and harness folder, `cd frontend`, default folders, a "pilot" section title, manifest example with the pilot's module | `capture-from-code`, `docs/project-paths.md`, "folder with Playwright", neutral manifest example |
 | `skills/capture-from-code/` + `templates/capture/` (new) | — | the capture method as a DSX skill (see below) |
 
 ## Capture from code is now part of the DSX
@@ -65,7 +65,7 @@ What the pilot could reuse (not changed — the DSX does not edit projects): its
 ## Still tied to a convention, and why
 
 - **MUI-first hints in the text, states and preview code** (`text.mjs` variant/helper/alert classes, `states.mjs` alert classes, `lib/preview-kit.mjs`, `lib/preview-runtime.mjs`). They are additive: roles and HTML are read too, so other kits are analyzed, with less detail (button variant, alert severity, helper text). Moving them into `lib/kits.mjs` touches the preview runtime and the variations page that another work front is changing; it is the next step.
-- **Portuguese interface heuristics** in the text checker (verb lists, title case, generated-text marks): the detectors judge pt-BR interface text. Language packs are wave 2 (the product's language is configurable; DSX's own language is English).
+- **Interface-language heuristics** in the text checker (verb lists, title case, generated-text marks): the detectors judge the product's interface text through a language pack (`tools/ux-lint/lib/lang/{pt-BR,en}.mjs`), chosen by `content.language` in `UX.md`; the default stays `pt-BR` so existing results do not change. DSX's own language is English (DSX 0.9.0).
 - **`.stitch/`** remains the state folder of the official Stitch skills (`.stitch/DESIGN.md`, `designs/`, `metadata.json`, `reviews/`); only captures moved out of it.
 - **`.dsx/maps/flows-<module>.json`, `.dsx/findings`, `.dsx/variations`** stay DSX-only artifacts with defaults; the Forward bridge for them is another work front (`docs/forward-compat.md`).
 - **Chakra and shadcn profiles** rely on class/attribute conventions that projects customize; they are documented as best effort and overridable per project.

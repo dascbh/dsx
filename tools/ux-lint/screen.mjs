@@ -1,22 +1,26 @@
 #!/usr/bin/env node
-// ux-lint, nível tela: aplica as regras T1–T7 do contrato do UX.md (knowledge/fundamentos/ux-md.md)
-// sobre capturas HTML de telas. Sem dependências.
+// ux-lint, screen level: applies rules T1–T7 of the UX.md contract (knowledge/foundations/ux-md.md)
+// to HTML captures of screens. No dependencies.
 //
-// Uso: node tools/ux-lint/screen.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--json] [--fail-at 3]
-// Saída: achados por tela (regra, região, evidência arquivo:linha, severidade 0–4) e resumo.
-// Código de saída 1 quando há achado com severidade >= --fail-at (padrão 3).
+// Usage: node tools/ux-lint/screen.mjs <folder-or-files.html...> [--ux UX.md] [--json] [--fail-at 3]
+// Output: findings per screen (rule, region, file:line evidence, severity 0–4) and a summary.
+// Exit code 1 when a finding has severity >= --fail-at (default 3).
+// Product-text vocabulary (dismiss, generic and verbless labels) comes from the language pack (lib/lang/).
 // JSON (--json): { summary, screens: [{ file, dialog_open, findings: [{ rule, severity, region, message, evidence }] }] }.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseCli } from '../lib/legacy-cli.mjs';
 import { loadConfig, configFrom } from './lib/config.mjs';
+import { langPack, unionList } from './lib/lang/index.mjs';
 import { parseHtml, querySelectorAll, matches, closest, isHidden, textOf, getById, walk, contains } from './lib/html.mjs';
 
 export const SEVERITY = { T1: 3, T2: 2, T3: 2, T4: 3, T5: 3, T6: 2, T7: 1 };
-export const CANCEL_LABELS = ['cancelar', 'voltar', 'fechar', 'não', 'nao'];
-export const GENERIC_DESTRUCTIVE_LABELS = ['confirmar', 'ok', 'sim', 'continuar'];
-export const LABELS_WITHOUT_VERB = ['ok', 'sim', 'não', 'nao', 'enviar', 'confirmar'];
+/** Dismiss labels of every language pack (a cancel button is recognized in either language). */
+export const CANCEL_LABELS = unionList('dismiss');
+/** Default (pt-BR) lists, kept as exports for compatibility; the rules read the pack of `content.language`. */
+export const GENERIC_DESTRUCTIVE_LABELS = langPack().genericDestructiveLabels;
+export const LABELS_WITHOUT_VERB = langPack().labelsWithoutVerb;
 
 const norm = (s) => s.toLowerCase().replace(/[.!?:…]+$/, '').replace(/\s+/g, ' ').trim();
 const ariaHidden = (n) => !!closest(n, '[aria-hidden=true]');
@@ -47,11 +51,12 @@ function fieldLabel(root, f) {
 }
 
 /**
- * Analisa uma tela. `html` é o conteúdo; `file` entra na evidência; `cfg` vem de loadConfig/configFrom.
- * Devolve { file, dialog_open, findings: [{ rule, severity, region, message, evidence }] }.
+ * Analyzes one screen. `html` is the content; `file` goes into the evidence; `cfg` comes from loadConfig/configFrom.
+ * Returns { file, dialog_open, findings: [{ rule, severity, region, message, evidence }] }.
  */
-export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
+export function analyzeScreen(html, cfg = configFrom({}), file = 'screen.html') {
   const root = parseHtml(html);
+  const L = langPack(cfg);
   const sel = cfg.verification.selectors;
   const regionSel = [...sel.regions, sel.dialog].join(', ');
   const findings = [];
@@ -60,19 +65,19 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
   const add = (rule, region, message, evidence) =>
     findings.push({ rule, severity: SEVERITY[rule], region, message, evidence });
 
-  // Regiões: rótulo estável por elemento (tag, id/role e, no diálogo, o título).
+  // Regions: a stable label per element (tag, id/role and, for a dialog, its title).
   const counts = {};
   const labels = new Map();
   const regionLabel = (r) => {
-    if (!r) return '(fora de região)';
+    if (!r) return '(outside any region)';
     if (labels.has(r)) return labels.get(r);
     let base = r.tag + (r.attrs.id && !/^_r_|^:r/.test(r.attrs.id) ? `#${r.attrs.id}` : '');
     if (matches(r, sel.dialog)) {
       const title = r.attrs['aria-labelledby'] ? textOf(getById(root, r.attrs['aria-labelledby'].split(/\s+/)[0]) || r) : r.attrs['aria-label'] || '';
-      base = `diálogo${title ? ` "${title.slice(0, 60)}"` : ''}`;
+      base = `dialog${title ? ` "${title.slice(0, 60)}"` : ''}`;
     } else if (r.attrs.role) base += `[role=${r.attrs.role}]`;
     counts[base] = (counts[base] || 0) + 1;
-    const label = counts[base] > 1 ? `${base} (${counts[base]}º)` : base;
+    const label = counts[base] > 1 ? `${base} (#${counts[base]})` : base;
     labels.set(r, label);
     return label;
   };
@@ -80,7 +85,7 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
 
   const dialogs = querySelectorAll(root, sel.dialog).filter((d) => !isHidden(d) && !closest(d.parent, sel.dialog));
   const dialogOpen = dialogs.length > 0;
-  // Com diálogo aberto, a página atrás fica fora das regras de região (é o que a pessoa vê em foco).
+  // With a dialog open, the page behind it is outside the region rules (the dialog is what the person sees in focus).
   const inFocus = (n) => !dialogOpen || dialogs.some((d) => contains(d, n));
 
   const buttons = querySelectorAll(root, sel.button).filter((b) => !isHidden(b));
@@ -90,7 +95,7 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
   const primary = (b) => matches(b, sel.primary);
   const destructive = (b) => matches(b, sel.destructive);
 
-  // T1 — primárias por região (com diálogo aberto, só o diálogo conta).
+  // T1: primary actions per region (with a dialog open, only the dialog counts).
   const max = cfg.actions['primary-per-region'];
   const byRegion = new Map();
   for (const b of buttons.filter((b) => primary(b) && inFocus(b))) {
@@ -100,20 +105,20 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
   }
   for (const [r, bs] of byRegion) {
     if (bs.length > max) {
-      add('T1', regionLabel(r), `${bs.length} ações primárias (máx. ${max}): ${bs.map((b) => `"${accessibleName(root, b)}"`).join(', ')}`, evs(bs));
+      add('T1', regionLabel(r), `${bs.length} primary actions (max. ${max}): ${bs.map((b) => `"${accessibleName(root, b)}"`).join(', ')}`, evs(bs));
     }
   }
 
-  // T2 — ordem no rodapé do diálogo.
+  // T2: order in the dialog footer.
   const dialogOrder = cfg.actions['dialog-order'];
   for (const d of dialogs) {
     const inDialog = buttons.filter((b) => contains(d, b));
     const cancel = inDialog.filter((b) => CANCEL_LABELS.includes(norm(accessibleName(root, b))));
     const mainActions = inDialog.filter((b) => (primary(b) || destructive(b)) && !cancel.includes(b));
     for (const p of mainActions) {
-      // Sobe do botão principal até o primeiro ancestral, abaixo do próprio diálogo, que também tem um
-      // botão de cancelar: é o rodapé. Botões em áreas diferentes (conteúdo × rodapé) não são comparados.
-      // Com `verification.selectors.dialog-footer`, o rodapé é declarado; sem ele, é inferido.
+      // Walk up from the main button to the first ancestor, below the dialog itself, that also holds a cancel
+      // button: that is the footer. Buttons in different areas (content vs footer) are not compared.
+      // With `verification.selectors.dialog-footer` the footer is declared; without it, it is inferred.
       let group = p.parent, pair = null;
       const footer = sel['dialog-footer'] ? closest(p, sel['dialog-footer']) : null;
       if (footer && contains(d, footer)) {
@@ -129,40 +134,40 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
       const cancelFirst = order.get(pair) < order.get(p);
       const wrong = dialogOrder === 'action-cancel' ? cancelFirst : !cancelFirst;
       if (wrong) {
-        const expected = dialogOrder === 'action-cancel' ? 'ação antes de cancelar' : 'cancelar antes da ação';
-        add('T2', regionLabel(d), `ordem "${accessibleName(root, pair)}" × "${accessibleName(root, p)}" invertida (esperado: ${expected})`, `${ev(pair)}, ${ev(p)}`);
+        const expected = dialogOrder === 'action-cancel' ? 'action before cancel' : 'cancel before action';
+        add('T2', regionLabel(d), `order "${accessibleName(root, pair)}" × "${accessibleName(root, p)}" reversed (expected: ${expected})`, `${ev(pair)}, ${ev(p)}`);
       }
     }
   }
 
-  // T3 — exatamente um h1.
-  // Com diálogo aberto, a tela de base é avaliada na própria captura: não repete o T3.
+  // T3: exactly one h1.
+  // With a dialog open, the base screen is judged in its own capture: T3 is not repeated.
   const h1 = querySelectorAll(root, 'h1').filter((h) => !isHidden(h));
   if (dialogs.length === 0 && h1.length !== 1) {
-    add('T3', '(tela)', h1.length === 0 ? 'nenhum título principal (h1)' : `${h1.length} títulos principais (h1): ${h1.map((h) => `"${textOf(h).slice(0, 50)}"`).join(', ')}`, h1.length ? evs(h1) : file);
+    add('T3', '(screen)', h1.length === 0 ? 'no main title (h1)' : `${h1.length} main titles (h1): ${h1.map((h) => `"${textOf(h).slice(0, 50)}"`).join(', ')}`, h1.length ? evs(h1) : file);
   }
 
-  // T4 — campo com rótulo visível ou nome acessível.
+  // T4: field with a visible label or an accessible name.
   const fields = querySelectorAll(root, sel.field).filter((f) => inFocus(f) && !isHidden(f) && !ariaHidden(f) && !/^(submit|button|reset|image)$/.test(f.attrs.type || ''));
   for (const f of fields) {
     if (fieldLabel(root, f)) continue;
     const ph = f.attrs.placeholder;
-    add('T4', regionLabel(regionOf(f)), ph ? `campo só com placeholder ("${ph}"), sem rótulo` : `campo <${f.tag}${f.attrs.name ? ` name="${f.attrs.name}"` : ''}> sem rótulo nem nome acessível`, ev(f));
+    add('T4', regionLabel(regionOf(f)), ph ? `field with only a placeholder ("${ph}"), no label` : `field <${f.tag}${f.attrs.name ? ` name="${f.attrs.name}"` : ''}> without a label or accessible name`, ev(f));
   }
 
-  // T5 — destrutiva com rótulo genérico.
+  // T5: destructive action with a generic label.
   const flagged = new Set();
   if (cfg.actions['destructive-specific-label'] !== false) {
     for (const b of buttons.filter((b) => destructive(b) && inFocus(b))) {
       const name = accessibleName(root, b);
-      if (GENERIC_DESTRUCTIVE_LABELS.includes(norm(name))) {
+      if (L.genericDestructiveLabels.includes(norm(name))) {
         flagged.add(b);
-        add('T5', regionLabel(regionOf(b)), `ação destrutiva com rótulo genérico "${name}" (diga o que acontece: "Excluir pedido")`, ev(b));
+        add('T5', regionLabel(regionOf(b)), `destructive action with a generic label "${name}" (say what happens: "${L.destructiveExample}")`, ev(b));
       }
     }
   }
 
-  // T6 — termos proibidos no texto visível (palavra inteira, sem caixa).
+  // T6: forbidden terms in the visible text (whole word, case-insensitive).
   const terms = (cfg.content.forbidden || []).map(String).filter(Boolean);
   if (terms.length) {
     const re = terms.map((t) => [t, new RegExp(`(?<![\\p{L}\\p{N}_])${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}\\p{N}_])`, 'iu')]);
@@ -178,23 +183,23 @@ export function analyzeScreen(html, cfg = configFrom({}), file = 'tela.html') {
     }
     for (const { t, region, nodes } of seen.values()) {
       const snippet = nodes[0].text.replace(/\s+/g, ' ').trim().slice(0, 80);
-      add('T6', region, `termo proibido "${t}" no texto visível (${nodes.length}×), ex.: "${snippet}"`, evs(nodes.slice(0, 3).map((n) => n.parent)));
+      add('T6', region, `forbidden term "${t}" in the visible text (${nodes.length}×), e.g. "${snippet}"`, evs(nodes.slice(0, 3).map((n) => n.parent)));
     }
   }
 
-  // T7 — rótulo de botão sem verbo + objeto (aviso).
+  // T7: button label without verb + object (warning).
   const withoutVerb = new Map();
   for (const b of buttons) {
     if (flagged.has(b) || !inFocus(b)) continue;
     const name = accessibleName(root, b);
-    if (!LABELS_WITHOUT_VERB.includes(norm(name))) continue;
+    if (!L.labelsWithoutVerb.includes(norm(name))) continue;
     const region = regionLabel(regionOf(b));
     const k = `${norm(name)}|${region}`;
     if (!withoutVerb.has(k)) withoutVerb.set(k, { name, region, bs: [] });
     withoutVerb.get(k).bs.push(b);
   }
   for (const { name, region, bs } of withoutVerb.values()) {
-    add('T7', region, `botão "${name}" sem verbo + objeto${bs.length > 1 ? ` (${bs.length}×)` : ''} (ex.: "Enviar pedido")`, evs(bs));
+    add('T7', region, `button "${name}" without verb + object${bs.length > 1 ? ` (${bs.length}×)` : ''} (e.g. "${L.examples.buttonWithObject}")`, evs(bs));
   }
 
   return { file, dialog_open: dialogOpen, findings };
@@ -229,7 +234,7 @@ export function summarize(results) {
 function main() {
   const args = parseCli('ux-lint/screen.mjs');
   if (!args._.length) {
-    console.error('Uso: node tools/ux-lint/screen.mjs <pasta-ou-arquivos.html...> [--ux UX.md] [--json] [--fail-at 3]');
+    console.error('Usage: node tools/ux-lint/screen.mjs <folder-or-files.html...> [--ux UX.md] [--json] [--fail-at 3]');
     process.exit(2);
   }
   const cfg = loadConfig(typeof args.ux === 'string' ? args.ux : null);
@@ -241,13 +246,13 @@ function main() {
     for (const r of results) {
       const name = basename(r.file);
       if (!r.findings.length) { console.log(`✓ ${name}`); continue; }
-      console.log(`✗ ${name}${r.dialog_open ? ' (diálogo aberto)' : ''}`);
+      console.log(`✗ ${name}${r.dialog_open ? ' (dialog open)' : ''}`);
       for (const a of r.findings.sort((x, y) => y.severity - x.severity || x.rule.localeCompare(y.rule))) {
         console.log(`   ${a.rule} sev ${a.severity} | ${a.region} | ${a.message}\n      ${a.evidence}`);
       }
     }
-    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'nenhum';
-    console.log(`\nResumo: ${summary.screens} telas, ${summary.screens_with_findings} com achado, ${summary.findings} achados (${rules}); severidade ${Object.entries(summary.by_severity).map(([k, v]) => `${k}:${v}`).join(' ')}`);
+    const rules = Object.entries(summary.by_rule).sort().map(([k, v]) => `${k}=${v}`).join(' ') || 'none';
+    console.log(`\nSummary: ${summary.screens} screens, ${summary.screens_with_findings} with findings, ${summary.findings} findings (${rules}); severity ${Object.entries(summary.by_severity).map(([k, v]) => `${k}:${v}`).join(' ')}`);
   }
   const failed = results.some((r) => r.findings.some((a) => a.severity >= threshold));
   process.exit(failed ? 1 : 0);

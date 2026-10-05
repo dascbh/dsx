@@ -1,55 +1,55 @@
 /**
- * Prelúdio de helpers para `use_figma` — cole no topo de cada script.
+ * Helper prelude for `use_figma`: paste it at the top of every script.
  *
- * NÃO roda no Node: é código do Plugin API do Figma, colado dentro de uma
- * chamada `use_figma` (por isso o `await` no nível de topo e o objeto global
- * `figma`). `node --check` reclamaria do `await` solto — é esperado.
+ * Does NOT run in Node: it is Figma Plugin API code, pasted inside a
+ * `use_figma` call (hence the top-level `await` and the global `figma`
+ * object). `node --check` would complain about the bare `await`; that is expected.
  *
- * Cada chamada a `use_figma` roda num contexto novo: não há import, não há
- * estado entre chamadas. Este prelúdio é o preço fixo por script, e paga:
- * sem ele, montar uma tela vira dezenas de linhas de `createFrame` cru e o
- * layout sai posicionado à mão em vez de auto-layout.
+ * Each `use_figma` call runs in a fresh context: no imports, no state between
+ * calls. This prelude is the fixed cost per script, and it pays off:
+ * without it, building a screen takes dozens of lines of raw `createFrame` and
+ * the layout ends up hand-positioned instead of auto-layout.
  *
- * Depende de: variáveis de cor (coleções `Primitivos` / `Semântico` /
- * `Componente`) e estilos de texto já criados (skill `figma-fundacoes`), e do
- * frame de ícones com os componentes `Ícone/<Nome>`. Os nomes de variável
- * seguem a convenção DSX — o token DTCG com `/` no lugar de `.`
- * (`color.text.primary` → `color/text/primary`).
+ * Depends on: color variables (collections `Primitivos` / `Semântico` /
+ * `Componente`) and text styles already created (skill `figma-foundations`), and
+ * the icon frame with the `Ícone/<Name>` components. Variable names follow the
+ * DSX convention: the DTCG token with `/` instead of `.`
+ * (`color.text.primary` → `color/text/primary`). Collection, style and component
+ * names are text of the Figma file and stay in pt-BR (existing files carry them).
  *
- * Antes de colar, preencha o bloco CONFIGURE abaixo com os fatos do projeto.
- * Eles estão em `design/figma-reference.json` (skill `figma-convencoes`) —
- * leia de lá em vez de redescobrir por API.
+ * Before pasting, fill in the CONFIGURE block below with the project facts.
+ * They live in `design/figma-reference.json` (skill `figma-conventions`):
+ * read them from there instead of rediscovering them through the API.
  */
 
 // ═════════════════════════════════════════════════════════════════════════════
-// CONFIGURE — fatos específicos do projeto. Tudo o que muda de um arquivo do
-// Figma para outro mora aqui; o resto do prelúdio não deveria precisar de
-// edição.
+// CONFIGURE: project-specific facts. Everything that changes from one Figma
+// file to another lives here; the rest of the prelude should need no editing.
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Id do frame que agrupa os componentes de ícone (fase Fundações).
- *  Fonte: `design/figma-reference.json` → `foundation.icons.frameId`. */
+/** Id of the frame that groups the icon components (Foundations phase).
+ *  Source: `design/figma-reference.json` → `foundation.icons.frameId`. */
 const ICON_FRAME_ID = 'ID_DO_FRAME_DE_ICONES';
 
-/** Prefixo do nome dos componentes de ícone: `Ícone/Add`, `Ícone/Cancel`… */
+/** Name prefix of the icon components: `Ícone/Add`, `Ícone/Cancel`… */
 const ICON_PREFIX = 'Ícone/';
 
-/** Tamanho nativo dos componentes de ícone (MUI, Lucide etc. usam 24). */
+/** Native size of the icon components (MUI, Lucide etc. use 24). */
 const ICON_NATIVE_SIZE = 24;
 
-/** Família tipográfica real do projeto — a mesma que o código carrega. */
+/** The project's real font family, the same one the code loads. */
 const FONT_FAMILY = 'Plus Jakarta Sans';
 const FONT_WEIGHTS = ['Regular', 'Medium', 'SemiBold', 'Bold'];
 
-/** Nomes dos estilos de texto usados pelos helpers (criados em figma-fundacoes). */
+/** Names of the text styles the helpers use (created in figma-foundations). */
 const TEXT_STYLE = {
   sectionTitle: 'Título/Seção (SectionCard)',
   tableHeader: 'Rótulo/Cabeçalho de tabela',
 };
 
-/** Papéis → variável do Figma. Defaults = tokens semânticos do DSX.
- *  Se o projeto não usa tokens no formato DSX, troque pelos nomes semânticos
- *  do tema dele (mantendo as chaves à esquerda, que é o que os helpers leem). */
+/** Roles → Figma variable. Defaults = DSX semantic tokens.
+ *  If the project does not use DSX-format tokens, swap in its theme's semantic
+ *  names (keeping the keys on the left, which is what the helpers read). */
 const TK = {
   pageBg: 'color/bg/canvas',
   surfaceBg: 'color/bg/surface',
@@ -67,22 +67,22 @@ const TK = {
   info: 'color/feedback/info-icon',
 };
 
-/** Ícone por tom do Verdict/alerta. Ajustado 2026-08-18: WarningAmber/ErrorOutline
- *  não existem mais no projeto de origem — usar ReportProblem/Cancel. Sem
- *  entrada para `neutral` de propósito: ele não tem ícone próprio e cai em
- *  InfoOutlined no verdict() abaixo; esse fallback é decisão de desenho, não
- *  caso esquecido (o tom em si continua validado por `oneOf`).
- *  Troque pelos nomes exportados pelo pacote de ícones do SEU projeto. */
+/** Icon per Verdict/alert tone. Adjusted 2026-08-18: WarningAmber/ErrorOutline
+ *  no longer exist in the source project; use ReportProblem/Cancel. No entry
+ *  for `neutral` on purpose: it has no icon of its own and falls back to
+ *  InfoOutlined in verdict() below; that fallback is a design decision, not a
+ *  forgotten case (the tone itself is still validated by `oneOf`).
+ *  Swap in the names exported by YOUR project's icon package. */
 const TONE_ICON = {
   safe: 'CheckCircle', warn: 'ReportProblem', danger: 'Cancel', info: 'InfoOutlined',
 };
 
-/** Chrome da tela (casca). Larguras/alturas do AppBar e do menu lateral. */
+/** Screen chrome (shell). AppBar and side menu widths/heights. */
 const SCREEN_WIDTH = 1440;
 const APPBAR_HEIGHT = 48;
 
 // ═════════════════════════════════════════════════════════════════════════════
-// fim do CONFIGURE
+// end of CONFIGURE
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ── base ─────────────────────────────────────────────────────────────────────
@@ -94,17 +94,17 @@ const TS = {}; tsl.forEach(s => TS[s.name] = s);
 const FA = s => ({ family: FONT_FAMILY, style: s });
 await Promise.all(FONT_WEIGHTS.map(s => figma.loadFontAsync(FA(s))));
 
-/** Paint sólido ligado à variável `n`. Falha alto se a variável não existe —
- *  variável ausente = parar e propor, nunca inventar inline. */
+/** Solid paint bound to variable `n`. Fails loudly when the variable does not
+ *  exist: a missing variable means stop and propose, never invent inline. */
 const P = n => {
-  if (!V[n]) throw new Error(`variável "${n}" não existe no arquivo — confira TK no CONFIGURE ou rode figma-fundacoes`);
+  if (!V[n]) throw new Error(`variable "${n}" does not exist in the file: check TK in CONFIGURE or run figma-foundations`);
   return figma.variables.setBoundVariableForPaint(
     { type: 'SOLID', color: { r: 0, g: 0, b: 0 } }, 'color', V[n]);
 };
 const fill = (nd, n) => { nd.fills = [P(n)]; };
 const bord = (nd, n, w) => { nd.strokes = [P(n)]; nd.strokeWeight = w == null ? 1 : w; };
-/** Tinta translúcida: precisa de read-modify-write
- *  (ver skills/figma-espelhar/references/plugin-api.md, "Cor e variáveis"). */
+/** Translucent paint: needs read-modify-write
+ *  (see skills/figma-mirror/references/plugin-api.md, "Color and variables"). */
 const tint = (nd, n, a) => {
   nd.fills = [P(n)];
   const f = JSON.parse(JSON.stringify(nd.fills));
@@ -113,9 +113,9 @@ const tint = (nd, n, a) => {
 };
 
 const AL = (dir, props) => figma.createAutoLayout(dir, props);
-/** Texto com estilo do arquivo. */
+/** Text with a file style. */
 const T = async (chars, style, color) => {
-  if (!TS[style]) throw new Error(`estilo de texto "${style}" não existe no arquivo — confira TEXT_STYLE no CONFIGURE`);
+  if (!TS[style]) throw new Error(`text style "${style}" does not exist in the file: check TEXT_STYLE in CONFIGURE`);
   const t = figma.createText();
   t.fontName = FA('Regular');
   t.characters = chars;
@@ -123,7 +123,7 @@ const T = async (chars, style, color) => {
   fill(t, color);
   return t;
 };
-/** Texto avulso (tamanhos que não têm estilo próprio). */
+/** Loose text (sizes without a style of their own). */
 const RAW = (chars, weight, size, color) => {
   const t = figma.createText();
   t.fontName = FA(weight);
@@ -134,19 +134,19 @@ const RAW = (chars, weight, size, color) => {
   return t;
 };
 
-// ── ícones (componentes criados pela skill figma-fundacoes) ──────────────────
+// ── icons (components created by the figma-foundations skill) ───────────────
 const ICO = {};
 for (const c of (await figma.getNodeByIdAsync(ICON_FRAME_ID)).children) {
   ICO[c.name.replace(ICON_PREFIX, '')] = c;
 }
-/** Instância de ícone no tamanho pedido.
- *  `rescale`, não `resize`: `resize` só muda a caixa da instância e deixa o
- *  vetor interno no tamanho nativo quando a constraint do vetor não é SCALE —
- *  o glifo vaza ou fica deslocado. `rescale` escala a instância inteira,
- *  vetor incluído, independentemente da constraint (ver figma-convencoes,
- *  seção "Criar ou evoluir um componente do kit", item de retrocompatibilidade). */
+/** Icon instance at the requested size.
+ *  `rescale`, not `resize`: `resize` only changes the instance box and leaves the
+ *  inner vector at native size when the vector constraint is not SCALE, so the
+ *  glyph overflows or shifts. `rescale` scales the whole instance, vector
+ *  included, regardless of the constraint (see figma-conventions, section on
+ *  creating or evolving a kit component, backward-compatibility item). */
 const icon = (name, color, size) => {
-  if (!ICO[name]) throw new Error(`ícone "${name}" não existe em ${ICON_PREFIX}* — confira o frame de ícones`);
+  if (!ICO[name]) throw new Error(`icon "${name}" does not exist in ${ICON_PREFIX}*: check the icon frame`);
   const i = ICO[name].createInstance();
   i.rescale((size || 18) / ICON_NATIVE_SIZE);
   i.children[0].fills = [P(color)];
@@ -158,20 +158,20 @@ const TONE = {
   neutral: TK.textPrimary, info: TK.info,
 };
 
-/** Guarda de conjunto fechado: tipo/tom não reconhecido tem que falhar alto,
- *  não degradar em silêncio para o ramo que por acaso é o fallback. Fallback
- *  silencioso aqui é como um erro de digitação numa chamada de helper vira
- *  cor errada sem nada no relatório para pegar (mesma doutrina do `uncertain`
- *  dos mapas — vale também para o próprio código). */
+/** Closed-set guard: an unrecognized type/tone must fail loudly, not degrade
+ *  silently into whichever branch happens to be the fallback. A silent fallback
+ *  here is how a typo in a helper call becomes a wrong color with nothing in
+ *  the report to catch it (same doctrine as the maps' `uncertain`, applied to
+ *  the code itself). */
 const oneOf = (value, allowed, label) => {
   if (!allowed.includes(value)) {
-    throw new Error(`${label} "${value}" não é um de: ${allowed.join(', ')}`);
+    throw new Error(`${label} "${value}" is not one of: ${allowed.join(', ')}`);
   }
   return value;
 };
 
-// ── casca de tela ────────────────────────────────────────────────────────────
-/** Tela com AppBar + menu lateral por instância; devolve o container de conteúdo. */
+// ── screen shell ─────────────────────────────────────────────────────────────
+/** Screen with AppBar + side menu by instance; returns the content container. */
 function screen(page, name, x, y, h, APPBAR, DRAWER, menuWidth) {
   const s = figma.createFrame();
   s.name = name; s.resize(SCREEN_WIDTH, h); s.x = x; s.y = y;
@@ -192,20 +192,20 @@ function screen(page, name, x, y, h, APPBAR, DRAWER, menuWidth) {
   main.layoutSizingVertical = 'HUG';
   return { s, main, dr };
 }
-/** Depois de montar: ajusta a altura da tela ao conteúdo real. */
+/** After building: fits the screen height to the real content. */
 function finish(s, main, dr) {
   s.resize(SCREEN_WIDTH, main.height + APPBAR_HEIGHT + 20);
   if (dr) dr.resize(dr.width, s.height - APPBAR_HEIGHT);
 }
 
-// ── primitivos ───────────────────────────────────────────────────────────────
+// ── primitives ───────────────────────────────────────────────────────────────
 const BUTTON_TYPES = ['primary', 'secondary', 'destructive', 'neutral'];
-// Nome do frame no Figma (texto do arquivo, em pt-BR) e valores antigos aceitos na chamada.
+// Frame name in Figma (file text, in pt-BR) and old values accepted in the call.
 const BUTTON_LABEL = { primary: 'primária', secondary: 'secundária', destructive: 'destrutiva', neutral: 'neutra' };
 const LEGACY_BUTTON_TYPE = { 'primária': 'primary', 'secundária': 'secondary', destrutiva: 'destructive', neutra: 'neutral' };
 function btn(label, type, iconName, small) {
   type = LEGACY_BUTTON_TYPE[type] || type;
-  oneOf(type, BUTTON_TYPES, 'tipo de botão');
+  oneOf(type, BUTTON_TYPES, 'button type');
   const b = AL('HORIZONTAL', {
     itemSpacing: 7,
     paddingLeft: small ? 10 : 16, paddingRight: small ? 10 : 16,
@@ -226,7 +226,7 @@ function btn(label, type, iconName, small) {
 }
 
 function chip(label, tone, filled) {
-  oneOf(tone, Object.keys(TONE), 'tom do chip');
+  oneOf(tone, Object.keys(TONE), 'chip tone');
   const c = AL('HORIZONTAL', { paddingLeft: 8, paddingRight: 8, paddingTop: 2, paddingBottom: 2 });
   c.name = 'Chip'; c.counterAxisAlignItems = 'CENTER'; c.cornerRadius = 999;
   const t = TONE[tone];
@@ -247,7 +247,7 @@ async function card(parent, title, count, action) {
   head.counterAxisAlignItems = 'CENTER'; head.fills = [];
   c.appendChild(head); head.layoutSizingHorizontal = 'FILL';
   head.appendChild(await T(title, TEXT_STYLE.sectionTitle, TK.textPrimary));
-  // contagem aceita string OU nó (chip) — o código real usa os dois
+  // count accepts a string OR a node (chip); real code uses both
   if (count) head.appendChild(
     typeof count === 'string' ? RAW(count, 'Regular', 13, TK.textSecondary) : count);
   const sp = figma.createFrame(); sp.fills = []; sp.resize(4, 4);
@@ -256,10 +256,10 @@ async function card(parent, title, count, action) {
   return c;
 }
 
-/** Faixa de status com borda esquerda de 2px — a borda é um filho em fluxo,
- *  não um nó absoluto (absoluto não aceita layoutSizingVertical FILL). */
+/** Status strip with a 2px left border: the border is an in-flow child,
+ *  not an absolute node (absolute does not accept layoutSizingVertical FILL). */
 function verdict(parent, tone, title, body) {
-  oneOf(tone, Object.keys(TONE), 'tom do verdict');
+  oneOf(tone, Object.keys(TONE), 'verdict tone');
   const v = AL('HORIZONTAL', { itemSpacing: 0 }); v.name = 'Verdict';
   fill(v, TK.surfaceBg); bord(v, TK.dividerBorder); v.clipsContent = true;
   parent.appendChild(v); v.layoutSizingHorizontal = 'FILL';
@@ -283,8 +283,8 @@ function verdict(parent, tone, title, body) {
   return v;
 }
 
-/** Campo de formulário com o rótulo no entalhe da borda (MUI outlined).
- *  valor === null → campo vazio: o rótulo fica dentro, como o MUI faz. */
+/** Form field with the label in the border notch (MUI outlined).
+ *  value === null → empty field: the label sits inside, as MUI does. */
 function field(parent, label, value, width, help, multiline) {
   const wrap = AL('VERTICAL', { itemSpacing: 4 }); wrap.fills = [];
   parent.appendChild(wrap);
@@ -298,10 +298,10 @@ function field(parent, label, value, width, help, multiline) {
   });
   f.name = 'TextField · ' + label; f.counterAxisAlignItems = 'MIN';
   f.cornerRadius = 4; f.clipsContent = false; f.fills = []; bord(f, TK.cardBorder);
-  /** createAutoLayout() vem com clipsContent=true por padrão — o rótulo do
-   *  entalhe fica posicionado ACIMA da borda superior do próprio frame
-   *  (y negativo), então o wrapper precisa de clipsContent=false também,
-   *  senão o rótulo é cortado (achado 2026-08-18, fase Fundações). */
+  /** createAutoLayout() comes with clipsContent=true by default; the notch
+   *  label sits ABOVE the frame's own top border (negative y), so the wrapper
+   *  needs clipsContent=false too, or the label is clipped (finding
+   *  2026-08-18, Foundations phase). */
   wrap.clipsContent = false;
   wrap.appendChild(f); f.layoutSizingHorizontal = 'FILL';
 
@@ -309,10 +309,10 @@ function field(parent, label, value, width, help, multiline) {
     value == null ? TK.textSecondary : TK.textPrimary);
   f.appendChild(inner); inner.layoutSizingHorizontal = 'FILL'; inner.textAutoResize = 'HEIGHT';
 
-  if (value != null) {                       // entalhe: tampa a borda atrás do rótulo
+  if (value != null) {                       // notch: covers the border behind the label
     const bg = figma.createFrame(); bg.name = 'notch'; bg.strokes = [];
     fill(bg, TK.surfaceBg); bg.resize(10, 3);
-    f.appendChild(bg); bg.layoutPositioning = 'ABSOLUTE';   // depois do appendChild
+    f.appendChild(bg); bg.layoutPositioning = 'ABSOLUTE';   // after appendChild
     const lb = RAW(label, 'Regular', 10.5, TK.textSecondary);
     f.appendChild(lb); lb.layoutPositioning = 'ABSOLUTE'; lb.x = 9; lb.y = -7;
     bg.resize(lb.width + 6, 3); bg.x = 7; bg.y = -1.5;
@@ -324,8 +324,8 @@ function field(parent, label, value, width, help, multiline) {
   return wrap;
 }
 
-/** Tabela densa. cols = [[rótulo, largura, alinhamento?]]; linhas = matriz de nós.
- *  CONFIRA: Σ larguras + (n−1)×12 ≤ largura interna do container. */
+/** Dense table. cols = [[label, width, alignment?]]; rows = matrix of nodes.
+ *  CHECK: Σ widths + (n−1)×12 ≤ the container's inner width. */
 async function table(parent, cols, rows) {
   const wrap = AL('VERTICAL', { itemSpacing: 0 }); wrap.name = 'Tabela'; wrap.fills = [];
   parent.appendChild(wrap); wrap.layoutSizingHorizontal = 'FILL';
@@ -371,7 +371,7 @@ async function table(parent, cols, rows) {
   return wrap;
 }
 
-/** Espaçador vertical de altura fixa, esticado na largura do pai. */
+/** Fixed-height vertical spacer, stretched to the parent width. */
 function gap(parent, h) {
   const g = figma.createFrame(); g.name = 'gap'; g.fills = []; g.resize(10, h);
   parent.appendChild(g); g.layoutSizingHorizontal = 'FILL';

@@ -1,6 +1,6 @@
 ---
 id: guest-checkout
-title: Quando oferecer checkout como convidado?
+title: When should you offer guest checkout?
 category: ecommerce
 components: [checkout, account-selection, button, form]
 type: recommendation
@@ -11,85 +11,85 @@ wcag: ["3.3.2", "2.4.6", "2.4.3", "2.5.3"]
 related: [cart-edit-items, address-by-postal-code, form-steps, password-recovery]
 ---
 
-# Quando oferecer checkout como convidado?
+# When should you offer guest checkout?
 
-> **Regra:** Quando a conta não é essencial para concluir a compra, ofereça "Continuar como convidado" de forma explícita e destacada no início da seleção de conta, e proponha criar conta só depois da confirmação do pedido.
+> **Rule:** When an account is not essential to complete the purchase, offer "Continue as guest" explicitly and prominently at the start of account selection, and suggest creating an account only after the order is confirmed.
 
-## Contexto
+## Context
 
-O checkout de convidado desvincula a coleta dos dados que a transação exige da decisão de manter cadastro. A questão não é se a loja deve abolir contas, mas se criar conta precisa ocorrer antes ou durante a compra para que a pessoa finalize.
+Guest checkout separates collecting the data the transaction requires from the decision to keep an account. The question is not whether the store should abolish accounts, but whether creating one must happen before or during the purchase for the person to finish.
 
-Criar conta acrescenta uma decisão e, em muitos fluxos, senha ou verificação que não são necessárias ao pedido. Pesquisas de checkout relatam dificuldade quando a opção de convidado é discreta, aparece abaixo de login e cadastro ou só surge depois do e-mail.
+Creating an account adds a decision and, in many flows, a password or verification that the order does not need. Checkout research reports difficulty when the guest option is discreet, sits below sign-in and sign-up, or only appears after the email.
 
-Também há atrito quando a pessoa escolhe continuar como convidada e o fluxo volta a pedir cadastro.
+There is also friction when the person chooses to continue as a guest and the flow asks them to sign up again.
 
-## Decisão
+## Decision
 
-- **SE** a conta não é indispensável para concluir a compra **ENTÃO** ofereça checkout como convidado.
-- **SE** houver seleção de conta **ENTÃO** coloque a opção de convidado no início, com destaque comparável ao do login.
-- **SE** o cliente é recorrente **ENTÃO** mantenha o login disponível, sem exigi-lo de quem é novo.
-- **SE** criar conta traz valor real **ENTÃO** ofereça depois da confirmação do pedido, explicando os benefícios, sem interromper o checkout.
-- **SE** a conta é essencial ao serviço ou há exigência operacional ou normativa justificada **ENTÃO** explique no início por que ela é necessária e quais dados serão usados.
-- **SE** a pessoa escolheu convidado **ENTÃO** não peça senha nem cadastro no meio do fluxo.
-- **SE** houver erro ou retorno **ENTÃO** preserve os dados preenchidos.
-- **SENÃO** trate convidado como caminho padrão para compras pontuais.
+- **IF** an account is not indispensable to complete the purchase **THEN** offer guest checkout.
+- **IF** there is account selection **THEN** put the guest option first, with prominence comparable to sign-in.
+- **IF** the customer is returning **THEN** keep sign-in available, without requiring it of new customers.
+- **IF** creating an account brings real value **THEN** offer it after the order is confirmed, explaining the benefits, without interrupting checkout.
+- **IF** the account is essential to the service or there is a justified operational or regulatory requirement **THEN** explain at the start why it is needed and what data will be used.
+- **IF** the person chose guest **THEN** do not ask for a password or sign-up in the middle of the flow.
+- **IF** there is an error or the person comes back **THEN** preserve the data already entered.
+- **ELSE** treat guest as the default path for one-off purchases.
 
-## Quando usar
+## When to use
 
-- Compras pontuais ou de baixa recorrência.
-- Produtos que não dependem de área autenticada.
-- Lojas em que rastreio, suporte e comprovante funcionam por e-mail ou número do pedido.
-- Fluxos mobile com atenção e espaço limitados.
+- One-off or infrequent purchases.
+- Products that do not depend on an authenticated area.
+- Stores where tracking, support and receipts work by email or order number.
+- Mobile flows with limited attention and space.
 
-## Quando evitar
+## When to avoid
 
-- Conta é parte essencial do serviço → **use em vez disso:** explicar a necessidade antes e pedir só os dados necessários.
-- Relação recorrente precisa existir antes da transação → **use em vez disso:** cadastro curto no início, com justificativa.
+- The account is an essential part of the service → **use instead:** explain the need beforehand and ask only for the necessary data.
+- A recurring relationship must exist before the transaction → **use instead:** a short sign-up at the start, with a justification.
 
-## Faça
+## Do
 
-- Use rótulos como "Continuar como convidado" ou "Comprar sem criar conta".
-- Informe, quando verdadeiro, que a conta pode ser criada depois.
-- Mantenha o login acessível.
-- Valide a decisão no contexto do produto, público e modelo de negócio.
+- Use labels such as "Continue as guest" or "Buy without an account".
+- State, when true, that the account can be created later.
+- Keep sign-in accessible.
+- Validate the decision in the context of the product, audience and business model.
 
-## Evite
+## Avoid
 
-- Exigir cadastro antes de verificar se é necessário.
-- Esconder a opção em link de baixo destaque.
-- Rótulo vago como "Continuar".
-- Revelar a opção só depois do e-mail.
-- Afirmar que convidado sempre aumenta conversão.
+- Requiring sign-up before checking whether it is necessary.
+- Hiding the option in a low-prominence link.
+- A vague label such as "Continue".
+- Revealing the option only after the email.
+- Claiming that guest checkout always increases conversion.
 
-## Acessibilidade
+## Accessibility
 
-- O rótulo deve deixar claro o que acontece ao ativar (3.3.2); "Continuar" sozinho não informa o destino.
-- Controle alcançável por teclado, com foco visível e ordem de foco previsível (2.4.3).
-- Nome acessível coerente com o texto visível (2.5.3).
-- Teste com leitor de tela, zoom e viewport mobile.
+- The label must make clear what happens on activation (3.3.2); "Continue" alone does not say where it leads.
+- A control reachable by keyboard, with visible focus and a predictable focus order (2.4.3).
+- An accessible name consistent with the visible text (2.5.3).
+- Test with screen reader, zoom and a mobile viewport.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Opção principal | "Continuar como convidado" |
-| Login | "Já tenho conta" |
-| Pós-compra | "Quer salvar seus dados para a próxima compra? Crie uma senha." |
-| Conta obrigatória | "Para este serviço, precisamos de uma conta. Leva menos de um minuto." |
+| Main option | "Continue as guest" |
+| Sign-in | "I already have an account" |
+| After purchase | "Want to save your details for next time? Create a password." |
+| Account required | "This service needs an account. It takes less than a minute." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A conta é realmente necessária para concluir esta compra.
-- [ ] A opção de convidado aparece no início da seleção de conta.
-- [ ] O rótulo informa o que acontecerá.
-- [ ] A opção tem destaque comparável ao do login.
-- [ ] É possível concluir sem criar senha.
-- [ ] A oferta de criar conta aparece só após a confirmação do pedido.
-- [ ] Os dados preenchidos permanecem após erro ou retorno.
-- [ ] O fluxo opera com teclado, leitor de tela, zoom e no mobile.
+- [ ] An account is really needed to complete this purchase.
+- [ ] The guest option appears at the start of account selection.
+- [ ] The label says what will happen.
+- [ ] The option has prominence comparable to sign-in.
+- [ ] It is possible to finish without creating a password.
+- [ ] The offer to create an account appears only after the order is confirmed.
+- [ ] Entered data remains after an error or a return.
+- [ ] The flow works with keyboard, screen reader, zoom and on mobile.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute (tornar o checkout de convidado proeminente; deixar a criação de conta para a etapa de confirmação): dificuldade com opção discreta e ganho ao adiar o cadastro.
-- Baymard Institute (metodologia de pesquisa): base dos testes de usabilidade de checkout; evidência contextual.
-- W3C WAI, técnica G131 e critério 3.3.2 (Labels or Instructions): rótulos e instruções claras quanto ao propósito dos controles.
+- Baymard Institute (make guest checkout prominent; leave account creation for the confirmation step): difficulty with a discreet option and gains from postponing sign-up.
+- Baymard Institute (research methodology): the basis of checkout usability tests; contextual evidence.
+- W3C WAI, technique G131 and criterion 3.3.2 (Labels or Instructions): clear labels and instructions about the purpose of controls.

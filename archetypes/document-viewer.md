@@ -1,10 +1,10 @@
 ---
 id: document-viewer
-title: Documento com visor
-summary: Tela de leitura de um documento pronto (pedido emitido, nota fiscal, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.
+title: Document viewer
+summary: Reading screen for a finished document (issued order, invoice, uploaded PDF) with metadata and actions alongside, without editing the content.
 register: [operational, editorial]
-when-to-use: SE a pessoa precisa ler, conferir ou despachar um documento que não edita nesta tela ENTÃO use documento com visor
-avoid-when: a pessoa vai alterar o texto (use editor com painel), o documento é curto o bastante para caber num painel lateral ou a tarefa é comparar muitos documentos ao mesmo tempo
+when-to-use: IF the person needs to read, check or dispatch a document they do not edit on this screen THEN use a document viewer
+avoid-when: the person will change the text (use editor with panel), the document is short enough to fit in a side panel, or the task is comparing many documents at once
 regions: [page-header, viewer-toolbar, viewer, info-panel]
 primary-action: { region: page-header, position: top-right, max: 1 }
 states: [loading, processing, error, no-access, unavailable, success]
@@ -13,90 +13,90 @@ variations: [viewer-with-right-panel, fullscreen-viewer, side-by-side-comparison
 rules: [T1, T3, T6, T7, F5]
 ---
 
-# Documento com visor
+# Document viewer
 
-O documento é o protagonista: o pedido de compra emitido, a nota fiscal enviada pelo fornecedor, um relatório final. A pessoa lê, confere dados contra metadados, baixa, encaminha ou registra uma decisão. A tela não edita o texto — e deixa isso claro para ninguém procurar o cursor.
+The document is the protagonist: the issued purchase order, the invoice sent by the supplier, a final report. The person reads, checks data against metadata, downloads, forwards or records a decision. The screen does not edit the text, and makes that clear so nobody goes looking for the cursor.
 
-## Quando usar
+## When to use
 
-- **SE** o conteúdo é um arquivo ou versão fechada (emitida, enviada, congelada) **ENTÃO** use documento com visor, e diga no cabeçalho que é somente leitura e por quê.
-- **SE** a pessoa confere o documento contra dados estruturados (partes, valores, datas) **ENTÃO** esses dados ficam no `info-panel`, lado a lado com o texto.
-- **SE** o documento tem várias versões **ENTÃO** a versão exibida aparece no cabeçalho, e trocar de versão é uma ação explícita no painel — nunca um visor que muda sozinho.
-- **SE** a pessoa precisa alterar o texto **ENTÃO** ofereça "Editar" que leva ao `editor-with-panel` (ou "Criar nova versão" quando a atual está congelada).
-- **SE** a tarefa é comparar duas versões **ENTÃO** use a variação `side-by-side-comparison`.
-- **SENÃO** (documento curto, consulta rápida a partir de uma lista) **ENTÃO** `detail-side-panel` resolve.
+- **IF** the content is a closed file or version (issued, sent, frozen) **THEN** use a document viewer, and say in the header that it is read-only and why.
+- **IF** the person checks the document against structured data (parties, amounts, dates) **THEN** that data sits in the `info-panel`, side by side with the text.
+- **IF** the document has several versions **THEN** the displayed version appears in the header, and switching versions is an explicit action in the panel, never a viewer that changes on its own.
+- **IF** the person needs to change the text **THEN** offer "Edit" leading to `editor-with-panel` (or "Create new version" when the current one is frozen).
+- **IF** the task is comparing two versions **THEN** use the `side-by-side-comparison` variation.
+- **ELSE** (short document, quick lookup from a list) **THEN** `detail-side-panel` is enough.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header  ‹ Pedidos / Título do documento (h1)              │
-│   Versão 3 · emitida em 12/03 · somente leitura [Ação prim.] │
+│ page-header  ‹ Orders / Document title (h1)                    │
+│   Version 3 · issued on 03/12 · read-only    [Primary act.]  │
 ├───────────────────────────────────────────┬──────────────────┤
-│ viewer-toolbar  ‹ 2/14 › · − 100% + · ⌕   │ painel-de-       │
-├───────────────────────────────────────────┤ informacoes      │
-│ viewer                                    │ Partes           │
-│  ┌─────────────────────────────────┐      │ Valor · Vigência │
-│  │  página do documento            │      │ Versões          │
-│  │                                 │      │ Histórico        │
+│ viewer-toolbar  ‹ 2/14 › · − 100% + · ⌕   │ info-panel       │
+├───────────────────────────────────────────┤                  │
+│ viewer                                    │ Parties          │
+│  ┌─────────────────────────────────┐      │ Amount · Term    │
+│  │  document page                  │      │ Versions         │
+│  │                                 │      │ History          │
 │  └─────────────────────────────────┘      │                  │
 └───────────────────────────────────────────┴──────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **page-header** — caminho de volta (trilha ou "‹ Voltar para …"), título do documento como `h1`, linha de estado (versão, situação, data, "somente leitura"), ação primária e até duas secundárias (baixar, compartilhar).
-- **viewer-toolbar** — navegação de páginas com "página X de Y", zoom, busca no texto, alternar tela cheia. Controles só com ícone precisam de nome acessível e dica.
-- **viewer** — o documento em largura de leitura confortável; rolagem própria; texto selecionável quando o formato permite. Destaques da busca visíveis, com contagem.
-- **info-panel** — dados estruturados para conferência, lista de versões com a atual marcada, histórico de eventos. Se tiver mais de três blocos, use abas no painel ("Dados", "Versões", "Histórico").
+- **page-header**: the way back (breadcrumbs or "‹ Back to …"), the document title as the `h1`, a status line (version, situation, date, "read-only"), the primary action and up to two secondary ones (download, share).
+- **viewer-toolbar**: page navigation with "page X of Y", zoom, text search, full-screen toggle. Icon-only controls need an accessible name and a tooltip.
+- **viewer**: the document at a comfortable reading width; its own scrolling; selectable text when the format allows. Search highlights visible, with a count.
+- **info-panel**: structured data for checking, the list of versions with the current one marked, the event history. If it has more than three blocks, use tabs in the panel ("Data", "Versions", "History").
 
-## Ações
+## Actions
 
-- **Primária:** uma, no `page-header`, top-right — o próximo passo do ciclo do documento ("Enviar para assinatura", "Registrar recebimento"). Se não há próximo passo, a primária pode ser "Baixar".
-- **Secundárias:** baixar, imprimir, copiar link — com ênfase menor; "abrir em nova aba" avisa que abre em nova aba.
-- **Indisponíveis:** ação que depende de estado ("Enviar" em documento ainda processando) aparece desabilitada com o motivo visível.
-- **Edição:** nunca editável no visor; "Editar" ou "Criar nova versão" leva a outra tela.
+- **Primary:** one, in the `page-header`, top-right: the next step in the document's lifecycle ("Send for signature", "Record receipt"). If there is no next step, the primary can be "Download".
+- **Secondary:** download, print, copy link, with less emphasis; "open in new tab" warns that it opens in a new tab.
+- **Unavailable:** an action that depends on state ("Send" on a document still processing) appears disabled with the reason visible.
+- **Editing:** never editable in the viewer; "Edit" or "Create new version" leads to another screen.
 
-## Estados
+## States
 
-- **loading** — esqueleto da página no visor e do painel; cabeçalho com título já visível.
-- **processing** — arquivo enviado ainda sendo convertido ou analisado: diga o que está acontecendo, há quanto tempo e se a pessoa pode sair e voltar; nada de spinner mudo por minutos.
-- **error** — falha ao abrir: alerta no visor com "Tentar novamente" e "Baixar arquivo original" quando possível; o painel continua útil.
-- **no-access** — sem permissão para este documento: tela explica e indica a quem pedir; nenhum trecho do conteúdo vaza no título.
-- **unavailable** — o documento existia e foi removido, substituído ou expirou: diga qual, quando, e leve à versão vigente se houver.
-- **success** — depois de uma ação (enviado, registrado): confirmação breve e a linha de estado do cabeçalho atualizada.
+- **loading**: a page skeleton in the viewer and in the panel; the header with the title already visible.
+- **processing**: an uploaded file still being converted or analyzed: say what is happening, for how long, and whether the person can leave and come back; no silent spinner for minutes.
+- **error**: failed to open: an alert in the viewer with "Try again" and "Download original file" when possible; the panel stays useful.
+- **no-access**: no permission for this document: the screen explains and says whom to ask; no part of the content leaks into the title.
+- **unavailable**: the document existed and was removed, replaced or expired: say which, when, and lead to the current version if there is one.
+- **success**: after an action (sent, recorded): brief confirmation and the header's status line updated.
 
-## Variações
+## Variations
 
 ### viewer-with-right-panel
-Visor ocupa ~70% e o painel de informações fica fixo à direita.
-**Favorece:** conferência de dados contra o texto; despacho rápido.
-**Piora:** documentos largos (planilhas, plantas) ficam pequenos; em telas médias o painel precisa recolher.
+The viewer takes ~70% and the info panel stays fixed on the right.
+**Favors:** checking data against the text; fast dispatch.
+**Worsens:** wide documents (spreadsheets, floor plans) become small; on medium screens the panel has to collapse.
 
 ### fullscreen-viewer
-Painel recolhido; visor ocupa a tela; cabeçalho reduzido a título e "Sair da tela cheia".
-**Favorece:** leitura longa e atenta, apresentação em reunião.
-**Piora:** some o contexto (versão, dados); a primária fica a um clique de distância.
+Panel collapsed; the viewer takes the screen; the header reduced to the title and "Exit full screen".
+**Favors:** long, attentive reading, presenting in a meeting.
+**Worsens:** context disappears (version, data); the primary is one click away.
 
 ### side-by-side-comparison
-Dois visores sincronizados (versão anterior × atual), com diferenças destacadas e navegação "próxima diferença".
-**Favorece:** revisão de alterações entre versões, conferência de notas fiscais contra o pedido.
-**Piora:** exige largura; diferenças só por cor reprovam — use também marcação de inserção/remoção em texto; rolagem sincronizada precisa poder ser desligada.
+Two synchronized viewers (previous × current version), with differences highlighted and "next difference" navigation.
+**Favors:** reviewing changes between versions, checking invoices against the order.
+**Worsens:** needs width; differences shown only by color fail, so also mark insertions/removals in the text; synchronized scrolling must be possible to turn off.
 
-## Anti-padrões
+## Anti-patterns
 
-- Visor que parece editável (cursor de texto, barra de formatação) num documento congelado.
-- Trocar a versão exibida sem a pessoa pedir.
-- Spinner indefinido durante processamento longo.
-- Controles de zoom e página só com ícone, sem nome acessível.
-- Título genérico ("Documento") em vez do nome do documento.
-- Sem caminho de volta para a lista de onde a pessoa veio.
+- A viewer that looks editable (text cursor, formatting bar) on a frozen document.
+- Switching the displayed version without the person asking.
+- An indefinite spinner during long processing.
+- Icon-only zoom and page controls with no accessible name.
+- A generic title ("Document") instead of the document's name.
+- No way back to the list the person came from.
 
 ## Checklist
 
-- [ ] `h1` com o nome do documento; versão e situação visíveis no cabeçalho.
-- [ ] "Somente leitura" explícito quando aplicável, com caminho para editar ou criar nova versão.
-- [ ] Uma primária no cabeçalho; ações de visor com nome acessível.
-- [ ] Processamento longo com mensagem, tempo e possibilidade de sair.
-- [ ] Erro do visor não derruba o painel; oferta de baixar o original.
-- [ ] Caminho de volta visível.
+- [ ] `h1` with the document's name; version and situation visible in the header.
+- [ ] "Read-only" stated explicitly when applicable, with a path to edit or create a new version.
+- [ ] One primary in the header; viewer actions with an accessible name.
+- [ ] Long processing with a message, elapsed time and the option to leave.
+- [ ] A viewer error does not bring down the panel; offer to download the original.
+- [ ] Visible way back.

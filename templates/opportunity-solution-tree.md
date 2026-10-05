@@ -1,37 +1,37 @@
-# Opportunity Solution Tree: <resultado>
+# Opportunity Solution Tree: <outcome>
 
-<!-- Referência: knowledge/pesquisa/discovery-e-estrategia.md §3 (Teresa Torres) -->
-<!-- Revise a cada nova leva de entrevistas. Documento vivo, não roadmap. -->
+<!-- Reference: knowledge/research/discovery-and-strategy.md §3 (Teresa Torres) -->
+<!-- Review after every new batch of interviews. A living document, not a roadmap. -->
 
-**Atualizado em:** <AAAA-MM-DD> · **Trio:** <produto, design, engenharia>
+**Updated on:** <YYYY-MM-DD> · **Trio:** <product, design, engineering>
 
-## Resultado desejado
-<!-- Mudança de comportamento que o time influencia. Não "aumentar receita", não "lançar X". -->
-<métrica> de <valor atual> para <meta>, entre <público>, até <prazo>.
+## Desired outcome
+<!-- A behavior change the team influences. Not "increase revenue", not "launch X". -->
+<metric> from <current value> to <target>, among <audience>, by <deadline>.
 
-## Árvore
+## Tree
 ```
-Resultado: <...>
-├─ Oportunidade A: <necessidade na linguagem do cliente>   [evidência: entrevistas <IDs>]
-│   ├─ A1: <sub-oportunidade>
-│   └─ A2: <sub-oportunidade>
-├─ Oportunidade B: <...>                                   [evidência: <...>]
-└─ Oportunidade C: <...>                                   [evidência: <...>]
+Outcome: <...>
+├─ Opportunity A: <need in the customer's language>   [evidence: interviews <IDs>]
+│   ├─ A1: <sub-opportunity>
+│   └─ A2: <sub-opportunity>
+├─ Opportunity B: <...>                                [evidence: <...>]
+└─ Opportunity C: <...>                                [evidence: <...>]
 ```
-<!-- Teste de oportunidade: mais de uma solução poderia atendê-la? Se não, é solução disfarçada. -->
+<!-- Opportunity test: could more than one solution address it? If not, it is a solution in disguise. -->
 
-## Oportunidade-alvo
-- Escolhida: <...>
-- Critérios: tamanho <...> · frequência <...> · importância <...> · insatisfação com alternativas <...> · encaixe estratégico <...>
-<!-- Esforço técnico não entra aqui. -->
+## Target opportunity
+- Chosen: <...>
+- Criteria: size <...> · frequency <...> · importance <...> · dissatisfaction with alternatives <...> · strategic fit <...>
+<!-- Technical effort does not count here. -->
 
-## Soluções para a oportunidade-alvo
-<!-- Pelo menos três, realmente diferentes entre si. -->
+## Solutions for the target opportunity
+<!-- At least three, genuinely different from each other. -->
 1. <...>
 2. <...>
 3. <...>
 
-## Suposições e testes
-| Solução | Suposição | Categoria (valor/usabilidade/técnica/negócio/ética) | Teste | Critério de sucesso (antes) | Resultado | Decisão |
+## Assumptions and tests
+| Solution | Assumption | Category (value/usability/technical/business/ethics) | Test | Success criterion (before) | Result | Decision |
 |---|---|---|---|---|---|---|
 | <...> | <...> | <...> | <...> | <...> | <...> | <...> |

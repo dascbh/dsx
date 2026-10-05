@@ -1,55 +1,55 @@
 ---
 name: discovery
-description: "Product discovery antes de construir: enquadra o problema, JTBD, opportunity solution tree, mapa de suposições, teste mais barato e brief com métricas. Use quando o pedido chega como solução pronta ou no início de uma feature."
+description: "Product discovery before building: frames the problem, JTBD, opportunity solution tree, assumption map, cheapest test and a brief with metrics. Use when the request arrives as a ready-made solution or at the start of a feature."
 ---
 
-# Discovery de produto
+# Product discovery
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `templates/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. The `knowledge/` and `templates/` paths are relative to it.
 
-Referências: `knowledge/pesquisa/discovery-e-estrategia.md`, `metricas-e-roi.md`; templates `jtbd.md`, `opportunity-solution-tree.md`, `assumption-map.md`, `brief.md`.
+References: `knowledge/research/discovery-and-strategy.md`, `metrics-and-roi.md`; templates `jtbd.md`, `opportunity-solution-tree.md`, `assumption-map.md`, `brief.md`.
 
-**Regra:** discovery reduz o risco de construir a coisa errada. Ele termina quando a próxima decisão está clara — não quando o documento está bonito.
+**Rule:** discovery reduces the risk of building the wrong thing. It ends when the next decision is clear — not when the document looks nice.
 
-## 1. Enquadre o problema
+## 1. Frame the problem
 
-Responda com evidência (ou marque `[sem evidência]`):
-- **Quem** tem o problema (segmento, papel, contexto)?
-- **Qual** é o problema, em termos de comportamento observado — não de solução ausente? ~~"Falta um dashboard"~~ → "Gestores levam 2h por semana montando o relatório manualmente."
-- **Por que agora?** Qual o custo de não resolver?
-- **Como saberemos** que resolvemos? (métrica de resultado, não de entrega)
+Answer with evidence (or mark `[no evidence]`):
+- **Who** has the problem (segment, role, context)?
+- **What** is the problem, in terms of observed behavior — not a missing solution? ~~"We lack a dashboard"~~ → "Managers spend 2h a week building the report by hand."
+- **Why now?** What is the cost of not solving it?
+- **How will we know** we solved it? (outcome metric, not delivery metric)
 
-Se o pedido veio como solução, reescreva-o como problema e confirme com quem pediu.
+If the request came in as a solution, rewrite it as a problem and confirm with whoever asked.
 
 ## 2. Job to be done
 
-`templates/jtbd.md`: **Quando** <situação>, **quero** <motivação>, **para** <resultado esperado>. Inclua dimensões funcional, emocional e social, e as soluções que a pessoa "contrata" hoje (inclusive planilha, WhatsApp, não fazer nada).
+`templates/jtbd.md`: **When** <situation>, **I want** <motivation>, **so that** <expected outcome>. Include functional, emotional and social dimensions, and the solutions the person "hires" today (including spreadsheets, WhatsApp, doing nothing).
 
 ## 3. Opportunity solution tree
 
-`templates/opportunity-solution-tree.md`: **resultado desejado** (1 métrica) → **oportunidades** (necessidades/dores ouvidas de usuários) → **soluções** (≥ 3 por oportunidade escolhida) → **experimentos** (testam suposições da solução). Compare soluções entre si; nunca avalie uma só.
+`templates/opportunity-solution-tree.md`: **desired outcome** (1 metric) → **opportunities** (needs/pains heard from users) → **solutions** (≥ 3 per chosen opportunity) → **experiments** (test the solution's assumptions). Compare solutions with each other; never evaluate just one.
 
-## 4. Suposições
+## 4. Assumptions
 
-`templates/assumption-map.md`: liste o que precisa ser verdade para cada solução funcionar, nas categorias desejabilidade, viabilidade (negócio), factibilidade (técnica), usabilidade e ética. Posicione em **importância × evidência**. Teste primeiro as **importantes com pouca evidência**.
+`templates/assumption-map.md`: list what must be true for each solution to work, in the categories desirability, viability (business), feasibility (technical), usability and ethics. Place them on **importance × evidence**. Test the **important ones with little evidence** first.
 
-## 5. Teste mais barato que responde
+## 5. The cheapest test that answers
 
-| Suposição | Teste |
+| Assumption | Test |
 |---|---|
-| As pessoas querem isto? | fake door / landing com medição, entrevista de problema |
-| Entendem a proposta? | teste de conceito (5–8 pessoas) |
-| Conseguem usar? | protótipo + teste de usabilidade |
-| Pagam / adotam? | pré-venda, piloto, MVP concierge |
-| Dá para construir? | spike técnico |
+| Do people want this? | fake door / landing page with measurement, problem interview |
+| Do they understand the proposal? | concept test (5–8 people) |
+| Can they use it? | prototype + usability test |
+| Will they pay / adopt? | pre-sale, pilot, concierge MVP |
+| Can it be built? | technical spike |
 
-Defina **antes** do teste: o que conta como sucesso e o que você fará se falhar. Fake door exige aviso honesto logo após o clique e não pode coletar pagamento.
+Define **before** the test: what counts as success and what you will do if it fails. A fake door requires an honest notice right after the click and must not collect payment.
 
 ## 6. Brief
 
-`templates/brief.md`, uma página: problema e evidência · pessoas e job · resultado esperado e métrica (com linha de base) · escopo **e escopo negativo** (o que fica de fora) · suposições abertas e como serão testadas · riscos (inclusive de acessibilidade e ética) · restrições.
+`templates/brief.md`, one page: problem and evidence · people and job · expected outcome and metric (with a baseline) · scope **and negative scope** (what is left out) · open assumptions and how they will be tested · risks (including accessibility and ethics) · constraints.
 
-## O que um agente pode e não pode fazer
+## What an agent can and cannot do
 
-- **Pode:** reescrever pedidos de solução como problema, rascunhar JTBD/OST/mapa de suposições, gerar alternativas de solução, sugerir experimentos, calcular amostra e métricas.
-- **Não pode:** afirmar que um problema existe ou é frequente sem dado, "validar" uma solução com usuários sintéticos, escolher o resultado de negócio pelo time.
+- **Can:** rewrite solution requests as problems, draft JTBD/OST/assumption map, generate solution alternatives, suggest experiments, calculate samples and metrics.
+- **Cannot:** claim a problem exists or is frequent without data, "validate" a solution with synthetic users, choose the business outcome for the team.

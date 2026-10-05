@@ -1,50 +1,50 @@
-# Brief: <nome da iniciativa>
+# Brief: <initiative name>
 
-<!-- Uma página. Se passar disso, o problema ainda não está claro. Use com a skill `discovery`.
-Marque qualquer afirmação sem dado com [sem evidência]. -->
+<!-- One page. If it runs longer, the problem is not clear yet. Use with the `discovery` skill.
+Mark any statement without data with [no evidence]. -->
 
-**Responsável:** <nome> · **Data:** <AAAA-MM-DD> · **Status:** rascunho | em validação | aprovado
+**Owner:** <name> · **Date:** <YYYY-MM-DD> · **Status:** draft | in validation | approved
 
-## Problema
+## Problem
 
-<!-- Comportamento observado, não solução ausente. "Gestores levam 2h/semana montando relatório à mão",
-não "falta um dashboard". -->
-<descrição do problema>
+<!-- Observed behavior, not a missing solution. "Managers spend 2h/week building a report by hand",
+not "there is no dashboard". -->
+<problem description>
 
-**Evidência:** <fonte: entrevistas, suporte, analytics, com números e data>
+**Evidence:** <source: interviews, support, analytics, with numbers and date>
 
-## Para quem
+## For whom
 
-| Segmento / papel | Contexto de uso | Job (quando… quero… para…) |
+| Segment / role | Context of use | Job (when… I want… so I can…) |
 |---|---|---|
-| <segmento> | <dispositivo, frequência, pressão> | <job statement> |
+| <segment> | <device, frequency, pressure> | <job statement> |
 
-## Resultado esperado
+## Expected outcome
 
-| Métrica de resultado | Linha de base | Meta | Prazo |
+| Outcome metric | Baseline | Target | Deadline |
 |---|---|---|---|
-| <métrica que muda se o problema for resolvido> | <valor atual> | <valor> | <data> |
+| <metric that changes if the problem is solved> | <current value> | <value> | <date> |
 
-<!-- Métrica de resultado, não de entrega ("tela lançada" não é resultado). -->
+<!-- An outcome metric, not a delivery one ("screen launched" is not an outcome). -->
 
-## Escopo
+## Scope
 
-**Dentro:** <o que será feito>
+**In:** <what will be done>
 
-**Fora (escopo negativo):** <o que explicitamente NÃO será feito nesta etapa e por quê>
+**Out (negative scope):** <what will explicitly NOT be done in this stage, and why>
 
-## Suposições abertas
+## Open assumptions
 
-| Suposição | Tipo (desejab./viab./factib./usab./ética) | Evidência hoje | Como vamos testar |
+| Assumption | Type (desirability/viability/feasibility/usability/ethics) | Evidence today | How we will test |
 |---|---|---|---|
-| <precisa ser verdade que…> | <tipo> | <baixa/média/alta> | <teste e critério de sucesso> |
+| <it must be true that…> | <type> | <low/medium/high> | <test and success criterion> |
 
-## Riscos e restrições
+## Risks and constraints
 
-- **Acessibilidade:** <público com deficiência afetado? requisitos WCAG específicos?>
-- **Ética e dados:** <dados pessoais, LGPD, risco de dark pattern>
-- **Técnicos / prazo / regulatórios:** <…>
+- **Accessibility:** <is an audience with disabilities affected? specific WCAG requirements?>
+- **Ethics and data:** <personal data, privacy law (e.g. LGPD, GDPR), dark-pattern risk>
+- **Technical / deadline / regulatory:** <…>
 
-## Decisão pedida
+## Decision requested
 
-<O que precisa ser decidido agora, por quem, até quando.>
+<What must be decided now, by whom, by when.>

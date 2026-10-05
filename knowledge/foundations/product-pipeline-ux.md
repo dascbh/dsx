@@ -15,22 +15,22 @@ observed, never as permission to invent a domain or a design system).
 
 | Entry | First DSX move | Baseline it records |
 |---|---|---|
-| build | `iniciar` (stack, tokens, kit, UX.md) and `auditar-ds` on the reusable assets, before any screen | observed: what kit and conventions already exist; empty is a fact, not a licence |
-| inspect | captures + `mapear` + `auditar-ux` (`audit.mjs --register`) on the existing surfaces | observed: findings per rule, journey lengths, words and primary actions per surface |
+| build | `init` (stack, tokens, kit, UX.md) and `audit-ds` on the reusable assets, before any screen | observed: what kit and conventions already exist; empty is a fact, not a licence |
+| inspect | captures + `map-ux` + `audit-ux` (`audit.mjs --register`) on the existing surfaces | observed: findings per rule, journey lengths, words and primary actions per surface |
 
 ## Stage → DSX skill or tool → artifact (Forward path)
 
 | Forward stage | DSX skill / tool | Artifact (Forward path, owner role) |
 |---|---|---|
 | Request | — (Forward `fde-spec`) | `discovery/<objective>.md` (fde-spec) |
-| Discovery augmentation | `discovery`, `pesquisa`, `mapear`, `auditar-ux` baseline, `auditar-ds` inventory | same `discovery/<objective>.md`; DS inventory in `discovery/<objective>-design-system.md`; DSX maps stay in `.dsx/maps/` and are cited by revision |
-| Hypotheses | `repensar-ux` (variations manifest, format 2) | `.dsx/variations/<module>/<flow>/variations.json` exported to `specs/<demand-id>/design/alternatives.md` by `variations.mjs alternatives` (fde-spec / fde-design divergence) |
+| Discovery augmentation | `discovery`, `research`, `map-ux`, `audit-ux` baseline, `audit-ds` inventory | same `discovery/<objective>.md`; DS inventory in `discovery/<objective>-design-system.md`; DSX maps stay in `.dsx/maps/` and are cited by revision |
+| Hypotheses | `rethink-ux` (variations manifest, format 2) | `.dsx/variations/<module>/<flow>/variations.json` exported to `specs/<demand-id>/design/alternatives.md` by `variations.mjs alternatives` (fde-spec / fde-design divergence) |
 | Product spec + UI/UX criteria | `tools/ux-lint/criteria.mjs check` on the plan | criteria in `## Acceptance criteria` of `cycles/C-<n>/plan.md` (fde-spec), format below |
 | UX blueprint (before UI) | `templates/ux-blueprint.md`, `blueprint.mjs check --no-captures` | `specs/<demand-id>/design/intended-model.md`, `flow.md`, `ia.md` (fde-spec; flow/IA with fde-design) |
-| Domain + data model | `mapeador-dominio` (read only) | requirements and client ADRs stay Forward's (`docs/adr/<n>-<slug>.md` in the project) |
+| Domain + data model | `domain-mapper` (read only) | requirements and client ADRs stay Forward's (`docs/adr/<n>-<slug>.md` in the project) |
 | Architecture | — | client ADRs (fde-architecture) |
-| Implementation | `construir-ui` (with internal criticism), `design-md`, `tokens` | client source; product conventions in `UX.md` and `DESIGN.md`; foundation in `design/foundation.md` |
-| Post-UI validation | `audit.mjs --criteria`, `blueprint.mjs check`, `revisar-ux`, `acessibilidade`, agent `revisor-ux` | evidence under `evals/` (results JSON from `--criteria-out`); heuristic findings in `reviews/<demand-id>/findings.toml` citing USE/DOM ids |
+| Implementation | `build-ui` (with internal criticism), `design-md`, `tokens` | client source; product conventions in `UX.md` and `DESIGN.md`; foundation in `design/foundation.md` |
+| Post-UI validation | `audit.mjs --criteria`, `blueprint.mjs check`, `review-ux`, `accessibility`, agent `ux-reviewer` | evidence under `evals/` (results JSON from `--criteria-out`); heuristic findings in `reviews/<demand-id>/findings.toml` citing USE/DOM ids |
 | Deploy | — (Forward `fde-review`, `fde-promotion`) | `cycles/C-<n>/review.md`, `promotion.md` settle each criterion |
 
 DSX-only working files (`.dsx/findings/`, `.dsx/maps/`, `.dsx/variations/`, captures) are inputs and caches. Every
@@ -134,12 +134,12 @@ shows the hypothesis in plain language under "Como saber se funciona" (in the pa
 
 ## Internal criticism before implementation
 
-`repensar-ux` (before the page goes to the owner) and `construir-ui` (before code) record an internal criticism with
+`rethink-ux` (before the page goes to the owner) and `build-ui` (before code) record an internal criticism with
 six entries: strongest counter-case, unsupported claims, failure/recovery scenarios, accessibility, domain/data
 contradictions, security/operational risks. Each entry ends resolved (what changed) or as an explicit limitation or
 measurement task (a criterion with an unknown baseline, a backlog line). It lives in the same artifact the stage
 already writes (the variations manifest's `critique` block, or the demand's notes on the board) and never replaces
-the isolated review (I2/I3): the `revisor-ux` agent and Forward's `fde-review` still run without the builder's
+the isolated review (I2/I3): the `ux-reviewer` agent and Forward's `fde-review` still run without the builder's
 context.
 
 ## Provenance

@@ -1,6 +1,6 @@
 ---
 id: undo
-title: Quando oferecer a opção Desfazer?
+title: When should you offer an Undo option?
 category: actions
 components: [toast, snackbar, undo-button]
 type: recommendation
@@ -11,99 +11,99 @@ wcag: ["4.1.3", "2.1.1", "2.2.1", "3.3.4", "1.4.1"]
 related: [confirm-action, confirm-deletion, destructive-action, toast-duration, toast-vs-inline-alert]
 ---
 
-# Quando oferecer a opção Desfazer?
+# When should you offer an Undo option?
 
-> **Regra:** Ofereça "Desfazer" logo após uma ação reversível iniciada pela pessoa, com texto que diga o que mudou, e só se a reversão restaurar o estado completo.
+> **Rule:** Offer "Undo" right after a reversible action started by the person, with text that says what changed, and only if reverting restores the complete state.
 
-## Contexto
+## Context
 
-"Desfazer" reverte uma ação já concluída, sem pedir confirmação antes de cada interação. Não se confunde com "Cancelar", que interrompe algo em curso, nem com lixeira ou histórico, que oferecem recuperação persistente.
+"Undo" reverts an action that has already completed, without asking for confirmation before each interaction. It is not "Cancel", which stops something in progress, nor a trash or history, which offer persistent recovery.
 
-Pessoas erram, sobretudo em telas pequenas e listas densas. A reversibilidade evita impor confirmação a todos, mas só dá segurança quando é real: um "Desfazer" que expira cedo, restaura parte do estado ou não reverte efeitos externos cria falsa sensação de proteção.
+People make mistakes, especially on small screens and in dense lists. Reversibility avoids imposing confirmation on everyone, but it only gives safety when it is real: an "Undo" that expires too soon, restores part of the state or does not reverse external effects creates a false sense of protection.
 
-A pessoa deve entender o que mudou, qual ação será revertida e o que acontece depois.
+The person must understand what changed, which action will be reverted and what happens next.
 
-## Decisão
+## Decision
 
-- **SE** a ação é reversível, iniciada pela pessoa e o erro acidental é plausível (arquivar, remover de lista, mover, marcar, alterar estado) **ENTÃO** aplique a mudança na hora e mostre notificação breve com "Desfazer".
-- **SE** a reversão restaura conteúdo, posição, relações, seleção e permissões **ENTÃO** ofereça "Desfazer".
-- **SE** o sistema não restaura o estado exato **ENTÃO** não ofereça "Desfazer".
-- **SE** há efeito financeiro, legal, de privacidade, externo ou sobre outras pessoas **ENTÃO** use confirmação antes, atraso controlado ou recuperação persistente.
-- **SE** a ação é irreversível **ENTÃO** peça confirmação clara antes.
-- **SE** a ação ainda está em andamento **ENTÃO** use "Cancelar", não "Desfazer".
-- **SE** a notificação pode desaparecer **ENTÃO** ofereça também lixeira, histórico ou registro de alterações.
-- **SENÃO** feedback simples sem ação.
+- **IF** the action is reversible, started by the person and an accidental mistake is plausible (archive, remove from list, move, mark, change status) **THEN** apply the change immediately and show a brief notification with "Undo".
+- **IF** reverting restores content, position, relationships, selection and permissions **THEN** offer "Undo".
+- **IF** the system cannot restore the exact state **THEN** do not offer "Undo".
+- **IF** there is a financial, legal, privacy, external or third-party effect **THEN** use prior confirmation, a controlled delay or persistent recovery.
+- **IF** the action is irreversible **THEN** ask for clear confirmation first.
+- **IF** the action is still in progress **THEN** use "Cancel", not "Undo".
+- **IF** the notification may disappear **THEN** also offer a trash, history or change log.
+- **ELSE** simple feedback with no action.
 
-## Quando usar
+## When to use
 
-- Ação reversível com estado anterior restaurável.
-- Resultado visível e compreensível.
-- Reversão rápida e confiável.
-- Existe outra via de recuperação em casos importantes.
+- A reversible action with a restorable previous state.
+- A visible, understandable result.
+- A fast, reliable reversal.
+- Another recovery path exists for important cases.
 
-## Quando evitar
+## When to avoid
 
-- Ação irreversível → **use em vez disso:** confirmação antes.
-- Efeito financeiro ou legal → **use em vez disso:** confirmação ou atraso controlado.
-- Dados sensíveis já compartilhados → **use em vez disso:** confirmação antes de compartilhar.
-- Efeito imediato sobre terceiros → **use em vez disso:** confirmação.
-- Ação em andamento → **use em vez disso:** "Cancelar".
+- Irreversible action → **use instead:** prior confirmation.
+- Financial or legal effect → **use instead:** confirmation or a controlled delay.
+- Sensitive data already shared → **use instead:** confirmation before sharing.
+- Immediate effect on third parties → **use instead:** confirmation.
+- Action in progress → **use instead:** "Cancel".
 
-## Faça
+## Do
 
-- Nomeie o que mudou e o objeto afetado.
-- Use uma única ação clara.
-- Reverta de forma atômica, sem duplicar nem perder dados.
-- Confirme a reversão com novo feedback.
-- Garanta teclado e nome acessível.
+- Name what changed and the affected object.
+- Use a single clear action.
+- Revert atomically, without duplicating or losing data.
+- Confirm the reversal with new feedback.
+- Ensure keyboard support and an accessible name.
 
-## Evite
+## Avoid
 
-- "Desfazer" genérico sem contexto.
-- Reverter só parte da ação.
-- Depender só do tempo para recuperar algo importante.
-- Várias notificações concorrentes.
-- Prometer o que o sistema não cumpre.
+- A generic "Undo" without context.
+- Reverting only part of the action.
+- Relying on time alone to recover something important.
+- Several competing notifications.
+- Promising what the system cannot deliver.
 
-## Acessibilidade
+## Accessibility
 
-- Anuncie o resultado em região de status, sem mover o foco (4.1.3).
-- "Desfazer" operável por teclado, toque e tecnologia assistiva (2.1.1), com nome que cite o objeto quando necessário.
-- Não dependa só de cor, ícone, posição ou desaparecimento da notificação (1.4.1).
-- Se houver tempo limitado, dê tempo suficiente ou caminho persistente (2.2.1).
-- Para ações relevantes, o mecanismo de reversão apoia a prevenção de erros (3.3.4).
+- Announce the result in a status region, without moving focus (4.1.3).
+- "Undo" operable by keyboard, touch and assistive technology (2.1.1), with a name that mentions the object when needed.
+- Do not rely on color, icon, position or the notification disappearing alone (1.4.1).
+- If time is limited, give enough time or a persistent path (2.2.1).
+- For relevant actions, the reversal mechanism supports error prevention (3.3.4).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Arquivar | "Conversa arquivada. Desfazer" |
-| Remover da lista | "Item removido da lista. Desfazer" |
-| Reversão concluída | "Conversa restaurada." |
-| Nome acessível | "Desfazer arquivamento da conversa" |
-| Recuperação persistente | "Você também pode restaurar pela Lixeira." |
+| Archive | "Conversation archived. Undo" |
+| Remove from list | "Item removed from the list. Undo" |
+| Reversal completed | "Conversation restored." |
+| Accessible name | "Undo archiving the conversation" |
+| Persistent recovery | "You can also restore it from the Trash." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A ação pode ser revertida de verdade.
-- [ ] A reversão restaura o estado completo.
-- [ ] A mensagem explica o que mudou.
-- [ ] O rótulo "Desfazer" é específico.
-- [ ] A mudança aparece imediatamente.
-- [ ] A reversão é atômica e confiável.
-- [ ] O controle funciona por teclado.
-- [ ] O foco não é movido sem necessidade.
-- [ ] O status é anunciado a tecnologia assistiva.
-- [ ] Existe alternativa persistente para ações relevantes.
-- [ ] O padrão não substitui confirmação necessária.
+- [ ] The action can truly be reverted.
+- [ ] The reversal restores the complete state.
+- [ ] The message explains what changed.
+- [ ] The "Undo" label is specific.
+- [ ] The change appears immediately.
+- [ ] The reversal is atomic and reliable.
+- [ ] The control works by keyboard.
+- [ ] Focus is not moved unnecessarily.
+- [ ] The status is announced to assistive technology.
+- [ ] There is a persistent alternative for relevant actions.
+- [ ] The pattern does not replace a needed confirmation.
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group (10 heurísticas, controle e liberdade do usuário): permitir reverter ações indesejadas.
-- Baymard Institute (toques acidentais): reversibilidade como alternativa de menor atrito à confirmação.
-- WCAG 2.2, 4.1.3, e técnica ARIA22: mensagem de status sem receber foco.
-- Material Design (Snackbars): ação única "Desfazer"; ação temporária não pode ser o único caminho.
-- Adobe Spectrum e React Spectrum (Toast): ação opcional relacionada à mensagem.
-- IBM Carbon (Notification usage): uma ação contextual por notificação.
-- VA.gov Design System (Snackbar): desfazer e dispensar com feedback da reversão.
-- Interaction Design Foundation: histórico de ações e reversão no tratamento de erros.
+- Nielsen Norman Group (10 heuristics, user control and freedom): allow unwanted actions to be reverted.
+- Baymard Institute (accidental taps): reversibility as a lower-friction alternative to confirmation.
+- WCAG 2.2, 4.1.3, and ARIA22 technique: a status message without receiving focus.
+- Material Design (Snackbars): a single "Undo" action; a temporary action cannot be the only path.
+- Adobe Spectrum and React Spectrum (Toast): an optional action related to the message.
+- IBM Carbon (Notification usage): one contextual action per notification.
+- VA.gov Design System (Snackbar): undo and dismiss with feedback on the reversal.
+- Interaction Design Foundation: action history and reversal in error handling.

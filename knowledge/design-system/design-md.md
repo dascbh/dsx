@@ -1,43 +1,43 @@
 # DESIGN.md
 
-## Quando consultar
+## When to consult
 
-- Ao criar o `DESIGN.md` de um projeto (novo ou existente) a partir de `templates/DESIGN.md`.
-- Ao revisar, pontuar ou auditar um `DESIGN.md` existente.
-- Ao conectar o `DESIGN.md` a um agente ou ferramenta de IA.
-- Quando um agente gerou interface fora do padrão e é preciso descobrir que lacuna do arquivo permitiu isso.
+- When creating a project's `DESIGN.md` (new or existing) from `templates/DESIGN.md`.
+- When reviewing, scoring or auditing an existing `DESIGN.md`.
+- When connecting the `DESIGN.md` to an agent or AI tool.
+- When an agent generated off-pattern interface and you need to find which gap in the file allowed it.
 
-## O que é
+## What it is
 
-`DESIGN.md` é um arquivo Markdown na raiz do projeto que descreve a linguagem visual do produto para **pessoas e agentes** ao mesmo tempo. Tem duas camadas:
+`DESIGN.md` is a Markdown file at the project root that describes the product's visual language for **people and agents** at the same time. It has two layers:
 
-1. **Front matter YAML**: tokens estruturados, verificáveis por máquina (o "o quê").
-2. **Corpo Markdown**: intenção, critérios de uso, hierarquia, estados, restrições (o "quando, por que e onde não").
+1. **YAML front matter**: structured, machine-verifiable tokens (the "what").
+2. **Markdown body**: intent, usage criteria, hierarchy, states, constraints (the "when, why and where not").
 
-Um valor sozinho não carrega decisão. Com só os tokens, o agente acerta a cor e erra o uso; com a prosa, ele decide como alguém do time decidiria.
+A value alone carries no decision. With tokens only, the agent gets the color right and the usage wrong; with the prose, it decides the way someone on the team would.
 
-O formato é uma especificação aberta em estágio alfa (`version: alpha`). Trate como instável: versione o arquivo e revise quando a especificação mudar.
+The format is an open specification at alpha stage (`version: alpha`). Treat it as unstable: version the file and review it when the specification changes.
 
-### O que ele não é
+### What it is not
 
-- **Não é o design system inteiro.** Biblioteca de componentes, código, governança e contribuição continuam existindo; o `DESIGN.md` é a porta de entrada legível.
-- **Não decide UX.** Não resolve arquitetura de informação, jornada ou adequação do problema; isso pertence à camada de contexto de UX (ver `design-system-para-ia.md`). Que tipo de tela é cada uma, onde fica a ação primária, quando confirmar e quais estados são obrigatórios vão no par dele, o `UX.md` (`knowledge/fundamentos/ux-md.md`), que tem a mesma rubrica de 100 pontos, os mesmos gates e a mesma regra de manutenção.
-- **Não é `CLAUDE.md`/`AGENTS.md`.** Esses carregam instruções operacionais (comandos, arquitetura de código, restrições técnicas) e apenas **apontam** para o `DESIGN.md` e o `UX.md`.
+- **It is not the whole design system.** The component library, code, governance and contribution still exist; the `DESIGN.md` is the readable entry point.
+- **It does not decide UX.** It does not solve information architecture, journey or problem fit; that belongs to the UX context layer (see `design-system-for-ai.md`). What kind of screen each one is, where the primary action goes, when to confirm and which states are mandatory go in its companion, the `UX.md` (`knowledge/foundations/ux-md.md`), which has the same 100-point rubric, the same gates and the same maintenance rule.
+- **It is not `CLAUDE.md`/`AGENTS.md`.** Those carry operational instructions (commands, code architecture, technical constraints) and only **point** to the `DESIGN.md` and the `UX.md`.
 
-## Schema do front matter (como no template do repo)
+## Front matter schema (as in the repo template)
 
-| Campo | Obrigatório | Conteúdo |
+| Field | Required | Content |
 |---|---|---|
-| `version` | sim | Versão do formato (`alpha`) |
-| `name` | sim | Nome do produto |
-| `description` | recomendado | Tipo de produto, público, densidade de uso |
-| `owner` | recomendado (linter avisa) | Time ou pessoa que mantém |
-| `updated` | recomendado (linter avisa) | Data da última revisão, `AAAA-MM-DD` |
-| `colors` | sim (linter erra) | Papéis → hex. Nomes por papel: `canvas`, `surface`, `text-primary`, `text-secondary`, `border`, `border-strong`, `focus`, `primary`, `on-primary`, `danger`, `on-danger` |
-| `typography` | sim (linter erra) | Níveis (`h1`, `body`, `label`…) com `fontFamily`, `fontSize`, `fontWeight`, `lineHeight` |
-| `spacing` | recomendado | Escala; chaves espelhando os multiplicadores do repo (`"1": 4px`, `"4": 16px`…) |
-| `rounded` | recomendado | Raios (`sm`, `md`…) |
-| `components` | recomendado | Componentes que **referenciam** tokens com `{grupo.chave}` |
+| `version` | yes | Format version (`alpha`) |
+| `name` | yes | Product name |
+| `description` | recommended | Product type, audience, usage density |
+| `owner` | recommended (linter warns) | Team or person who maintains it |
+| `updated` | recommended (linter warns) | Date of last review, `YYYY-MM-DD` |
+| `colors` | yes (linter errors) | Roles → hex. Names by role: `canvas`, `surface`, `text-primary`, `text-secondary`, `border`, `border-strong`, `focus`, `primary`, `on-primary`, `danger`, `on-danger` |
+| `typography` | yes (linter errors) | Levels (`h1`, `body`, `label`…) with `fontFamily`, `fontSize`, `fontWeight`, `lineHeight` |
+| `spacing` | recommended | Scale; keys mirroring the repo's multipliers (`"1": 4px`, `"4": 16px`…) |
+| `rounded` | recommended | Radii (`sm`, `md`…) |
+| `components` | recommended | Components that **reference** tokens with `{group.key}` |
 
 ```yaml
 ---
@@ -74,146 +74,146 @@ components:
 ---
 ```
 
-Os hex acima são os valores resolvidos do tema claro deste repositório (`tokens/build/tokens.light.json`): `canvas` = `color.bg.canvas`, `primary` = `color.action.primary` etc. Quando o projeto usa o pipeline de tokens, **o front matter é derivado dos tokens, nunca o contrário**; diga isso no topo do corpo e qual fonte vence em conflito.
+The hex values above are the resolved values of this repository's light theme (`tokens/build/tokens.light.json`): `canvas` = `color.bg.canvas`, `primary` = `color.action.primary`, etc. When the project uses the token pipeline, **the front matter is derived from the tokens, never the reverse**; say so at the top of the body, along with which source wins in a conflict.
 
-Convenções que o linter usa:
+Conventions the linter uses:
 
-- Para cada cor de fundo com texto, declare `on-<papel>`; o par `on-X` sobre `X` é checado a 4,5:1.
-- `text-*` e `link` são checados a 4,5:1 contra `canvas`/`background`/`surface`; `border-strong`, `focus` e `primary` a 3:1 contra o primeiro fundo.
-- Referência `{grupo.chave}` inexistente é erro. Cor crua dentro de `components` é aviso.
-- Prefira YAML em bloco (uma chave por linha): é mais fácil de revisar em diff. Sempre coloque referências entre aspas (`"{colors.primary}"`); sem aspas, YAML pode interpretá-las como mapa. O linter aceita mapas em linha simples (`{ sm: 4px, md: 8px }`), mas não listas aninhadas nem texto multilinha.
+- For each background color with text, declare `on-<role>`; the pair `on-X` on `X` is checked at 4.5:1.
+- `text-*` and `link` are checked at 4.5:1 against `canvas`/`background`/`surface`; `border-strong`, `focus` and `primary` at 3:1 against the first background.
+- A nonexistent `{group.key}` reference is an error. A raw color inside `components` is a warning.
+- Prefer block YAML (one key per line): it is easier to review in a diff. Always quote references (`"{colors.primary}"`); unquoted, YAML may parse them as a map. The linter accepts simple inline maps (`{ sm: 4px, md: 8px }`), but not nested lists or multiline text.
 
-## As 8 seções do corpo
+## The 8 body sections
 
-| # | Seção (`##`) | Deve responder |
+| # | Section (`##`) | Must answer |
 |---|---|---|
-| 1 | Overview | Direção visual em critérios observáveis; tipo de uso (tarefa × vitrine); densidade; o que a interface nunca faz |
-| 2 | Colors | Papel → token → onde aparece → onde nunca aparece; regras de contraste; "cor nunca é o único sinal"; tema escuro |
-| 3 | Typography | Hierarquia (quem é título único, quem agrupa, quem é leitura); escala e razão; mínimos; pesos; medida |
-| 4 | Layout | Grade de espaço, ritmo vertical (rótulo/campo, campos, grupos, seções), contêineres, breakpoints, mobile, posição das ações primárias |
-| 5 | Elevation & Depth | Como camadas se distinguem (superfície, borda, sombra); limite de empilhamento |
-| 6 | Shapes | Raio por tipo de elemento; linguagem de ícones |
-| 7 | Components | Para cada componente central: quando usar, variantes, todos os estados, contraindicações |
-| 8 | Do's and Don'ts | Blocos **Faça** e **Não faça**, ≥ 3 itens cada, derivados de erros reais |
+| 1 | Overview | Visual direction in observable criteria; type of use (task × showcase); density; what the interface never does |
+| 2 | Colors | Role → token → where it appears → where it never appears; contrast rules; "color is never the only cue"; dark theme |
+| 3 | Typography | Hierarchy (what is the single title, what groups, what is reading text); scale and ratio; minimums; weights; measure |
+| 4 | Layout | Spacing grid, vertical rhythm (label/field, fields, groups, sections), containers, breakpoints, mobile, position of primary actions |
+| 5 | Elevation & Depth | How layers are told apart (surface, border, shadow); stacking limit |
+| 6 | Shapes | Radius by element type; icon language |
+| 7 | Components | For each core component: when to use, variants, all states, contraindications |
+| 8 | Do's and Don'ts | **Do** and **Don't** blocks, ≥ 3 items each, derived from real mistakes (the linter also accepts the pt-BR labels **Faça** / **Não faça**) |
 
-Recomendadas (o linter avisa se faltarem): **Accessibility** (meta WCAG, foco, alvo, movimento reduzido, zoom, alternativa textual) e **Agent Instructions** (quando consultar, o que preservar, como validar). O linter aceita títulos em pt-BR equivalentes (Visão geral, Cores, Tipografia, Layout e espaçamento, Elevação, Formas, Componentes, Faça e não faça, Acessibilidade, Instruções para agentes).
+Recommended (the linter warns if missing): **Accessibility** (WCAG target, focus, target size, reduced motion, zoom, text alternative) and **Agent Instructions** (when to consult, what to preserve, how to validate). The English titles above are canonical. The DSX linter still accepts the equivalent pt-BR titles (Visão geral, Cores, Tipografia, Layout e espaçamento, Elevação, Formas, Componentes, Faça e não faça, Acessibilidade, Instruções para agentes).
 
-## Especificação oficial e linter oficial
+## Official specification and official linter
 
-O formato tem especificação pública do Google Labs (versão `alpha`, licença Apache-2.0) e uma CLI própria, o pacote `@google/design.md`, usável sem instalar com `npx -y @google/design.md <comando>`:
+The format has a public specification from Google Labs (version `alpha`, Apache-2.0 license) and its own CLI, the `@google/design.md` package, usable without installing via `npx -y @google/design.md <command>`:
 
-| Comando | Para que serve |
+| Command | What it is for |
 |---|---|
-| `lint DESIGN.md` | Relatório JSON com achados por severidade: referência quebrada, falta de cor primária ou de tipografia, contraste abaixo de AA, token declarado e nunca usado, seções fora da ordem canônica, chave desconhecida |
-| `diff A.md B.md` | Mudanças token a token entre duas versões e regressões |
-| `export --format dtcg\|json-tailwind\|css-tailwind DESIGN.md` | Tokens em W3C DTCG, Tailwind v3 (`theme.extend`) ou Tailwind v4 (`@theme`) |
-| `spec [--rules]` | A especificação e as regras do linter, na versão instalada |
+| `lint DESIGN.md` | JSON report with findings by severity: broken reference, missing primary color or typography, contrast below AA, token declared and never used, sections out of canonical order, unknown key |
+| `diff A.md B.md` | Token-by-token changes between two versions, and regressions |
+| `export --format dtcg\|json-tailwind\|css-tailwind DESIGN.md` | Tokens in W3C DTCG, Tailwind v3 (`theme.extend`) or Tailwind v4 (`@theme`) |
+| `spec [--rules]` | The specification and the linter rules, in the installed version |
 
-Use os dois linters: o do DSX (`tools/lint-design-md.mjs`) cobre os gates de qualidade da rubrica (pares de contraste declarados, prosa vaga, seções recomendadas); o oficial cobre conformidade ao formato. Divergências conhecidas entre o DSX e a especificação oficial:
+Use both linters: the DSX one (`tools/lint-design-md.mjs`) covers the rubric's quality gates (declared contrast pairs, vague prose, recommended sections); the official one covers format conformance. Known divergences between DSX and the official specification:
 
-- **Sub-tokens de componente.** A especificação aceita só `backgroundColor`, `textColor`, `typography`, `rounded`, `padding`, `size`, `height`, `width`. O DSX também usa `borderColor` (o template e `examples/DESIGN.md`), e o linter oficial avisa a cada uso. **SE** o arquivo vai para uma ferramenta que segue estritamente a especificação **ENTÃO** descreva a borda na prosa da seção Components e no papel de cor (`border`, `*-border`), sem o sub-token.
-- **Seções recomendadas.** Accessibility e Agent Instructions são exigência do DSX, não da especificação; o linter oficial não reclama da ausência nem da presença.
-- **Títulos em pt-BR.** O linter do DSX aceita os equivalentes em português; o oficial verifica a ordem pelos nomes canônicos em inglês. Para máxima compatibilidade, use os títulos canônicos.
+- **Component sub-tokens.** The specification accepts only `backgroundColor`, `textColor`, `typography`, `rounded`, `padding`, `size`, `height`, `width`. DSX also uses `borderColor` (the template and `examples/DESIGN.md`), and the official linter warns on every use. **IF** the file goes to a tool that strictly follows the specification **THEN** describe the border in the prose of the Components section and in the color role (`border`, `*-border`), without the sub-token.
+- **Recommended sections.** Accessibility and Agent Instructions are a DSX requirement, not a specification one; the official linter complains neither about their absence nor their presence.
+- **pt-BR titles.** The DSX linter accepts the Portuguese equivalents; the official one checks order by the canonical English names. For maximum compatibility, use the canonical titles.
 
-Referências prontas no formato, para escolher e adaptar: `escolher-design-system.md`.
+Ready-made references in the format, to choose from and adapt: `choosing-a-design-system.md`.
 
-## Regras de escrita
+## Writing rules
 
-1. **Critério observável no lugar de adjetivo.** "Moderno, clean, elegante" não orienta. Escreva "no máximo uma cor de destaque por viewport; hierarquia por tamanho e peso; cards sem sombra no tema claro". O linter avisa sobre adjetivos vagos.
-2. **Ligue cada token à intenção.** Para cada cor: onde aparece, onde não aparece, papel na hierarquia.
-3. **Escreva hierarquia, não inventário.** "H1 é o título único da página; H2 agrupa blocos; corpo é leitura e texto funcional" vale mais que a lista de tamanhos.
-4. **Números em vez de "bonito".** Contraste mínimo, alvo de toque, largura de linha, durações.
-5. **Do/Don't nascem de falhas reais** observadas em gerações anteriores ou em produção. Platitude ("seja consistente") não conta.
-6. **Só documente o que existe** em produção ou foi deliberadamente decidido. Componente inventado é a origem mais comum de alucinação do agente.
-7. **Marque o inferido.** Ao documentar produto existente, separe "observado no código" de "inferido".
-8. **Prosa não contradiz tokens.** Se o texto diz "raio 8px" e o token diz 12px, o arquivo reprova.
-9. **Instrução para o agente em três partes**: quando consultar (antes de qualquer mudança de UI), o que preservar (tokens e componentes existentes), como validar (comandos e checklist).
+1. **Observable criterion instead of adjective.** "Modern, clean, elegant" gives no guidance. Write "at most one accent color per viewport; hierarchy by size and weight; cards without shadow in the light theme". The linter warns about vague adjectives.
+2. **Tie each token to intent.** For each color: where it appears, where it does not, its role in the hierarchy.
+3. **Write hierarchy, not inventory.** "H1 is the page's single title; H2 groups blocks; body is reading and functional text" is worth more than the list of sizes.
+4. **Numbers instead of "pretty".** Minimum contrast, touch target, line length, durations.
+5. **Do/Don't come from real failures** observed in previous generations or in production. Platitudes ("be consistent") do not count.
+6. **Only document what exists** in production or was deliberately decided. An invented component is the most common source of agent hallucination.
+7. **Mark what is inferred.** When documenting an existing product, separate "observed in the code" from "inferred".
+8. **Prose does not contradict tokens.** If the text says "8px radius" and the token says 12px, the file fails.
+9. **Agent instructions in three parts**: when to consult (before any UI change), what to preserve (existing tokens and components), how to validate (commands and checklist).
 
-## Fluxo de criação
+## Creation flow
 
-1. **Defina a fonte da verdade**: produto existente (documente o que está em uso), design system com tokens (traduza), projeto novo (decida a direção antes), referência externa (adapte, nunca copie).
-2. **Copie `templates/DESIGN.md` para a raiz** do projeto.
-3. **Preencha o front matter** a partir dos tokens resolvidos (`tokens/build/tokens.light.json`) ou dos valores observados.
-4. **Escreva as 8 seções + 2 recomendadas**, com intenção e critérios.
-5. **Valide**: `node tools/lint-design-md.mjs DESIGN.md` (use `--json` para máquina). Sai com 0 se os gates objetivos passam, 1 caso contrário.
-6. **Compare por amostragem** com produção ou com o arquivo de design.
-7. **Conecte ao agente** e faça uma geração controlada (ver auditoria, passe 5).
+1. **Define the source of truth**: existing product (document what is in use), design system with tokens (translate), new project (decide the direction first), external reference (adapt, never copy).
+2. **Copy `templates/DESIGN.md` to the project root.**
+3. **Fill in the front matter** from the resolved tokens (`tokens/build/tokens.light.json`) or from the observed values.
+4. **Write the 8 sections + 2 recommended**, with intent and criteria.
+5. **Validate**: `node tools/lint-design-md.mjs DESIGN.md` (use `--json` for machines). Exits 0 if the objective gates pass, 1 otherwise.
+6. **Spot-check** against production or the design file.
+7. **Connect to the agent** and run a controlled generation (see audit, pass 5).
 
-Extração automática a partir de um site ou do CSS é aceitável como **rascunho**: ela captura valores, não intenção, estados, acessibilidade nem guardrails. Curadoria humana é obrigatória.
+Automatic extraction from a site or from CSS is acceptable as a **draft**: it captures values, not intent, states, accessibility or guardrails. Human curation is mandatory.
 
-## Conectar aos agentes
+## Connecting to agents
 
-- **Nunca assuma autodescoberta.** Configure pelo mecanismo nativo de cada ferramenta.
-- Agente de terminal com arquivo de memória do projeto: importe o arquivo no `CLAUDE.md`/`AGENTS.md` (ex.: linha `@DESIGN.md`) junto da instrução de quando consultá-lo.
-- Editores com regras de projeto: crie uma regra no diretório de regras da ferramenta, com escopo (`globs`) para arquivos de UI, apontando para o `DESIGN.md`.
-- **Fonte única**: as regras de cada ferramenta apenas referenciam o `DESIGN.md`; não copiam conteúdo dele.
-- **Carga contextual**: não injete o contexto visual em tarefas sem UI (migração de banco, infraestrutura).
-- Siga a documentação atual de cada ferramenta; sintaxe obsoleta falha em silêncio.
+- **Never assume auto-discovery.** Configure through each tool's native mechanism.
+- Terminal agent with a project memory file: import the file in `CLAUDE.md`/`AGENTS.md` (e.g. an `@DESIGN.md` line) together with the instruction on when to consult it.
+- Editors with project rules: create a rule in the tool's rules directory, scoped (`globs`) to UI files, pointing to the `DESIGN.md`.
+- **Single source**: each tool's rules only reference the `DESIGN.md`; they do not copy its content.
+- **Contextual loading**: do not inject the visual context into tasks without UI (database migration, infrastructure).
+- Follow each tool's current documentation; obsolete syntax fails silently.
 
-Esqueleto de pedido de geração: "Leia o DESIGN.md antes. Objetivo: <tarefa do usuário>. Use apenas tokens e componentes existentes; justifique qualquer variante nova. Inclua estados vazio, carregando, erro, sucesso, foco e desabilitado. Ao final, liste os tokens e componentes usados."
+Generation request skeleton: "Read the DESIGN.md first. Goal: <user task>. Use only existing tokens and components; justify any new variant. Include empty, loading, error, success, focus and disabled states. At the end, list the tokens and components used."
 
-Esqueleto de auditoria pós-geração: comparar cores, tipografia, espaço e raio com o `DESIGN.md`; checar reuso de componentes; checar estados e acessibilidade; listar divergências e corrigir **só** elas. Depois, revisão humana: o agente garante coerência, não julgamento de UX.
+Post-generation audit skeleton: compare colors, typography, spacing and radius with the `DESIGN.md`; check component reuse; check states and accessibility; list divergences and fix **only** those. Then human review: the agent guarantees coherence, not UX judgment.
 
-## Rubrica de 100 pontos
+## 100-point rubric
 
-Princípio: **pontue o quanto o arquivo poupa o agente de adivinhar.**
+Principle: **score how much the file spares the agent from guessing.**
 
-| Critério | Peso | Pergunta |
+| Criterion | Weight | Question |
 |---|---:|---|
-| Fidelidade à fonte | 15 | Tokens, componentes e regras correspondem ao produto ou a um sistema deliberadamente definido? |
-| Validade técnica | 10 | Estrutura interpretável, linter aprovado, referências resolvidas? |
-| Tokens semânticos | 10 | Nomes por função, escalas coerentes, sem duplicação arbitrária? |
-| Intenção e prosa | 15 | A prosa explica decisões que o valor sozinho não explica? |
-| Componentes e estados | 15 | Componentes críticos têm variantes e estados relevantes? |
-| Acessibilidade | 15 | Regras verificáveis (números, critérios), não frase genérica? |
-| Responsividade e casos extremos | 8 | Mobile, conteúdo longo, vazio/erro/carregando? |
-| Guardrails | 5 | Restrições específicas contra erros recorrentes? |
-| Operação com agente | 4 | O arquivo comprovadamente chega ao contexto do agente? |
-| Manutenção | 3 | Dono, data, rotina de revisão? |
+| Fidelity to source | 15 | Do tokens, components and rules match the product or a deliberately defined system? |
+| Technical validity | 10 | Parseable structure, linter passes, references resolved? |
+| Semantic tokens | 10 | Names by function, coherent scales, no arbitrary duplication? |
+| Intent and prose | 15 | Does the prose explain decisions that the value alone does not? |
+| Components and states | 15 | Do critical components have the relevant variants and states? |
+| Accessibility | 15 | Verifiable rules (numbers, criteria), not a generic sentence? |
+| Responsiveness and edge cases | 8 | Mobile, long content, empty/error/loading? |
+| Guardrails | 5 | Specific constraints against recurring mistakes? |
+| Agent operation | 4 | Does the file demonstrably reach the agent's context? |
+| Maintenance | 3 | Owner, date, review routine? |
 
-Faixas: **90–100** fonte confiável; **75–89** utilizável com lacunas controladas; **60–74** revisar antes de virar autoridade; **< 60** alto risco: o agente vai inventar decisões centrais.
+Bands: **90–100** reliable source; **75–89** usable with controlled gaps; **60–74** review before it becomes an authority; **< 60** high risk: the agent will invent core decisions.
 
-### Cinco gates (reprovam independentemente da nota)
+### Five gates (fail regardless of the score)
 
-1. Erro estrutural ou referência não resolvida. *(automatizado: `lint-design-md`)*
-2. Contradição com o produto ou a fonte sem justificativa documentada.
-3. Falha de contraste em combinação essencial (ex.: texto principal sobre fundo abaixo de 4,5:1). *(automatizado para os pares declarados)*
-4. O arquivo nunca chega à ferramenta em que o agente trabalha.
-5. Instruções conflitantes para o mesmo contexto.
+1. Structural error or unresolved reference. *(automated: `lint-design-md`)*
+2. Contradiction with the product or the source without documented justification.
+3. Contrast failure in an essential combination (e.g. main text on background below 4.5:1). *(automated for the declared pairs)*
+4. The file never reaches the tool the agent works in.
+5. Conflicting instructions for the same context.
 
-## Auditoria em cinco passes
+## Five-pass audit
 
-1. **Estrutura**: rode `node tools/lint-design-md.mjs`. Corrija todos os `ERRO` antes de qualquer julgamento.
-2. **Fonte da verdade**: amostre tokens, tipografia e 3+ componentes contra produção, código ou arquivo de design.
-3. **Lacunas de improvisação**: leia como alguém que nunca viu o produto; anote cada decisão que ainda exige inferência (qual botão é primário? o que fazer com texto longo? como mostrar erro?).
-4. **Pontuar e aplicar gates**: nota por critério com evidência; qualquer gate reprovado = reprovado.
-5. **Geração controlada**: peça uma tela nova usando só o contexto do projeto + `DESIGN.md`. Registre o que o agente inventou (cores, componentes, estados ausentes); rode `tools/lint-raw-values.mjs` no resultado. Cada invenção vira correção no arquivo ou novo item de "Não faça". Repita a mesma tarefa mais de uma vez: saída gerativa varia.
+1. **Structure**: run `node tools/lint-design-md.mjs`. Fix every `ERROR` (the tool's error label) before any judgment.
+2. **Source of truth**: sample tokens, typography and 3+ components against production, code or the design file.
+3. **Improvisation gaps**: read it as someone who has never seen the product; note each decision that still requires inference (which button is primary? what to do with long text? how to show an error?).
+4. **Score and apply gates**: score per criterion with evidence; any failed gate = fail.
+5. **Controlled generation**: ask for a new screen using only the project context + `DESIGN.md`. Record what the agent invented (colors, components, missing states); run `tools/lint-raw-values.mjs` on the result. Each invention becomes a fix in the file or a new "Don't" item. Repeat the same task more than once: generative output varies.
 
-## Manutenção
+## Maintenance
 
-- Versione junto com o código; `updated` atualizado a cada revisão; `owner` explícito.
-- Revise quando: tokens mudarem, componente ganhar regra, linguagem visual evoluir, comportamento experimental virar padrão, ou uma geração controlada revelar invenção recorrente.
-- Rode o linter no CI em todo PR que toque `DESIGN.md` ou `tokens/`.
-- Audite periodicamente instruções conflitantes entre `DESIGN.md`, `CLAUDE.md`/`AGENTS.md` e regras de ferramentas; remova o obsoleto.
+- Version it alongside the code; `updated` refreshed on every review; explicit `owner`.
+- Review when: tokens change, a component gains a rule, the visual language evolves, experimental behavior becomes standard, or a controlled generation reveals a recurring invention.
+- Run the linter in CI on every PR that touches `DESIGN.md` or `tokens/`.
+- Periodically audit conflicting instructions between `DESIGN.md`, `CLAUDE.md`/`AGENTS.md` and tool rules; remove what is obsolete.
 
-## Anti-padrões
+## Anti-patterns
 
-- Copiar o template sem adaptar (o linter acusa placeholders `<…>`).
-- Lista de valores sem intenção.
-- Componentes que não existem em produção.
-- Texto contradizendo tokens.
-- Mesmo conteúdo duplicado em várias regras de ferramenta.
-- Tratar a especificação alfa como definitiva.
-- Usar o `DESIGN.md` para decisões de pesquisa ou de jornada.
+- Copying the template without adapting it (the linter flags `<…>` placeholders).
+- A list of values without intent.
+- Components that do not exist in production.
+- Text contradicting tokens.
+- The same content duplicated across several tool rules.
+- Treating the alpha specification as final.
+- Using the `DESIGN.md` for research or journey decisions.
 
 ## Checklist
 
-- [ ] Front matter com `version`, `name`, `owner`, `updated`, `colors`, `typography` e `components` por referência.
-- [ ] Pares `on-*` declarados para todo fundo com texto.
-- [ ] 8 seções obrigatórias + Accessibility + Agent Instructions preenchidas.
-- [ ] Sem adjetivos vagos; regras com números.
-- [ ] Do/Don't com ≥ 3 itens cada, vindos de falhas reais.
-- [ ] `node tools/lint-design-md.mjs` aprovado.
-- [ ] Arquivo importado/referenciado no mecanismo nativo de cada ferramenta usada.
-- [ ] Geração controlada feita; invenções corrigidas.
-- [ ] Nota ≥ 75 e nenhum gate reprovado.
+- [ ] Front matter with `version`, `name`, `owner`, `updated`, `colors`, `typography` and `components` by reference.
+- [ ] `on-*` pairs declared for every background with text.
+- [ ] 8 required sections + Accessibility + Agent Instructions filled in.
+- [ ] No vague adjectives; rules with numbers.
+- [ ] Do/Don't with ≥ 3 items each, from real failures.
+- [ ] `node tools/lint-design-md.mjs` passes.
+- [ ] File imported/referenced in the native mechanism of each tool used.
+- [ ] Controlled generation done; inventions fixed.
+- [ ] Score ≥ 75 and no failed gate.

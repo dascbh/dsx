@@ -1,6 +1,6 @@
 ---
 id: error-placement
-title: Onde exibir mensagens de erro em formulários?
+title: Where should error messages appear in forms?
 category: forms
 components: [error-message, error-summary, global-alert]
 type: recommendation
@@ -11,92 +11,92 @@ wcag: ["3.3.1", "1.3.1", "1.4.1", "2.4.3"]
 related: [field-error-position, form-errors, toast-vs-inline-alert, preserve-data-after-error]
 ---
 
-# Onde exibir mensagens de erro em formulários?
+# Where should error messages appear in forms?
 
-> **Regra:** Erro de campo fica junto ao campo; vários erros ganham resumo navegável no topo; mensagem global é só para falha que afeta o formulário ou o serviço inteiro.
+> **Rule:** A field error stays next to the field; several errors get a navigable summary at the top; a global message is only for a failure that affects the whole form or service.
 
-## Contexto
+## Context
 
-A posição da mensagem decide se a pessoa a encontra, entende e corrige. Mensagem distante passa despercebida ou não deixa claro qual campo precisa de atenção.
+Where the message sits decides whether the person finds it, understands it and fixes the problem. A distant message goes unnoticed or leaves unclear which field needs attention.
 
-O padrão combina três camadas com papéis diferentes: mensagem contextual para o campo, resumo para localizar vários problemas (especialmente em formulários longos ou por teclado e leitor de tela) e mensagem global para o que não pertence a um campo.
+The pattern combines three layers with different roles: a contextual message for the field, a summary to locate several problems (especially in long forms, or for keyboard and screen reader users) and a global message for what does not belong to a field.
 
-Depois do envio, o foco precisa ir a um ponto previsível e os dados preenchidos devem ser mantidos.
+After submitting, focus must go to a predictable place and the entered data must be kept.
 
-## Decisão
+## Decision
 
-- **SE** o erro pertence a um campo **ENTÃO** exiba a mensagem inline junto dele.
-- **SE** há vários erros ou o formulário é longo **ENTÃO** adicione resumo no topo com links para cada campo.
-- **SE** o envio acabou de falhar **ENTÃO** direcione o foco ao resumo ou ao primeiro campo inválido, sempre do mesmo jeito.
-- **SE** o problema afeta o formulário ou o serviço inteiro (indisponibilidade, falha geral) **ENTÃO** use mensagem global com próximo passo.
-- **SE** o erro exige correção **ENTÃO** nunca use toast.
-- **SE** é validação comum **ENTÃO** nunca use modal.
-- **SE** existe resumo **ENTÃO** ele não pode ser o único meio de identificar o erro.
-- **SENÃO** mensagem inline.
+- **IF** the error belongs to a field **THEN** show the message inline next to it.
+- **IF** there are several errors or the form is long **THEN** add a summary at the top with links to each field.
+- **IF** the submit has just failed **THEN** move focus to the summary or to the first invalid field, always the same way.
+- **IF** the problem affects the whole form or service (unavailability, general failure) **THEN** use a global message with a next step.
+- **IF** the error requires a correction **THEN** never use a toast.
+- **IF** it is ordinary validation **THEN** never use a modal.
+- **IF** there is a summary **THEN** it cannot be the only way to identify the error.
+- **ELSE** an inline message.
 
-## Quando usar
+## When to use
 
-- Inline: erros específicos de campo.
-- Resumo: vários erros.
-- Global: falhas que afetam todo o fluxo.
-- Contextual: feedback ligado a um componente.
+- Inline: field-specific errors.
+- Summary: several errors.
+- Global: failures that affect the whole flow.
+- Contextual: feedback tied to a component.
 
-## Quando evitar
+## When to avoid
 
-- Erro só no topo → **use em vez disso:** inline mais resumo.
-- Mensagem no rodapé ou distante → **use em vez disso:** junto do campo.
-- Modal para validação → **use em vez disso:** resumo e inline.
-- Toast para erro persistente → **use em vez disso:** inline.
-- Várias mensagens globais desconectadas → **use em vez disso:** uma mensagem global única.
+- An error only at the top → **use instead:** inline plus a summary.
+- A message in the footer or far away → **use instead:** next to the field.
+- A modal for validation → **use instead:** summary and inline.
+- A toast for a persistent error → **use instead:** inline.
+- Several disconnected global messages → **use instead:** a single global message.
 
-## Faça
+## Do
 
-- Associe cada erro ao seu campo.
-- Use o mesmo texto no resumo e no campo.
-- Preserve os dados.
-- Reserve a mensagem global para o que não se liga a campo.
+- Associate each error with its field.
+- Use the same text in the summary and in the field.
+- Preserve the data.
+- Reserve the global message for what is not tied to a field.
 
-## Evite
+## Avoid
 
-- Remover o preenchimento após o erro.
-- Repetir mensagens desconectadas.
-- Depender de cor, ícone ou posição.
+- Clearing what was entered after the error.
+- Repeating disconnected messages.
+- Relying on color, icon or position.
 
-## Acessibilidade
+## Accessibility
 
-- Mensagem inline associada programaticamente ao campo (1.3.1).
-- Erro descrito em texto (3.3.1); sem depender de cor (1.4.1).
-- Resumo com links diretos aos campos (técnica de salto até os erros).
-- Ordem de foco previsível após o envio (2.4.3).
-- Teste com teclado, zoom e leitor de tela.
+- Inline message programmatically associated with the field (1.3.1).
+- Error described in text (3.3.1); not relying on color (1.4.1).
+- Summary with direct links to the fields (skip-to-errors technique).
+- Predictable focus order after submitting (2.4.3).
+- Test with keyboard, zoom and screen reader.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Título do resumo | "Corrija os campos abaixo para continuar" |
-| Item do resumo | "Telefone: inclua o DDD" |
-| Global | "Não foi possível enviar agora. Tente novamente em instantes." |
-| Inline | "Telefone: inclua o DDD." |
+| Summary title | "Fix the fields below to continue" |
+| Summary item | "Phone: include the area code" |
+| Global | "We couldn't submit right now. Try again in a moment." |
+| Inline | "Phone: include the area code." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A mensagem aparece junto ao campo afetado.
-- [ ] Existe resumo quando há vários erros.
-- [ ] Os links do resumo levam aos campos corretos.
-- [ ] O resumo não é a única forma de localizar o erro.
-- [ ] O foco vai para o resumo ou para o primeiro erro.
-- [ ] Os dados preenchidos são preservados.
-- [ ] Falhas gerais usam mensagem global.
-- [ ] Erros de validação não usam modal nem toast.
-- [ ] Foi testado com teclado e leitor de tela.
+- [ ] The message appears next to the affected field.
+- [ ] There is a summary when there are several errors.
+- [ ] The summary links lead to the right fields.
+- [ ] The summary is not the only way to locate the error.
+- [ ] Focus goes to the summary or to the first error.
+- [ ] The entered data is preserved.
+- [ ] General failures use a global message.
+- [ ] Validation errors use neither a modal nor a toast.
+- [ ] Tested with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, 3.3.1: erro identificado e descrito em texto, sem posição única.
-- W3C técnica G139: mecanismo para saltar aos erros.
-- W3C WAI (Form Notifications): mensagem por campo e foco no primeiro inválido.
-- GOV.UK Design System (Error summary, Error message): resumo no topo mais mensagem próxima; mesmo texto.
-- Padrão Digital GOV.BR (Message): diferencia global e contextual.
-- Atlassian Design (Error messages): inline versus global, com próximo passo.
-- USWDS (Form) e AMAWeb: validação inline e acessibilidade em formulários.
+- WCAG 2.2, 3.3.1: error identified and described in text, not by position alone.
+- W3C technique G139: a mechanism to jump to the errors.
+- W3C WAI (Form Notifications): a message per field and focus on the first invalid one.
+- GOV.UK Design System (Error summary, Error message): summary at the top plus a nearby message; same text.
+- GOV.BR Digital Standard (Message): distinguishes global and contextual.
+- Atlassian Design (Error messages): inline versus global, with a next step.
+- USWDS (Form) and AMAWeb: inline validation and accessibility in forms.

@@ -1,6 +1,6 @@
 ---
 id: confirm-deletion
-title: Quando pedir confirmação antes de excluir?
+title: When should you ask for confirmation before deleting?
 category: actions
 components: [modal, button, snackbar]
 type: contextual-decision
@@ -11,91 +11,91 @@ wcag: ["3.3.4", "2.4.3", "2.1.2", "1.4.1"]
 related: [destructive-action, undo, confirm-action, close-modal]
 ---
 
-# Quando pedir confirmação antes de excluir?
+# When should you ask for confirmation before deleting?
 
-> **Regra:** Peça confirmação só quando a exclusão for irreversível, ampla ou difícil de recuperar; nos demais casos, execute e ofereça "Desfazer".
+> **Rule:** Ask for confirmation only when the deletion is irreversible, broad or hard to recover from; otherwise, execute it and offer "Undo".
 
-## Contexto
+## Context
 
-Excluir não é o mesmo que sumir da tela. Antes de bloquear o fluxo com um modal, avalie impacto, reversibilidade e alcance da ação.
+Deleting is not the same as disappearing from the screen. Before blocking the flow with a modal, weigh the impact, reversibility and reach of the action.
 
-Confirmação usada sem critério vira ruído e induz clique automático. Excluir sem explicar a consequência, por outro lado, causa perda de trabalho, registros ou acesso. A proteção deve ser proporcional, sem criar etapa extra para toda exclusão simples.
+Confirmation used indiscriminately becomes noise and encourages automatic clicking. Deleting without explaining the consequence, on the other hand, causes loss of work, records or access. Protection should be proportional, without adding an extra step to every simple deletion.
 
-A confirmação precisa explicar a consequência, não apenas perguntar "tem certeza?".
+The confirmation must explain the consequence, not just ask "are you sure?".
 
-## Decisão
+## Decision
 
-- **SE** a exclusão é facilmente reversível ou o item se recria sem custo **ENTÃO** execute e mostre "Desfazer"; não abra modal.
-- **SE** é irreversível, de dados importantes ou de recuperação difícil **ENTÃO** confirme.
-- **SE** são vários itens ao mesmo tempo **ENTÃO** confirme mostrando a quantidade e os nomes (ou resumo).
-- **SE** afeta outras pessoas, registros ou configurações **ENTÃO** confirme descrevendo o efeito.
-- **SE** o impacto é alto ou crítico **ENTÃO** exija confirmação adicional, como digitar o nome do recurso.
-- **SE** confirma **ENTÃO** use título "Excluir <objeto>", botão "Excluir" e "Cancelar"; nunca "Sim"/"Não".
-- **SE** o modal abre **ENTÃO** inicie o foco em "Cancelar" e não execute a exclusão com Esc.
-- **SENÃO** mostre feedback de sucesso após excluir, sem modal extra.
+- **IF** the deletion is easily reversible or the item can be recreated at no cost **THEN** execute it and show "Undo"; do not open a modal.
+- **IF** it is irreversible, involves important data or is hard to recover from **THEN** confirm.
+- **IF** several items are deleted at once **THEN** confirm, showing the quantity and the names (or a summary).
+- **IF** it affects other people, records or settings **THEN** confirm, describing the effect.
+- **IF** the impact is high or critical **THEN** require additional confirmation, such as typing the resource name.
+- **IF** you confirm **THEN** use the title "Delete <object>", a "Delete" button and "Cancel"; never "Yes"/"No".
+- **IF** the modal opens **THEN** put initial focus on "Cancel" and do not perform the deletion on Esc.
+- **ELSE** show success feedback after deleting, with no extra modal.
 
-## Quando usar
+## When to use
 
-- Exclusão que não pode ser desfeita.
-- Dados importantes ou difíceis de recriar.
-- Exclusão em lote.
-- Ação que afeta terceiros ou configurações.
+- A deletion that cannot be undone.
+- Important or hard-to-recreate data.
+- Bulk deletion.
+- An action that affects third parties or settings.
 
-## Quando evitar
+## When to avoid
 
-- Ação reversível → **use em vez disso:** "Desfazer".
-- Ações pequenas e repetitivas → **use em vez disso:** execução direta com feedback.
-- Modal apenas para avisar que terminou → **use em vez disso:** toast de sucesso.
+- Reversible action → **use instead:** "Undo".
+- Small, repetitive actions → **use instead:** direct execution with feedback.
+- A modal just to say it finished → **use instead:** a success toast.
 
-## Faça
+## Do
 
-- Identifique o item ou a quantidade.
-- Descreva a consequência.
-- Use verbo específico no botão.
-- Escale a confirmação conforme o impacto.
+- Identify the item or the quantity.
+- Describe the consequence.
+- Use a specific verb on the button.
+- Scale the confirmation to the impact.
 
-## Evite
+## Avoid
 
-- "Tem certeza?" como única mensagem.
-- Botões "Sim" e "Não".
-- Confirmar toda exclusão.
-- Esconder a consequência.
-- Usar cor como único aviso.
+- "Are you sure?" as the only message.
+- "Yes" and "No" buttons.
+- Confirming every deletion.
+- Hiding the consequence.
+- Using color as the only warning.
 
-## Acessibilidade
+## Accessibility
 
-- Modal com título e descrição associados; o título identifica a ação ("Excluir projeto").
-- Foco inicial na opção segura; foco contido no modal; Esc cancela sem excluir; foco volta ao acionador (WCAG 2.4.3, 2.1.2).
-- Nomes claros, foco visível e diferença perceptível sem depender só de cor (WCAG 1.4.1).
-- Atende à proteção exigida por WCAG 3.3.4 para exclusão de dados controláveis.
+- Modal with an associated title and description; the title identifies the action ("Delete project").
+- Initial focus on the safe option; focus contained in the modal; Esc cancels without deleting; focus returns to the trigger (WCAG 2.4.3, 2.1.2).
+- Clear names, visible focus and a perceivable difference that does not rely on color alone (WCAG 1.4.1).
+- Meets the protection required by WCAG 3.3.4 for deleting controllable data.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Título | "Excluir projeto Orçamento 2026?" |
-| Consequência | "Os 14 arquivos serão apagados e não poderão ser recuperados." |
-| Botões | "Excluir" / "Cancelar" |
-| Confirmação forte | "Digite o nome do projeto para confirmar." |
-| Reversível | "Tarefa excluída. Desfazer" |
+| Title | "Delete project Budget 2026?" |
+| Consequence | "The 14 files will be deleted and cannot be recovered." |
+| Buttons | "Delete" / "Cancel" |
+| Strong confirmation | "Type the project name to confirm." |
+| Reversible | "Task deleted. Undo" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A exclusão é irreversível ou difícil de recuperar?
-- [ ] O texto identifica o item ou a quantidade?
-- [ ] A consequência está explicada?
-- [ ] O botão usa "Excluir" e há "Cancelar"?
-- [ ] "Desfazer" foi avaliado como alternativa?
-- [ ] O modal aparece só quando o impacto justifica?
-- [ ] Esc não executa a exclusão?
-- [ ] O foco começa na opção segura e retorna ao acionador?
-- [ ] Há feedback após excluir?
+- [ ] Is the deletion irreversible or hard to recover from?
+- [ ] Does the text identify the item or the quantity?
+- [ ] Is the consequence explained?
+- [ ] Does the button say "Delete" and is there a "Cancel"?
+- [ ] Was "Undo" considered as an alternative?
+- [ ] Does the modal appear only when the impact justifies it?
+- [ ] Does Esc avoid performing the deletion?
+- [ ] Does focus start on the safe option and return to the trigger?
+- [ ] Is there feedback after deleting?
 
-## Fundamentação
+## Rationale
 
-- IBM Carbon (Remove pattern, Modal Usage): níveis de impacto, confirmação proporcional, digitar o nome em casos críticos, danger modal.
-- Adobe Spectrum (Alert Dialog): variante destrutiva e rótulo coerente com a ação.
-- Padrão Digital GOV.BR (Modal): títulos e ações específicos; evitar "Tem certeza?" e "Sim/Não".
-- U.S. Web Design System (Alert): confirmação mais intrusiva para ações destrutivas.
-- W3C WAI-ARIA APG (Dialog Modal): foco, teclado, Escape, nome acessível.
-- AMAWeb (checklist de acessibilidade): verificação de foco e teclado.
+- IBM Carbon (Remove pattern, Modal Usage): impact levels, proportional confirmation, typing the name in critical cases, danger modal.
+- Adobe Spectrum (Alert Dialog): destructive variant and a label consistent with the action.
+- GOV.BR Digital Standard (Modal): specific titles and actions; avoid "Are you sure?" and "Yes/No".
+- U.S. Web Design System (Alert): more intrusive confirmation for destructive actions.
+- W3C WAI-ARIA APG (Dialog Modal): focus, keyboard, Escape, accessible name.
+- AMAWeb (accessibility checklist): focus and keyboard checks.

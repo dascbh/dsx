@@ -1,55 +1,55 @@
 ---
 name: figma-diff
-description: "Tira o retrato atual do arquivo do Figma e compara com o baseline versionado, gerando o relatório já classificado em token, primitivo e composição. Use para ver o que mudou no Figma antes de trazer para o código."
-argument-hint: "[páginas ou frames a limitar, opcional]"
+description: "Takes the current snapshot of the Figma file and compares it with the versioned baseline, producing a report already classified into token, primitive and composition. Use to see what changed in Figma before bringing it into the code."
+argument-hint: "[pages or frames to limit to, optional]"
 ---
 
-# figma-diff — o que mudou no Figma desde o baseline
+# figma-diff — what changed in Figma since the baseline
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/`, `tools/`, `templates/` são relativos a ela; caminhos sem prefixo (`design/`, `.dsx/`, `src/`) são do projeto do usuário.
+> **DSX root:** two levels above this skill's base directory. `knowledge/`, `patterns/`, `tools/`, `templates/` paths are relative to it; paths without a prefix (`design/`, `.dsx/`, `src/`) belong to the user's project.
 
-Produza o relatório de diff do arquivo do Figma. Mecanismo em
-[../figma-ciclo/references/diff.md](../figma-ciclo/references/diff.md).
+Produce the diff report for the Figma file. Mechanism in
+[../figma-cycle/references/diff.md](../figma-cycle/references/diff.md).
 
-Antes de começar, leia `design/figma-sync.md` (o arquivo e o baseline de
-registro) e a última linha de `design/figma-changelog.jsonl` — o `summary` e a
-`direction` da última rodada, e o ponteiro para os achados que talvez já expliquem
-algo que pareceria divergência nova. Diff é leitura: roda em qualquer vez,
-inclusive `design` — o hook `turn-guard` deixa passar o que não escreve no
-arquivo.
+Before starting, read `design/figma-sync.md` (the file and the baseline of
+record) and the last line of `design/figma-changelog.jsonl` — the `summary` and
+`direction` of the last round, and the pointer to findings that may already
+explain something that would look like a new divergence. A diff is a read: it
+runs on any turn, including `design` — the `turn-guard` hook lets through
+whatever does not write to the file.
 
-1. **Fase 1 — hashes.** Cole `tools/figma/snapshot.js` com `MODE = 'hashes'`
-   num `use_figma` (carregue a skill `figma-use` antes). Resposta pequena.
-   Compare cada `frames[chave].hash` com o do baseline.
-2. **Fase 2 — detalhe.** Só nos frames cujo hash difere do baseline: rode de
-   novo com `MODE = 'full'` e `TARGETS` preenchido com esses frames (aceita
-   `"Página › Frame"` ou só o nome do frame). Salve o retorno em arquivo
-   temporário. Se a resposta truncar por tamanho, divida `TARGETS` em lotes
-   menores e junte os `frames` num só JSON.
-3. **Comparação.**
+1. **Phase 1 — hashes.** Paste `tools/figma/snapshot.js` with `MODE = 'hashes'`
+   into a `use_figma` (load the `figma-use` skill first). Small response.
+   Compare each `frames[key].hash` with the baseline's.
+2. **Phase 2 — detail.** Only for frames whose hash differs from the baseline:
+   run again with `MODE = 'full'` and `TARGETS` filled with those frames (it
+   accepts `"Page › Frame"` or just the frame name). Save the return to a
+   temporary file. If the response truncates because of size, split `TARGETS`
+   into smaller batches and merge the `frames` into a single JSON.
+3. **Comparison.**
 
 ```bash
-node <DSX>/tools/figma/diff-baseline.cjs design/figma-baseline/<arquivo>.json /tmp/atual.json
+node <DSX>/tools/figma/diff-baseline.cjs design/figma-baseline/<file>.json /tmp/atual.json
 ```
 
-O script é `.cjs` de propósito (o `package.json` do DSX é `"type": "module"`) e
-aceita baselines do fluxo anterior com chaves em pt-BR. Se o baseline foi tirado
-só com hashes, os frames alterados aparecem em "Mudaram, mas o baseline não tem
-detalhe" — é o sinal para detalhar com `TARGETS` nesta rodada e regerar o
-baseline completo desses frames ao fechar.
+The script is `.cjs` on purpose (the DSX `package.json` is `"type": "module"`)
+and accepts baselines from the previous flow with pt-BR keys. If the baseline
+was taken with hashes only, the changed frames appear under "Changed, but the
+baseline has no detail" — the signal to detail them with `TARGETS` in this round
+and regenerate the full baseline for those frames when closing.
 
-Entregue o relatório ao usuário **sem aplicar nada** e aponte, em uma linha, o
-que é `token` (afeta o app inteiro — exige varredura nos dois temas), o que é
-`primitivo` (≥ 2 frames — aplica uma vez no componente compartilhado) e o que é
-`composição` (1 frame). Se aparecer a seção "Possível problema de
-nomenclatura", diga: é a convenção `Tipo · instância` violada, e o diff está
-deixando de agrupar um primitivo por isso (skill `figma-convencoes`). Se houver
-frames novos, lembre que tela nova não é mudança — a triagem está em
-`figma-trazer`. Mudança em massa `FRAME`→`INSTANCE` é componentização automática
-do MCP: ruído, não decisão de design.
+Deliver the report to the user **without applying anything** and point out, in
+one line, what is `token` (affects the whole app — requires a sweep in both
+themes), what is `primitive` (≥ 2 frames — apply once to the shared component)
+and what is `composition` (1 frame). If the "Possible naming problem" section
+appears, say so: the `Type · instance` convention was violated, and because of
+it the diff is failing to group a primitive (skill `figma-conventions`). If
+there are new frames, remind the user that a new screen is not a change — triage
+lives in `figma-pull`. A mass `FRAME`→`INSTANCE` change is the MCP's automatic
+componentization: noise, not a design decision.
 
-Quando o inventário ou o diff forem grandes o bastante para poluir a conversa,
-delegue as duas fases e a comparação ao agente `leitor-figma` e traga só o
-relatório.
+When the inventory or the diff is large enough to pollute the conversation,
+delegate both phases and the comparison to the `figma-reader` agent and bring
+back only the report.
 
-Escopo opcional: $ARGUMENTS
+Optional scope: $ARGUMENTS

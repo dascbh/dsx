@@ -1,6 +1,6 @@
 ---
 id: auto-advancing-carousel
-title: Por que evitar carrossel com rotação automática?
+title: Why avoid an auto-advancing carousel?
 category: content
 components: [carousel, pause-control, position-indicator]
 type: anti-pattern
@@ -11,92 +11,92 @@ wcag: ["2.2.2", "2.1.1", "2.4.7", "1.4.10"]
 related: [carousel, main-navigation, keyboard-focus, tabs]
 ---
 
-# Por que evitar carrossel com rotação automática?
+# Why avoid an auto-advancing carousel?
 
-> **Regra:** Não faça o carrossel girar sozinho; prefira controle manual ou seção estática e, se a rotação for inevitável, ofereça pausa visível e pare ao foco ou à interação.
+> **Rule:** Do not let the carousel rotate on its own; prefer manual control or a static section and, if rotation is unavoidable, provide a visible pause and stop on focus or interaction.
 
-## Contexto
+## Context
 
-O carrossel automático muda o conteúdo sem que ninguém acione controle algum. Parece um jeito eficaz de mostrar várias mensagens, mas encurta o tempo de leitura, atrapalha decisões e tira a atenção de quem usa teclado, toque, zoom ou leitor de tela.
+An auto-advancing carousel changes content without anyone operating a control. It looks like an effective way to show several messages, but it shortens reading time, disrupts decisions and pulls attention away from keyboard, touch, zoom and screen reader users.
 
-A rotação cria uma mudança de contexto não solicitada: o clique pode cair em outro slide, o texto some antes de ser lido e parte do conteúdo nunca é vista. Testes de e-commerce encontraram problemas de usabilidade em parcela relevante dos carrosséis avaliados e recomendam evitar autorrotação no mobile.
+Rotation causes an unrequested change of context: a click may land on another slide, text disappears before it is read and part of the content is never seen. E-commerce testing found usability problems in a significant share of the carousels evaluated and recommends avoiding auto-rotation on mobile.
 
-Na maioria dos casos, uma seção estática ou um carrossel manual resolve melhor e é mais simples de implementar.
+In most cases, a static section or a manual carousel works better and is simpler to build.
 
-## Decisão
+## Decision
 
-- **SE** a interface é móvel ou por toque **ENTÃO** desative a rotação automática.
-- **SE** o conteúdo é essencial, uma oferta importante ou o único caminho para uma tarefa **ENTÃO** use uma seção estática, fora dos slides.
-- **SE** o slide exige leitura atenta **ENTÃO** use controle manual.
-- **SE** há razão clara para rotacionar em desktop **ENTÃO** ofereça botão visível de pausa e retomada, acessível por teclado.
-- **SE** houver rotação **ENTÃO** pare ao receber foco ou hover e não reinicie sem ação explícita.
-- **SE** a rotação passa de 5 segundos e ocorre ao lado de outro conteúdo **ENTÃO** é obrigatório haver mecanismo de pausar, parar ou ocultar.
-- **SE** o sistema indica movimento reduzido **ENTÃO** não inicie a rotação.
-- **SENÃO** use carrossel manual com anterior, próximo e indicação de posição.
+- **IF** the interface is mobile or touch-based **THEN** disable auto-rotation.
+- **IF** the content is essential, an important offer or the only path to a task **THEN** use a static section, outside the slides.
+- **IF** the slide requires careful reading **THEN** use manual control.
+- **IF** there is a clear reason to rotate on desktop **THEN** provide a visible, keyboard-accessible pause and resume button.
+- **IF** it rotates **THEN** stop on focus or hover and do not restart without an explicit action.
+- **IF** rotation lasts more than 5 seconds and runs alongside other content **THEN** a pause, stop or hide mechanism is mandatory.
+- **IF** the system signals reduced motion **THEN** do not start rotation.
+- **ELSE** use a manual carousel with previous, next and a position indicator.
 
-## Quando usar
+## When to use
 
-- Rotação automática apenas com objetivo claro e conteúdo secundário.
-- Controle de pausa visível e acessível.
-- Parada ao foco e à interação.
-- Teste com teclado, toque e leitor de tela.
+- Auto-rotation only with a clear goal and secondary content.
+- A visible, accessible pause control.
+- Stopping on focus and interaction.
+- Testing with keyboard, touch and screen reader.
 
-## Quando evitar
+## When to avoid
 
-- Interfaces móveis ou por toque → **use em vez disso:** seção estática ou carrossel manual.
-- Texto que exige leitura cuidadosa → **use em vez disso:** blocos estáticos.
-- Cada slide é importante → **use em vez disso:** exibir todos em grade.
-- Carrossel como única rota para uma tarefa → **use em vez disso:** links na navegação.
-- Sem pausa clara → **use em vez disso:** controle manual.
+- Mobile or touch interfaces → **use instead:** static section or manual carousel.
+- Text that requires careful reading → **use instead:** static blocks.
+- Every slide matters → **use instead:** show them all in a grid.
+- Carousel as the only route to a task → **use instead:** links in the navigation.
+- No clear pause → **use instead:** manual control.
 
-## Faça
+## Do
 
-- Priorize controle manual.
-- Mantenha o botão de pausa visível e rotulado.
-- Repita o conteúdo essencial fora do carrossel.
-- Dê tempo suficiente de leitura e respeite movimento reduzido.
+- Prioritize manual control.
+- Keep the pause button visible and labeled.
+- Repeat essential content outside the carousel.
+- Allow enough reading time and respect reduced motion.
 
-## Evite
+## Avoid
 
-- Trocar slides sem ação da pessoa.
-- Reiniciar a rotação depois de foco ou interação.
-- Depender só de pontos para navegar.
-- Esconder conteúdo essencial em slide.
-- Limitar o tempo de leitura.
+- Changing slides without any action from the person.
+- Restarting rotation after focus or interaction.
+- Relying on dots alone for navigation.
+- Hiding essential content in a slide.
+- Limiting reading time.
 
-## Acessibilidade
+## Accessibility
 
-- Critério 2.2.2: mecanismo para pausar, parar ou ocultar movimento que começa sozinho, dura mais de 5 s e aparece junto de outro conteúdo.
-- O botão de pausa é operável por teclado, tem nome claro e permanece localizável.
-- Padrão APG: parar a rotação ao foco ou hover e não retomar sem ação explícita.
-- Comunique slide atual e posição sem mover o foco de forma inesperada.
-- Não use só cor, movimento ou pontos como indicação; respeite `prefers-reduced-motion`.
+- Criterion 2.2.2: a mechanism to pause, stop or hide motion that starts automatically, lasts more than 5 s and appears alongside other content.
+- The pause button is keyboard-operable, clearly named and stays easy to find.
+- APG pattern: stop rotation on focus or hover and do not resume without an explicit action.
+- Communicate the current slide and position without moving focus unexpectedly.
+- Do not use color, motion or dots alone as the indication; respect `prefers-reduced-motion`.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Pausar | "Pausar apresentação" |
-| Retomar | "Retomar apresentação" |
-| Posição | "Slide 2 de 5" |
-| Navegar | "Slide anterior" / "Próximo slide" |
+| Pause | "Pause slideshow" |
+| Resume | "Resume slideshow" |
+| Position | "Slide 2 of 5" |
+| Navigate | "Previous slide" / "Next slide" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A rotação automática é realmente necessária.
-- [ ] O conteúdo funciona sem autoplay.
-- [ ] Existe botão de pausa visível e operável por teclado.
-- [ ] A rotação para ao receber foco e após interação.
-- [ ] Há controles de anterior e próximo.
-- [ ] O conteúdo essencial também aparece fora do carrossel.
-- [ ] No mobile não há rotação automática.
-- [ ] Movimento reduzido é respeitado.
-- [ ] Leitor de tela e zoom foram testados.
+- [ ] Auto-rotation is truly necessary.
+- [ ] The content works without autoplay.
+- [ ] There is a visible, keyboard-operable pause button.
+- [ ] Rotation stops on focus and after interaction.
+- [ ] There are previous and next controls.
+- [ ] Essential content also appears outside the carousel.
+- [ ] There is no auto-rotation on mobile.
+- [ ] Reduced motion is respected.
+- [ ] Screen reader and zoom were tested.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 2.2.2 (Pause, Stop, Hide): requisito mínimo para movimento automático; não prova que autoplay seja boa escolha.
-- W3C WAI-ARIA APG (Carousel Pattern): parar ao foco ou hover, controle de parada e anúncio do slide atual.
-- W3C WAI (tutorial de carrosséis): movimento precisa ser controlável.
-- Baymard Institute (carrosséis de home e controles de página): evitar autorrotação em mobile, controles claros, seção estática como alternativa; evidência contextual de e-commerce.
-- Nielsen Norman Group: pausar a rotação, permitir escolha direta do slide e repetir o conteúdo importante fora do carrossel.
+- WCAG 2.2, criterion 2.2.2 (Pause, Stop, Hide): the minimum requirement for automatic motion; it does not prove autoplay is a good choice.
+- W3C WAI-ARIA APG (Carousel Pattern): stop on focus or hover, a stop control and announcement of the current slide.
+- W3C WAI (carousels tutorial): motion must be controllable.
+- Baymard Institute (homepage carousels and page controls): avoid auto-rotation on mobile, clear controls, a static section as the alternative; contextual e-commerce evidence.
+- Nielsen Norman Group: pause rotation, allow direct slide choice and repeat important content outside the carousel.

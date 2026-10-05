@@ -1,147 +1,147 @@
 ---
 id: multimodal
 area: ai
-title: UX multimodal (tela, toque, texto, voz, câmera)
+title: Multimodal UX (screen, touch, text, voice, camera)
 evidence: contextual
-related: [ux-para-agentes, generative-ui, evals]
+related: [ux-for-agents, generative-ui, evals]
 ---
 
-# UX multimodal
+# Multimodal UX
 
-> **Quando consultar**
-> - Ao adicionar voz, câmera, áudio, gesto ou compartilhamento de tela a um fluxo que já tem tela e toque.
-> - Ao decidir qual modalidade assume cada etapa de uma tarefa.
-> - Ao especificar o estado compartilhado entre modalidades, permissões de captura e fallbacks.
-> - Ao planejar testes de uma experiência que alterna modalidades.
+> **When to consult**
+> - When adding voice, camera, audio, gesture or screen sharing to a flow that already has screen and touch.
+> - When deciding which modality takes over each step of a task.
+> - When specifying the state shared between modalities, capture permissions and fallbacks.
+> - When planning tests for an experience that switches modalities.
 >
-> **Não consultar para:** continuidade entre canais (site → atendimento), que é omnichannel; nem para escolher componentes gerados, que é `generative-ui.md`.
+> **Do not consult for:** continuity across channels (website → customer service), which is omnichannel; nor for choosing generated components, which is `generative-ui.md`.
 
-## 1. Definição e fronteiras
+## 1. Definition and boundaries
 
-UX multimodal é coordenar diferentes formas de entrada e saída **dentro da mesma tarefa**, com **um único estado** compartilhado. Ter um botão de microfone e outro de câmera não torna um produto multimodal; a coordenação, sim.
+Multimodal UX is coordinating different forms of input and output **within the same task**, with **a single** shared **state**. Having a microphone button and a camera button does not make a product multimodal; coordination does.
 
-| Conceito | O que muda | Exemplo |
+| Concept | What changes | Example |
 |---|---|---|
-| Multimodal | Modalidades combinadas ou alternadas numa tarefa | Aponta a câmera, pergunta por voz, confirma na tela |
-| Omnichannel | Continuidade entre canais/pontos de contato | Começa no app, termina na loja |
-| Conversacional | Diálogo como forma principal | Chat ou assistente de voz |
-| Generative UI | A composição da tela é gerada | IA escolhe tabela ou formulário |
+| Multimodal | Modalities combined or alternated within a task | Points the camera, asks by voice, confirms on screen |
+| Omnichannel | Continuity across channels/touchpoints | Starts in the app, finishes in the store |
+| Conversational | Dialogue as the main form | Chat or voice assistant |
+| Generative UI | The screen composition is generated | AI chooses table or form |
 
-Os conceitos podem coexistir, mas não são sinônimos. Multimodalidade é campo antigo da interação humano-computador; o que mudou é que modelos atuais interpretam fala, imagem e texto numa camada comum, tornando a coordenação viável em produtos de massa. `[evidência: contextual]`
+The concepts can coexist, but they are not synonyms. Multimodality is an old field of human-computer interaction; what changed is that current models interpret speech, image and text in a common layer, making coordination viable in mass-market products. `[evidence: contextual]`
 
-## 2. Princípio central: uma tarefa, um estado
+## 2. Central principle: one task, one state
 
-O histórico pertence à **tarefa**, não à modalidade. Se a pessoa apontou a câmera para um objeto e disse "essa peça está certa?", a referência a "essa peça" precisa sobreviver quando a conversa continua por voz ou quando ela toca numa opção na tela.
+History belongs to the **task**, not to the modality. If the person pointed the camera at an object and said "is this part right?", the reference to "this part" needs to survive when the conversation continues by voice or when they tap an option on the screen.
 
-Especifique o estado da interação, não só as telas:
+Specify the interaction state, not just the screens:
 
 ```yaml
-estado_da_tarefa:
-  objetivo_atual: "diagnosticar luz piscando no equipamento"
-  objetos_referenciados: [{ id: painel-frontal, origem: camera, confianca: baixa }]
-  modalidade_ativa: [camera, voz]
-  capturas_ativas: { microfone: true, camera: true }
-  escolhas_feitas: ["modelo X confirmado por toque"]
-  permissoes: { camera: concedida_nesta_sessao }
-  risco_da_proxima_acao: baixo
-  alternativas_se_falhar: { camera: "descrever por texto", voz: "digitar" }
+task_state:
+  current_goal: "diagnose a blinking light on the equipment"
+  referenced_objects: [{ id: front-panel, source: camera, confidence: low }]
+  active_modality: [camera, voice]
+  active_captures: { microphone: true, camera: true }
+  choices_made: ["model X confirmed by touch"]
+  permissions: { camera: granted_this_session }
+  next_action_risk: low
+  fallbacks: { camera: "describe by text", voice: "type" }
 ```
 
-Regras condicionais típicas:
-- **SE** a câmera estiver indisponível **ENTÃO** ofereça descrição por texto mantendo o restante do estado.
-- **SE** a confiança na identificação for baixa **ENTÃO** destaque na tela o que foi reconhecido e peça confirmação antes de seguir.
-- **SE** a próxima ação tiver impacto financeiro, legal ou irreversível **ENTÃO** exija revisão persistente em tela.
+Typical conditional rules:
+- **IF** the camera is unavailable **THEN** offer text description while keeping the rest of the state.
+- **IF** confidence in the identification is low **THEN** highlight on screen what was recognized and ask for confirmation before proceeding.
+- **IF** the next action has a financial, legal or irreversible impact **THEN** require persistent on-screen review.
 
-## 3. Forças e limites de cada modalidade
+## 3. Strengths and limits of each modality
 
-| Modalidade | Serve bem para | Cuidado com |
+| Modality | Good for | Watch out for |
 |---|---|---|
-| Tela e toque | Comparar, revisar, selecionar com precisão, manter informação persistente | Excesso de informação, alvos pequenos, exigir mãos livres |
-| Voz | Expressar intenção complexa rápido, mãos ocupadas | Ruído, privacidade, ambiguidade, revisar conteúdo longo |
-| Câmera | Referenciar objetos, documentos, ambiente | Permissão, terceiros no quadro, luz, enquadramento, interpretação errada |
-| IA (camada) | Relacionar sinais, manter contexto, adaptar resposta | Erro probabilístico, excesso de autonomia, opacidade |
+| Screen and touch | Comparing, reviewing, selecting precisely, keeping information persistent | Information overload, small targets, requiring free hands |
+| Voice | Expressing complex intent quickly, busy hands | Noise, privacy, ambiguity, reviewing long content |
+| Camera | Referencing objects, documents, surroundings | Permission, third parties in frame, light, framing, misinterpretation |
+| AI (layer) | Relating signals, keeping context, adapting the answer | Probabilistic error, excessive autonomy, opacity |
 
-## 4. Escolha da modalidade por contexto
+## 4. Choosing the modality by context
 
-A pergunta certa é: **qual modalidade reduz esforço sem aumentar risco neste momento?**
+The right question is: **which modality reduces effort without increasing risk at this moment?**
 
-| Contexto | Principal | Apoio / fallback |
+| Context | Primary | Support / fallback |
 |---|---|---|
-| Mãos ocupadas | Voz | Tela para revisar passos e confirmar |
-| Comparar alternativas | Tela | Voz para refinar critérios |
-| Identificar algo físico | Câmera + voz | Tela mostrando o que foi reconhecido |
-| Ambiente público ou sensível | Texto + tela | Áudio opcional, nunca obrigatório |
-| Ação financeira, jurídica ou irreversível | Tela com revisão explícita | Voz só como apoio, nunca escondendo a confirmação |
-| Necessidade de acessibilidade ou preferência | Escolha da pessoa | Mecanismos concorrentes sempre que possível |
+| Busy hands | Voice | Screen to review steps and confirm |
+| Comparing alternatives | Screen | Voice to refine criteria |
+| Identifying something physical | Camera + voice | Screen showing what was recognized |
+| Public or sensitive environment | Text + screen | Audio optional, never mandatory |
+| Financial, legal or irreversible action | Screen with explicit review | Voice only as support, never hiding the confirmation |
+| Accessibility need or preference | The person's choice | Concurrent mechanisms whenever possible |
 
-Voz não é "mais natural" por padrão: é ótima cozinhando, péssima num ônibus ou para revisar vinte opções.
+Voice is not "more natural" by default: it is great while cooking, terrible on a bus or for reviewing twenty options.
 
-## 5. Sete regras
+## 5. Seven rules
 
-1. **Tarefa antes da tecnologia.** Mapeie o que a pessoa precisa, onde está e o que a impede. **SE** um formulário simples resolve **ENTÃO** não adicione voz nem câmera.
-2. **Preserve contexto na troca.** Objetos citados, filtros, escolhas, permissões e estado atravessam a mudança de modalidade. Trocar deve parecer trocar de instrumento, não de aplicativo.
-3. **Use modalidades complementares.** Uma compensa o limite da outra: voz expressa, tela permite revisar, câmera mostra, áudio libera a atenção visual.
-4. **Torne a percepção visível.** Indique quando microfone e câmera começam e param, o que está sendo analisado, o que foi enviado e como interromper. Permita conferir a referência interpretada antes de decisões importantes.
-5. **Confirme o que importa em formato persistente.** Uma fala desaparece. Valores, destinatários e consequências de ações relevantes são revisados em tela (ver [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md)).
-6. **Projete correção e fallback antes do caminho ideal.** Fala não reconhecida, câmera bloqueada, pouca luz, rede caindo, objeto identificado errado. Fallback é rota alternativa que preserva estado, não mensagem de erro final (ver [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md)).
-7. **Nunca force uma modalidade.** Mecanismos de entrada disponíveis devem poder ser usados de forma concorrente (WCAG 2.5.6). Nova modalidade amplia caminhos; não vira requisito.
+1. **Task before technology.** Map what the person needs, where they are and what stops them. **IF** a simple form solves it **THEN** do not add voice or camera.
+2. **Preserve context on switching.** Referenced objects, filters, choices, permissions and state carry across the modality change. Switching should feel like changing instruments, not apps.
+3. **Use complementary modalities.** One compensates for the other's limit: voice expresses, screen lets you review, camera shows, audio frees visual attention.
+4. **Make perception visible.** Indicate when microphone and camera start and stop, what is being analyzed, what was sent and how to interrupt. Allow checking the interpreted reference before important decisions.
+5. **Confirm what matters in a persistent format.** Speech disappears. Values, recipients and consequences of relevant actions are reviewed on screen (see [`confirm-ai-action`](../../patterns/ai/confirm-ai-action.md)).
+6. **Design correction and fallback before the ideal path.** Unrecognized speech, blocked camera, low light, dropping network, wrongly identified object. A fallback is an alternative route that preserves state, not a final error message (see [`ai-error-recovery`](../../patterns/ai/ai-error-recovery.md)).
+7. **Never force a modality.** Available input mechanisms must be usable concurrently (WCAG 2.5.6). A new modality widens paths; it does not become a requirement.
 
-## 6. Acessibilidade não é "ter voz"
+## 6. Accessibility is not "having voice"
 
-- Voz ajuda quem prefere não usar as mãos e cria barreira para quem não fala ou não pode falar no momento.
-- Câmera ajuda a reconhecer objetos e é inviável sem luz, para pessoas com baixa visão em certas tarefas, ou quando captar imagem é inadequado.
-- Mantenha **equivalência de informação**: resposta crítica apenas em áudio exclui quem não ouve ou precisa reler; confirmação apenas visual exclui o caso inverso. Decida o que precisa ser redundante, persistente ou adaptável.
+- Voice helps those who prefer not to use their hands and creates a barrier for those who do not speak or cannot speak at the moment.
+- Camera helps recognize objects and is unworkable without light, for people with low vision in certain tasks, or when capturing images is inappropriate.
+- Keep **information equivalence**: a critical answer only in audio excludes those who cannot hear or need to reread; a confirmation only visual excludes the opposite case. Decide what needs to be redundant, persistent or adaptable.
 
-## 7. Privacidade e confiança
+## 7. Privacy and trust
 
-Câmera e microfone captam o entorno: pessoas ao fundo, documentos, endereços, conversas alheias à tarefa. Permissão não é só o pop-up do sistema operacional. A experiência comunica:
-- por que a captura é necessária;
-- quando está ativa;
-- o que foi enviado e para onde;
-- como interromper;
-- que alternativa existe.
+Camera and microphone capture the surroundings: people in the background, documents, addresses, conversations unrelated to the task. Permission is not just the operating system pop-up. The experience communicates:
+- why the capture is necessary;
+- when it is active;
+- what was sent and where;
+- how to interrupt;
+- what alternative exists.
 
-Quando a IA interpreta a captura, mostre a conclusão antes de executar algo relevante. Interpretar intenção e executar consequência são problemas diferentes.
+When the AI interprets the capture, show the conclusion before executing anything relevant. Interpreting intent and executing a consequence are different problems.
 
-## 8. Anti-padrões
+## 8. Anti-patterns
 
-- **Teatro de modalidade:** voz ou câmera adicionadas porque existem, não porque resolvem.
-- **Perda de estado na troca:** a pessoa repete filtros, referências ou dados.
-- **Resposta monolítica:** tudo pela mesma modalidade (comparar 20 opções em áudio).
-- **Captura escondida:** sensor ativo sem indicação clara.
-- **Sem fallback:** o fluxo depende de reconhecimento perfeito.
-- **Confundir multimodal com acessível.**
-- **Automação prematura:** executar ação antes de resolver a confiança na interpretação.
+- **Modality theater:** voice or camera added because they exist, not because they solve something.
+- **State loss on switching:** the person repeats filters, references or data.
+- **Monolithic answer:** everything through the same modality (comparing 20 options in audio).
+- **Hidden capture:** an active sensor without clear indication.
+- **No fallback:** the flow depends on perfect recognition.
+- **Confusing multimodal with accessible.**
+- **Premature automation:** executing an action before resolving confidence in the interpretation.
 
-## 9. Testes e métricas
+## 9. Tests and metrics
 
-Roteiro de teste deve incluir:
-- troca de modalidade no meio da tarefa (começar por voz e continuar na tela; câmera e depois texto);
-- condições reais: ruído, pouca luz, uma mão ocupada, rede instável, câmera bloqueada, reconhecimento errado;
-- observação de repetição (a pessoa informa de novo algo já dito ou mostrado?);
-- entendimento do estado (sabe o que o sistema ouve, vê, processa e vai fazer?);
-- correção sem recomeçar;
-- alternativa funcional quando uma modalidade não é desejável.
+A test script should include:
+- a modality switch mid-task (start by voice and continue on screen; camera and then text);
+- real conditions: noise, low light, one hand busy, unstable network, blocked camera, wrong recognition;
+- observation of repetition (does the person provide again something already said or shown?);
+- understanding of state (do they know what the system hears, sees, processes and will do?);
+- correction without starting over;
+- a working alternative when a modality is not desirable.
 
-| Aspecto | Indicador | Revela |
+| Aspect | Indicator | Reveals |
 |---|---|---|
-| Conclusão | Sucesso da tarefa | Se a combinação chega ao resultado |
-| Continuidade | Sucesso após troca de modalidade | Se o contexto sobrevive |
-| Correção | Ciclos de correção por tarefa | Se erros de reconhecimento são reparáveis |
-| Esforço | Tempo, repetições, passos supérfluos | Se a multimodalidade reduziu trabalho |
-| Controle | Cancelamentos, desfazer, ações indevidas | Equilíbrio entre autonomia e confirmação |
-| Preferência | Modalidade escolhida por contexto | Se o produto respeita condições reais |
+| Completion | Task success | Whether the combination reaches the result |
+| Continuity | Success after a modality switch | Whether context survives |
+| Correction | Correction cycles per task | Whether recognition errors are repairable |
+| Effort | Time, repetitions, superfluous steps | Whether multimodality reduced work |
+| Control | Cancellations, undo, improper actions | Balance between autonomy and confirmation |
+| Preference | Modality chosen by context | Whether the product respects real conditions |
 
-Mais trocas de modalidade podem significar flexibilidade ou confusão; interprete com dados qualitativos.
+More modality switches can mean flexibility or confusion; interpret with qualitative data.
 
 ## 10. Checklist
 
-- [ ] Cada modalidade adicionada tem justificativa de redução de esforço.
-- [ ] Existe especificação de estado compartilhado (objetivo, referências, escolhas, permissões, capturas ativas).
-- [ ] A troca de modalidade não exige repetir informação.
-- [ ] Indicadores visíveis de captura ativa e controle para interromper.
-- [ ] Ações relevantes têm confirmação persistente em tela.
-- [ ] Fallback definido para cada modalidade, preservando estado.
-- [ ] Toda informação crítica tem equivalente em outra modalidade.
-- [ ] Nenhuma modalidade é obrigatória quando há alternativa viável.
-- [ ] Testes incluem trocas, condições adversas e erros de reconhecimento.
+- [ ] Every added modality has an effort-reduction justification.
+- [ ] There is a shared state specification (goal, references, choices, permissions, active captures).
+- [ ] Switching modality does not require repeating information.
+- [ ] Visible indicators of active capture and a control to interrupt.
+- [ ] Relevant actions have persistent on-screen confirmation.
+- [ ] A fallback defined for each modality, preserving state.
+- [ ] All critical information has an equivalent in another modality.
+- [ ] No modality is mandatory when there is a viable alternative.
+- [ ] Tests include switches, adverse conditions and recognition errors.

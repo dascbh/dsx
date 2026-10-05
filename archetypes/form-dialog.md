@@ -1,10 +1,10 @@
 ---
 id: form-dialog
-title: Diálogo de formulário
-summary: Janela modal curta que coleta poucos dados para criar ou alterar algo sem tirar a pessoa da tela em que ela está.
+title: Form dialog
+summary: Short modal window that collects a little data to create or change something without taking the person away from the screen they are on.
 register: [operational, consumer]
-when-to-use: SE a tarefa pede poucos campos, nasce de uma tela e deve voltar a ela ao terminar ENTÃO use diálogo de formulário
-avoid-when: há mais de ~6 campos ou seções, a pessoa precisa consultar a tela de trás para preencher, o preenchimento leva minutos ou abriria outro diálogo por cima
+when-to-use: IF the task asks for few fields, starts from a screen and should return to it when done THEN use a form dialog
+avoid-when: there are more than ~6 fields or sections, the person needs to consult the screen behind to fill it in, filling it takes minutes, or it would open another dialog on top
 regions: [dialog-header, dialog-body, dialog-footer]
 primary-action: { region: dialog-footer, position: bottom-right, max: 1 }
 states: [open, field-error, submitting, error, success]
@@ -13,89 +13,88 @@ variations: [short-dialog, sectioned-dialog, promote-to-page]
 rules: [T1, T2, T4, T6, T7, F4]
 ---
 
-# Diálogo de formulário
+# Form dialog
 
-"Novo membro", "Renomear documento", "Adicionar destinatário", "Registrar envio": tarefas de um minuto que nascem numa lista ou num detalhe e devem devolver a pessoa ao mesmo lugar, com o resultado à vista. O diálogo segura a atenção na tarefa curta; quando a tarefa cresce, ele vira armadilha.
+"New member", "Rename document", "Add recipient", "Record shipment": one-minute tasks that start in a list or a detail and should bring the person back to the same place, with the result in view. The dialog holds attention on the short task; when the task grows, it becomes a trap.
 
-## Quando usar
+## When to use
 
-- **SE** a tarefa tem até ~6 campos e uma decisão **ENTÃO** use diálogo de formulário.
-- **SE** a pessoa precisa olhar dados da tela de trás para preencher **ENTÃO** use `detail-side-panel` (não bloqueia o fundo) ou formulário de página.
-- **SE** o formulário precisa abrir outro diálogo (escolher um item, criar algo auxiliar) **ENTÃO** resolva dentro do mesmo diálogo (campo de busca, troca de conteúdo com "voltar") ou promova a página; nunca empilhe diálogos.
-- **SE** o preenchimento pode levar minutos ou ter rascunho **ENTÃO** use `promote-to-page` ou `step-wizard`.
-- **SENÃO** (só confirmar uma ação, sem dados) **ENTÃO** é `confirmation-dialog`.
+- **IF** the task has up to ~6 fields and one decision **THEN** use a form dialog.
+- **IF** the person needs to look at data on the screen behind to fill it in **THEN** use `detail-side-panel` (it does not block the background) or a page form.
+- **IF** the form needs to open another dialog (pick an item, create something auxiliary) **THEN** solve it inside the same dialog (search field, content swap with "back") or promote it to a page; never stack dialogs.
+- **IF** filling it in may take minutes or needs a draft **THEN** use `promote-to-page` or `step-wizard`.
+- **ELSE** (only confirming an action, with no data) **THEN** it is a `confirmation-dialog`.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────┐
-│ dialog-header  Novo membro (h2)  ✕        │
+│ dialog-header  New member (h2)   ✕        │
 ├──────────────────────────────────────────┤
 │ dialog-body                               │
-│  Frase curta de contexto (opcional)       │
-│  Nome *        [____________________]     │
-│  E-mail *      [____________________]     │
-│  Papel         [Membro            ▾]      │
-│                texto de ajuda             │
+│  Short context sentence (optional)        │
+│  Name *        [____________________]     │
+│  Email *       [____________________]     │
+│  Role          [Member            ▾]      │
+│                help text                  │
 ├──────────────────────────────────────────┤
-│ dialog-footer   [Cancelar] [Adicionar     │
-│                                  membro]  │
+│ dialog-footer   [Cancel] [Add member]     │
 └──────────────────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **dialog-header** — título com verbo + objeto ("Adicionar membro"), ligado ao diálogo como nome acessível; botão fechar (✕) com nome acessível.
-- **dialog-body** — no máximo uma frase de contexto; campos em uma coluna, rótulo visível acima de cada campo, obrigatórios marcados conforme a política do produto, ajuda curta abaixo. Erro de sistema aparece no topo do corpo, não em toast.
-- **dialog-footer** — "Cancelar" (secundária) antes da primária, na ordem declarada pelo produto; a primária repete o verbo do título.
+- **dialog-header**: a title with verb + object ("Add member"), tied to the dialog as its accessible name; a close button (✕) with an accessible name.
+- **dialog-body**: at most one sentence of context; fields in one column, a visible label above each field, required fields marked according to the product's policy, short help below. A system error appears at the top of the body, not in a toast.
+- **dialog-footer**: "Cancel" (secondary) before the primary, in the order the product declares; the primary repeats the title's verb.
 
-## Ações
+## Actions
 
-- **Primária:** uma, no `dialog-footer`, bottom-right, com rótulo verbo + objeto; Enter num campo de linha única envia.
-- **Cancelar / fechar / Esc / clique fora:** fecham sem efeito; se houver dados digitados, perguntam antes de descartar (ou o clique fora não fecha).
-- **Foco:** ao abrir, vai para o primeiro campo; preso no diálogo enquanto aberto; ao fechar, volta para o controle que abriu.
-- **Envio:** bloqueia clique duplo; o diálogo só fecha depois da resposta de sucesso.
+- **Primary:** one, in the `dialog-footer`, bottom-right, labeled verb + object; Enter in a single-line field submits.
+- **Cancel / close / Esc / click outside:** close with no effect; if data was typed, they ask before discarding (or clicking outside does not close).
+- **Focus:** on opening, goes to the first field; trapped in the dialog while open; on closing, returns to the control that opened it.
+- **Submission:** blocks double clicks; the dialog only closes after a success response.
 
-## Estados
+## States
 
-- **open** — campos vazios ou com valores atuais (edição); primária habilitada (valide no envio e ao sair do campo, não desabilite sem motivo visível).
-- **field-error** — mensagem junto ao campo, em texto; foco no primeiro campo com erro; diálogo continua aberto.
-- **submitting** — primária com indicador, campos e fechamento bloqueados.
-- **error** — falha do sistema: alerta no topo do corpo, dados preservados, primária disponível para tentar de novo.
-- **success** — diálogo fecha, confirmação breve na tela de origem e o item criado/alterado aparece destacado nela.
+- **open**: fields empty or with current values (editing); primary enabled (validate on submit and on leaving the field; do not disable without a visible reason).
+- **field-error**: a message next to the field, as text; focus on the first field with an error; the dialog stays open.
+- **submitting**: the primary with an indicator, fields and closing locked.
+- **error**: a system failure: an alert at the top of the body, data preserved, the primary available to try again.
+- **success**: the dialog closes, a brief confirmation on the originating screen and the created/changed item highlighted on it.
 
-## Variações
+## Variations
 
 ### short-dialog
-Até 3 campos, largura pequena.
-**Favorece:** renomear, adicionar um item, ajustes pontuais; tarefa em segundos.
-**Piora:** nada, enquanto a tarefa caber; a tentação é ir enchendo de campos.
+Up to 3 fields, small width.
+**Favors:** renaming, adding an item, one-off adjustments; a task done in seconds.
+**Worsens:** nothing, as long as the task fits; the temptation is to keep adding fields.
 
 ### sectioned-dialog
-4–6 campos agrupados por subtítulos, largura média, corpo com rolagem própria e rodapé fixo.
-**Favorece:** criação de um registro com dados básicos sem sair da lista.
-**Piora:** aproxima-se do limite; rolagem dentro de diálogo esconde campos e erros — garanta que o erro role até o campo.
+4–6 fields grouped under subtitles, medium width, a body with its own scrolling and a fixed footer.
+**Favors:** creating a record with basic data without leaving the list.
+**Worsens:** gets close to the limit; scrolling inside a dialog hides fields and errors, so make sure the error scrolls to the field.
 
 ### promote-to-page
-O mesmo formulário vira página própria com retorno à tela de origem.
-**Favorece:** formulários longos, consulta a outras telas, rascunho, URL compartilhável.
-**Piora:** perde o contexto visual da tela de origem; exige caminho de volta e destaque do resultado ao voltar.
+The same form becomes its own page with a way back to the originating screen.
+**Favors:** long forms, consulting other screens, drafts, a shareable URL.
+**Worsens:** loses the visual context of the originating screen; requires a way back and highlighting the result on return.
 
-## Anti-padrões
+## Anti-patterns
 
-- Diálogo que abre outro diálogo.
-- Título "Atenção" ou "Formulário" e primária "OK".
-- Placeholder no lugar do rótulo.
-- Fechar o diálogo antes da resposta do servidor e mostrar erro depois, já sem os dados.
-- Clique fora que descarta um formulário preenchido sem perguntar.
-- Erro de sistema em toast atrás do diálogo.
+- A dialog that opens another dialog.
+- A title "Attention" or "Form" and a primary "OK".
+- A placeholder instead of a label.
+- Closing the dialog before the server's response and showing the error afterwards, with the data already gone.
+- A click outside that discards a filled-in form without asking.
+- A system error in a toast behind the dialog.
 
 ## Checklist
 
-- [ ] Título com verbo + objeto, ligado como nome acessível do diálogo.
-- [ ] Até ~6 campos, rótulo visível, uma coluna.
-- [ ] Uma primária; "Cancelar" antes dela na ordem do produto.
-- [ ] Foco inicial no primeiro campo, preso no diálogo, devolvido ao fechar.
-- [ ] Fechar com dados pergunta antes de descartar.
-- [ ] Erros no campo; erro de sistema no corpo; dados preservados.
-- [ ] Nenhum diálogo empilhado.
+- [ ] A title with verb + object, tied as the dialog's accessible name.
+- [ ] Up to ~6 fields, visible labels, one column.
+- [ ] One primary; "Cancel" before it in the product's order.
+- [ ] Initial focus on the first field, trapped in the dialog, returned on closing.
+- [ ] Closing with data asks before discarding.
+- [ ] Errors at the field; system errors in the body; data preserved.
+- [ ] No stacked dialogs.

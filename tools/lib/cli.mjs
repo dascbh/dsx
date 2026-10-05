@@ -1,4 +1,4 @@
-// Parser mínimo de argumentos: --chave valor | --flag
+// Minimal argument parser: --key value | --flag
 export function parseArgs(argv = process.argv.slice(2)) {
   const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {

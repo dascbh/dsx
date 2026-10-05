@@ -1,5 +1,5 @@
 {
-  "description": "Guarda da vez do ciclo Figma↔código: nega escrita no arquivo do Figma enquanto design/figma-sync.md disser `turn: design` (aceita o legado `vez:` e os valores antigos `codigo`/`aplicando`, com aviso) e anuncia o estado do ciclo ao abrir a sessão. Leitura sempre passa; projeto sem registro não é afetado.",
+  "description": "Turn guard for the Figma↔code cycle: denies writing to the Figma file while design/figma-sync.md says `turn: design` (accepts the legacy `vez:` and the old values `codigo`/`aplicando`, with a warning) and announces the cycle state when the session opens. Reading always passes; a project without a registry is not affected.",
   "hooks": {
     "PreToolUse": [
       {

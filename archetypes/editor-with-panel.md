@@ -1,10 +1,10 @@
 ---
 id: editor-with-panel
-title: Editor com painel
-summary: Tela de produção de um documento ou objeto complexo, com a área de edição ao centro e um painel lateral de apoio (comentários, variáveis, sugestões, verificação).
+title: Editor with panel
+summary: Production screen for a document or complex object, with the editing area in the center and a supporting side panel (comments, variables, suggestions, checks).
 register: [operational, editorial]
-when-to-use: SE a pessoa constrói ou altera um conteúdo longo e precisa de apoio contextual sem sair dele ENTÃO use editor com painel
-avoid-when: o conteúdo é um formulário de poucos campos (use diálogo de formulário ou configurações), o documento está congelado (use documento com visor) ou não existe apoio lateral que justifique o painel
+when-to-use: IF the person builds or changes long content and needs contextual support without leaving it THEN use an editor with panel
+avoid-when: the content is a form with few fields (use form dialog or settings), the document is frozen (use document viewer), or there is no side support that justifies the panel
 regions: [page-header, toolbar, editing-area, side-panel, status-bar]
 primary-action: { region: page-header, position: top-right, max: 1 }
 states: [loading, saving, saved, conflict, error, no-access, read-only, success]
@@ -13,102 +13,102 @@ variations: [fixed-right-panel, collapsible-panel, tabbed-panel, focus-without-p
 rules: [T1, T3, T4, T6, T7, F5]
 ---
 
-# Editor com painel
+# Editor with panel
 
-Pedido de compra com muitas linhas, especificação técnica, modelo de documento, regra complexa: a pessoa passa horas aqui. A área de edição precisa de calma e largura; o painel traz o que ajuda a escrever certo — comentários, campos a preencher, alternativas aprovadas, verificações, sugestões de IA. O cabeçalho diz em que estado o trabalho está e qual o próximo passo do ciclo.
+A purchase order with many lines, a technical specification, a document template, a complex rule: the person spends hours here. The editing area needs calm and width; the panel brings what helps to write it right: comments, fields to fill, approved alternatives, checks, AI suggestions. The header says what state the work is in and what the next step of the lifecycle is.
 
-## Quando usar
+## When to use
 
-- **SE** o conteúdo é longo e editado em várias sessões **ENTÃO** use editor com painel com salvamento automático e indicador de estado sempre visível.
-- **SE** há apoio contextual que a pessoa consulta enquanto escreve (comentários, variáveis, itens do catálogo, verificação) **ENTÃO** esse apoio vai no `side-panel`, nunca em diálogo que cobre o texto.
-- **SE** o painel tem mais de um tipo de apoio **ENTÃO** use a variação `tabbed-panel`; não empilhe tudo num painel rolante.
-- **SE** partes do conteúdo são geradas ou sugeridas por IA **ENTÃO** marque a origem, mostre a base e exija aceite explícito antes de entrar no texto.
-- **SE** algo bloqueia o próximo passo (pendência, campo obrigatório, desvio a aprovar) **ENTÃO** a primária fica desabilitada com o motivo, e o painel lista as pendências com link para cada ponto do texto.
-- **SENÃO** (conteúdo curto, sem apoio) **ENTÃO** um formulário de página ou `form-dialog` basta.
+- **IF** the content is long and edited across several sessions **THEN** use an editor with panel with autosave and an always-visible status indicator.
+- **IF** there is contextual support the person consults while writing (comments, variables, catalog items, checks) **THEN** that support goes in the `side-panel`, never in a dialog that covers the text.
+- **IF** the panel has more than one kind of support **THEN** use the `tabbed-panel` variation; do not stack everything in one scrolling panel.
+- **IF** parts of the content are generated or suggested by AI **THEN** mark the origin, show the basis and require explicit acceptance before it enters the text.
+- **IF** something blocks the next step (pending item, required field, deviation to approve) **THEN** the primary stays disabled with the reason, and the panel lists the pending items with a link to each point in the text.
+- **ELSE** (short content, no support) **THEN** a page form or `form-dialog` is enough.
 
-## Mapa de regiões
+## Region map
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ page-header ‹ Pedidos / Título (h1)  Rascunho  [Primária]        │
+│ page-header ‹ Orders / Title (h1)      Draft     [Primary]     │
 ├──────────────────────────────────────────────────────────────┤
-│ toolbar  B I U · Título ▾ · Inserir ▾ · ↶ ↷                  │
+│ toolbar  B I U · Heading ▾ · Insert ▾ · ↶ ↷                  │
 ├──────────────────────────────────────────┬───────────────────┤
 │ editing-area                             │ side-panel         │
-│                                          │ [Coment.|Campos|✓] │
-│   Texto em largura de leitura            │ • Pendência 1 →    │
-│   (60–80 caracteres por linha)           │ • Comentário de Ana│
-│                                          │ • Sugestão (IA)    │
+│                                          │ [Comm.|Fields|✓]   │
+│   Text at reading width                  │ • Pending item 1 → │
+│   (60–80 characters per line)            │ • Comment by Ana   │
+│                                          │ • Suggestion (AI)  │
 ├──────────────────────────────────────────┴───────────────────┤
-│ status-bar  Salvo há 10 s · 2 pendências · 3.412 palavras      │
+│ status-bar  Saved 10 s ago · 2 pending items · 3,412 words     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## O que vai em cada região
+## What goes in each region
 
-- **page-header** — caminho de volta, título do documento (`h1`, editável no lugar se fizer sentido), etiqueta de situação (Rascunho, Em revisão, Aprovado), ação primária do ciclo e menu "Mais ações" (duplicar, exportar, histórico, excluir).
-- **toolbar** — formatação e inserção agrupadas por função, desfazer/refazer; botões só com ícone têm nome acessível e dica com atalho. Fixa no topo ao rolar.
-- **editing-area** — o conteúdo, em largura de leitura; trechos com status especial (travado, sugerido por IA, com comentário) marcados com mais de um sinal (cor + ícone ou sublinhado + rótulo).
-- **side-panel** — apoio contextual ligado ao ponto do texto: clicar num item do painel leva ao trecho, e selecionar um trecho filtra o painel. Itens de IA trazem rótulo de origem e ações "Aceitar", "Editar", "Descartar".
-- **status-bar** — estado de salvamento com horário, contagem de pendências (link para o painel), métricas do conteúdo. Mensagens aqui são `aria-live` educado.
+- **page-header**: the way back, the document title (`h1`, editable in place if it makes sense), a status label (Draft, In review, Approved), the lifecycle's primary action and a "More actions" menu (duplicate, export, history, delete).
+- **toolbar**: formatting and insertion grouped by function, undo/redo; icon-only buttons have an accessible name and a tooltip with the shortcut. Sticks to the top when scrolling.
+- **editing-area**: the content, at reading width; passages with a special status (locked, AI-suggested, commented) marked with more than one signal (color + icon or underline + label).
+- **side-panel**: contextual support tied to the point in the text: clicking a panel item goes to the passage, and selecting a passage filters the panel. AI items carry an origin label and "Accept", "Edit", "Discard" actions.
+- **status-bar**: save status with a timestamp, the count of pending items (link to the panel), content metrics. Messages here are polite `aria-live`.
 
-## Ações
+## Actions
 
-- **Primária:** uma, no `page-header`, top-right — avançar o ciclo ("Enviar para aprovação", "Exportar pedido"). Salvar não é primária quando há salvamento automático.
-- **Bloqueio:** primária desabilitada enquanto houver pendência impeditiva, com o motivo junto ("2 pendências impedem o envio") e caminho para resolvê-las.
-- **Desfazer:** desfazer/refazer sempre disponíveis para edição; ação que não se desfaz (enviar, congelar versão) pede confirmação.
-- **Destrutiva:** excluir o documento só no menu "Mais ações", com confirmação que nomeia o documento.
+- **Primary:** one, in the `page-header`, top-right: move the lifecycle forward ("Send for approval", "Export order"). Save is not the primary when there is autosave.
+- **Blocking:** the primary is disabled while there is a blocking pending item, with the reason next to it ("2 pending items prevent sending") and a path to resolve them.
+- **Undo:** undo/redo always available for editing; an action that cannot be undone (send, freeze version) asks for confirmation.
+- **Destructive:** deleting the document only in the "More actions" menu, with a confirmation that names the document.
 
-## Estados
+## States
 
-- **loading** — esqueleto do texto e do painel; a barra de ferramentas aparece desabilitada até o conteúdo chegar.
-- **saving** — indicador discreto na barra de status ("Salvando…"); nunca bloqueia a digitação.
-- **saved** — "Salvo às 14:32" ou "há 10 s"; a pessoa sabe que pode fechar.
-- **conflict** — outra pessoa ou sessão alterou o mesmo conteúdo: avise antes de sobrescrever, mostre quem e quando, e ofereça comparar, manter a minha ou recarregar a outra.
-- **error** — falha ao salvar: alerta persistente (não toast que some) com "Tentar novamente"; o texto digitado continua no editor e, se possível, numa cópia local.
-- **no-access** — sem permissão para editar nem ver: tela explica; se puder ver mas não editar, vá para `read-only`.
-- **read-only** — documento congelado ou sem permissão de edição: barra de ferramentas some, faixa explica o motivo e o caminho ("Criar nova versão").
-- **success** — passo do ciclo concluído (enviado, exportado): confirmação com o que acontece agora e situação atualizada no cabeçalho.
+- **loading**: a skeleton of the text and the panel; the toolbar appears disabled until the content arrives.
+- **saving**: a discreet indicator in the status bar ("Saving…"); never blocks typing.
+- **saved**: "Saved at 14:32" or "10 s ago"; the person knows they can close.
+- **conflict**: another person or session changed the same content: warn before overwriting, show who and when, and offer to compare, keep mine or reload theirs.
+- **error**: save failed: a persistent alert (not a toast that disappears) with "Try again"; the typed text stays in the editor and, if possible, in a local copy.
+- **no-access**: no permission to edit or view: the screen explains; if they can view but not edit, go to `read-only`.
+- **read-only**: frozen document or no edit permission: the toolbar disappears, a banner explains the reason and the path ("Create new version").
+- **success**: lifecycle step completed (sent, exported): confirmation with what happens now and the situation updated in the header.
 
-## Variações
+## Variations
 
 ### fixed-right-panel
-Painel sempre aberto com ~320–380 px.
-**Favorece:** trabalho com muitos comentários ou pendências; revisão.
-**Piora:** área de edição mais estreita; em telas médias o texto fica apertado.
+Panel always open at ~320–380 px.
+**Favors:** work with many comments or pending items; review.
+**Worsens:** a narrower editing area; on medium screens the text gets cramped.
 
 ### collapsible-panel
-Painel abre e fecha por botão (com `aria-expanded`) e lembra a escolha da pessoa.
-**Favorece:** escrita concentrada com apoio sob demanda; telas médias.
-**Piora:** pendências escondidas podem passar despercebidas — mostre a contagem no botão de abrir.
+The panel opens and closes with a button (with `aria-expanded`) and remembers the person's choice.
+**Favors:** focused writing with support on demand; medium screens.
+**Worsens:** hidden pending items can go unnoticed, so show the count on the open button.
 
 ### tabbed-panel
-Um painel, várias abas (Comentários, Campos, Verificação, Sugestões).
-**Favorece:** vários tipos de apoio sem multiplicar painéis.
-**Piora:** a informação da aba fechada some; aba com pendência precisa de contador visível.
+One panel, several tabs (Comments, Fields, Checks, Suggestions).
+**Favors:** several kinds of support without multiplying panels.
+**Worsens:** the closed tab's information disappears; a tab with pending items needs a visible counter.
 
 ### focus-without-panel
-Modo de escrita: painel e barra de ferramentas recolhidos, só o texto e a barra de status.
-**Favorece:** redação longa sem distração.
-**Piora:** apoio e pendências ficam fora de vista; o caminho de saída do modo precisa ser óbvio.
+Writing mode: panel and toolbar collapsed, only the text and the status bar.
+**Favors:** long writing without distraction.
+**Worsens:** support and pending items are out of sight; the way out of the mode must be obvious.
 
-## Anti-padrões
+## Anti-patterns
 
-- Botão "Salvar" como primária ao lado de salvamento automático (dois modelos ao mesmo tempo).
-- Falha de salvamento comunicada por toast que desaparece.
-- Sugestão de IA inserida direto no texto, sem rótulo e sem aceite.
-- Comentários em diálogo modal que cobre o trecho comentado.
-- Primária desabilitada sem dizer o que falta.
-- Trechos travados indicados só por cor de fundo.
-- Sair da tela sem aviso quando há alteração não salva.
+- A "Save" button as the primary next to autosave (two models at once).
+- A save failure communicated by a toast that disappears.
+- An AI suggestion inserted straight into the text, with no label and no acceptance.
+- Comments in a modal dialog that covers the commented passage.
+- A disabled primary that does not say what is missing.
+- Locked passages indicated only by background color.
+- Leaving the screen without warning when there are unsaved changes.
 
 ## Checklist
 
-- [ ] `h1` com o nome do documento; situação visível no cabeçalho.
-- [ ] Um modelo de salvamento só, com estado e horário visíveis.
-- [ ] Uma primária; desabilitada com motivo e caminho quando bloqueada.
-- [ ] Painel ligado ao texto nos dois sentidos (clicar leva ao trecho).
-- [ ] Conteúdo de IA rotulado, com base e aceite explícito.
-- [ ] Conflito e erro de salvamento tratados sem perda de texto.
-- [ ] Ícones da barra com nome acessível; status especiais com mais de um sinal.
-- [ ] Caminho de volta visível e aviso ao sair com alteração pendente.
+- [ ] `h1` with the document's name; situation visible in the header.
+- [ ] A single save model, with status and time visible.
+- [ ] One primary; disabled with a reason and a path when blocked.
+- [ ] Panel tied to the text both ways (clicking goes to the passage).
+- [ ] AI content labeled, with its basis and explicit acceptance.
+- [ ] Conflict and save errors handled without losing text.
+- [ ] Toolbar icons with an accessible name; special statuses with more than one signal.
+- [ ] Visible way back and a warning when leaving with pending changes.

@@ -1,6 +1,6 @@
 ---
 id: long-loading
-title: Como tratar carregamentos que demoram muito?
+title: How do you handle loads that take a long time?
 category: feedback
 components: [loading-indicator, progress-bar, skeleton]
 type: contextual-decision
@@ -11,94 +11,94 @@ wcag: ["4.1.3", "2.2.2", "2.3.3"]
 related: [skeleton-vs-spinner, progress-percentage, skeleton-screen, double-submit]
 ---
 
-# Como tratar carregamentos que demoram muito?
+# How do you handle loads that take a long time?
 
-> **Regra:** Escolha o indicador pela duração e pelo tipo de espera: nada abaixo de 1 s, indeterminado de 1 a 3 s, progresso real acima de 3 s e, acima de 10 s, preserve a tarefa e ofereça continuar, cancelar ou acompanhar depois.
+> **Rule:** Choose the indicator by duration and type of wait: nothing under 1 s, indeterminate from 1 to 3 s, real progress above 3 s and, above 10 s, preserve the task and offer to continue, cancel or follow up later.
 
-## Contexto
+## Context
 
-Quando a resposta demora, a pessoa precisa saber se o sistema está trabalhando, quanto avançou e o que pode fazer enquanto espera. Sem retorno, a espera parece falha e leva a cliques repetidos, abandono e perda de confiança.
+When the response is slow, people need to know whether the system is working, how far it has gone and what they can do while waiting. Without feedback, the wait looks like a failure and leads to repeated clicks, abandonment and loss of trust.
 
-O indicador não acelera o processo, mas reduz a incerteza e ajuda a decidir se espera ou tenta outra coisa. A escolha depende da duração esperada, de haver progresso mensurável e do escopo afetado.
+The indicator does not speed up the process, but it reduces uncertainty and helps people decide whether to wait or try something else. The choice depends on the expected duration, on whether progress is measurable and on the scope affected.
 
-Os intervalos abaixo são heurísticas de projeto cruzadas de várias fontes, não limites universais.
+The ranges below are design heuristics cross-checked across several sources, not universal limits.
 
-## Decisão
+## Decision
 
-- **SE** a operação leva menos de 1 s **ENTÃO** não mostre indicador, para evitar flash.
-- **SE** dura de 1 a 3 s **ENTÃO** exiba carregamento indeterminado e localizado, caso a espera seja notada.
-- **SE** leva mais de 3 s e há estimativa confiável **ENTÃO** use progresso determinado; **SENÃO** mantenha estado indeterminado com contexto textual.
-- **SE** ultrapassa 10 s **ENTÃO** não deixe spinner sem fim: informe o estado, guarde a tarefa e permita seguir, cancelar ou acompanhar depois.
-- **SE** a estrutura do conteúdo é conhecida e aparece em partes **ENTÃO** use skeleton; **SENÃO** não use.
-- **SE** o carregamento afeta uma área pequena **ENTÃO** limite o indicador a ela; não use overlay de página inteira.
-- **SE** o estado muda **ENTÃO** troque o indicador por sucesso, erro ou cancelamento.
-- **SE** é um envio **ENTÃO** bloqueie cliques duplicados sem apagar dados.
-- **SENÃO** mantenha apenas um indicador por contexto.
+- **IF** the operation takes less than 1 s **THEN** show no indicator, to avoid a flash.
+- **IF** it takes 1 to 3 s **THEN** show a localized indeterminate loading indicator, if the wait is noticeable.
+- **IF** it takes more than 3 s and there is a reliable estimate **THEN** use determinate progress; **ELSE** keep an indeterminate state with textual context.
+- **IF** it exceeds 10 s **THEN** do not leave an endless spinner: report the state, save the task and allow continuing, cancelling or following up later.
+- **IF** the content's structure is known and appears in parts **THEN** use a skeleton; **ELSE** do not.
+- **IF** the loading affects a small area **THEN** limit the indicator to it; do not use a full-page overlay.
+- **IF** the state changes **THEN** replace the indicator with success, error or cancellation.
+- **IF** it is a submission **THEN** block duplicate clicks without clearing data.
+- **ELSE** keep only one indicator per context.
 
-## Quando usar
+## When to use
 
-- Buscas, filtros e carga de dados lentos.
-- Envios, importações, exportações e cálculos demorados.
-- Operações de duração variável (rede, volume, serviço externo).
-- Processos que podem seguir em segundo plano.
+- Slow searches, filters and data loads.
+- Long submissions, imports, exports and calculations.
+- Operations of variable duration (network, volume, external service).
+- Processes that can continue in the background.
 
-## Quando evitar
+## When to avoid
 
-- Operação tão rápida que o indicador pisca → **use em vez disso:** nenhum indicador.
-- Spinner sem contexto nem saída → **use em vez disso:** texto de status + opção de continuar ou cancelar.
-- Porcentagem sem avanço real → **use em vez disso:** indeterminado.
-- Vários loaders simultâneos → **use em vez disso:** um por contexto.
+- An operation so fast the indicator flickers → **use instead:** no indicator.
+- A spinner with no context or way out → **use instead:** status text + an option to continue or cancel.
+- A percentage without real progress → **use instead:** indeterminate.
+- Several simultaneous loaders → **use instead:** one per context.
 
-## Faça
+## Do
 
-- Diga o que está carregando.
-- Mostre progresso só quando mensurável.
-- Preserve contexto e dados.
-- Ofereça cancelar ou recuperar quando seguro.
-- Termine sempre em sucesso, erro ou cancelamento.
+- Say what is loading.
+- Show progress only when it is measurable.
+- Preserve context and data.
+- Offer cancel or recovery when safe.
+- Always end in success, error or cancellation.
 
-## Evite
+## Avoid
 
-- Spinner sem explicação.
-- Bloqueio total da tela sem necessidade.
-- Promessas de tempo imprecisas.
-- Cliques duplicados processados.
+- A spinner with no explanation.
+- Blocking the whole screen unnecessarily.
+- Imprecise time promises.
+- Processing duplicate clicks.
 
-## Acessibilidade
+## Accessibility
 
-- Texto compreensível associado, como "Carregando resultados".
-- `role="status"` ou `aria-live="polite"` para mensagens, sem mover o foco (WCAG 4.1.3); `aria-busy="true"` na região afetada.
-- Use semântica de barra de progresso só com valor atual real; não invente `aria-valuenow` para indeterminado.
-- Não dependa de cor, movimento ou som; respeite redução de movimento (WCAG 2.3.3).
-- Informe conclusão, falha e cancelamento de forma programática.
+- Understandable associated text, such as "Loading results".
+- `role="status"` or `aria-live="polite"` for messages, without moving focus (WCAG 4.1.3); `aria-busy="true"` on the affected region.
+- Use progress bar semantics only with a real current value; do not invent `aria-valuenow` for indeterminate states.
+- Do not rely on color, motion or sound; respect reduced motion (WCAG 2.3.3).
+- Report completion, failure and cancellation programmatically.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Indeterminado | "Carregando resultados…" |
-| Determinado | "Importando… 75%" |
-| Longo | "Isso pode levar alguns minutos. Você pode continuar usando o sistema e avisaremos ao terminar." |
-| Cancelar | "Cancelar importação" |
-| Falha | "A importação não foi concluída. Tentar novamente" |
+| Indeterminate | "Loading results…" |
+| Determinate | "Importing… 75%" |
+| Long | "This may take a few minutes. You can keep using the system and we'll let you know when it's done." |
+| Cancel | "Cancel import" |
+| Failure | "The import didn't finish. Try again" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O estado diz o que está carregando?
-- [ ] O indicador está no escopo correto?
-- [ ] Esperas menores que 1 s não exibem indicador?
-- [ ] A porcentagem reflete avanço real?
-- [ ] O skeleton espelha a estrutura esperada?
-- [ ] Acima de 10 s há opção de continuar, cancelar ou acompanhar?
-- [ ] O carregamento termina em sucesso, erro ou cancelamento?
-- [ ] Envios duplicados são evitados?
-- [ ] O status é anunciado sem mover o foco?
+- [ ] Does the state say what is loading?
+- [ ] Is the indicator in the right scope?
+- [ ] Do waits under 1 s show no indicator?
+- [ ] Does the percentage reflect real progress?
+- [ ] Does the skeleton mirror the expected structure?
+- [ ] Above 10 s, is there an option to continue, cancel or follow up?
+- [ ] Does loading end in success, error or cancellation?
+- [ ] Are duplicate submissions prevented?
+- [ ] Is the status announced without moving focus?
 
-## Fundamentação
+## Rationale
 
-- Nielsen Norman Group: indicadores de progresso reduzem a incerteza e aumentam a tolerância à espera.
-- Baymard Institute: impaciência e cliques repetidos em etapas lentas de e-commerce.
-- GitHub Primer (Loading): esperas curtas, indeterminado, determinado e tarefas longas.
-- IBM Carbon (Loading): skeleton para conteúdo progressivo, escopo, evitar múltiplos loaders.
+- Nielsen Norman Group: progress indicators reduce uncertainty and increase tolerance for waiting.
+- Baymard Institute: impatience and repeated clicks in slow e-commerce steps.
+- GitHub Primer (Loading): short waits, indeterminate, determinate and long tasks.
+- IBM Carbon (Loading): skeleton for progressive content, scope, avoiding multiple loaders.
 - WCAG 2.2, 4.1.3 (Status Messages).
-- Padrão Digital GOV.BR (Loading): determinado com cancelar e indeterminado.
+- Brazilian Government Digital Standard GOV.BR (Loading): determinate with cancel, and indeterminate.

@@ -1,8 +1,8 @@
 [
   {
     "id": "confirmation-dialog",
-    "title": "Diálogo de confirmação",
-    "summary": "Interrupção curta que pede uma decisão explícita antes de uma ação de consequência séria, dizendo o que vai acontecer e com o quê.",
+    "title": "Confirmation dialog",
+    "summary": "Short interruption that asks for an explicit decision before an action with serious consequences, saying what will happen and to what.",
     "register": [
       "operational",
       "consumer"
@@ -54,8 +54,8 @@
   },
   {
     "id": "detail-side-panel",
-    "title": "Painel lateral de detalhe",
-    "summary": "Painel que desliza da borda sobre a tela atual para mostrar ou editar um registro sem perder a lista ou o contexto de onde a pessoa veio.",
+    "title": "Detail side panel",
+    "summary": "Panel that slides in from the edge over the current screen to show or edit a record without losing the list or the context the person came from.",
     "register": [
       "operational"
     ],
@@ -107,8 +107,8 @@
   },
   {
     "id": "document-viewer",
-    "title": "Documento com visor",
-    "summary": "Tela de leitura de um documento pronto (pedido emitido, nota fiscal, PDF enviado) com metadados e ações ao lado, sem edição do conteúdo.",
+    "title": "Document viewer",
+    "summary": "Reading screen for a finished document (issued order, invoice, uploaded PDF) with metadata and actions alongside, without editing the content.",
     "register": [
       "operational",
       "editorial"
@@ -159,8 +159,8 @@
   },
   {
     "id": "editor-with-panel",
-    "title": "Editor com painel",
-    "summary": "Tela de produção de um documento ou objeto complexo, com a área de edição ao centro e um painel lateral de apoio (comentários, variáveis, sugestões, verificação).",
+    "title": "Editor with panel",
+    "summary": "Production screen for a document or complex object, with the editing area in the center and a supporting side panel (comments, variables, suggestions, checks).",
     "register": [
       "operational",
       "editorial"
@@ -218,8 +218,8 @@
   },
   {
     "id": "form-dialog",
-    "title": "Diálogo de formulário",
-    "summary": "Janela modal curta que coleta poucos dados para criar ou alterar algo sem tirar a pessoa da tela em que ela está.",
+    "title": "Form dialog",
+    "summary": "Short modal window that collects a little data to create or change something without taking the person away from the screen they are on.",
     "register": [
       "operational",
       "consumer"
@@ -272,8 +272,8 @@
   },
   {
     "id": "library",
-    "title": "Biblioteca",
-    "summary": "Acervo de itens reutilizáveis (modelos, itens de catálogo, documentos de referência) organizado em coleções, com busca, visualização rápida e curadoria.",
+    "title": "Library",
+    "summary": "Collection of reusable items (templates, catalog items, reference documents) organized into collections, with search, quick view and curation.",
     "register": [
       "operational",
       "editorial"
@@ -327,8 +327,8 @@
   },
   {
     "id": "master-detail",
-    "title": "Mestre-detalhe",
-    "summary": "Duas colunas na mesma tela, a lista à esquerda e o registro selecionado à direita, para percorrer itens em sequência sem trocar de página.",
+    "title": "Master-detail",
+    "summary": "Two columns on the same screen, the list on the left and the selected record on the right, to go through items in sequence without changing pages.",
     "register": [
       "operational"
     ],
@@ -378,8 +378,8 @@
   },
   {
     "id": "monitoring-dashboard",
-    "title": "Painel de acompanhamento",
-    "summary": "Tela de visão geral que responde como as coisas estão e o que pede atenção agora, com indicadores, tendências e uma lista curta de pendências.",
+    "title": "Monitoring dashboard",
+    "summary": "Overview screen that answers how things are and what needs attention now, with indicators, trends and a short list of pending items.",
     "register": [
       "operational"
     ],
@@ -430,8 +430,8 @@
   },
   {
     "id": "operational-list",
-    "title": "Lista operacional",
-    "summary": "Tela de trabalho diário que mostra muitos registros do mesmo tipo para a pessoa encontrar, comparar e agir sobre eles.",
+    "title": "Operational list",
+    "summary": "Everyday work screen that shows many records of the same type so the person can find, compare and act on them.",
     "register": [
       "operational"
     ],
@@ -486,8 +486,8 @@
   },
   {
     "id": "public-decision-page",
-    "title": "Página pública de decisão",
-    "summary": "Página aberta por link, sem login, onde um terceiro de fora do produto lê um pedido e registra uma decisão (confirmação, recusa, aprovação, pedido de ajuste).",
+    "title": "Public decision page",
+    "summary": "Page opened by a link, without login, where a third party outside the product reads a request and records a decision (confirmation, refusal, approval, change request).",
     "register": [
       "consumer"
     ],
@@ -545,8 +545,8 @@
   },
   {
     "id": "settings",
-    "title": "Configurações",
-    "summary": "Tela de ajustes persistentes de conta, módulo ou organização, agrupados em seções, com salvamento previsível e uma zona separada para ações de risco.",
+    "title": "Settings",
+    "summary": "Screen of persistent account, module or organization adjustments, grouped into sections, with predictable saving and a separate zone for risky actions.",
     "register": [
       "operational",
       "consumer"
@@ -603,8 +603,8 @@
   },
   {
     "id": "step-wizard",
-    "title": "Assistente em etapas",
-    "summary": "Fluxo guiado que divide uma tarefa longa ou rara em etapas ordenadas, com uma decisão por vez e revisão antes de concluir.",
+    "title": "Step wizard",
+    "summary": "Guided flow that splits a long or rare task into ordered steps, with one decision at a time and a review before finishing.",
     "register": [
       "operational",
       "consumer"

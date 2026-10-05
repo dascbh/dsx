@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Gera escala tipográfica modular (estática ou fluida com clamp()).
-// Uso:
+// Generates a modular type scale (static, or fluid with clamp()).
+// Usage:
 //   node tools/type-scale.mjs --base 16 --ratio major-third
 //   node tools/type-scale.mjs --base 16 --ratio 1.2 --fluid --max-ratio 1.333 --min-vw 360 --max-vw 1440 --format css
 import { parseArgs } from './lib/cli.mjs';
@@ -10,13 +10,13 @@ export const RATIOS = {
   'perfect-fourth': 1.333, 'augmented-fourth': 1.414, 'perfect-fifth': 1.5, golden: 1.618,
 };
 
-// Nomes semânticos por passo da escala (0 = corpo).
+// Semantic names per scale step (0 = body).
 const NAMES = { '-2': 'caption', '-1': 'small', 0: 'body', 1: 'h6', 2: 'h5', 3: 'h4', 4: 'h3', 5: 'h2', 6: 'h1', 7: 'display' };
 
 const resolveRatio = (r) => (RATIOS[r] ?? Number(r)) || 1.25;
 const round = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
 
-/** Altura de linha: textos maiores pedem entrelinha menor. Corpo ~1.5; display ~1.1. */
+/** Line height: larger text needs tighter leading. Body ~1.5; display ~1.1. */
 export function lineHeight(px) {
   if (px <= 14) return 1.5;
   if (px <= 18) return 1.5;
@@ -37,7 +37,7 @@ export function typeScale({ base = 16, ratio = 'major-third', min = -1, max = 6,
   return { base, ratio: r, steps: out };
 }
 
-/** Escala fluida: interpola entre a razão mínima (mobile) e máxima (desktop). */
+/** Fluid scale: interpolates between the minimum (mobile) and maximum (desktop) ratio. */
 export function fluidScale({ base = 16, maxBase = base, ratio = 1.2, maxRatio = 1.333, minVw = 360, maxVw = 1440, min = -2, max = 6 }) {
   const r1 = resolveRatio(ratio), r2 = resolveRatio(maxRatio);
   const steps = [];

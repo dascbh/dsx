@@ -1,6 +1,6 @@
 ---
 id: no-search-results
-title: O que mostrar quando a busca não retorna resultados?
+title: What should you show when a search returns no results?
 category: search-filters
 components: [search-field, empty-state, filters, status-region]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["4.1.3", "3.3.1", "2.4.3"]
 related: [empty-state, active-filters, retry, filter-structure]
 ---
 
-# O que mostrar quando a busca não retorna resultados?
+# What should you show when a search returns no results?
 
-> **Regra:** Mantenha a consulta digitada, informe com clareza que não há resultados e aponte o caminho mais provável para seguir, sem deslocar o foco.
+> **Rule:** Keep the typed query, state clearly that there are no results and point to the most likely way forward, without moving focus.
 
-## Contexto
+## Context
 
-Com zero resultados, a pessoa quer saber se o conteúdo inexiste, se a consulta ficou restrita demais, se há filtros ligados ou se ocorreu falha técnica. O estado não deve limpar o texto digitado nem encerrar a tarefa.
+With zero results, the person wants to know whether the content does not exist, whether the query was too narrow, whether filters are on or whether there was a technical failure. The state must not clear the typed text nor end the task.
 
-Encare a ausência de resultados como um estado de recuperação. Benchmarks de busca indicam que páginas "nenhum resultado" com dicas genéricas viram beco sem saída, enquanto sugestões atreladas à consulta dão um próximo passo.
+Treat the absence of results as a recovery state. Search benchmarks show that "no results" pages with generic tips become dead ends, while suggestions tied to the query provide a next step.
 
-Causas diferentes exigem estados diferentes: combinação de filtros sem correspondência, falha de rede e base vazia não são a mesma situação.
+Different causes call for different states: a filter combination with no match, a network failure and an empty database are not the same situation.
 
-## Decisão
+## Decision
 
-- **SE** a busca retorna zero resultados **ENTÃO** mantenha o texto no campo, informe "nenhum resultado" e repita o termo na mensagem.
-- **SE** há filtros ativos **ENTÃO** liste-os e ofereça remover um a um e "Limpar filtros".
-- **SE** a consulta parece ter erro de grafia **ENTÃO** sugira a grafia provável ou termos mais amplos e sinônimos.
-- **SE** existem alternativas realmente relacionadas à intenção **ENTÃO** mostre categorias ou conteúdos próximos.
-- **SE** não há alternativa relevante **ENTÃO** não invente resultados para preencher a tela.
-- **SE** a requisição falhou **ENTÃO** mostre estado de erro com "Tentar novamente", não "sem resultados".
-- **SE** a busca ainda carrega **ENTÃO** mostre carregamento, não estado vazio.
-- **SE** sugestões podem expor conteúdo protegido ou registro sensível **ENTÃO** omita-as.
-- **SENÃO** ofereça "Limpar busca" e mantenha o campo disponível.
+- **IF** the search returns zero results **THEN** keep the text in the field, say "no results" and repeat the term in the message.
+- **IF** there are active filters **THEN** list them and offer to remove them one by one and "Clear filters".
+- **IF** the query seems to have a spelling mistake **THEN** suggest the likely spelling or broader terms and synonyms.
+- **IF** there are alternatives truly related to the intent **THEN** show nearby categories or content.
+- **IF** there is no relevant alternative **THEN** do not invent results to fill the screen.
+- **IF** the request failed **THEN** show an error state with "Try again", not "no results".
+- **IF** the search is still loading **THEN** show loading, not an empty state.
+- **IF** suggestions could expose protected content or a sensitive record **THEN** omit them.
+- **ELSE** offer "Clear search" and keep the field available.
 
-## Quando usar
+## When to use
 
-- Buscas em sites, catálogos, bibliotecas e bases de conhecimento.
-- Consultas livres com termos variados.
-- Combinações de filtros que podem zerar o resultado.
-- Buscas remotas que podem demorar ou falhar.
+- Searches on sites, catalogs, libraries and knowledge bases.
+- Free queries with varied terms.
+- Filter combinations that can bring the result to zero.
+- Remote searches that can be slow or fail.
 
-## Quando evitar
+## When to avoid
 
-- Consulta ainda carregando → **use em vez disso:** estado de carregamento.
-- Falha técnica → **use em vez disso:** mensagem de erro com nova tentativa.
-- Conjunto pequeno → **use em vez disso:** navegação direta em vez de busca livre.
+- A query still loading → **use instead:** a loading state.
+- A technical failure → **use instead:** an error message with a retry.
+- A small set → **use instead:** direct navigation instead of free search.
 
-## Faça
+## Do
 
-- Mantenha a consulta visível e editável.
-- Diga o que aconteceu e o que tentar a seguir.
-- Permita remover filtros no próprio estado vazio.
-- Mantenha a busca disponível na tela.
+- Keep the query visible and editable.
+- Say what happened and what to try next.
+- Allow removing filters right in the empty state.
+- Keep search available on the screen.
 
-## Evite
+## Avoid
 
-- Tela em branco sem explicação.
-- Apagar o termo digitado.
-- Dicas genéricas sem relação com a consulta.
-- Sugestões sem relação com a intenção.
-- Esconder os filtros que causaram o zero.
+- A blank screen with no explanation.
+- Clearing the typed term.
+- Generic tips unrelated to the query.
+- Suggestions unrelated to the intent.
+- Hiding the filters that caused the zero.
 
-## Acessibilidade
+## Accessibility
 
-- Campo de busca com rótulo visível e valor preservado.
-- Anuncie o resultado numa região de status (por exemplo, role="status", polida), sem mover o foco (4.1.3).
-- A mensagem não depende só de cor, ícone ou posição.
-- Teclado alcança o campo, os filtros removíveis e as sugestões; foco visível preservado.
-- Teste com leitor de tela, zoom, reflow e mobile.
+- Search field with a visible label and the value preserved.
+- Announce the result in a status region (for example, role="status", polite), without moving focus (4.1.3).
+- The message does not rely only on color, icon or position.
+- The keyboard reaches the field, the removable filters and the suggestions; visible focus preserved.
+- Test with screen reader, zoom, reflow and mobile.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Zero resultados | "Nenhum resultado para 'cadeira gamer'." |
-| Dica | "Confira a grafia ou use termos mais amplos." |
-| Com filtros | "Nenhum resultado com os filtros atuais. Remova um filtro para ver mais." |
-| Ação | "Limpar filtros" |
-| Falha | "Não foi possível buscar agora. Tentar novamente" |
+| Zero results | "No results for 'gaming chair'." |
+| Tip | "Check the spelling or use broader terms." |
+| With filters | "No results with the current filters. Remove a filter to see more." |
+| Action | "Clear filters" |
+| Failure | "Couldn't search right now. Try again" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A consulta continua visível no campo.
-- [ ] A mensagem informa que não há resultados e cita o termo.
-- [ ] O estado diferencia zero resultado, filtro restritivo e falha técnica.
-- [ ] Existe ação clara de recuperação (ajustar, limpar, tentar de novo).
-- [ ] Filtros ativos podem ser removidos no próprio estado.
-- [ ] Sugestões, quando existem, têm relação com a intenção.
-- [ ] A mudança é anunciada sem mover o foco.
-- [ ] O fluxo funciona com teclado e leitor de tela.
+- [ ] The query stays visible in the field.
+- [ ] The message says there are no results and quotes the term.
+- [ ] The state distinguishes zero results, a restrictive filter and a technical failure.
+- [ ] There is a clear recovery action (adjust, clear, try again).
+- [ ] Active filters can be removed right in the state.
+- [ ] Suggestions, when present, relate to the intent.
+- [ ] The change is announced without moving focus.
+- [ ] The flow works with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute (busca e navegação mobile; página de nenhum resultado; filtros de e-commerce): dicas genéricas viram beco sem saída; sugestões contextuais e remoção de filtros ajudam a recuperar.
-- WCAG 2.2, critério 4.1.3 (Status Messages): "nenhum resultado" exposto sem deslocar o foco.
-- W3C WAI (exemplo com role=status em resultados de busca): comunicação de contagem, inclusive zero.
-- W3C WAI, técnica G161: correção ortográfica e sinônimos ampliam a recuperação.
-- IBM Carbon (padrão de busca): referência de estrutura de busca e feedback.
+- Baymard Institute (mobile search and navigation; no-results page; e-commerce filters): generic tips become dead ends; contextual suggestions and filter removal help recovery.
+- WCAG 2.2, criterion 4.1.3 (Status Messages): "no results" exposed without moving focus.
+- W3C WAI (example with role=status in search results): communicating the count, including zero.
+- W3C WAI, technique G161: spelling correction and synonyms broaden retrieval.
+- IBM Carbon (search pattern): reference for search structure and feedback.

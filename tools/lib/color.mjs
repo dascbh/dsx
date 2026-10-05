@@ -1,9 +1,9 @@
-// Utilitários de cor sem dependências: sRGB <-> OKLCH e contraste WCAG 2.x.
+// Dependency-free color utilities: sRGB <-> OKLCH and WCAG 2.x contrast.
 
 export function parseHex(hex) {
   const h = hex.trim().replace(/^#/, '');
   const full = h.length === 3 ? [...h].map((c) => c + c).join('') : h;
-  if (!/^[0-9a-fA-F]{6}$/.test(full)) throw new Error(`Cor hex inválida: ${hex}`);
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) throw new Error(`Invalid hex color: ${hex}`);
   return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255);
 }
 
@@ -15,19 +15,19 @@ const clamp01 = (v) => Math.min(1, Math.max(0, v));
 const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 const fromLinear = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
 
-/** Luminância relativa conforme WCAG 2.x. */
+/** Relative luminance per WCAG 2.x. */
 export function luminance(hex) {
   const [r, g, b] = parseHex(hex).map(toLinear);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** Razão de contraste WCAG 2.x (1 a 21). */
+/** WCAG 2.x contrast ratio (1 to 21). */
 export function contrast(a, b) {
   const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (l1 + 0.05) / (l2 + 0.05);
 }
 
-/** Classifica uma razão de contraste nos níveis WCAG. */
+/** Classifies a contrast ratio into WCAG levels. */
 export function wcagLevels(ratio) {
   return {
     ratio: Math.round(ratio * 100) / 100,
@@ -68,7 +68,7 @@ function oklchToLinear({ l: L, c: C, h: H }) {
 
 const inGamut = (rgb) => rgb.every((v) => v >= -1e-4 && v <= 1 + 1e-4);
 
-/** Converte OKLCH para hex, reduzindo croma até caber no gamut sRGB. */
+/** Converts OKLCH to hex, reducing chroma until it fits the sRGB gamut. */
 export function oklchToHex({ l, c, h }) {
   let chroma = c;
   let lin = oklchToLinear({ l, c: chroma, h });

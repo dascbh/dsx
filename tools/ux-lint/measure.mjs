@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// ux-lint, medida de geometria: abre capturas HTML ESTÁTICAS (file://, sem servidor) num navegador headless e
-// grava, por tela, `<nome>.geometry.json` no formato descrito em lib/geometry.mjs. É a entrada de layout.mjs
-// (regras L1–L9), que não precisa de navegador.
+// ux-lint, geometry measurement: opens STATIC HTML captures (file://, no server) in a headless browser and writes,
+// per screen, `<name>.geometry.json` in the format described in lib/geometry.mjs. It is the input of layout.mjs
+// (rules L1–L9), which needs no browser.
 //
-// Uso: node tools/ux-lint/measure.mjs <pasta|arquivo.html...> --out <pasta-geometria> [--ux UX.md] [--width 1440] [--height 900]
+// Usage: node tools/ux-lint/measure.mjs <folder|file.html...> --out <geometry-folder> [--ux UX.md] [--width 1440] [--height 900]
 //
-// O Playwright NÃO é dependência do DSX: é resolvido a partir do projeto (diretório atual), como `playwright` ou
-// `@playwright/test`. Sem ele, o comando sai com 3 e explica como instalar; a análise L fica indisponível.
+// Playwright is NOT a DSX dependency: it is resolved from the project (current directory), as `playwright` or
+// `@playwright/test`. Without it, the command exits with 3 and explains how to install it; the L analysis is unavailable.
 import { readdirSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, basename, resolve, relative } from 'node:path';
 import { createRequire } from 'node:module';
@@ -18,17 +18,17 @@ import { kitProfile } from './lib/kits.mjs';
 import { resolveProjectPaths } from './lib/project-paths.mjs';
 
 /**
- * Regiões de arquétipo reconhecidas por padrão (além de `data-region`): as do perfil de kit `auto`
- * (lib/kits.mjs). Com `verification.kit` no UX.md valem as do kit escolhido; o UX.md pode acrescentar ou
- * trocar em `verification.selectors.archetype-regions`.
+ * Archetype regions recognized by default (besides `data-region`): those of the `auto` kit profile
+ * (lib/kits.mjs). With `verification.kit` in the UX.md, those of the chosen kit apply; the UX.md can add or
+ * replace them in `verification.selectors.archetype-regions`.
  */
 export const DEFAULT_ARCHETYPE_REGION_SELECTORS = kitProfile('auto').regions;
 
-/** Resolve o Playwright do projeto (cwd). Devolve o módulo ou null. */
+/** Resolves the project's Playwright (cwd). Returns the module or null. */
 export function resolvePlaywright(cwd = process.cwd()) {
   const req = createRequire(join(resolve(cwd), 'package.json'));
   for (const name of ['playwright', '@playwright/test']) {
-    try { const m = req(name); if (m?.chromium) return { module: m, name }; } catch { /* tenta o próximo */ }
+    try { const m = req(name); if (m?.chromium) return { module: m, name }; } catch { /* try the next one */ }
   }
   return null;
 }
@@ -43,7 +43,7 @@ export function listHtml(inputs) {
   return out;
 }
 
-// Roda dentro da página: coleta os elementos relevantes. Recebe os seletores do UX.md.
+// Runs inside the page: collects the relevant elements. Receives the UX.md selectors.
 /* c8 ignore start */
 function collect(sel) {
   const regionSel = [...sel.regions, sel.dialog].join(', ');
@@ -86,23 +86,23 @@ function collect(sel) {
   const regionLabels = new Map();
   const counts = {};
   const regionLabel = (r) => {
-    if (!r) return '(fora de região)';
+    if (!r) return '(outside any region)';
     if (regionLabels.has(r)) return regionLabels.get(r);
     const tag = r.tagName.toLowerCase();
     let base = tag + (r.id && !unstableId(r.id) ? `#${r.id}` : '');
     if (r.matches(sel.dialog)) {
       const first = (r.getAttribute('aria-labelledby') || '').split(/\s+/)[0];
       const title = (first ? clean(document.getElementById(first)?.textContent) : '') || clean(r.getAttribute('aria-label'));
-      base = `diálogo${title ? ` "${title.slice(0, 60)}"` : ''}`;
+      base = `dialog${title ? ` "${title.slice(0, 60)}"` : ''}`;
     } else if (r.getAttribute('role')) base += `[role=${r.getAttribute('role')}]`;
     counts[base] = (counts[base] || 0) + 1;
-    const l = counts[base] > 1 ? `${base} (${counts[base]}º)` : base;
+    const l = counts[base] > 1 ? `${base} (#${counts[base]})` : base;
     regionLabels.set(r, l);
     return l;
   };
   const archRegion = (el) => {
     if (el.dataset && el.dataset.region) return el.dataset.region;
-    for (const [id, s] of Object.entries(sel.archetype_regions || {})) { try { if (el.matches(s)) return id; } catch { /* seletor inválido */ } }
+    for (const [id, s] of Object.entries(sel.archetype_regions || {})) { try { if (el.matches(s)) return id; } catch { /* invalid selector */ } }
     return null;
   };
   const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim().length > 0;
@@ -125,7 +125,7 @@ function collect(sel) {
     const isField = el.matches(sel.field) || role === 'combobox';
     const hl = /^h[1-6]$/.test(tag) ? Number(tag[1]) : role === 'heading' ? Number(el.getAttribute('aria-level') || 2) : null;
     const isLabel = tag === 'label' || tag === 'legend';
-    // Campo: a caixa visual é o contorno do controle, não o <input> interno (que tem recuo de padding).
+    // Field: the visual box is the control outline, not the inner <input> (which is inset by padding).
     const fieldBox = (() => {
       if (!isField) return null;
       const marked = el.closest('[data-field-box], .MuiInputBase-root');
@@ -200,7 +200,7 @@ function collect(sel) {
 }
 /* c8 ignore stop */
 
-/** Mede uma lista de capturas e grava a geometria. Devolve [{ file, out, elements }]. */
+/** Measures a list of captures and writes the geometry. Returns [{ file, out, elements }]. */
 export async function measure(files, { outDir, cfg, width = 1440, height = 900, playwright }) {
   const sel = { ...cfg.verification.selectors };
   const kit = cfg.kitProfile ?? kitProfile(cfg.verification?.kit);
@@ -233,16 +233,16 @@ export async function measure(files, { outDir, cfg, width = 1440, height = 900, 
 }
 
 export const PLAYWRIGHT_MISSING = [
-  'Playwright não encontrado no projeto (procurei "playwright" e "@playwright/test" a partir do diretório atual).',
-  'A medida de geometria precisa de um navegador headless; o DSX não o traz como dependência.',
-  'Para instalar no projeto:  npm i -D playwright && npx playwright install chromium',
-  '(ou rode este comando de dentro de uma pasta do projeto que já tenha @playwright/test, ex.: frontend/).',
-  'Sem a geometria, a análise de layout e hierarquia (L1–L9, tools/ux-lint/layout.mjs) fica indisponível.',
+  'Playwright not found in the project (looked for "playwright" and "@playwright/test" from the current directory).',
+  'Geometry measurement needs a headless browser; DSX does not ship one as a dependency.',
+  'To install it in the project:  npm i -D playwright && npx playwright install chromium',
+  '(or run this command from a project folder that already has @playwright/test, e.g. frontend/).',
+  'Without the geometry, the layout and hierarchy analysis (L1–L9, tools/ux-lint/layout.mjs) is unavailable.',
 ].join('\n');
 
 async function main() {
   const args = parseCli('ux-lint/measure.mjs');
-  // Com --module (e --root), entrada e saída vêm dos caminhos do projeto (lib/project-paths.mjs).
+  // With --module (and --root), input and output come from the project paths (lib/project-paths.mjs).
   if (typeof args.module === 'string') {
     const pp = resolveProjectPaths({ root: typeof args.root === 'string' ? args.root : process.cwd(), module: args.module, config: typeof args.config === 'string' ? args.config : null });
     for (const w of pp.warnings) console.error(`AVISO ${w}`);
@@ -251,7 +251,7 @@ async function main() {
     if (typeof args.ux !== 'string' && statSync(pp.ux, { throwIfNoEntry: false })?.isFile()) args.ux = pp.ux;
   }
   if (!args._.length || typeof args.out !== 'string') {
-    console.error('Uso: node tools/ux-lint/measure.mjs <pasta|arquivo.html...> --out <pasta-geometria> [--ux UX.md] [--width 1440] [--height 900]\n     ou: node tools/ux-lint/measure.mjs --module <m> [--root <projeto>] [--config <file>]');
+    console.error('Usage: node tools/ux-lint/measure.mjs <folder|file.html...> --out <geometry-folder> [--ux UX.md] [--width 1440] [--height 900]\n    or: node tools/ux-lint/measure.mjs --module <m> [--root <project>] [--config <file>]');
     process.exit(2);
   }
   const playwright = resolvePlaywright();
@@ -263,13 +263,13 @@ async function main() {
     results = await measure(files, { outDir: resolve(args.out), cfg, width: Number(args.width ?? 1440), height: Number(args.height ?? 900), playwright });
   } catch (e) {
     if (/Executable doesn't exist|browserType\.launch/i.test(String(e.message))) {
-      console.error(`O navegador do Playwright (${playwright.name}) não está instalado: rode  npx playwright install chromium\n${e.message.split('\n')[0]}`);
+      console.error(`The Playwright browser (${playwright.name}) is not installed: run  npx playwright install chromium\n${e.message.split('\n')[0]}`);
       process.exit(3);
     }
     throw e;
   }
-  for (const r of results) console.log(`${basename(r.file)} → ${relative(process.cwd(), r.out).startsWith('..') ? r.out : relative(process.cwd(), r.out)} (${r.elements} elementos${r.dialog_open ? ', diálogo aberto' : ''})`);
-  console.log(`\n${results.length} tela(s) medidas com ${playwright.name}.`);
+  for (const r of results) console.log(`${basename(r.file)} → ${relative(process.cwd(), r.out).startsWith('..') ? r.out : relative(process.cwd(), r.out)} (${r.elements} elements${r.dialog_open ? ', dialog open' : ''})`);
+  console.log(`\n${results.length} screen(s) measured with ${playwright.name}.`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();

@@ -1,7 +1,7 @@
-# Rubrica: qualidade de um UX.md (espelha skills/ux-md, Modo C, e evals/rubrics/design-md.yaml).
-# A nota de 100 pontos é calculada por código (node tools/lint-ux-md.mjs UX.md --score [--map …] [--screens …]).
-# O que a máquina não mede entra como gate de julgamento (human/judge) e como critérios abertos para o juiz-de-evals,
-# que não somam pontos: reprovam ou registram lacunas.
+# Rubric: quality of a UX.md (mirrors skills/ux-md, Mode C, and evals/rubrics/design-md.yaml).
+# The 100-point score is computed by code (node tools/lint-ux-md.mjs UX.md --score [--map …] [--screens …]).
+# What the machine cannot measure goes in as judgment gates (human/judge) and as open criteria for the eval-judge,
+# which add no points: they fail the file or record gaps.
 id: ux-md
 version: 1
 max-score: 100
@@ -14,78 +14,78 @@ bands:
 gates:
   - id: lint
     evaluator: code
-    how: "node tools/lint-ux-md.mjs UX.md → 0 erros"
+    how: "node tools/lint-ux-md.mjs UX.md → 0 errors"
   - id: essential-coverage
     evaluator: code
-    how: "toda tela do mapa de fluxo e das capturas tem arquétipo no front matter ou está num desvio declarado (--score com --map/--screens; drift U1)"
+    how: "every screen in the flow map and in the captures has an archetype in the front matter or sits in a declared deviation (--score with --map/--screens; drift U1)"
   - id: policy-fidelity
     evaluator: code+human
-    how: "nenhuma política do front matter contrariada pela maioria das telas de um arquétipo (drift U3, com T1, T2, T5 e L1); amostra de 5 telas confirma o resto"
+    how: "no front-matter policy contradicted by most screens of an archetype (drift U3, with T1, T2, T5 and L1); a sample of 5 screens confirms the rest"
   - id: connected-to-agent
     evaluator: code
-    how: "CLAUDE.md, AGENTS.md ou regra da ferramenta do projeto cita UX.md"
+    how: "CLAUDE.md, AGENTS.md or the project's tool rule cites UX.md"
   - id: no-conflict
     evaluator: judge
-    how: "nenhuma regra de ferramenta, DESIGN.md ou documento de produto contradiz o UX.md para o mesmo contexto"
+    how: "no tool rule, DESIGN.md or product document contradicts the UX.md for the same context"
 
 criteria:
   - id: screen-coverage
     weight: 20
     evaluator: code
-    how: "telas do inventário (mapa + capturas) com arquétipo ou desvio ÷ total, × fração das entradas de archetypes que nomeiam tela do mapa; sem inventário, no máximo 50%"
+    how: "inventory screens (map + captures) with an archetype or deviation ÷ total, × fraction of archetypes entries that name a map screen; without an inventory, at most 50%"
   - id: policies-with-evidence
     weight: 15
     evaluator: code
-    how: "metade: políticas declaradas das 15 chaves (navigation, actions, confirmation, feedback, forms); metade: evidências no corpo (arquivo:linha + ids de padrões citados), cheia com 15"
+    how: "half: declared policies out of the 15 keys (navigation, actions, confirmation, feedback, forms); half: evidence in the body (file:line + cited pattern ids), full at 15"
   - id: declared-states
     weight: 10
     evaluator: code
-    how: "metade: os 5 estados base em states; metade: os 5 descritos na seção Feedback e estados"
+    how: "half: the 5 base states in states; half: the 5 described in the Feedback & States section"
   - id: flow-limits
     weight: 10
     evaluator: code
-    how: "0,4 limites em flows (3 chaves) + 0,3 jornadas na seção Fluxos (≥ 2) + 0,3 limites citados e justificados no texto"
+    how: "0.4 limits in flows (3 keys) + 0.3 journeys in the Flows section (≥ 2) + 0.3 limits cited and justified in the text"
   - id: glossary
     weight: 10
     evaluator: code
-    how: "por fonte (única ou por módulo, média): 0,3 declarada + 0,3 resolve (arquivo existe, tabela inline ou mapa) + 0,4 termos com 'nunca chamar de' (cheia com 8)"
+    how: "per source (single or per module, averaged): 0.3 declared + 0.3 resolves (file exists, inline table or map) + 0.4 terms with 'never call it' (full at 8)"
   - id: dos-donts
     weight: 10
     evaluator: code
-    how: "0,4 se Faça e Não faça têm ≥ 3 itens + 0,6 × fração de itens com âncora concreta (tela, arquivo, número, rótulo entre aspas, código)"
+    how: "0.4 if Do and Don't each have ≥ 3 items + 0.6 × fraction of items with a concrete anchor (screen, file, number, quoted label, code)"
   - id: verification-selectors
     weight: 10
     evaluator: code
-    how: "0,8 × seletores básicos (regions, dialog, primary, destructive, button, field) + 0,2 com dialog-footer ou archetype-regions"
+    how: "0.8 × basic selectors (regions, dialog, primary, destructive, button, field) + 0.2 with dialog-footer or archetype-regions"
   - id: freshness
     weight: 10
     evaluator: code
-    how: "0,3 version em semver + 0,2 updated AAAA-MM-DD + 0,5 idade (≤ 90 dias cheio, 0 em 365); zera a idade se as telas mudaram depois do updated (drift U5)"
+    how: "0.3 version in semver + 0.2 updated YYYY-MM-DD + 0.5 age (≤ 90 days full, 0 at 365); age drops to zero if the screens changed after updated (drift U5)"
   - id: declared-deviations
     weight: 5
     evaluator: code
-    how: "desvios da tabela do corpo (D1…) e do bloco deviations do front matter coincidem (interseção ÷ união); sem desvio nenhum, cheio"
+    how: "deviations in the body table (D1…) and in the front matter's deviations block match (intersection ÷ union); with no deviation at all, full"
 
-# Critérios abertos: o juiz-de-evals avalia um por vez, com o UX.md e as capturas, e devolve evidência + âncora.
-# Não somam pontos à nota de código; âncora ≤ 0,33 em qualquer um é lacuna a corrigir antes de o arquivo virar autoridade.
+# Open criteria: the eval-judge evaluates one at a time, with the UX.md and the captures, and returns evidence + anchor.
+# They add no points to the code score; an anchor ≤ 0.33 on any of them is a gap to fix before the file becomes authoritative.
 judge-criteria:
   - id: archetype-fit
-    question: "O arquétipo atribuído casa com a tarefa de cada tela (quando-usar e evitar-quando do cartão), não só com a aparência?"
+    question: "Does the assigned archetype match each screen's task (the card's when-to-use and avoid-when), not just its look?"
   - id: policies-are-real
-    question: "As políticas do front matter descrevem o que o produto faz hoje (ou a contradição está registrada como desvio ou Não faça), em vez de aspiração?"
+    question: "Do the front-matter policies describe what the product does today (or is the contradiction recorded as a deviation or a Don't), rather than aspiration?"
   - id: dos-donts-from-real-problems
-    question: "Cada item de Faça e não faça vem de um problema real (tela, achado, chamado) e diz o critério observável?"
+    question: "Does every Do's and Don'ts item come from a real problem (screen, finding, ticket) and state the observable criterion?"
   - id: agent-instructions-actionable
-    question: "As Instruções para agentes dizem quando consultar, o que preservar e como validar (comandos), a ponto de um agente novo seguir sem perguntar?"
+    question: "Do the Agent Instructions say when to consult, what to preserve and how to validate (commands), well enough that a new agent follows them without asking?"
   - id: deviations-justified
-    question: "Cada desvio declarado tem motivo de produto e custo explícitos, e não é dívida disfarçada (que deveria ser Não faça com prazo)?"
+    question: "Does every declared deviation have an explicit product reason and cost, rather than being disguised debt (which should be a Don't with a deadline)?"
 
 generic-anchors:
-  0.0: "Ausente ou contraditório."
-  0.33: "Presente, mas genérico: o agente ainda precisaria adivinhar onde fica cada coisa ou como a tela se comporta."
-  0.67: "Específico na maior parte; lacunas pontuais."
-  1.0: "Específico, verificável e com evidência; a geração controlada não revela invenção de comportamento neste critério."
+  0.0: "Missing or contradictory."
+  0.33: "Present but generic: the agent would still have to guess where each thing goes or how the screen behaves."
+  0.67: "Specific for the most part; isolated gaps."
+  1.0: "Specific, verifiable and with evidence; controlled generation reveals no invented behavior on this criterion."
 
 acceptance-test:
-  description: "Geração controlada: peça uma tela nova de um arquétipo já usado, só com o UX.md, o DESIGN.md e o código; cada posição de ação, confirmação, estado ou rótulo inventado é uma lacuna do UX.md."
+  description: "Controlled generation: ask for a new screen of an archetype already in use, with only the UX.md, the DESIGN.md and the code; every invented action position, confirmation, state or label is a gap in the UX.md."
   attempts: 3

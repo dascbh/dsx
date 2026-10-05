@@ -1,82 +1,84 @@
 ---
 name: ux-writing
-description: "Escreve e revisa todo texto da interface em pt-BR: botões, erros, vazios, toasts, confirmações e conteúdo de IA, com tom definido e glossário consistente. Use ao criar ou mudar qualquer string visível."
+description: "Writes and reviews all interface text in the project's language (pt-BR detectors included): buttons, errors, empty states, toasts, confirmations and AI content, with a defined tone and a consistent glossary. Use when creating or changing any visible string."
 ---
 
 # UX writing
 
-> **Raiz do DSX:** dois níveis acima do diretório base desta skill. Caminhos `knowledge/`, `patterns/` são relativos a ela.
+> **DSX root:** two levels above this skill's base directory. Paths under `knowledge/`, `patterns/` are relative to it.
 
-Referências: `knowledge/fundamentos/ux-writing.md`, `knowledge/fundamentos/marcas-de-texto-gerado.md` (marcas de texto gerado por IA e burocrático, regras X1–X11), `patterns/ux-writing/*` (texto de botão, texto de link, mensagem de erro útil).
+**Language:** this skill is written in English, but the product text it produces and reviews follows the project's language (the language of the existing UI strings, the glossary and `UX.md`). The examples below are pt-BR product text and stay in pt-BR, labeled "(pt-BR example)"; apply the same formulas in the project's language. The text detectors (`text.mjs`, rules X1–X11) currently target pt-BR.
 
-## Levantamento automático (quando há telas para olhar)
+References: `knowledge/foundations/ux-writing.md`, `knowledge/foundations/generated-text-marks.md` (marks of AI-generated and bureaucratic text, rules X1–X11), `patterns/ux-writing/*` (button text, link text, useful error message).
 
-Antes de revisar à mão, deixe a ferramenta achar o que é mecânico. Ela não julga arquitetura de tela, só o texto.
+## Automatic survey (when there are screens to look at)
 
-1. Rode sobre as capturas HTML, apontando o código onde os textos nascem:
+Before reviewing by hand, let the tool find what is mechanical. It does not judge screen architecture, only the text.
+
+1. Run it over the HTML captures, pointing at the code where the strings originate:
    ```bash
-   node tools/ux-lint/text.mjs --screens <pasta-de-capturas> --code <pastas-do-front> <pastas-de-vocabulário> --ux UX.md [--ignore <arquivo.html>] [--json]
+   node tools/ux-lint/text.mjs --screens <captures-folder> --code <front-folders> <vocabulary-folders> --ux UX.md [--ignore <file.html>] [--json]
    ```
-   Sem capturas, gere-as antes (skill `capture-from-code`, ou qualquer HTML renderizado).
-2. Leia o resumo por regra e o ranking "Textos mais problemáticos" (severidade × número de telas). Priorize por severidade e frequência: texto da navegação ou do cabeçalho, que aparece em todas as telas, vem primeiro.
-3. Corrija **na origem** (`arquivo:linha` do relatório), uma vez: o vocabulário ou o template, não a captura. Um achado com "variantes do mesmo template" se resolve numa linha só.
-4. Ignore a seção "Provável dado": ali a marca veio do conteúdo interpolado (nome de pedido, pessoa, categoria), não do texto da interface.
-5. Para reescrever cada achado, use os antes/depois de `knowledge/fundamentos/marcas-de-texto-gerado.md`. As marcas que a ferramenta não acusa (tríades, "não só … mas também", adjetivos genéricos) entram na revisão manual abaixo.
-6. Rode de novo depois de corrigir e recapturar: o número de achados da interface deve cair, sem achado novo.
+   Without captures, generate them first (skill `capture-from-code`, or any rendered HTML).
+2. Read the per-rule summary and the "Most problematic strings" ranking (severity × number of screens). Prioritize by severity and frequency: navigation or header text, which appears on every screen, comes first.
+3. Fix **at the source** (the report's `file:line`), once: the vocabulary or the template, not the capture. A finding with "variants of the same template" is solved in a single line.
+4. Ignore the "Likely data" section: there the mark came from interpolated content (order name, person, category), not from the interface text.
+5. To rewrite each finding, use the before/after examples in `knowledge/foundations/generated-text-marks.md`. Marks the tool does not flag (triads, "not only … but also", generic adjectives) go into the manual review below.
+6. Run again after fixing and recapturing: the number of interface findings should drop, with no new finding.
 
-## Registrar em `.dsx/findings` e decidir pelo registro
+## Record in `.dsx/findings` and decide through the register
 
-O resultado não fica na conversa nem em pasta temporária (contrato: `knowledge/fundamentos/achados-de-ux.md`).
+The result does not stay in the conversation or in a temporary folder (contract: `knowledge/foundations/ux-findings.md`).
 
-1. `node tools/ux-lint/findings.mjs register --module <m> --text texto.json [--screen tela.json] [--flow fluxo.json] --root <repo>` — cada achado ganha id estável e status.
-2. Escreva as opções em `cases.json` (formato em `knowledge/fundamentos/achados-de-ux.md`) e ligue-as aos ids: `findings.mjs options --module <m> --from cases.json`. Caso de revisão manual (descrição desnecessária) entra como item `origin: "review"`.
-3. `findings.mjs page --module <m> pagina.html --product "<produto>" --color "<primária>"`: o dono marca A/B/C ou Ignorar (com motivo) e usa "Copiar decisões"; grave com `findings.mjs import --module <m> decisions.json` (ou `decide` para uma decisão dita no chat).
-4. Aplique na origem só o que está `decided` (`findings.mjs status --module <m>` lista com `arquivo:linha`), recapture, registre de novo e confira `fixed`. `findings.mjs check` no pre-commit ou CI impede achado novo e regressão.
+1. `node tools/ux-lint/findings.mjs register --module <m> --text texto.json [--screen tela.json] [--flow fluxo.json] --root <repo>` — each finding gets a stable id and a status.
+2. Write the options in `cases.json` (format in `knowledge/foundations/ux-findings.md`) and link them to the ids: `findings.mjs options --module <m> --from cases.json`. A manual-review case (unnecessary description) goes in as an item with `origin: "review"`.
+3. `findings.mjs page --module <m> pagina.html --product "<product>" --color "<primary>"`: the owner marks A/B/C or Ignore (with a reason) and uses "Copy decisions"; save with `findings.mjs import --module <m> decisions.json` (or `decide` for a decision stated in chat).
+4. Apply at the source only what is `decided` (`findings.mjs status --module <m>` lists it with `file:line`), recapture, register again and confirm `fixed`. `findings.mjs check` in pre-commit or CI blocks new findings and regressions.
 
-## Antes de escrever
+## Before writing
 
-1. Leia o glossário do projeto, se existir: o de `content.glossary` do `UX.md` (por módulo, quando o produto tem vocabulários diferentes: `{ default: …, <módulo>: … }`), senão DESIGN.md, `docs/` ou strings existentes. Rode `text.mjs` e `consistency.mjs` com `--module <m>` para usar o glossário certo. **Mesmo conceito = mesma palavra em todas as telas.** Se não existir, monte um com os 10–20 termos do domínio a partir das strings atuais e aponte divergências.
-2. Identifique o tom de voz nas 4 dimensões (formal↔casual, sério↔divertido, respeitoso↔irreverente, entusiasmado↔objetivo). Interface de tarefa tende a objetivo e respeitoso. O tom **muda com o momento**: erro e perda de dinheiro pedem mais sobriedade que boas-vindas.
+1. Read the project glossary, if it exists: the one in `UX.md`'s `content.glossary` (per module, when the product has different vocabularies: `{ default: …, <module>: … }`), otherwise DESIGN.md, `docs/` or existing strings. Run `text.mjs` and `consistency.mjs` with `--module <m>` to use the right glossary. **Same concept = same word on every screen.** If none exists, build one with the 10–20 domain terms from the current strings and point out divergences.
+2. Identify the tone of voice along the 4 dimensions (formal↔casual, serious↔funny, respectful↔irreverent, enthusiastic↔matter-of-fact). Task interfaces tend toward matter-of-fact and respectful. Tone **changes with the moment**: errors and money loss call for more sobriety than a welcome.
 
-## Fórmulas
+## Formulas
 
-| Elemento | Fórmula | Exemplo |
+| Element | Formula | Example (pt-BR example) |
 |---|---|---|
-| Botão | verbo no infinitivo + objeto | "Salvar alterações", "Enviar proposta" — nunca "OK", "Sim", "Enviar" solto quando há ambiguidade |
-| Link | descreve o destino | "Ver política de reembolso" — nunca "clique aqui" |
-| Erro de campo | o que aconteceu + como resolver, sem culpar | "Informe um CEP com 8 números." |
-| Erro de sistema | o que houve + o que foi preservado + próximo passo | "Não conseguimos salvar agora. Suas alterações continuam aqui. Tente de novo em instantes." |
-| Estado vazio | o que é este lugar + por que está vazio + ação | "Nenhuma fatura ainda. As faturas aparecem aqui depois do primeiro pagamento." |
-| Confirmação destrutiva | ação + objeto + consequência; botões repetem o verbo | "Excluir o projeto 'Site 2026'? Os 14 arquivos serão apagados e não podem ser recuperados." → [Cancelar] [Excluir projeto] |
-| Sucesso | o que foi feito (+ desfazer se cabível) | "Proposta enviada para Ana Souza." [Desfazer] |
-| Carregamento longo | o que está acontecendo + quanto falta | "Gerando relatório… cerca de 30 segundos." |
-| Conteúdo de IA | rótulo + limite + ação | "Resumo gerado por IA. Confira os valores antes de enviar." |
+| Button | verb (infinitive in pt-BR) + object | "Salvar alterações", "Enviar proposta" — never "OK", "Sim", or a bare "Enviar" when there is ambiguity |
+| Link | describes the destination | "Ver política de reembolso" — never "clique aqui" |
+| Field error | what happened + how to fix it, without blaming | "Informe um CEP com 8 números." |
+| System error | what happened + what was preserved + next step | "Não conseguimos salvar agora. Suas alterações continuam aqui. Tente de novo em instantes." |
+| Empty state | what this place is + why it is empty + action | "Nenhuma fatura ainda. As faturas aparecem aqui depois do primeiro pagamento." |
+| Destructive confirmation | action + object + consequence; buttons repeat the verb | "Excluir o projeto 'Site 2026'? Os 14 arquivos serão apagados e não podem ser recuperados." → [Cancelar] [Excluir projeto] |
+| Success | what was done (+ undo when it applies) | "Proposta enviada para Ana Souza." [Desfazer] |
+| Long loading | what is happening + how long is left | "Gerando relatório… cerca de 30 segundos." |
+| AI content | label + limitation + action | "Resumo gerado por IA. Confira os valores antes de enviar." |
 
-## Regras
+## Rules
 
-- Frases curtas; uma ideia por frase; a informação mais importante primeiro.
-- Voz ativa, segunda pessoa implícita ("Informe seu e-mail"), sem "o usuário" na interface.
-- Sem jargão técnico ou interno ("payload", "erro 500", nome de tabela). Código técnico só como detalhe secundário para suporte — `patterns/feedback/technical-error-code.md`.
-- Não culpe ("Você digitou errado") nem infantilize ("Ops! 🙈") em erro.
-- Números como algarismos; datas e moeda no formato brasileiro (`01/10/2026`, `R$ 1.234,56`).
-- Sentence case em títulos e botões ("Criar conta", não "Criar Conta").
-- Plural e gênero gerados por código: trate 0, 1 e N ("Nenhum item", "1 item", "3 itens").
-- Siglas com gênero correto ("a API", "o PDF"); crase e acentuação revisadas.
-- Rótulos de campo não terminam com dois-pontos quando acima do campo; placeholder nunca substitui rótulo.
+- Short sentences; one idea per sentence; the most important information first.
+- Active voice, implicit second person (pt-BR example: "Informe seu e-mail"), never "the user" in the interface.
+- No technical or internal jargon ("payload", "erro 500", table names). Technical codes only as a secondary detail for support — `patterns/feedback/technical-error-code.md`.
+- Do not blame (pt-BR example: "Você digitou errado") or infantilize (pt-BR example: "Ops! 🙈") in errors.
+- Numbers as digits; dates and currency in the project locale's format (pt-BR example: `01/10/2026`, `R$ 1.234,56`).
+- Sentence case in titles and buttons (pt-BR example: "Criar conta", not "Criar Conta").
+- Plural and gender generated by code: handle 0, 1 and N (pt-BR example: "Nenhum item", "1 item", "3 itens").
+- In pt-BR, acronyms take the correct gender ("a API", "o PDF"); crase and accents reviewed. In other languages, apply the equivalent grammar check.
+- Field labels do not end with a colon when placed above the field; a placeholder never replaces a label.
 
-## Revisão de um fluxo
+## Reviewing a flow
 
-1. Extraia todas as strings do fluxo (código ou tela) para uma tabela: `tela | elemento | texto atual`.
-2. Marque: inconsistência de termo, fórmula violada, tom fora do momento, erro de português, texto que não ajuda a decidir, marca de texto gerado (`knowledge/fundamentos/marcas-de-texto-gerado.md`).
-3. Proponha a reescrita na coluna ao lado, com o motivo em ≤ 8 palavras.
-4. Atualize o glossário com qualquer termo decidido.
+1. Extract every string in the flow (code or screen) into a table: `screen | element | current text`.
+2. Mark: inconsistent term, violated formula, tone wrong for the moment, language error, text that does not help decide, mark of generated text (`knowledge/foundations/generated-text-marks.md`).
+3. Propose the rewrite in the next column, with the reason in ≤ 8 words.
+4. Update the glossary with any term that was decided.
 
-Saída: a tabela `tela | elemento | atual | proposto | motivo` + glossário atualizado.
+Output: the table `screen | element | current | proposed | reason` + updated glossary.
 
 
-## Levantamento com opções para o dono escolher
+## Survey with options for the owner to choose
 
-1. `node tools/ux-lint/text.mjs --screens <capturas> --code <pastas do código> --ux UX.md --json > text.json` — achados X1–X11 com a origem `arquivo:linha`.
-2. Some a revisão por julgamento do que a máquina não pega bem: **descrições desnecessárias** (repetem o óbvio, explicam o que a tela já mostra, tom de manual).
-3. Para cada caso, escreva 2–3 opções prontas para colar, cada uma com a convenção de origem (`knowledge/fundamentos/elementos-comparados.md`: Material, Carbon, Polaris, GOV.UK, Atlassian, Apple HIG, DSX) e uma recomendada com o porquê. Quando a correção é de lugar (nome vai para o nome acessível, explicação sai da dica e vira texto visível), diga isso na opção.
-4. Registre e gere a página pelo registro (`findings.mjs options` + `findings.mjs page`, seção anterior): mostra cada elemento renderizado hoje e em cada opção, com id, status e o formulário de decisão. Sem registro, `node tools/ux-lint/text-page.mjs cases.json pagina.html --product "<produto>" --color "<primária>"` gera só a página. O dono escolhe; a correção é feita na origem.
+1. `node tools/ux-lint/text.mjs --screens <captures> --code <code folders> --ux UX.md --json > text.json` — findings X1–X11 with the `file:line` source.
+2. Add the judgment review of what the machine does not catch well: **unnecessary descriptions** (they repeat the obvious, explain what the screen already shows, read like a manual).
+3. For each case, write 2–3 ready-to-paste options, each with its source convention (`knowledge/foundations/compared-elements.md`: Material, Carbon, Polaris, GOV.UK, Atlassian, Apple HIG, DSX) and one recommended with the reason. When the fix is about placement (the name goes to the accessible name, the explanation leaves the tooltip and becomes visible text), say so in the option.
+4. Register and generate the page from the register (`findings.mjs options` + `findings.mjs page`, previous section): it shows each element as rendered today and in each option, with id, status and the decision form. Without a register, `node tools/ux-lint/text-page.mjs cases.json pagina.html --product "<product>" --color "<primary>"` generates the page only. The owner chooses; the fix is made at the source.

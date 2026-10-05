@@ -38,21 +38,21 @@ test('states: discovers screens and states from file names', () => {
 
 test('states: required states per kind (page, child, dialog, panel)', () => {
   const ux = ['loading', 'empty', 'error', 'no-access', 'success'];
-  // página com lista: UX.md ∪ arquétipo, menos o principal
+  // page with a list: UX.md ∪ archetype, minus the main state
   assert.deepEqual(requiredStates({ kind: 'page', archetype: 'operational-list', uxStates: ux, archetypeStates: ARCH['operational-list'].states }),
     ['loading', 'empty', 'error', 'no-access', 'empty-filtered']);
-  // editor: sem lista vazia (o arquétipo não tem vazio) e sem estado momentâneo (saving)
+  // editor: no empty list (the archetype has no empty state) and no transient state (saving)
   assert.deepEqual(requiredStates({ kind: 'page', archetype: 'editor-with-panel', uxStates: ux, archetypeStates: ARCH['editor-with-panel'].states }),
     ['loading', 'error', 'no-access', 'saved']);
-  // filha: desconta o que a mãe exige e a carga da página
+  // child: subtracts what the parent requires and the page loading
   assert.deepEqual(requiredStates({ kind: 'child', archetype: 'editor-with-panel', uxStates: ux, archetypeStates: ARCH['editor-with-panel'].states, parentRequired: ['saved'] }), []);
-  // diálogo: só erro quando chama o servidor; field-error só com campo obrigatório e se o arquétipo declara
+  // dialog: only error when it calls the server; field-error only with a required field and when the archetype declares it
   assert.deepEqual(requiredStates({ kind: 'dialog', archetype: 'confirmation-dialog', archetypeStates: ARCH['confirmation-dialog'].states, traits: { serverAction: true } }), ['error']);
   assert.deepEqual(requiredStates({ kind: 'dialog', archetype: 'confirmation-dialog', archetypeStates: ARCH['confirmation-dialog'].states, traits: { serverAction: false } }), []);
   assert.deepEqual(requiredStates({ kind: 'dialog', archetype: 'form-dialog', archetypeStates: ARCH['form-dialog'].states, traits: { serverAction: true, requiredField: true } }), ['error', 'field-error']);
-  // painel sem arquétipo: nada
+  // panel without an archetype: nothing
   assert.deepEqual(requiredStates({ kind: 'panel', uxStates: ux }), []);
-  // sem arquétipo: o mínimo do UX.md inteiro
+  // no archetype: the whole UX.md minimum
   assert.deepEqual(requiredStates({ kind: 'page', uxStates: ux }), ['loading', 'empty', 'error', 'no-access']);
 });
 
@@ -75,8 +75,8 @@ test('states: S1 flags each missing required state; order file makes a child scr
   assert.deepEqual(by['painel-filho'].findings, []);
   assert.equal(by['dlg-excluir'].kind, 'dialog');
   assert.deepEqual(rules(by['dlg-excluir'].findings), ['S1:error']);
-  assert.match(by['dlg-excluir'].findings[0].message, /diálogo com ação que chama o servidor/);
-  assert.match(by.lista.findings.find((f) => f.state === 'empty-filtered').message, /arquétipo operational-list.*02-lista\.empty-filtered\.html/);
+  assert.match(by['dlg-excluir'].findings[0].message, /dialog with an action that calls the server/);
+  assert.match(by.lista.findings.find((f) => f.state === 'empty-filtered').message, /archetype operational-list.*02-lista\.empty-filtered\.html/);
   const s = summarize(r);
   assert.equal(s.state_captures, 2);
   assert.equal(s.by_rule.S1, 8);
@@ -89,10 +89,10 @@ test('states: S2 empty or error state without an exit in its region', () => {
   assert.match(noExit[0].evidence, /^x\.empty\.html:\d+:\d+$/);
   const withExit = analyzeStateCapture(page(`<p>Nenhuma proposta salva ainda.</p>${btn('Nova proposta')}`), 'empty', cfg, 'x.empty.html');
   assert.deepEqual(withExit, []);
-  // a saída no cabeçalho (fora da região do estado) não conta
+  // the exit in the header (outside the state's region) does not count
   const errorNoExit = analyzeStateCapture(page(errorBox('Tente de novo em instantes.')), 'error', cfg, 'x.error.html');
   assert.deepEqual(rules(errorNoExit), ['S2:error']);
-  // estado em diálogo: a região é o diálogo
+  // state in a dialog: the region is the dialog
   const inDialog = analyzeStateCapture(dialog(errorBox('Tente de novo.'), btn('Fechar', 'MuiButton-text')), 'error', cfg, 'd.error.html');
   assert.deepEqual(inDialog, []);
 });
@@ -110,7 +110,7 @@ test('states: S3 error message without guidance', () => {
   assert.deepEqual(withRetry, []);
   const noMessage = analyzeStateCapture(page(btn('Voltar')), 'error', cfg, 'e.html');
   assert.deepEqual(rules(noMessage), ['S3:error']);
-  // na captura principal só o alerta de erro do MUI conta (aviso com role=alert não é erro)
+  // in the main capture only the MUI error alert counts (a warning with role=alert is not an error)
   const main = analyzeStateCapture(page('<div class="MuiAlert-root MuiAlert-standardWarning" role="alert">Prazo perto do fim.</div><div class="MuiAlert-root MuiAlert-standardError" role="alert"><div class="MuiAlert-message">Falhou.</div></div>'), null, cfg, 'p.html');
   assert.deepEqual(rules(main), ['S3:principal']);
 });
@@ -138,8 +138,18 @@ test('states: JSON goes into findings.mjs with stable st- ids', () => {
   assert.deepEqual(a.items.map((i) => i.id), b.items.map((i) => i.id));
 });
 
-test('página pública sem login não exige no-access', async () => {
+test('public page without login does not require no-access', async () => {
   const { requiredStates } = await import('../ux-lint/states.mjs');
   const r = requiredStates({ kind: 'page', archetype: 'public-decision-page', archetypeStates: ['loading', 'invalid-link', 'error'], traits: { public: true } });
   if (r.includes('no-access')) throw new Error(r.join(','));
+});
+
+test('states: English product text is recognized through the language packs', () => {
+  // empty wording + exit action in English: no S2
+  assert.deepEqual(analyzeStateCapture(page(`<p>No proposals yet.</p>${btn('New proposal')}`), 'empty', cfg, 'x.empty.html'), []);
+  // failure-only English message: S3; with guidance: none
+  const bare = analyzeStateCapture(page(`<div role="alert"><p>Something went wrong.</p></div>${btn('Back')}`), 'error', cfg, 'e.html');
+  assert.deepEqual(rules(bare), ['S3:error']);
+  const guided = analyzeStateCapture(page(`<div role="alert"><p>We could not load the orders. Try again in a moment.</p>${btn('Try again')}</div>`), 'error', cfg, 'e.html');
+  assert.deepEqual(guided, []);
 });

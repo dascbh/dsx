@@ -1,6 +1,6 @@
 ---
 id: label-vs-placeholder
-title: Label ou placeholder: o que usar em formulários?
+title: Label or placeholder: which should forms use?
 category: forms
 components: [text-field, label, placeholder, helper-text]
 type: recommendation
@@ -11,92 +11,92 @@ wcag: ["3.3.2", "1.3.1", "4.1.2", "1.4.3", "2.5.3"]
 related: [required-fields, field-order, form-errors, helpful-error-message]
 ---
 
-# Label ou placeholder: o que usar em formulários?
+# Label or placeholder: which should forms use?
 
-> **Regra:** Todo campo tem label visível e associado; o placeholder serve apenas como exemplo curto ou formato, nunca como identificação.
+> **Rule:** Every field has a visible, associated label; the placeholder only serves as a short example or format, never as identification.
 
-## Contexto
+## Context
 
-O placeholder some assim que a pessoa começa a digitar. Se ele é o único texto que identifica o campo, ela esquece o que deveria informar e tem dificuldade de revisar os dados antes de enviar.
+The placeholder disappears as soon as the person starts typing. If it is the only text that identifies the field, they forget what they were supposed to enter and struggle to review the data before submitting.
 
-Além disso, placeholders costumam ter contraste baixo e não são tratados como rótulo por tecnologias assistivas. O label visível continua na tela durante e depois do preenchimento, serve de alvo de clique e dá nome ao campo para leitor de tela e comando de voz.
+Placeholders also tend to have low contrast and are not treated as a label by assistive technologies. A visible label stays on screen during and after filling in, works as a click target and names the field for screen readers and voice commands.
 
-Instruções longas pertencem a um texto auxiliar próximo ao campo, não ao placeholder.
+Long instructions belong in helper text near the field, not in the placeholder.
 
-## Decisão
+## Decision
 
-- **SE** existe um campo de entrada **ENTÃO** forneça label visível, curto e específico.
-- **SE** o campo precisa de formato ou exemplo **ENTÃO** use placeholder curto, só como complemento.
-- **SE** a instrução tem mais que uma frase curta ou deve ser relida **ENTÃO** use texto auxiliar associado por aria-describedby.
-- **SE** o campo é obrigatório **ENTÃO** indique isso no label, nunca só no placeholder.
-- **SE** o campo é de busca **ENTÃO** mantenha label (visível ou, no mínimo, nome acessível) e botão claro.
-- **SE** o design pede label flutuante **ENTÃO** garanta que o label permaneça visível com o campo preenchido.
-- **SENÃO** label acima do campo, texto auxiliar abaixo do label.
+- **IF** there is an input field **THEN** provide a short, specific, visible label.
+- **IF** the field needs a format or an example **THEN** use a short placeholder, only as a complement.
+- **IF** the instruction is longer than one short sentence or must be reread **THEN** use helper text associated through aria-describedby.
+- **IF** the field is required **THEN** say so in the label, never only in the placeholder.
+- **IF** it is a search field **THEN** keep a label (visible or, at least, an accessible name) and a clear button.
+- **IF** the design calls for a floating label **THEN** make sure the label stays visible when the field is filled.
+- **ELSE** label above the field, helper text below the label.
 
-## Quando usar
+## When to use
 
-- Label visível: em todos os campos.
-- Placeholder: exemplo curto ("nome@empresa.com.br") ou formato ("DD/MM/AAAA").
-- Texto auxiliar: regras, restrições e instruções persistentes.
+- Visible label: on every field.
+- Placeholder: a short example ("name@company.com") or format ("MM/DD/YYYY").
+- Helper text: rules, restrictions and persistent instructions.
 
-## Quando evitar
+## When to avoid
 
-- Placeholder como único label → **use em vez disso:** label visível.
-- Regras longas no placeholder → **use em vez disso:** texto auxiliar.
-- Obrigatoriedade apenas no placeholder → **use em vez disso:** marca no label.
-- Label que desaparece no foco → **use em vez disso:** label persistente.
+- A placeholder as the only label → **use instead:** a visible label.
+- Long rules in the placeholder → **use instead:** helper text.
+- Required status only in the placeholder → **use instead:** a marker in the label.
+- A label that disappears on focus → **use instead:** a persistent label.
 
-## Faça
+## Do
 
-- Associe label e campo com for e id.
-- Escreva labels que identifiquem o propósito sem ambiguidade.
-- Mantenha exemplos de placeholder em poucas palavras.
-- Relacione o texto auxiliar ao campo com aria-describedby.
-- Teste o campo já preenchido.
+- Associate label and field with for and id.
+- Write labels that identify the purpose without ambiguity.
+- Keep placeholder examples to a few words.
+- Relate the helper text to the field with aria-describedby.
+- Test the field when already filled in.
 
-## Evite
+## Avoid
 
-- Usar exemplo como se fosse label.
-- Repetir no placeholder a regra já escrita no texto auxiliar.
-- Confiar no contraste padrão do placeholder.
-- Remover o contexto do campo ao receber foco.
+- Using an example as if it were a label.
+- Repeating in the placeholder the rule already written in the helper text.
+- Trusting the default placeholder contrast.
+- Removing the field's context when it gets focus.
 
-## Acessibilidade
+## Accessibility
 
-- O nome acessível vem do label, não do placeholder (3.3.2, 4.1.2).
-- Associação programática label-campo (1.3.1).
-- Instruções continuam disponíveis após preencher.
-- Se houver placeholder, garanta contraste suficiente (1.4.3).
-- O nome acessível deve conter o texto visível do label, para comando de voz (2.5.3).
+- The accessible name comes from the label, not the placeholder (3.3.2, 4.1.2).
+- Programmatic label–field association (1.3.1).
+- Instructions remain available after filling in.
+- If there is a placeholder, ensure sufficient contrast (1.4.3).
+- The accessible name must contain the label's visible text, for voice commands (2.5.3).
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Label | "E-mail" |
-| Placeholder de exemplo | "nome@empresa.com.br" |
-| Texto auxiliar | "Use o e-mail cadastrado na sua conta." |
-| Label obrigatório | "CPF (obrigatório)" |
-| Label de busca | "Pesquisar pedidos" |
+| Label | "Email" |
+| Example placeholder | "name@company.com" |
+| Helper text | "Use the email registered on your account." |
+| Required label | "Tax ID (required)" |
+| Search label | "Search orders" |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] Todo campo tem label visível.
-- [ ] O label permanece visível após o preenchimento.
-- [ ] O label identifica claramente o propósito.
-- [ ] O placeholder é só um exemplo ou formato curto.
-- [ ] Nenhuma instrução longa está no placeholder.
-- [ ] Label e campo estão associados (for/id).
-- [ ] O texto auxiliar está ligado por aria-describedby.
-- [ ] A obrigatoriedade não depende só do placeholder.
-- [ ] O campo foi testado com teclado e leitor de tela.
+- [ ] Every field has a visible label.
+- [ ] The label stays visible after filling in.
+- [ ] The label clearly identifies the purpose.
+- [ ] The placeholder is only a short example or format.
+- [ ] No long instruction is in the placeholder.
+- [ ] Label and field are associated (for/id).
+- [ ] The helper text is linked by aria-describedby.
+- [ ] Required status does not depend only on the placeholder.
+- [ ] The field was tested with keyboard and screen reader.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 3.3.2: rótulos ou instruções para entrada de dados.
-- W3C Forms Tutorial (rotular controles; instruções de formulário): associação for/id e limites do placeholder.
-- GOV.UK Design System (Text input): label visível, sem placeholder no lugar de label ou dica.
-- U.S. Web Design System (Text input): campo com label e cautela com placeholder.
-- Padrão Digital GOV.BR (Input): distingue label, placeholder e texto auxiliar.
-- Material Design 3 e Apple Human Interface Guidelines: o label permanece visível; o placeholder desaparece.
-- AMAWeb e ABNT NBR 17225: verificação de existência e clareza de rótulos.
+- WCAG 2.2, criterion 3.3.2: labels or instructions for data entry.
+- W3C Forms Tutorial (labeling controls; form instructions): for/id association and the limits of the placeholder.
+- GOV.UK Design System (Text input): visible label, no placeholder in place of a label or hint.
+- U.S. Web Design System (Text input): field with label and caution with placeholders.
+- GOV.BR Digital Standard (Input): distinguishes label, placeholder and helper text.
+- Material Design 3 and Apple Human Interface Guidelines: the label stays visible; the placeholder disappears.
+- AMAWeb and ABNT NBR 17225: checking that labels exist and are clear.

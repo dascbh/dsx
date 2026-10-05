@@ -1,19 +1,20 @@
 #!/usr/bin/env node
-// Ponte DTCG → Figma: transforma os tokens do projeto (3 camadas) em variáveis do Figma.
+// DTCG → Figma bridge: turns the project tokens (3 layers) into Figma variables.
 //
-//   node tools/figma/tokens-to-figma.mjs --tokens <pasta> [--json | --script]
+//   node tools/figma/tokens-to-figma.mjs --tokens <folder> [--json | --script]
 //
-// --json   (padrão) imprime o plano: coleções, modos, variáveis, aliases, scopes e o que não é suportado.
-// --script imprime um script para colar em `use_figma` (carregue a skill `figma-use` antes). Idempotente:
-//          reusa coleção, modo e variável pelo nome; só cria o que falta e atualiza valores.
+// --json   (default) prints the plan: collections, modes, variables, aliases, scopes and what is unsupported.
+// --script prints a script to paste into `use_figma` (load the `figma-use` skill first). Idempotent:
+//          reuses collection, mode and variable by name; only creates what is missing and updates values.
 //
-// Esquema no Figma (mesma arquitetura do DSX):
-//   Primitivos  — modo "Valor"; scopes vazios (não aparecem no seletor: força o uso dos semânticos)
-//   Semântico   — modos "Claro" e "Escuro"; valores = alias para Primitivos (ou valor cru, se o token é cru)
-//   Componente  — modo "Valor"; alias para Semântico (resolve conforme o modo aplicado no frame)
-// Nomes de coleção e modo são texto do arquivo do Figma (o que a pessoa vê no painel) e continuam em pt-BR.
-// Nomes de variável: caminho DTCG com "/" no lugar de "." (color.text.primary → color/text/primary).
-// Saída --json: { collections, variables: [{ collection, name, dtcg_type, type, scopes, description, values }], unsupported, summary }.
+// Schema in Figma (same architecture as DSX):
+//   Primitivos  — mode "Valor"; empty scopes (hidden from the picker: forces the use of semantic tokens)
+//   Semântico   — modes "Claro" and "Escuro"; values = alias to Primitivos (or a raw value, when the token is raw)
+//   Componente  — mode "Valor"; alias to Semântico (resolves with the mode applied to the frame)
+// Collection and mode names are text of the Figma file (what the person sees in the panel) and stay in pt-BR:
+// existing files already carry them, and figma-to-tokens.mjs reads them back.
+// Variable names: DTCG path with "/" instead of "." (color.text.primary → color/text/primary).
+// --json output: { collections, variables: [{ collection, name, dtcg_type, type, scopes, description, values }], unsupported, summary }.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { flatten } from '../build-tokens.mjs';
@@ -28,7 +29,7 @@ export const COLLECTIONS = {
 export const toFigmaName = (path) => path.replace(/\./g, '/');
 export const toDtcgPath = (name) => name.replace(/\//g, '.');
 
-/** Converte "#rrggbb[aa]" em {r,g,b,a} 0–1. */
+/** Converts "#rrggbb[aa]" into {r,g,b,a} 0–1. */
 export function hexToRgba(hex) {
   const h = hex.replace('#', '');
   const full = h.length === 3 ? [...h].map((c) => c + c).join('') : h;
@@ -36,12 +37,12 @@ export function hexToRgba(hex) {
   return { r: n(0), g: n(2), b: n(4), a: full.length === 8 ? Math.round(n(6) * 1000) / 1000 : 1 };
 }
 
-/** Tipo DTCG → tipo de variável do Figma + valor convertido. null = não suportado como variável. */
+/** DTCG type → Figma variable type + converted value. null = not supported as a variable. */
 export function convertValue(type, value) {
   if (type === 'color' && typeof value === 'string' && value.startsWith('#')) return { type: 'COLOR', value: hexToRgba(value) };
   if (type === 'dimension' && typeof value === 'string') {
     const m = value.match(/^(-?\d+(?:\.\d+)?)px$/);
-    return m ? { type: 'FLOAT', value: Number(m[1]) } : null; // ch, rem, % não têm equivalente direto
+    return m ? { type: 'FLOAT', value: Number(m[1]) } : null; // ch, rem, % have no direct equivalent
   }
   if (type === 'duration' && typeof value === 'string') {
     const m = value.match(/^(\d+(?:\.\d+)?)ms$/);
@@ -49,10 +50,10 @@ export function convertValue(type, value) {
   }
   if ((type === 'number' || type === 'fontWeight') && typeof value === 'number') return { type: 'FLOAT', value };
   if (type === 'fontFamily') return { type: 'STRING', value: Array.isArray(value) ? value[0] : String(value) };
-  return null; // shadow, cubicBezier, typography composta: viram estilos (efeito/texto), não variáveis
+  return null; // shadow, cubicBezier, composite typography: become styles (effect/text), not variables
 }
 
-/** Scopes por intenção: é isso que faz o Figma sugerir a variável certa no lugar certo. */
+/** Scopes by intent: this is what makes Figma suggest the right variable in the right place. */
 export function scopesFor(path, layer) {
   if (layer === 'primitives') return [];
   const p = path;
@@ -73,14 +74,14 @@ export function scopesFor(path, layer) {
 const ALIAS = /^\{([^}]+)\}$/;
 const readJson = (dir, f) => (existsSync(join(dir, f)) ? JSON.parse(readFileSync(join(dir, f), 'utf8')) : null);
 
-/** Monta o plano completo a partir da pasta de tokens. */
+/** Builds the full plan from the tokens folder. */
 export function plan(dir) {
   const prim = flatten(readJson(dir, 'primitives.tokens.json') ?? {});
   const light = flatten(readJson(dir, 'semantic.light.tokens.json') ?? {});
   const dark = flatten(readJson(dir, 'semantic.dark.tokens.json') ?? {});
   const comp = flatten(readJson(dir, 'component.tokens.json') ?? {});
   if (!Object.keys(prim).length || !Object.keys(light).length) {
-    throw new Error(`Pasta ${dir} sem primitives.tokens.json ou semantic.light.tokens.json.`);
+    throw new Error(`Folder ${dir} has no primitives.tokens.json or semantic.light.tokens.json.`);
   }
   const layerOf = (path) => (path in comp ? 'component' : path in light ? 'semantic' : path in prim ? 'primitives' : null);
   const variables = [];
@@ -95,7 +96,7 @@ export function plan(dir) {
       if (a) {
         const target = a[1];
         const targetLayer = layerOf(target);
-        if (!targetLayer) throw new Error(`${path}: alias para token inexistente {${target}}`);
+        if (!targetLayer) throw new Error(`${path}: alias to a missing token {${target}}`);
         values[mode] = { alias: toFigmaName(target), collection: COLLECTIONS[targetLayer].name };
         continue;
       }
@@ -114,7 +115,7 @@ export function plan(dir) {
   for (const [p, tok] of Object.entries(light)) entry('semantic', p, [{ mode: 'Claro', tok }, { mode: 'Escuro', tok: dark[p] ?? tok }]);
   for (const [p, tok] of Object.entries(comp)) entry('component', p, [{ mode: 'Valor', tok }]);
 
-  // Tipo de variável que é só alias: herda do alvo.
+  // Variable type of a pure alias: inherited from the target.
   const byName = Object.fromEntries(variables.map((v) => [v.name, v]));
   const typeOf = (v, seen = new Set()) => {
     if (v.type) return v.type;
@@ -124,10 +125,10 @@ export function plan(dir) {
     return target && byName[target.alias] ? typeOf(byName[target.alias], seen) : null;
   };
   for (const v of variables) v.type = typeOf(v);
-  // Alias para token não suportado (ex.: dimensão em ch) → também não suportado.
+  // Alias to an unsupported token (e.g. a dimension in ch) → also unsupported.
   const valid = variables.filter((v) => {
     if (v.type) return true;
-    unsupported.push({ token: toDtcgPath(v.name), type: v.dtcg_type, value: 'alias para token não suportado' });
+    unsupported.push({ token: toDtcgPath(v.name), type: v.dtcg_type, value: 'alias to an unsupported token' });
     return false;
   });
 
@@ -141,10 +142,10 @@ export function plan(dir) {
   };
 }
 
-/** Script idempotente para `use_figma`. */
+/** Idempotent script for `use_figma`. */
 export function generateScript(plan) {
-  return `// Gerado por tools/figma/tokens-to-figma.mjs — cole em use_figma (carregue a skill figma-use antes).
-// Idempotente: reusa coleção/modo/variável pelo nome. Escreve no arquivo: respeita o guarda da vez (turn-guard).
+  return `// Generated by tools/figma/tokens-to-figma.mjs. Paste into use_figma (load the figma-use skill first).
+// Idempotent: reuses collection/mode/variable by name. It writes to the file: respect the turn guard (turn-guard).
 const PLAN = ${JSON.stringify({ collections: plan.collections, variables: plan.variables })};
 
 const cols = await figma.variables.getLocalVariableCollectionsAsync();
@@ -152,7 +153,7 @@ const vars = await figma.variables.getLocalVariablesAsync();
 const collection = {}, mode = {}, variable = {};
 for (const c of PLAN.collections) {
   let col = cols.find(x => x.name === c.name) || figma.variables.createVariableCollection(c.name);
-  // O primeiro modo de uma coleção nova se chama "Mode 1": renomeie em vez de criar outro.
+  // The first mode of a new collection is called "Mode 1": rename it instead of creating another.
   c.modes.forEach((m, i) => {
     let found = col.modes.find(x => x.name === m);
     if (!found && i === 0 && col.modes.length === 1 && !c.modes.includes(col.modes[0].name)) {
@@ -189,12 +190,12 @@ return { created, updated, pending, collections: PLAN.collections.map(c => c.nam
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const a = parseCli('figma/tokens-to-figma.mjs'); // apelidos com aviso para nomes antigos
+  const a = parseCli('figma/tokens-to-figma.mjs'); // aliases with a warning for old names
   const result = plan(a.tokens ?? 'tokens');
   if (a.script) console.log(generateScript(result));
   else console.log(JSON.stringify(result, null, 2));
   if (result.unsupported.length) {
-    console.error(`\n${result.unsupported.length} token(s) sem variável equivalente (viram estilos ou ficam só no código): ` +
+    console.error(`\n${result.unsupported.length} token(s) with no equivalent variable (they become styles or stay in code only): ` +
       result.unsupported.map((n) => n.token).join(', '));
   }
 }

@@ -1,6 +1,6 @@
 ---
 id: applying-filters
-title: Filtros devem ser aplicados automaticamente?
+title: Should filters apply automatically?
 category: search-filters
 components: [filter, filter-panel, apply-button, results-list]
 type: contextual-decision
@@ -11,91 +11,91 @@ wcag: ["3.2.2", "4.1.3", "1.4.1", "2.4.7"]
 related: [filter-structure, active-filters, no-search-results, date-range-filter]
 ---
 
-# Filtros devem ser aplicados automaticamente?
+# Should filters apply automatically?
 
-> **Regra:** Atualize a lista na hora quando a resposta for rápida e a escolha for simples; exija "Aplicar" quando houver várias escolhas combinadas, consulta lenta ou painel que cobre os resultados.
+> **Rule:** Update the list right away when the response is fast and the choice is simple; require "Apply" when there are several combined choices, a slow query or a panel that covers the results.
 
-## Contexto
+## Context
 
-Ao marcar um filtro, a interface pode atualizar a lista imediatamente ou esperar uma confirmação. O primeiro modelo dá retorno instantâneo; o segundo permite compor várias decisões antes de gastar uma consulta.
+When a filter is checked, the interface can update the list immediately or wait for a confirmation. The first model gives instant feedback; the second lets the person compose several decisions before spending a query.
 
-A escolha depende do número de critérios, do tempo de resposta, do dispositivo e da facilidade de desfazer. No desktop, com filtros e resultados visíveis juntos, a atualização imediata costuma funcionar. No celular, um painel que esconde a lista pede confirmação explícita para evitar recargas sucessivas e perda de orientação.
+The choice depends on the number of criteria, the response time, the device and how easy it is to undo. On desktop, with filters and results visible together, immediate updating usually works. On mobile, a panel that hides the list calls for explicit confirmation to avoid successive reloads and loss of orientation.
 
-Além do desempenho, há acessibilidade: atualização que move o foco, rola a página ou não informa a nova contagem prejudica teclado e leitor de tela.
+Beyond performance, there is accessibility: an update that moves focus, scrolls the page or does not announce the new count hurts keyboard and screen reader users.
 
-## Decisão
+## Decision
 
-- **SE** há poucos critérios, resposta rápida e efeito fácil de desfazer **ENTÃO** aplique automaticamente.
-- **SE** a pessoa escolhe opções em vários grupos **ENTÃO** use botão "Aplicar filtros".
-- **SE** a consulta é pesada ou a rede é lenta **ENTÃO** use aplicação manual.
-- **SE** o painel de filtros cobre a lista (mobile) **ENTÃO** use confirmação com a contagem, como "Mostrar X resultados".
-- **SE** desktop e mobile exigem modelos diferentes **ENTÃO** adote modelo híbrido e mantenha rótulos e estados consistentes.
-- **SE** a aplicação é manual **ENTÃO** separe "Aplicar", "Cancelar" e "Limpar", e distinga escolhas pendentes das ativas.
-- **SE** a aplicação é automática **ENTÃO** indique carregamento, anuncie a nova contagem e mantenha o foco no controle acionado.
-- **SENÃO** comece pela aplicação automática e meça o tempo de resposta com dados reais.
+- **IF** there are few criteria, a fast response and an effect that is easy to undo **THEN** apply automatically.
+- **IF** the person picks options in several groups **THEN** use an "Apply filters" button.
+- **IF** the query is heavy or the network is slow **THEN** use manual application.
+- **IF** the filter panel covers the list (mobile) **THEN** use a confirmation with the count, such as "Show X results".
+- **IF** desktop and mobile need different models **THEN** adopt a hybrid model and keep labels and states consistent.
+- **IF** application is manual **THEN** separate "Apply", "Cancel" and "Clear", and distinguish pending choices from active ones.
+- **IF** application is automatic **THEN** show loading, announce the new count and keep focus on the control that was used.
+- **ELSE** start with automatic application and measure the response time with real data.
 
-## Quando usar
+## When to use
 
-- Aplicação automática: listas locais e rápidas, uma escolha simples.
-- Aplicação manual: painéis com várias categorias, consultas pesadas, filtros em tela cheia no mobile.
+- Automatic application: local, fast lists; a single simple choice.
+- Manual application: panels with several categories, heavy queries, full-screen filters on mobile.
 
-## Quando evitar
+## When to avoid
 
-- Atualizar a cada toque em painel complexo → **use em vez disso:** botão "Aplicar".
-- Exigir "Aplicar" para uma única escolha rápida → **use em vez disso:** atualização imediata.
-- Recarregar a página inteira sem aviso → **use em vez disso:** atualizar só a região de resultados.
+- Updating on every tap in a complex panel → **use instead:** an "Apply" button.
+- Requiring "Apply" for a single fast choice → **use instead:** immediate updating.
+- Reloading the whole page without warning → **use instead:** updating only the results region.
 
-## Faça
+## Do
 
-- Meça o tempo de resposta antes de decidir.
-- Mostre a contagem de resultados (ou prévia) antes de aplicar.
-- Permita remover um filtro, limpar todos e desfazer.
-- Preserve escolhas pendentes ao fechar e reabrir o painel.
-- Teste rede lenta, resultado vazio e mudanças rápidas.
+- Measure the response time before deciding.
+- Show the result count (or a preview) before applying.
+- Allow removing a filter, clearing all and undoing.
+- Preserve pending choices when the panel is closed and reopened.
+- Test a slow network, an empty result and quick changes.
 
-## Evite
+## Avoid
 
-- Apagar escolhas ao fechar o painel sem avisar.
-- Esconder filtros pendentes.
-- Deslocar o foco ou a posição da página após a atualização.
-- Usar "Aplicar" sem indicar o que será aplicado.
-- Trocar de modelo entre dispositivos sem sinalizar o estado.
+- Erasing choices when the panel closes without warning.
+- Hiding pending filters.
+- Shifting focus or the page position after the update.
+- Using "Apply" without saying what will be applied.
+- Switching models between devices without signaling the state.
 
-## Acessibilidade
+## Accessibility
 
-- Mudar um filtro não deve provocar mudança de contexto inesperada (3.2.2).
-- Anuncie "18 resultados encontrados" ou "Nenhum resultado" em região de status polida, sem roubar o foco (4.1.3).
-- Controles com rótulo, agrupamento e estado programáticos; pendente e ativo distinguíveis sem depender de cor (1.4.1).
-- "Aplicar", "Cancelar" e "Limpar" alcançáveis por teclado, com foco visível (2.4.7).
-- Defina para onde o foco volta após aplicar ou cancelar.
+- Changing a filter must not cause an unexpected change of context (3.2.2).
+- Announce "18 results found" or "No results" in a polite status region, without stealing focus (4.1.3).
+- Controls with programmatic label, grouping and state; pending and active distinguishable without relying on color (1.4.1).
+- "Apply", "Cancel" and "Clear" reachable by keyboard, with visible focus (2.4.7).
+- Define where focus returns after applying or canceling.
 
-## Microcópia
+## Microcopy
 
-| Situação | Exemplo |
+| Situation | Example |
 |---|---|
-| Confirmação com contagem | "Mostrar 42 resultados" |
-| Aplicar em lote | "Aplicar filtros" |
-| Descartar | "Cancelar" |
-| Limpar | "Limpar filtros" |
-| Status automático | "18 resultados encontrados" |
-| Sem resultado | "Nenhum resultado. Remova algum filtro para ampliar a busca." |
+| Confirmation with count | "Show 42 results" |
+| Batch apply | "Apply filters" |
+| Discard | "Cancel" |
+| Clear | "Clear filters" |
+| Automatic status | "18 results found" |
+| No result | "No results. Remove a filter to widen the search." |
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] O modelo (automático ou manual) condiz com o número de filtros.
-- [ ] O tempo de resposta foi aferido com dados reais.
-- [ ] Filtros pendentes estão separados dos ativos.
-- [ ] Há contagem ou prévia de resultados.
-- [ ] É possível cancelar e limpar a combinação.
-- [ ] O foco permanece no controle após a atualização.
-- [ ] A mudança é anunciada em região de status.
-- [ ] O fluxo foi testado em rede lenta e no mobile.
-- [ ] O fluxo passou por teste com leitor de tela e teclado.
+- [ ] The model (automatic or manual) matches the number of filters.
+- [ ] The response time was measured with real data.
+- [ ] Pending filters are separate from active ones.
+- [ ] There is a result count or preview.
+- [ ] The combination can be canceled and cleared.
+- [ ] Focus stays on the control after the update.
+- [ ] The change is announced in a status region.
+- [ ] The flow was tested on a slow network and on mobile.
+- [ ] The flow was tested with screen reader and keyboard.
 
-## Fundamentação
+## Rationale
 
-- Baymard Institute: filtragem em tempo real funciona no desktop; no mobile prefere-se ação explícita com contagem.
-- IBM Carbon (Filtering, Disclosures): distingue atualização instantânea de aplicação em lote e define botões de aplicar e limpar.
-- WCAG 2.2: 3.2.2 (alteração na entrada) e 4.1.3 (mensagens de status).
-- W3C WAI técnica ARIA22: região role=status para anúncio polido.
-- Red Hat PatternFly (Filters): combinações de filtros, contagem e adaptação mobile.
+- Baymard Institute: real-time filtering works on desktop; on mobile an explicit action with a count is preferred.
+- IBM Carbon (Filtering, Disclosures): distinguishes instant updating from batch application and defines apply and clear buttons.
+- WCAG 2.2: 3.2.2 (On Input) and 4.1.3 (Status Messages).
+- W3C WAI technique ARIA22: role=status region for polite announcements.
+- Red Hat PatternFly (Filters): filter combinations, count and mobile adaptation.

@@ -1,14 +1,15 @@
-// Glossário do produto para o ux-lint (`content.glossary` do UX.md). Sem dependências.
+// Product glossary for ux-lint (`content.glossary` in UX.md). No dependencies.
 //
-// Formas aceitas:
-//   content.glossary: docs/glossario.md            # caminho de um .md com tabela (relativo ao UX.md)
-//   content.glossary: inline                       # tabela no próprio corpo do UX.md
-//   content.glossary: { Order: [ticket] }          # mapa termo → sinônimos a evitar
-//   content.glossary:                              # por módulo: escolhido pelo --module do verificador
-//     default: design/product.md                   #   (sem --module, ou módulo sem entrada, vale o default)
+// Accepted forms:
+//   content.glossary: docs/glossary.md             # path of a .md with a table (relative to the UX.md)
+//   content.glossary: inline                       # table in the UX.md body itself
+//   content.glossary: { Order: [ticket] }          # term → synonyms-to-avoid map
+//   content.glossary:                              # per module: picked by the detector's --module
+//     default: design/product.md                   #   (no --module, or a module with no entry: default)
 //     purchasing: design/purchasing-glossary.md
 //
-// O mapa é por módulo quando tem a chave `default` ou quando todo valor é um caminho `.md`, `inline` ou um mapa.
+// The map is per module when it has a `default` key or when every value is a `.md` path, `inline` or a map.
+// Table headers are matched in English or Portuguese (term/termo, never call it/nunca chamar de, avoid/evitar…).
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { splitFrontMatter } from '../../lib/yaml-lite.mjs';
@@ -18,7 +19,7 @@ const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 const isMap = (v) => v && typeof v === 'object' && !Array.isArray(v);
 const isSource = (v) => isMap(v) || (typeof v === 'string' && (v === 'inline' || /\.md$/i.test(v.trim())));
 
-/** O valor de `content.glossary` é um mapa por módulo? */
+/** Is the `content.glossary` value a per-module map? */
 export function isModuleGlossary(g) {
   if (!isMap(g)) return false;
   const values = Object.values(g);
@@ -26,8 +27,8 @@ export function isModuleGlossary(g) {
 }
 
 /**
- * Escolhe a fonte do glossário para o módulo: { source, module } — `module` é a chave usada (`default` ou o
- * módulo), ou null quando o glossário é único. Sem glossário, `source` é null.
+ * Picks the glossary source for the module: { source, module }; `module` is the key used (`default` or the
+ * module), or null when there is a single glossary. Without a glossary, `source` is null.
  */
 export function glossarySource(g, module = null) {
   if (g === undefined || g === null || g === '') return { source: null, module: null };
@@ -37,7 +38,7 @@ export function glossarySource(g, module = null) {
   return { source: null, module: null };
 }
 
-/** Tabelas Markdown com coluna de termo e coluna de sinônimo a evitar → [{ term, avoid: [...] }]. */
+/** Markdown tables with a term column and a synonym-to-avoid column → [{ term, avoid: [...] }]. */
 export function glossaryFromMarkdown(md) {
   const out = [];
   const lines = String(md ?? '').split('\n');
@@ -61,7 +62,7 @@ export function glossaryFromMarkdown(md) {
   return out;
 }
 
-/** Lê uma fonte já escolhida (caminho, "inline" ou mapa termo → sinônimos). */
+/** Reads an already picked source (path, "inline" or term → synonyms map). */
 export function readGlossarySource(source, uxPath = null) {
   if (!source) return [];
   if (isMap(source)) return Object.entries(source).map(([term, avoid]) => ({ term, avoid: [].concat(avoid ?? []).map(String) }));
@@ -71,7 +72,7 @@ export function readGlossarySource(source, uxPath = null) {
   return existsSync(file) ? glossaryFromMarkdown(readFileSync(file, 'utf8')) : [];
 }
 
-/** Glossário de `content.glossary` para o módulo (ou o único). */
+/** Glossary of `content.glossary` for the module (or the single one). */
 export function loadGlossary(cfg, uxPath = null, module = null) {
   return readGlossarySource(glossarySource(cfg?.content?.glossary, module).source, uxPath);
 }

@@ -1,6 +1,6 @@
 ---
 id: field-order
-title: Como definir a sequência dos campos em um formulário?
+title: How do you decide the order of fields in a form?
 category: forms
 components: [form, fieldset, legend, conditional-field]
 type: recommendation
@@ -11,91 +11,91 @@ wcag: ["2.4.3", "1.3.2", "1.3.1", "3.3.2"]
 related: [form-steps, split-form, required-fields, label-vs-placeholder, dropdown]
 ---
 
-# Como definir a sequência dos campos em um formulário?
+# How do you decide the order of fields in a form?
 
-> **Regra:** Ordene os campos pela tarefa da pessoa, não pelo banco de dados, e faça ordem visual, ordem do HTML e ordem do Tab seguirem a mesma lógica.
+> **Rule:** Order fields by the person's task, not by the database, and make visual order, HTML order and Tab order follow the same logic.
 
-## Contexto
+## Context
 
-A sequência dos campos conduz o diálogo entre a pessoa e o serviço. Se espelha o banco de dados, a estrutura interna da empresa ou um layout em duas colunas, a pessoa tem de decifrar o formulário em vez de responder às perguntas.
+The field order drives the dialogue between the person and the service. If it mirrors the database, the company's internal structure or a two-column layout, the person has to decode the form instead of answering the questions.
 
-Parta da tarefa e das decisões envolvidas. Elimine dados dispensáveis, junte campos afins e coloque antes as perguntas que definem elegibilidade, rota ou campos seguintes.
+Start from the task and the decisions it involves. Drop data you do not need, group related fields and ask first the questions that decide eligibility, route or the following fields.
 
-Não existe ordem universal. A melhor sequência varia com a tarefa, o conhecimento da pessoa, as dependências entre respostas e a real necessidade do serviço.
+There is no universal order. The best sequence depends on the task, what the person knows, the dependencies between answers and what the service really needs.
 
-## Decisão
+## Decision
 
-- **SE** o campo não é necessário à tarefa **ENTÃO** remova-o antes de ordenar.
-- **SE** uma resposta define elegibilidade ou caminho **ENTÃO** pergunte-a primeiro.
-- **SE** campos têm relação entre si **ENTÃO** agrupe-os com `fieldset` e `legend`.
-- **SE** existe dependência **ENTÃO** peça a causa antes do efeito: tipo antes de detalhes, país antes de estado, data inicial antes da final.
-- **SE** um campo só é relevante para parte do público **ENTÃO** mostre-o condicionalmente logo após a escolha que o gera.
-- **SE** o formulário é longo e tem objetivos distintos **ENTÃO** divida em etapas lógicas.
-- **SE** o layout usa duas colunas **ENTÃO** confirme que a leitura não cruza a tela; prefira uma coluna.
-- **SE** o CSS reordena campos ou há `tabindex` positivo **ENTÃO** remova e reordene no HTML.
-- **SENÃO** teste o caminho mais comum e os desvios antes de fixar a sequência definitiva.
+- **IF** the field is not needed for the task **THEN** remove it before ordering.
+- **IF** an answer decides eligibility or path **THEN** ask it first.
+- **IF** fields are related **THEN** group them with `fieldset` and `legend`.
+- **IF** there is a dependency **THEN** ask for the cause before the effect: type before details, country before state, start date before end date.
+- **IF** a field is relevant only to part of the audience **THEN** show it conditionally right after the choice that triggers it.
+- **IF** the form is long and has distinct goals **THEN** split it into logical steps.
+- **IF** the layout uses two columns **THEN** confirm that reading does not cross the screen; prefer one column.
+- **IF** CSS reorders fields or there is a positive `tabindex` **THEN** remove it and reorder in the HTML.
+- **ELSE** test the most common path and the detours before fixing the final order.
 
-## Quando usar
+## When to use
 
-- Dois ou mais campos relacionados.
-- Resposta que define elegibilidade ou próximo caminho.
-- Campos condicionais ou etapas.
-- Assuntos diferentes que precisam de agrupamento.
-- Ordem atual que causa dúvida, erro ou abandono.
+- Two or more related fields.
+- An answer that decides eligibility or the next path.
+- Conditional fields or steps.
+- Different subjects that need grouping.
+- A current order that causes doubt, errors or abandonment.
 
-## Quando evitar
+## When to avoid
 
-- Sequência copiada do banco de dados → **use em vez disso:** sequência da tarefa.
-- Campos condicionais irrelevantes visíveis para todos → **use em vez disso:** exibição condicional.
-- Assuntos misturados sem grupos → **use em vez disso:** grupos nomeados.
-- CSS ou `tabindex` positivo criando outra ordem → **use em vez disso:** ordem no HTML.
-- Regra fixa aplicada sem observar a tarefa → **use em vez disso:** teste com pessoas.
+- An order copied from the database → **use instead:** the task's order.
+- Irrelevant conditional fields visible to everyone → **use instead:** conditional display.
+- Mixed subjects without groups → **use instead:** named groups.
+- CSS or a positive `tabindex` creating another order → **use instead:** order in the HTML.
+- A fixed rule applied without observing the task → **use instead:** testing with people.
 
-## Faça
+## Do
 
-- Comece pelo objetivo da tarefa.
-- Pergunte a elegibilidade cedo.
-- Mostre só o que importa.
-- Teste os caminhos comuns e alternativos.
+- Start from the task's goal.
+- Ask about eligibility early.
+- Show only what matters.
+- Test the common and alternative paths.
 
-## Evite
+## Avoid
 
-- Misturar assuntos.
-- Revelar campos irrelevantes.
-- Colunas sem lógica de leitura.
-- Esconder dependências.
-- Começar pelo campo mais difícil sem pesquisa.
+- Mixing subjects.
+- Revealing irrelevant fields.
+- Columns with no reading logic.
+- Hiding dependencies.
+- Starting with the hardest field without research.
 
-## Acessibilidade
+## Accessibility
 
-- Ordem de foco preserva significado e operabilidade (2.4.3); sequência de leitura com sentido (1.3.2).
-- Mantenha a ordem do HTML igual à visual; não reorganize campos por CSS.
-- `fieldset` e `legend` para grupos, rótulos visíveis e instruções associadas (1.3.1, 3.3.2).
-- Campos condicionais aparecem no ponto esperado da sequência, sem saltos de foco.
-- Teste com teclado, leitor de tela, zoom, voz e tela pequena.
+- Focus order preserves meaning and operability (2.4.3); a meaningful reading sequence (1.3.2).
+- Keep the HTML order the same as the visual order; do not rearrange fields with CSS.
+- `fieldset` and `legend` for groups, visible labels and associated instructions (1.3.1, 3.3.2).
+- Conditional fields appear at the expected point in the sequence, with no focus jumps.
+- Test with keyboard, screen reader, zoom, voice and a small screen.
 
-## Microcópia
+## Microcopy
 
-Não se aplica.
+Not applicable.
 
-## Checklist de verificação
+## Verification checklist
 
-- [ ] A ordem segue a tarefa da pessoa.
-- [ ] Perguntas de elegibilidade vêm antes do preenchimento longo.
-- [ ] Campos relacionados estão agrupados.
-- [ ] Dependências aparecem na ordem correta.
-- [ ] Campos irrelevantes ficam ocultos.
-- [ ] A ordem visual corresponde à ordem do HTML.
-- [ ] A navegação por Tab preserva o sentido.
-- [ ] Grupos usam `fieldset` e `legend`.
-- [ ] Caminho comum e alternativos foram testados.
+- [ ] The order follows the person's task.
+- [ ] Eligibility questions come before long filling-in.
+- [ ] Related fields are grouped.
+- [ ] Dependencies appear in the right order.
+- [ ] Irrelevant fields stay hidden.
+- [ ] The visual order matches the HTML order.
+- [ ] Tab navigation preserves the meaning.
+- [ ] Groups use `fieldset` and `legend`.
+- [ ] The common and alternative paths were tested.
 
-## Fundamentação
+## Rationale
 
-- WCAG 2.2, critério 2.4.3 (Focus Order): ordem de foco preserva significado; relação entre DOM e ordem visual.
-- W3C WAI (tutorial de formulários): pedir só o necessário, agrupar controles e dividir formulários longos.
-- U.S. Web Design System (Form): mesma ordem no HTML e na tela, layout vertical simples.
-- GOV.UK Service Manual (estruturação de formulários): justificar cada pergunta, começar pela elegibilidade e usar ramificação.
-- IBM Carbon (padrão de formulários): Tab, rótulos visíveis e instruções antes do preenchimento.
-- Nielsen Norman Group (usabilidade de formulários e agrupamento com espaço em branco): sequência lógica, uma coluna e agrupamento; a ordem depende do contexto.
-- Adobe Spectrum (design inclusivo): exemplo de estrutura em ordem lógica versus fora de ordem.
+- WCAG 2.2, criterion 2.4.3 (Focus Order): focus order preserves meaning; relationship between DOM and visual order.
+- W3C WAI (forms tutorial): ask only for what is needed, group controls and split long forms.
+- U.S. Web Design System (Form): same order in the HTML and on screen, simple vertical layout.
+- GOV.UK Service Manual (structuring forms): justify each question, start with eligibility and use branching.
+- IBM Carbon (forms pattern): Tab, visible labels and instructions before filling in.
+- Nielsen Norman Group (form usability and grouping with white space): logical sequence, one column and grouping; the order depends on context.
+- Adobe Spectrum (inclusive design): example of a structure in logical order versus out of order.
