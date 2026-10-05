@@ -6,6 +6,10 @@
 // known fixes for what jsdom cannot lay out. No server, no browser.
 //
 // Adapt only the CONFIG block below; everything else is generic.
+//
+// Design options (skill design-lab): with DSX_DESIGN_MD=<option file> (legacy name: STITCH_THEME) the capture is saved
+// under options/<option>/ and design-option.ts adds the option's web fonts; the theme itself is applied by the
+// provider in mountPage (design-option-mui.tsx for MUI). `lab.mjs compare` sets these variables for you.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 
@@ -32,6 +36,15 @@ export const CAPTURE_CONFIG = {
   /** Tab indicators drawn by measuring the DOM (width 0 in jsdom): hidden and replaced by an inset line on the selected tab. */
   tabIndicatorSelectors: '.MuiTabs-indicator, .ant-tabs-ink-bar',
 };
+
+// ---------------------------------------------------------------- design option (env only, no dependency)
+/** Path of the DESIGN.md being compared, or null for the product's own theme. */
+export const DESIGN_MD_PATH = process.env.DSX_DESIGN_MD || process.env.STITCH_THEME || null;
+/** Option name: DSX_DESIGN_OPTION, else the file name without .md. */
+export const DESIGN_OPTION = DESIGN_MD_PATH ? (process.env.DSX_DESIGN_OPTION || DESIGN_MD_PATH.split(/[\\/]/).pop()!.replace(/\.md$/, '')) : null;
+const extraFonts: string[] = [];
+/** Web fonts the active design option needs (called by design-option.ts). */
+export function registerFonts(urls: string[]) { for (const u of urls) if (!extraFonts.includes(u)) extraFonts.push(u); }
 
 // ---------------------------------------------------------------- generic part
 const MIME: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon' };
@@ -170,7 +183,7 @@ export function saveCapture(title: string, file: string, options: CaptureOptions
 <meta charset="utf-8">
 <meta name="viewport" content="width=${width}">
 <title>${esc(title)}</title>
-${CAPTURE_CONFIG.fonts.map((f) => `<link href="${f}" rel="stylesheet">`).join('\n')}
+${[...CAPTURE_CONFIG.fonts, ...extraFonts].map((f) => `<link href="${f}" rel="stylesheet">`).join('\n')}
 <style>body{margin:0;min-width:${width}px}</style>
 <style data-source="app">
 ${styles}
@@ -182,7 +195,8 @@ ${body.innerHTML}
 </body>
 </html>
 `;
-  const target = resolve(CAPTURE_CONFIG.outDir, options.subdir ?? process.env.DSX_CAPTURE_SUBDIR ?? '', file);
+  const subdir = options.subdir ?? process.env.DSX_CAPTURE_SUBDIR ?? (DESIGN_OPTION ? `options/${DESIGN_OPTION}` : '');
+  const target = resolve(CAPTURE_CONFIG.outDir, subdir, file);
   mkdirSync(dirname(target), { recursive: true });
   writeFileSync(target, html);
   return { target, bytes: html.length, cssChars: styles.length };

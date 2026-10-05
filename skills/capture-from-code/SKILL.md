@@ -53,6 +53,7 @@ Copy `templates/capture/` into the project's test folder (e.g. `web/tests/captur
 | `orders.capture.test.tsx` + `orders.data.ts` | example capture of a page and a dialog | copy per area |
 | `states.capture.test.tsx` | loading / empty / error per main screen, table-driven | the deciding route and what proves each state |
 | `vitest.capture.config.ts` | jsdom, CSS processing on (CSS modules, Tailwind via the app's PostCSS) | the include glob |
+| `design-option.ts`, `design-option-mui.tsx` | design options (skill `design-lab`): read `DSX_DESIGN_MD` (legacy `STITCH_THEME`), parse it with the theme adapter and apply it over the product theme | the import path of the adapter copy |
 
 Captures only run with `DSX_CAPTURE=1` (`it.runIf(CAPTURE)`): CI and the normal suite skip them and write nothing.
 
@@ -100,7 +101,7 @@ node <DSX>/tools/stitch/journeys.mjs .dsx/maps/flows-<m>.json --module <m> --out
 
 All of them accept `--dry-run` where they would touch the network. Verify in Stitch with `get_screen` (download the screenshot) and record screen ids in `.stitch/metadata.json` (skill `stitch`).
 
-Comparing design systems on real screens (skill `choose-ds`): `apply_design_system` does not work on captured screens (their CSS is real and fixed). Render the same flow with each option's theme on top of the product theme (a provider in `mountPage` built from the option's `DESIGN.md` front matter), save with `{ subdir: 'options/<option>' }`, send each set and arrange with `--rows`.
+Comparing design systems on real screens (skills `choose-ds`, `design-lab`): `apply_design_system` does not work on captured screens (their CSS is real and fixed). Render the same flow with each option's theme on top of the product theme: `DSX_DESIGN_MD=<option file>` (legacy `STITCH_THEME`) makes `design-option.ts` parse the option, `design-option-mui.tsx` (a provider in `mountPage`) apply it with the same adapter as the live switcher, and `serialize.ts` save under `options/<option>/`. `node <DSX>/tools/design-md/lab.mjs compare` sets the variables and runs the project's `capture.command` per option, then writes the comparison page; to use Stitch instead, send each set and arrange with `--rows`.
 
 ## Other stacks
 

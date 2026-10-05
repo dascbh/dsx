@@ -37,6 +37,31 @@ paths:
 { "paths": { "captures": "ui/captures/<module>" }, "capture": { "blocklist": ["Real Client Inc"] } }
 ```
 
+## Design options and the capture command
+
+The design lab (`tools/design-md/lab.mjs`, skill `design-lab`) reads two more blocks of `.dsx/config.json`; they are not `paths` keys because they hold more than folders.
+
+```json
+{
+  "design": {
+    "official": "DESIGN.md",
+    "options_dir": ".dsx/design-options",
+    "active": "dense",
+    "manifest": "web/src/dev/design-lab/options.json",
+    "theme_gate": "cd web && npx vitest run tests/design-md.test.ts",
+    "compare_dir": ".dsx/captures/<module>/options"
+  },
+  "capture": {
+    "command": "cd web && npx vitest run --config vitest.capture.config.ts tests/capture",
+    "cwd": ".",
+    "module": "orders",
+    "option_output": ".dsx/captures/<module>/options/<option>"
+  }
+}
+```
+
+`design.active` is written by `lab.mjs use`; the official file is never edited by it. `capture.option_output` defaults to `<paths.captures>/options/<option>`, which is where `templates/capture/serialize.ts` writes when `DSX_DESIGN_MD` (or the legacy `STITCH_THEME`) is set.
+
 ## Legacy locations
 
 Captures written by DSX ≤ 0.7 live in `.stitch/<module>/code` (geometry in `.stitch/<module>/geometry`). When no path is configured and the generic folder has no capture, the legacy folder is used and every tool prints:

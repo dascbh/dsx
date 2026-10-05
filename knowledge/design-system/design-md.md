@@ -76,6 +76,16 @@ components:
 
 The hex values above are the resolved values of this repository's light theme (`tokens/build/tokens.light.json`): `canvas` = `color.bg.canvas`, `primary` = `color.action.primary`, etc. When the project uses the token pipeline, **the front matter is derived from the tokens, never the reverse**; say so at the top of the body, along with which source wins in a conflict.
 
+**Dark mode (DSX convention).** The format has no dark scheme. DSX reads an optional `colors-dark` group with only the keys that change in the dark scheme; the rest is inherited from `colors`. The DSX linter checks the same pairs on the merged palette (errors say "(dark)"); the theme adapters (`templates/theme-adapters/`) render it; the official linter warns that the group is unknown and export commands ignore it. A file without `colors-dark` has a single scheme, light or dark by its background. Hover, status tints and the danger color are taken in dark only when `colors-dark` declares them: inherited light values are usually unreadable on a dark background.
+
+```yaml
+colors-dark:
+  canvas: "#0d1724"
+  text-primary: "#e7edf5"
+  primary: "#7ea6f2"
+  on-primary: "#0d1724"
+```
+
 Conventions the linter uses:
 
 - For each background color with text, declare `on-<role>`; the pair `on-X` on `X` is checked at 4.5:1.

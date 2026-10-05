@@ -90,6 +90,10 @@ Gaps revealed by controlled generation: …
 Prioritized fixes (max. 7): …
 ```
 
+## Promote a design option
+
+When the new DESIGN.md was prepared as a design option (skill `design-lab`: candidates in `.dsx/design-options/`, compared on real screens), it becomes official only through `node tools/design-md/lab.mjs promote <name>`: DSX linter and official linter must pass, the previous file is kept as `previous-<date>.md`, the active pointer is cleared. Then update the code theme in the same change (DESIGN.md describes, the theme renders; `design.theme_gate` runs the project's DESIGN.md × theme check) and evaluate the promoted file with Mode C.
+
 ## Validation (all modes)
 
 1. `node tools/lint-design-md.mjs DESIGN.md` with no errors.

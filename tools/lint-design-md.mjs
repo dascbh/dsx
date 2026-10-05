@@ -79,21 +79,32 @@ export function lintDesignMd(md) {
     for (let i = 0; i < 5 && typeof v === 'string' && v.startsWith('{'); i++) v = lookup(v.slice(1, -1));
     return typeof v === 'string' && HEX.test(v) && v.length <= 7 ? v : null;
   };
-  const pairs = [];
-  for (const k of Object.keys(colors)) {
-    const m = k.match(/^on-(.+)$/);
-    if (m && colors[m[1]]) pairs.push([k, m[1], 4.5]);
-  }
-  const bgs = ['canvas', 'background', 'surface'].filter((b) => colors[b]);
-  for (const t of Object.keys(colors).filter((k) => /^text-|^link$/.test(k))) for (const b of bgs) pairs.push([t, b, 4.5]);
-  for (const ui of ['border-strong', 'focus', 'primary'].filter((k) => colors[k])) for (const b of bgs.slice(0, 1)) pairs.push([ui, b, 3]);
   info.contrast_pairs = [];
-  for (const [fg, bg, min] of pairs) {
-    const a = resolveColor(colors[fg]), b = resolveColor(colors[bg]);
-    if (!a || !b) continue;
-    const ratio = +contrast(a, b).toFixed(2);
-    info.contrast_pairs.push({ fg, bg, ratio, min, ok: ratio >= min });
-    if (ratio < min) errors.push(`Insufficient contrast: ${fg} on ${bg} = ${ratio}:1 (minimum ${min}:1).`);
+  // DSX convention: `colors-dark` holds the keys that change in the dark scheme; the same pairs are checked on the
+  // merged palette (knowledge/design-system/design-md.md). The official linter ignores the group with a warning.
+  const schemes = [['light', colors]];
+  if (fm['colors-dark'] && typeof fm['colors-dark'] === 'object') {
+    for (const [k, v] of Object.entries(fm['colors-dark'])) {
+      if (typeof v === 'string' && !v.startsWith('{') && !HEX.test(v)) errors.push(`colors-dark.${k}: value "${v}" is not a valid hex.`);
+    }
+    schemes.push(['dark', { ...colors, ...fm['colors-dark'] }]);
+  }
+  for (const [scheme, palette] of schemes) {
+    const pairs = [];
+    for (const k of Object.keys(palette)) {
+      const m = k.match(/^on-(.+)$/);
+      if (m && palette[m[1]]) pairs.push([k, m[1], 4.5]);
+    }
+    const bgs = ['canvas', 'background', 'surface'].filter((b) => palette[b]);
+    for (const t of Object.keys(palette).filter((k) => /^text-|^link$/.test(k))) for (const b of bgs) pairs.push([t, b, 4.5]);
+    for (const ui of ['border-strong', 'focus', 'primary'].filter((k) => palette[k])) for (const b of bgs.slice(0, 1)) pairs.push([ui, b, 3]);
+    for (const [fg, bg, min] of pairs) {
+      const a = resolveColor(palette[fg]), b = resolveColor(palette[bg]);
+      if (!a || !b) continue;
+      const ratio = +contrast(a, b).toFixed(2);
+      info.contrast_pairs.push({ fg, bg, ratio, min, ok: ratio >= min, ...(scheme === 'dark' ? { scheme } : {}) });
+      if (ratio < min) errors.push(`Insufficient contrast${scheme === 'dark' ? ' (dark)' : ''}: ${fg} on ${bg} = ${ratio}:1 (minimum ${min}:1).`);
+    }
   }
 
   // --- Typography and spacing ---------------------------------------------

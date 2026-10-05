@@ -9,6 +9,7 @@ This repository is a **design system, UI and UX framework for AI agents**. If yo
 | First use of DSX in a project; project without DESIGN.md or without UX.md | `init` |
 | Choose the design system (new project, redesign, "use style X") from curated references | `choose-ds` |
 | Create, update or evaluate the DESIGN.md | `design-md` |
+| Test several DESIGN.md, alternate between them (variant of the current one, curated reference), compare on real screens without a server or switch live in the app in development; promote the chosen one | `design-lab` |
 | Create, extract from code or evaluate the UX.md (screen types, regions, actions, navigation, feedback, flows); 100-point score, UX.md × product drift, declared deviations | `ux-md` |
 | Lay out or rearrange a screen from its archetype (2–3 arrangements to choose from) | `arrange-screen` |
 | Rethink a screen or flow, variations ("other versions", "how could it be"): 3 real variations built with the project's components, measured, compared on one page and decided | `rethink-ux` |
@@ -64,7 +65,7 @@ skills/       executable procedures (SKILL.md) — what to do, in what order, wh
 archetypes/   12 screen archetypes (regions, primary action, states, variations/arrangements) — index.json for search
 patterns/     ~80 interaction patterns with an IF→THEN rule, a11y and checklist (index.json for search)
 knowledge/    reference by area: foundations/, design-system/, research/, ia/
-templates/    DESIGN.md, pattern, component, brief, research plan/script/report, JTBD, OST…
+templates/    DESIGN.md, pattern, component, brief, research plan/script/report, JTBD, OST…; capture/ (capture harness), theme-adapters/ (DESIGN.md → MUI, CSS variables, Tailwind), theme-switcher/ (live design switcher, dev only)
 tokens/       W3C DTCG tokens in 3 layers + contrast pairs; build/ is generated
 tools/        dependency-free checkers (Node ≥ 20); tools/figma/ = snapshot, diff, prelude and token bridges; tools/stitch/ = design system and HTML analysis
 hooks/        turn-guard (Figma cycle)
@@ -94,7 +95,10 @@ node tools/contrast.mjs "#text" "#background"  # WCAG contrast of one pair
 node tools/palette.mjs "#hex" [--format dtcg]  # 50–950 ramp in OKLCH with contrast per step
 node tools/type-scale.mjs --ratio major-third  # type scale (or --fluid)
 node tools/spacing-scale.mjs --base 4          # spacing scale
-node tools/lint-design-md.mjs DESIGN.md        # objective DESIGN.md gates
+node tools/lint-design-md.mjs DESIGN.md        # objective DESIGN.md gates (colors-dark checked too)
+node tools/design-md/lab.mjs list|add|use|diff|promote|manifest   # design options in .dsx/design-options/, active pointer design.active, promote through the gates
+node tools/design-md/lab.mjs compare <a> <b> … --screens <list> --out <page.html> [--lang pt-BR]   # captures each option with the project's capture.command, screens × options page with "Copy decision"
+node tools/design-md/lab.mjs bundle-check <dist>  # the live design switcher must not reach a production build
 node tools/lint-ux-md.mjs UX.md [--archetypes <folder>] [--json]   # objective UX.md gates (accepts old names with a warning)
 node tools/lint-ux-md.mjs UX.md --score [--map <flows.json>] [--screens <captures>] [--geometry <folder>] [--json]   # 100-point score per criterion and gates (evals/rubrics/ux-md.yaml)
 node tools/ux-lint/ux-md-drift.mjs UX.md [--map …] [--screens …] [--geometry …] [--module <m> --root <project>] [--json] [--fail-at 2]   # UX.md × product drift U1–U6
