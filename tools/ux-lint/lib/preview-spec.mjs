@@ -11,7 +11,7 @@ import { pageStrings, productText } from './page-strings.mjs';
 import { unionList, PACKS } from './lang/index.mjs';
 
 /** Preview format version: part of the hash, so changing the generation invalidates the cache. */
-export const PREVIEW_VERSION = 9;
+export const PREVIEW_VERSION = 10;
 
 /** Operations accepted in `preview` (options.json). */
 export const PREVIEW_OPS = [

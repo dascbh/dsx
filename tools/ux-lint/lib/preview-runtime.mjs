@@ -360,6 +360,10 @@ export function runtime() {
     const fc = req.closest('.MuiTextField-root, .MuiFormControl-root') || req.parentElement;
     const color = kit.error_color || '#d32f2f';
     req.setAttribute('aria-invalid', 'true');
+    // A required-field error means the field was left empty: an error under a filled field contradicts itself.
+    req.value = '';
+    if (req.tagName === 'TEXTAREA') req.textContent = '';
+    req.removeAttribute('value');
     for (const e of [fc, ...fc.querySelectorAll('.MuiInputBase-root, .MuiOutlinedInput-root, .MuiInput-root, .MuiFilledInput-root, .MuiInputLabel-root, .MuiFormLabel-root, .MuiFormHelperText-root')]) e.classList.add('Mui-error');
     const outline = fc.querySelector('.MuiOutlinedInput-notchedOutline');
     if (outline) outline.style.setProperty('border-color', color, 'important');
