@@ -11,7 +11,7 @@ import { pageStrings, productText } from './page-strings.mjs';
 import { unionList, PACKS } from './lang/index.mjs';
 
 /** Preview format version: part of the hash, so changing the generation invalidates the cache. */
-export const PREVIEW_VERSION = 8;
+export const PREVIEW_VERSION = 9;
 
 /** Operations accepted in `preview` (options.json). */
 export const PREVIEW_OPS = [
@@ -350,7 +350,40 @@ export function optionOps(c, o, opts = {}) {
     const imp = implicitPreview(c, opts);
     return imp.ops ? { ops: imp.ops, derived: true } : { none: imp.none };
   }
+  if (BEHAVIOR_RULES.has(c.rule)) return behaviorOptionOps(c, o, opts);
   return deriveTextOp(c, o, opts);
+}
+
+/**
+ * Review rules whose options usually describe behavior, structure or flow (heuristics, dark patterns, IA,
+ * accessibility, laws), not a replacement text. Their option text is only taken as screen text when the option says
+ * so explicitly ("A" → "B", Label: text, element + quoted text, a whole quoted text); anything else is an instruction
+ * and gets no derived preview: a wrong "after" image is worse than none.
+ */
+export const BEHAVIOR_RULES = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 'DP', 'IA', 'A11Y', 'LAW']);
+/** Stored in English in the manifest; the page shows it in its language (pageStrings(lang).reasonBehavior). */
+export const NO_PREVIEW_BEHAVIOR = pageStrings('en').reasonBehavior;
+
+function behaviorOptionOps(c, o, opts) {
+  const t = clean(o?.text);
+  if (!t) return { none: 'option without text' };
+  if (/^(manter|keep)\b/i.test(t)) return deriveTextOp(c, o, opts);
+  if (c.element === 'accessible-name' || c.element === 'tooltip') return deriveTextOp(c, o, opts);
+  const ex = extractOptionText(t);
+  if (!ex) return { none: NO_PREVIEW_BEHAVIOR };
+  const r = deriveTextOp(c, o, opts);
+  return r.ops?.some((x) => x.op === 'text' && !plausibleText(c, x.text)) ? { none: NO_PREVIEW_BEHAVIOR } : r;
+}
+
+/** Elements whose text is a short label: an unquoted replacement much longer than a label is an instruction. */
+const LABEL_ELEMENTS = new Set(['button', 'tab', 'menu', 'label', 'title', 'cell', 'chip']);
+export const LABEL_MAX_CHARS = 60;
+/** A replacement that cannot be the element's text: a label-like element receiving a paragraph. */
+export function plausibleText(c, text) {
+  if (!LABEL_ELEMENTS.has(c.element)) return true;
+  const cur = clean([c.text, ...(c.variants ?? [])].sort((a, b) => String(b).length - String(a).length)[0] ?? '');
+  const t = clean(text);
+  return t.length <= Math.max(LABEL_MAX_CHARS, cur.length * 2);
 }
 
 /** What the screen reader or the hint would say in the option (accessible name and hint are not pixels: they become an annotation). */
@@ -390,6 +423,7 @@ export function deriveTextOp(c, o, { lang = 'en' } = {}) {
     return { ops: [{ op: 'text', text: seg, choices }], derived: true, note: 'the option lists texts of several elements; the preview applies the one that matches this element' };
   }
   const q = t.match(/^["“]([^"”]+)["”]$/);
+  if (!q && !plausibleText(c, t)) return { none: NO_PREVIEW_BEHAVIOR };
   return { ops: [{ op: 'text', text: q ? clean(q[1]) : t }], derived: true };
 }
 

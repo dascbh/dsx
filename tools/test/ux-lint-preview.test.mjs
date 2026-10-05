@@ -452,10 +452,10 @@ test('Playwright: new operations change the real capture (state, region, insert,
     for (const id of ['c-err-dlg', 'c-field', 'c-noacc', 'c-conf', 'c-l9']) assert.equal(made(id).kind_label, 'Proposal built with components of the screen itself', id);
     assert.equal(m['c-err-dlg'].kind, 'synth');
     assert.equal(made('c-t1').kind_label, 'Button weight changed');
-    assert.equal(made('c-l3').kind_label, 'Tamanho na escala do tema');
+    assert.equal(made('c-l3').kind_label, 'Size on the theme scale');
     assert.match(made('c-t6').description, /"SMTP" → "e-mail"/);
     assert.equal(made('c-t7').op[0].text, 'Confirmar nome do campo', 'the object comes from the nearest label');
-    assert.equal(made('c-l6').kind_label, 'Elemento movido');
+    assert.equal(made('c-l6').kind_label, 'Element moved');
     assert.equal(made('c-ops', 0).op[1].text, '1,2 MB');
     assert.equal(made('c-ops', 1).kind_label, 'No change');
     assert.equal(made('c-ops', 2).kind_label, 'Annotation: hint');
@@ -478,4 +478,51 @@ test('detector messages in English wording are parsed like the pt-BR ones (C2, L
   assert.deepEqual(ops({ family: 'text', rule: 'X6', message: 'button with 9 words (max. 4)' }), [{ op: 'text', text: '{part:0}' }]);
   assert.equal(ops({ family: 'text', rule: 'X6', message: 'button "OK" without an object', text: 'OK' })[0].text, 'OK {context}');
   assert.equal(stateRecipe('no-access', {}, 'en').page.title, 'You do not have access to this area');
+});
+
+test('behavior options never become screen text: a review case gets no after image unless the option quotes the new text', () => {
+  const rev = textCase({ rule: 'H9', text: 'Enviar pedido de ajustes', variants: [], element: 'button' });
+  const instr = 'Deixar o botão ativo e, ao enviar, mostrar o erro no campo (\'Escolha um motivo\', \'Escreva a mensagem\') com foco no primeiro campo inválido';
+  assert.match(optionOps(rev, { text: instr }).none, /behavior or structure/);
+  assert.match(optionOps(textCase({ rule: 'DP', element: 'screen', text: '' }), { text: 'Dar o mesmo peso às três opções e deixar o destaque só para o envio' }).none, /behavior or structure/);
+  assert.deepEqual(optionOps(rev, { text: '"Enviar pedido de ajustes" → "Enviar ajustes"' }).ops, [{ op: 'text', text: 'Enviar ajustes' }]);
+  assert.deepEqual(optionOps(rev, { text: '"Registrar de acordo"' }).ops, [{ op: 'text', text: 'Registrar de acordo' }]);
+  const longQuoted = optionOps(rev, { text: 'Botão "Desligar \'De acordo\' enquanto um painel está aberto, com Cancelar no painel para voltar à escolha"' });
+  assert.ok(longQuoted.none, 'a paragraph never goes inside a button, even when quoted after the element name');
+});
+
+test('text options: an unquoted paragraph is never pasted into a label-like element', () => {
+  assert.match(optionOps(textCase({ text: 'Salvar', variants: [] }), { text: 'Deixar o botão sempre ativo e, ao clicar com campo vazio, mostrar o erro embaixo do campo' }).none, /behavior or structure/);
+  assert.deepEqual(optionOps(textCase({ text: 'Salvar', variants: [] }), { text: 'Salvar rascunho' }).ops, [{ op: 'text', text: 'Salvar rascunho' }]);
+  const h = textCase({ element: 'helper', text: 'x', variants: [] });
+  const para = 'Para criar uma proposta, abra o pedido e use o botão de cotação que fica no topo da tela, ao lado do título.';
+  assert.deepEqual(optionOps(h, { text: para }).ops, [{ op: 'text', text: para }], 'helper text is a sentence: replacing it with a sentence is right');
+});
+
+test('page never leaks template source: the recommended badge is rendered text', () => {
+  const { reg, options } = registryWithPreview(1);
+  for (const o of Object.values(options.items ?? options)) if (o && Array.isArray(o.options)) o.recommended = { index: 0, why: 'x' };
+  const dir = manifestDir(reg);
+  try {
+    const outDir = tmp();
+    const r = writePages(reg, options, { items: {} }, join(outDir, 'page.html'), { previewsDir: dir, lang: 'pt-BR' });
+    const html = readFileSync(r.pages[0].file, 'utf8');
+    assert.doesNotMatch(html, /\$\{esc\(/);
+    assert.match(html, /<span class="selo">recomendada<\/span>/);
+    rmSync(outDir, { recursive: true, force: true });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('the behavior no-preview reason is shown in the page language', () => {
+  const { reg, options } = registryWithPreview(1);
+  const dir = manifestDir(reg);
+  try {
+    const m = JSON.parse(readFileSync(join(dir, 'previews.json'), 'utf8'));
+    m.cases['case-t-0'].after = [{ key: 'o0', option: 0, failed: optionOps(textCase({ rule: 'H5' }), { text: 'Pedir confirmação antes de gravar a resposta, com resumo e botões Voltar e Registrar' }).none }];
+    writeFileSync(join(dir, 'previews.json'), JSON.stringify(m));
+    const outDir = tmp();
+    const r = writePages(reg, options, { items: {} }, join(outDir, 'page.html'), { previewsDir: dir, lang: 'pt-BR' });
+    assert.match(readFileSync(r.pages[0].file, 'utf8'), /Sem prévia: a opção muda comportamento ou estrutura/);
+    rmSync(outDir, { recursive: true, force: true });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

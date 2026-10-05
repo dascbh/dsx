@@ -20,6 +20,10 @@ import { normalizeCases } from './lib/legacy.mjs';
 import { pageStrings, pageLang } from './lib/page-strings.mjs';
 import { unionList } from './lib/lang/index.mjs';
 
+/** Known no-preview reasons are stored in English; the page shows them in its own language. */
+const EN = pageStrings('en');
+const reason = (r, S) => (r === EN.reasonBehavior ? S.reasonBehavior : r);
+
 /** Element group labels in the page language (default en); `ELEMENT_LABEL` stays exported as the English map. */
 export const ELEMENT_LABEL = pageStrings('en').element;
 const ELEMENT_ORDER = ['title', 'helper', 'button', 'label', 'placeholder', 'tooltip', 'alert', 'tab', 'menu', 'cell', 'accessible-name', 'screen', 'layout', 'states', 'consistency', 'flow'];
@@ -81,13 +85,13 @@ function card(c, extra = {}, media = null, S = pageStrings()) {
     if (pv.failed) return '';
     const a = afterOf(i);
     if (!a) return '';
-    if (a.failed) return `<p class="pv-none">${esc(S.noPreview)}: ${esc(a.failed)}</p>`;
+    if (a.failed) return `<p class="pv-none">${esc(S.noPreview)}: ${esc(reason(a.failed, S))}</p>`;
     if (a.omitted) return `<p class="pv-none">${esc(a.omitted)}</p>`;
     return figure(media, a, before, { note: a.note }, S);
   };
   const ops = (c.options ?? []).map((o, i) => `
       <div class="op${i === rec ? ' rec' : ''}">
-        <div class="op-cab"><span class="letra">${LETTER(i)}</span>${i === rec ? '<span class="selo">${esc(S.recommended)}</span>' : ''}<span class="conv">${esc(o.convention)}</span></div>
+        <div class="op-cab"><span class="letra">${LETTER(i)}</span>${i === rec ? `<span class="selo">${esc(S.recommended)}</span>` : ''}<span class="conv">${esc(o.convention)}</span></div>
         <div class="vis">${sample(c.element, o.text, S)}</div>
         ${pvOption(i)}
         ${o.note ? `<p class="nota">${esc(o.note)}</p>` : ''}
@@ -96,11 +100,11 @@ function card(c, extra = {}, media = null, S = pageStrings()) {
   const ruleCol = rule ? `
       <div class="op regra-col">
         <div class="op-cab"><span class="letra">${esc(S.ruleFix)}</span></div>
-        ${rule.failed ? `<p class="pv-none">${esc(S.noPreview)}: ${esc(rule.failed)}</p>` : rule.omitted ? `<p class="pv-none">${esc(rule.omitted)}</p>` : figure(media, rule, before, { label: rule.label }, S)}
+        ${rule.failed ? `<p class="pv-none">${esc(S.noPreview)}: ${esc(reason(rule.failed, S))}</p>` : rule.omitted ? `<p class="pv-none">${esc(rule.omitted)}</p>` : figure(media, rule, before, { label: rule.label }, S)}
       </div>` : '';
   const variants = (c.variants ?? []).filter((v) => v && v !== c.text);
   const hoje = pv
-    ? (pv.failed ? `<p class="pv-none">${esc(S.noPreview)}: ${esc(pv.failed)}</p>`
+    ? (pv.failed ? `<p class="pv-none">${esc(S.noPreview)}: ${esc(reason(pv.failed, S))}</p>`
       : before?.omitted ? `<p class="pv-none">${esc(before.omitted)}</p>`
         : before ? `<figure class="pv"><button type="button" class="pv-zoom" aria-label="${esc(S.zoom)}: ${esc(before.alt)}"><span class="pv-a">${media(before.key, before.alt)}</span></button></figure>` : '')
     : '';
