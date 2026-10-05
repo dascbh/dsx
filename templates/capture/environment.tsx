@@ -28,38 +28,35 @@ export function fakeStorage(seed: Record<string, string> = {}) {
   return storage;
 }
 
-export type FakeResponse = { status: number; body: unknown; delayMs?: number };
-/** Adapt to the API envelope of the project (here: { data }). */
-export const ok = (data: unknown): FakeResponse => ({ status: 200, body: { data } });
-export const fail = (status = 500, code = 'INTERNAL', message = 'Something went wrong'): FakeResponse => ({ status, body: { error: { code, message } } });
-/** A response that never arrives: the screen stays in its loading state. */
-export const PENDING: FakeResponse = { status: 0, body: null, delayMs: Infinity };
+// The framework-free core (FakeResponse, ok, fail, PENDING, the route matcher) lives in fake-api.ts so that
+// `<area>.data.ts` files and the sandbox can use it without Vitest. Re-exported here for existing imports.
+export * from './fake-api';
+import { createRouter, toResponse, type FakeResponse, type Handler } from './fake-api';
 
 /** Routes the screen asked for that had no simulated answer (reset per test). */
 export const missingRoutes: string[] = [];
 
 /**
- * fetch replacement keyed by "METHOD /path" (query string ignored). Unknown routes answer 404 and are recorded in
- * `missingRoutes`; call `assertAllRoutesSimulated()` before saving so a capture never shows an error banner by accident.
+ * fetch replacement keyed by "METHOD /path" (query string ignored; ":param" segments allowed). An array answers in
+ * order and repeats the last one. Unknown routes answer 404 and are recorded in `missingRoutes`; call
+ * `assertAllRoutesSimulated()` before saving so a capture never shows an error banner by accident.
  */
-export function fakeFetch(routes: Record<string, FakeResponse | FakeResponse[]>, fallback?: (key: string) => FakeResponse | undefined) {
-  const queues = new Map<string, FakeResponse[]>();
+export function fakeFetch(routes: Record<string, Handler>, fallback?: (key: string) => FakeResponse | undefined) {
+  const router = createRouter();
+  router.table(routes);
   return async (input: RequestInfo | URL, init: RequestInit = {}) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     const path = url.replace(/^https?:\/\/[^/]+/, '').split('?')[0];
-    const key = `${(init.method ?? (typeof input === 'object' && 'method' in input ? input.method : 'GET')).toUpperCase()} ${path}`;
-    const entry = routes[key];
+    const method = (init.method ?? (typeof input === 'object' && 'method' in input ? input.method : 'GET')).toUpperCase();
+    const key = `${method} ${path}`;
+    const query = new URLSearchParams(url.includes('?') ? url.slice(url.indexOf('?') + 1) : '');
+    const match = router.match(method, null, path);
     let found: FakeResponse | undefined;
-    if (Array.isArray(entry)) {
-      if (!queues.has(key)) queues.set(key, [...entry]);
-      const q = queues.get(key)!;
-      found = q.length > 1 ? q.shift() : q[0];
-    } else found = entry ?? fallback?.(key);
+    if (match) {
+      found = await match.answer({ method, base: null, path, params: match.params, query, body: init.body ?? null, headers: new Headers(init.headers), scenario: 'normal' });
+    } else found = fallback?.(key);
     if (!found) missingRoutes.push(key);
-    const resp = found ?? { status: 404, body: { error: { code: 'CAPTURE_NO_ROUTE', message: key } } };
-    if (resp.delayMs === Infinity) return new Promise<Response>(() => {});
-    if (resp.delayMs) await new Promise((r) => setTimeout(r, resp.delayMs));
-    return new Response(JSON.stringify(resp.body), { status: resp.status, headers: { 'Content-Type': 'application/json' } });
+    return toResponse(found ?? { status: 404, body: { error: { code: 'CAPTURE_NO_ROUTE', message: key } } });
   };
 }
 

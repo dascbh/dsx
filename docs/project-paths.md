@@ -62,6 +62,51 @@ The design lab (`tools/design-md/lab.mjs`, skill `design-lab`) reads two more bl
 
 `design.active` is written by `lab.mjs use`; the official file is never edited by it. `capture.option_output` defaults to `<paths.captures>/options/<option>`, which is where `templates/capture/serialize.ts` writes when `DSX_DESIGN_MD` (or the legacy `STITCH_THEME`) is set.
 
+## Local sandbox
+
+`tools/sandbox/sandbox.mjs` (skill `sandbox`) reads the `sandbox` block, written by `sandbox.mjs init --write` from what it detected and owned by the team afterwards. Paths are relative to the project root, POSIX.
+
+```json
+{
+  "sandbox": {
+    "package": "web",
+    "dir": "web/sandbox",
+    "mirror": "web/sandbox/mirror",
+    "items": ["web/src", "web/public", "DESIGN.md", ".dsx/design-options", "web/tests/capture"],
+    "filters": { "web/tests/capture": ["**/*.data.ts", "**/fake-api.ts", "fixtures/**"] },
+    "ignore": [".DS_Store", "node_modules", "variants"],
+    "synthetic": { "web/tests/capture/environment.tsx": "export * from '../../../../runtime/fake-api';\n" },
+    "redirects": [{ "specifier": "./environment", "importer_prefix": "web/tests/capture", "to": "web/sandbox/runtime/fake-api.ts" }],
+    "entry": "web/src/main.tsx",
+    "public_dir": "web/public",
+    "aliases": { "@": "web/src" },
+    "swaps": { "web/src/context/AuthContext.tsx": "web/sandbox/auth/AuthContext.tsx" },
+    "api_bases": { "api": "VITE_API_URL" },
+    "env": { "VITE_AUTH_CLIENT_ID": "", "VITE_FILES_HOST": "files.sandbox.invalid" },
+    "fictitious_hosts": ["files.sandbox.invalid"],
+    "real_hosts": ["api.example.com"],
+    "exempt": ["GET api:/me", "/orgs/:id/settings"],
+    "scenario_responses": { "forbidden": { "status": 403, "body": { "error": { "code": "ORG_FORBIDDEN", "message": "No access" } } } },
+    "personas": [{ "id": "admin", "label": "Admin", "claims": { "sub": "sbx-user-admin", "groups": ["admins"] } }],
+    "default_persona": "admin",
+    "default_scenario": "normal",
+    "latency_ms": 250,
+    "slow_ms": 2500,
+    "storage_key": "dsx-sandbox",
+    "labels": { "scenario": "Cenário" },
+    "ports": { "dev": 3100, "preview": 3101 },
+    "csp_extra": { "font-src": ["https://fonts.gstatic.com"] }
+  }
+}
+```
+
+- `items` are mirrored at the same relative path; `filters` narrow an item to globs; `synthetic` files exist only in the mirror and are never compared or applied.
+- `swaps` and `aliases` are paths in the official tree; the sandbox build resolves them inside the mirror. `redirects` serve legacy capture data that imports `./environment`.
+- `api_bases` turn each env var into the same-origin prefix `/__dsx/<name>` answered by the mocks; `env` overrides other `import.meta.env` values (identity settings blanked, hosts made fictitious under `*.sandbox.invalid`).
+- `real_hosts` and the identity-provider endpoints are what `isolation-check` refuses in the sandbox build; `csp_extra` adds sources to the CSP except `connect-src`, which stays the page itself.
+- `exempt` routes keep answering under the error and forbidden scenarios (the app shell must load); `scenario_responses` replaces the default answers of those scenarios when the app needs its own error envelope or code.
+- `labels` translate the panel into the product language; keys, scenarios and the storage key stay in English.
+
 ## Legacy locations
 
 Captures written by DSX ≤ 0.7 live in `.stitch/<module>/code` (geometry in `.stitch/<module>/geometry`). When no path is configured and the generic folder has no capture, the legacy folder is used and every tool prints:

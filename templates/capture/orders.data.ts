@@ -2,7 +2,8 @@
 // approvals). Shape = what the API returns (copy it from the app's API client or its test fixtures).
 // NEVER real data: the HTML leaves the machine (Stitch, published pages). Invent plausible names; keep the
 // project's blocklist (`capture.blocklist` in .dsx/config.json) up to date so the send step refuses real ones.
-import { ok, type FakeResponse } from './environment';
+// Helpers come from the framework-free fake-api.ts (not environment.tsx): the sandbox loads this file in the browser.
+import { ok, type FakeResponse } from './fake-api';
 
 export const SUPPLIERS = [
   { id: 'sup-1', name: 'Northwind Fasteners Ltd.', email: 'orders@northwind.example' },

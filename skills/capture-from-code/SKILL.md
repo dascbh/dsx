@@ -49,8 +49,9 @@ Copy `templates/capture/` into the project's test folder (e.g. `web/tests/captur
 | File | Role | Adapt |
 |---|---|---|
 | `serialize.ts` | `saveCapture(title, file, options)` and `captureName(nn, screen, state?)` | only the `CAPTURE_CONFIG` block: `publicDir`, `outDir`, `lang` (the product's interface language), `fonts`, `extraCss`, selectors of the kit's overlays |
-| `environment.tsx` | `CAPTURE` guard, `fakeStorage`, `fakeFetch`, `ok`/`fail`/`PENDING`, `assertAllRoutesSimulated`, `waitForDialog`, `mountPage` | `mountPage`: the app's providers and layout route |
-| `orders.capture.test.tsx` + `orders.data.ts` | example capture of a page and a dialog | copy per area |
+| `fake-api.ts` | framework-free core: `FakeResponse`, `ok`/`fail`/`PENDING`, the route matcher (`"METHOD [base:]/path/:param"`, answer queues, handler functions). No Vitest: the sandbox (skill `sandbox`) loads it in the browser | `ok`/`fail`: the API envelope |
+| `environment.tsx` | `CAPTURE` guard, `fakeStorage`, `fakeFetch`, `assertAllRoutesSimulated`, `waitForDialog`, `mountPage`; re-exports `fake-api.ts` | `mountPage`: the app's providers and layout route |
+| `orders.capture.test.tsx` + `orders.data.ts` | example capture of a page and a dialog; `*.data.ts` imports its helpers from `./fake-api` (never from `./environment`) so the same data also feeds the sandbox | copy per area |
 | `states.capture.test.tsx` | loading / empty / error per main screen, table-driven | the deciding route and what proves each state |
 | `vitest.capture.config.ts` | jsdom, CSS processing on (CSS modules, Tailwind via the app's PostCSS) | the include glob |
 | `design-option.ts`, `design-option-mui.tsx` | design options (skill `design-lab`): read `DSX_DESIGN_MD` (legacy `STITCH_THEME`), parse it with the theme adapter and apply it over the product theme | the import path of the adapter copy |

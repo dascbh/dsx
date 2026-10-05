@@ -19,6 +19,7 @@ This repository is a **design system, UI and UX framework for AI agents**. If yo
 | Review the usability of a screen or flow | `review-ux` |
 | Audit the UX of a whole module, by dimension, with a registry and re-audit | `audit-ux` |
 | Capture existing screens from the code (static HTML, no server) for audit, variations or Stitch; send to Stitch, arrange the canvas, journey page | `capture-from-code` |
+| Try UI changes, states or DESIGN.md options in the running app without a back end, login or real host (isolated mirror, fake auth, mocked API with scenarios), then bring approved edits back to the code | `sandbox` |
 | WCAG / accessibility audit | `accessibility` |
 | Any text visible in the interface | `ux-writing` |
 | AI feature, chat, copilot or agent that executes actions | `ux-ia` |
@@ -65,9 +66,9 @@ skills/       executable procedures (SKILL.md) — what to do, in what order, wh
 archetypes/   12 screen archetypes (regions, primary action, states, variations/arrangements) — index.json for search
 patterns/     ~80 interaction patterns with an IF→THEN rule, a11y and checklist (index.json for search)
 knowledge/    reference by area: foundations/, design-system/, research/, ia/
-templates/    DESIGN.md, pattern, component, brief, research plan/script/report, JTBD, OST…; capture/ (capture harness), theme-adapters/ (DESIGN.md → MUI, CSS variables, Tailwind), theme-switcher/ (live design switcher, dev only)
+templates/    DESIGN.md, pattern, component, brief, research plan/script/report, JTBD, OST…; capture/ (capture harness), theme-adapters/ (DESIGN.md → MUI, CSS variables, Tailwind), theme-switcher/ (live design switcher, dev only), sandbox/ (local sandbox harness: runtime, fake auth, mocks, Vite config)
 tokens/       W3C DTCG tokens in 3 layers + contrast pairs; build/ is generated
-tools/        dependency-free checkers (Node ≥ 20); tools/figma/ = snapshot, diff, prelude and token bridges; tools/stitch/ = design system and HTML analysis
+tools/        dependency-free checkers (Node ≥ 20); tools/figma/ = snapshot, diff, prelude and token bridges; tools/stitch/ = design system and HTML analysis; tools/sandbox/ = local sandbox (mirror, apply, isolation)
 hooks/        turn-guard (Figma cycle)
 evals/        rubrics and cases to evaluate generated UI, DESIGN.md, UX.md and AI features
 examples/     reference DESIGN.md and UX.md (passing the linters)
@@ -99,6 +100,10 @@ node tools/lint-design-md.mjs DESIGN.md        # objective DESIGN.md gates (colo
 node tools/design-md/lab.mjs list|add|use|diff|promote|manifest   # design options in .dsx/design-options/, active pointer design.active, promote through the gates
 node tools/design-md/lab.mjs compare <a> <b> … --screens <list> --out <page.html> [--lang pt-BR]   # captures each option with the project's capture.command, screens × options page with "Copy decision"
 node tools/design-md/lab.mjs bundle-check <dist>  # the live design switcher must not reach a production build
+node tools/sandbox/sandbox.mjs init [--package <dir>] [--write] [--force]   # local sandbox: detect, show config + harness + ignore patches; writes only with --write
+node tools/sandbox/sandbox.mjs sync|status|diff|discard|dev|build|preview   # mirror of the UI code (3-way base), separate Vite build with fake auth and mocked API
+node tools/sandbox/sandbox.mjs apply <path>…|--all [--force]   # sandbox edits → official code (refuses on conflict, runs gates, never commits)
+node tools/sandbox/sandbox.mjs isolation-check [<dist>] · bundle-check <official dist>   # sandbox build reaches no real host · official build carries no sandbox
 node tools/lint-ux-md.mjs UX.md [--archetypes <folder>] [--json]   # objective UX.md gates (accepts old names with a warning)
 node tools/lint-ux-md.mjs UX.md --score [--map <flows.json>] [--screens <captures>] [--geometry <folder>] [--json]   # 100-point score per criterion and gates (evals/rubrics/ux-md.yaml)
 node tools/ux-lint/ux-md-drift.mjs UX.md [--map …] [--screens …] [--geometry …] [--module <m> --root <project>] [--json] [--fail-at 2]   # UX.md × product drift U1–U6
